@@ -1,6 +1,6 @@
 # ORIOM – Offshore Renewables Installation and O&M Model
 
-Offshore Renewables Installation and O&M (ORIOM) is a Python-based open-source tool developed
+Offshore Renewables Installation and O&M (ORIOM) is a Python-based tool developed
 by WavEC to simulate the scheduling, marine spread, port logistics, and total costs of the 
 installation and O&M operations in offshore renewable energy farms, including fixed-bottom 
 offshore wind, floating wind, wave energy and floating solar.
