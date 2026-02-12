@@ -1,0 +1,36 @@
+percentile main:
+    value: 50
+    units:
+percentiles:
+    value:
+    - 25
+    - 50
+    - 75
+    units:
+period infant mortality:
+    value: 2
+    units: years
+period wear out:
+    value: 3
+    units: years
+failure ratio:
+    value: 3.5
+    units:
+percentage shutdown:
+    value: 20
+    units: '%'
+lifetime:
+    value: 20
+    units: years
+start year:
+    value: 2023
+    units:
+start month:
+    value: 7
+    units:
+last day operation:
+    value: 15
+    units:
+failure ratio sensitivity:
+    value: 1.0
+    units:

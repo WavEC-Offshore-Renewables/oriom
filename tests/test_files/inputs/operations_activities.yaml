@@ -1,0 +1,211 @@
+owc_OP101:
+- id: ACT101_01
+  name: Transit to site
+  location: transit
+  hs: 3
+  light: false
+- id: ACT101_02
+  name: Vessel preparation
+  location: site
+  duration: 2
+  light: false
+- id: ACT101_03
+  name: Mooring line replacement
+  location: site
+  duration: 6
+  hs: 2
+  cs: 1
+  light: false
+- id: ACT101_04
+  name: Transit to port
+  location: transit
+  hs: 3
+  light: false
+ofw_OP103:
+- id: ACT102_01
+  name: Replace blade
+  location: port
+  duration: 12
+  ws_hub: 10
+  light: false
+oce_OP110:
+- id: ACT103_01
+  name: Transit to site
+  location: transit
+  hs: 3
+  light: false
+- id: ACT103_02
+  name: Cable repair
+  location: site
+  duration: 8
+  hs: 1
+  tp: 12
+  ws: 20
+  cs: 1.5
+  light: false
+- id: ACT103_03
+  name: Transit to port
+  location: transit
+  hs: 3
+  light: false
+owc_removal_tow:
+- id: CPO_A30_A1
+  name: Transit to site
+  location: transit
+  hs: 3
+  light: false
+- id: CPO_A30_A2
+  name: WEC disconnect
+  location: site
+  wec_shutdown_dur: 2
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A30_A3
+  name: Tow to port
+  location: transit
+  wec_shutdown_dur: true
+  hs: 2
+  light: false
+owc_redeploy_removal_tow:
+- id: CPO_A31_A1
+  name: Tow to site
+  location: transit
+  wec_shutdown_dur: true
+  hs: 2
+  light: false
+- id: CPO_A31_A2
+  name: WEC connect
+  location: site
+  wec_shutdown_dur: 2
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A31_A3
+  name: Transit to next device
+  location: site
+  wec_shutdown_dur: 0
+  hs: 3
+  light: false
+- id: CPO_A31_A4
+  name: WEC disconnect
+  location: site
+  wec_shutdown_dur: 2
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A31_A5
+  name: Tow to port
+  location: transit
+  wec_shutdown_dur: true
+  hs: 2
+  light: false
+owc_redeploy_tow:
+- id: CPO_A33_A1
+  name: Tow to site
+  location: transit
+  wec_shutdown_dur: true
+  hs: 2
+  light: false
+- id: CPO_A33_A2
+  name: WEC connect
+  location: site
+  wec_shutdown_dur: 2
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A33_A3
+  name: Transit to port
+  location: transit
+  hs: 3
+  light: false
+ofw_removal_tow:
+- id: ACT110_01
+  name: Vessel loading
+  location: port
+  wtg_shutdown_dur: 0
+  duration: 4
+  ws: 15
+  light: false
+- id: ACT110_02
+  name: Transit to site
+  location: transit
+  hs: 3
+  light: false
+- id: ACT110_03
+  name: Disconnect WTG
+  location: site
+  wtg_shutdown_dur: 6
+  duration: 6
+  light: true
+- id: ACT110_04
+  name: Tow to port
+  location: transit
+  wtg_shutdown_dur: true
+  hs: 2
+  ws_hub: 10
+  light: false
+ofw_redeploy_removal_tow:
+- id: ACT111_01
+  name: Floating platform preparation
+  location: port
+  wtg_shutdown_dur: 8
+  duration: 8
+  light: false
+- id: ACT111_02
+  name: Tow to site
+  location: transit
+  wtg_shutdown_dur: true
+  hs: 2
+  ws_hub: 10
+  light: false
+- id: ACT111_03
+  name: Connect WTG
+  location: site
+  wtg_shutdown_dur: 6
+  duration: 6
+  light: true
+- id: ACT111_04
+  name: Transit to next device
+  location: site
+  wtg_shutdown_dur: 0
+  hs: 3
+  light: false
+- id: ACT111_05
+  name: Disconnect WTG
+  location: site
+  wtg_shutdown_dur: 6
+  duration: 6
+  light: true
+- id: ACT111_06
+  name: Tow to port
+  location: transit
+  wtg_shutdown_dur: true
+  hs: 2
+  ws_hub: 10
+  light: false
+ofw_redeploy_tow:
+- id: ACT104_01
+  name: Floating platform preparation
+  location: port
+  wtg_shutdown_dur: 8
+  duration: 8
+  light: false
+- id: ACT104_02
+  name: Tow to site
+  location: transit
+  wtg_shutdown_dur: true
+  hs: 2
+  ws_hub: 10
+  light: false
+- id: ACT104_03
+  name: Connect WTG
+  location: site
+  wtg_shutdown_dur: 6
+  duration: 6
+  light: true
+- id: ACT104_04
+  name: Transit to port
+  location: transit
+  hs: 3
+  light: false

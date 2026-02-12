@@ -1,0 +1,42 @@
+surface roughness:
+    value: 0.0002
+    units: m
+time between devices pv:
+    value: 0.01
+    units: hours
+time between devices wec:
+    value: 0.1
+    units: hours
+time between devices wt:
+    value: 0.1
+    units: hours
+metocean ws height:
+    value: 10.0
+    units: m
+max wait:
+    value: 16.0
+    units: hours
+montecarlo percentage:
+    value: 0.3
+    units:
+shift duration:
+    value: 12
+    units: hours
+site latitude:
+    value: 41.0
+    units: degree
+site longitude:
+    value: -9.0
+    units: degree
+metocean file location:
+    value: .\tests\test_files\metocean\metocean_03years.csv
+    units:
+distance to port:
+    value: 6.0
+    units: km
+length export cable:
+    value: 6.0
+    units: km
+merge vessel:
+    value: "['v001']"
+    units: '-'

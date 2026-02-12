@@ -1,0 +1,8 @@
+Date,Event,id,Name,En_loss_kWh,Time_shutdown
+2010-05-01 08:00:00,inspection_site,ofw_wf_a1,WTG general inspection,34517.863333333335,56.00000000000001
+2010-06-02 08:00:00,inspection_port,ofw_wf_p1,ofw maintenance,16825981.55,6048.000000000001
+2010-07-01 08:00:00,inspection_site,ofw_wf_a2,WTG drive train inspection,25118.228333333336,21.0
+2010-09-01 08:00:00,inspection_site,ofw_wf_a6,WTG drone inspection blades,7229.413333333334,25.66666666666667
+2011-05-01 08:00:00,inspection_site,ofw_wf_a1,WTG general inspection,746.6666666666667,56.00000000000001
+2011-06-02 08:00:00,inspection_port,ofw_wf_p1,ofw maintenance,16908187.08833333,5371.333333333334
+2011-07-01 08:00:00,inspection_site,ofw_wf_a2,WTG drive train inspection,1462.2649999999999,21.0

@@ -1,0 +1,8 @@
+- fuel: hfo
+  density: 1010
+
+- fuel: mgo
+  density: 855
+
+- fuel: mdo
+  density: 860

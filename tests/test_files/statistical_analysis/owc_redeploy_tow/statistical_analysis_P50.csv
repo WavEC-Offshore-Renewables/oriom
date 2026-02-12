@@ -1,0 +1,12 @@
+operation_id,percentile,1,2,3,4,5,6,7,8,9,10,11,12
+owc_redeploy_tow,dur_total_p,308.97,115.97,77.97,41.97,30.97,11.97,12.97,18.97,9.97,27.97,40.97,183.97
+owc_redeploy_tow,dur_net_port,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+owc_redeploy_tow,dur_net_site,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0
+owc_redeploy_tow,wait_start,306.0,113.0,75.0,39.0,28.0,9.0,10.0,16.0,7.0,25.0,38.0,181.0
+owc_redeploy_tow,wait_port,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+owc_redeploy_tow,wait_site,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+owc_redeploy_tow,transit_to_site,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83
+owc_redeploy_tow,transit_to_port,0.14,0.14,0.14,0.14,0.14,0.14,0.14,0.14,0.14,0.14,0.14,0.14
+owc_redeploy_tow,dur_shutdown_wtg,,,,,,,,,,,,
+owc_redeploy_tow,dur_shutdown_wec,2.83,2.83,2.83,2.83,2.83,2.83,2.83,2.83,2.83,2.83,2.83,2.83
+owc_redeploy_tow,dur_shutdown_pv,,,,,,,,,,,,

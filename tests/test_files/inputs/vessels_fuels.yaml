@@ -1,0 +1,84 @@
+- vessel: AHTS
+  fuel type: HFO
+  rated power: 8220.8
+  sfoc: 210
+
+- vessel: CLV
+  fuel type: HFO
+  rated power: 14091.525
+  sfoc: 210
+
+- vessel: CSV
+  fuel type: HFO
+  rated power: 13360.0
+  sfoc: 210
+
+- vessel: CTV
+  fuel type: HFO
+  rated power: 1430.8725
+  sfoc: 210
+
+- vessel: Dredger Vessel
+  fuel type: HFO
+  rated power: 12287.333333333334
+  sfoc: 210
+
+- vessel: DSV
+  fuel type: HFO
+  rated power: 7026.666666666667
+  sfoc: 210
+
+- vessel: Guard Vessel
+  fuel type: HFO
+  rated power: 1595.625
+  sfoc: 210
+
+- vessel: Jack-up Vessel
+  fuel type: HFO
+  rated power: 6350.0
+  sfoc: 210
+
+- vessel: Multicat
+  fuel type: HFO
+  rated power: 1466.26125
+  sfoc: 210
+
+- vessel: Non-propelled Crane
+  fuel type: HFO
+  rated power: 1413.0
+  sfoc: 210
+
+- vessel: Propelled Crane
+  fuel type: HFO
+  rated power: 13478.125
+  sfoc: 210
+
+- vessel: PSV
+  fuel type: HFO
+  rated power: 5368.442499999999
+  sfoc: 210
+
+- vessel: Rigid Inflatable Boat
+  fuel type: HFO
+  rated power: 331.1306666666667
+  sfoc: 210
+
+- vessel: Rock Dumper
+  fuel type: HFO
+  rated power: 8998.0
+  sfoc: 210
+
+- vessel: SOV
+  fuel type: MGO
+  rated power: 8239.5
+  sfoc: 210
+
+- vessel: Survey Vessel
+  fuel type: HFO
+  rated power: 4082.3333333333335
+  sfoc: 210
+
+- vessel: Tug
+  fuel type: MGO
+  rated power: 4937.8254
+  sfoc: 210

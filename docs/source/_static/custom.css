@@ -1,0 +1,10 @@
+
+            /* Wrap long names in docs */
+            .rst-content code, .rst-content tt, .docutils.literal {
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
+            }
+            .wy-nav-side .wy-menu-vertical li a {
+                white-space: normal !important;
+            }
+            

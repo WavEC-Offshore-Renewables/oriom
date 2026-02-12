@@ -1,0 +1,21 @@
+number of inverters:
+    value: 4
+    units:
+devices:
+    value: 7500
+    units:
+number of strings:
+    value: 25
+    units:
+rated power:
+    value: 0.4
+    units: kW
+power curve file:
+    value: ./tests/test_files/pv_prod_month_hour.csv
+    units:
+degradation:
+    value: 1.0
+    units:
+layout type:
+    value: 1
+    units:

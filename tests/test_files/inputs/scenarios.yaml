@@ -1,0 +1,27 @@
+- scenarios: Scenario_0
+  january: 0.08333333333333333
+  february: 0.08333333333333333
+  march: 0.08333333333333333
+  april: 0.08333333333333333
+  may: 0.08333333333333333
+  june: 0.08333333333333333
+  july: 0.08333333333333333
+  august: 0.08333333333333333
+  september: 0.08333333333333333
+  october: 0.08333333333333333
+  november: 0.08333333333333333
+  december: 0.08333333333333333
+
+- scenarios: Scenario_1
+  january: 0.15
+  february: 0.15
+  march: 0.09
+  april: 0.09
+  may: 0.01
+  june: 0.01
+  july: 0.01
+  august: 0.01
+  september: 0.09
+  october: 0.09
+  november: 0.15
+  december: 0.15

@@ -1,0 +1,33 @@
+devices:
+    value: 40
+    units:
+rated power:
+    value: 8.3
+    units: MW
+cut-in:
+    value: 3.0
+    units: m/s
+cut-off:
+    value: 25.0
+    units: m/s
+hub height:
+    value: 200.0
+    units: m/s
+power curve file:
+    value: ./tests/test_files/pcurve_wind.csv
+    units:
+moorings per wtg:
+    value: 3
+    units:
+number of strings:
+    value: 2
+    units:
+layout type:
+    value: 1
+    units:
+number of substations:
+    value: 1
+    units:
+number export cables:
+    value: 1
+    units:

@@ -1,0 +1,77 @@
+- id: ofw_OPm001
+  name: 'Minor repair '
+  tech_wtg: true
+  tech_wec: false
+  tech_pv: false
+  duration_net: 4
+  wave_height: 1.5
+  vessel1_id: V201
+  tech_required: 2
+  tech_cost: 500
+  parts_cost: 4200
+  level: device
+
+- id: ofw_OPm002
+  name: Medium repair type1
+  tech_wtg: true
+  tech_wec: false
+  tech_pv: false
+  duration_net: 6
+  wave_height: 1.5
+  vessel1_id: V201
+  tech_required: 4
+  tech_cost: 500
+  parts_cost: 77700
+  level: device
+
+- id: ofw_OPm003
+  name: Medium repair type2
+  tech_wtg: true
+  tech_wec: false
+  tech_pv: false
+  duration_net: 8
+  wave_height: 1.5
+  vessel1_id: V201
+  tech_required: 4
+  tech_cost: 500
+  parts_cost: 77700
+  level: device
+
+- id: ofw_OPm004
+  name: Medium repair type3
+  tech_wtg: true
+  tech_wec: false
+  tech_pv: false
+  duration_net: 6
+  wave_height: 1.5
+  vessel1_id: V201
+  tech_required: 4
+  tech_cost: 500
+  parts_cost: 77700
+  level: device
+
+- id: ofw_OPm005
+  name: Medium repair type4
+  tech_wtg: true
+  tech_wec: false
+  tech_pv: false
+  duration_net: 5
+  wave_height: 1.5
+  vessel1_id: V201
+  tech_required: 4
+  tech_cost: 500
+  parts_cost: 77700
+  level: device
+
+- id: ofw_OPm006
+  name: Medium repair type5
+  tech_wtg: true
+  tech_wec: false
+  tech_pv: false
+  duration_net: 6
+  wave_height: 1.5
+  vessel1_id: V201
+  tech_required: 4
+  tech_cost: 500
+  parts_cost: 77700
+  level: device

@@ -1,0 +1,36 @@
+port cost year:
+    value: 300000
+    units: Euros
+merge:
+    value: false
+    units:
+time between merge:
+    value: 30
+    units: day
+insurance annual:
+    value: 5000000
+    units: Euros
+electricity price:
+    value:
+    units: euros/mwh
+electricity price pv:
+    value: 140.0
+    units: Euros/MWh
+electricity price wec:
+    value: 200.0
+    units: Euros/MWh
+electricity price wt:
+    value: 185.0
+    units: Euros/MWh
+technicians year:
+    value: 100000
+    units: Euros
+fuel cost hfo:
+    value: 450.0
+    units: euros/ton
+fuel cost mgo:
+    value: 655.0
+    units: euros/ton
+fuel cost mdo:
+    value: 550.0
+    units: euros/ton

@@ -1,0 +1,41 @@
+- id: owc_removal_tow
+  name: WEC removal
+  tech_required: 1
+  tech_cost: 200
+  vessel1_id: V006
+
+- id: owc_redeploy_removal_tow
+  name: WEC re-deploy and removal
+  tech_required: 1
+  tech_cost: 200
+  vessel1_id: V006
+
+- id: owc_redeploy_tow
+  name: WEC re-deploy
+  tech_required: 1
+  tech_cost: 200
+  vessel1_id: V006
+
+- id: ofw_removal_tow
+  name: WTG removal
+  tech_required: 6
+  tech_cost: 200
+  vessel1_id: V001
+  vessel1_qt: 3
+  other_costs: 5000
+
+- id: ofw_redeploy_removal_tow
+  name: WTG re-deploy and removal
+  tech_required: 6
+  tech_cost: 200
+  vessel1_id: V001
+  vessel1_qt: 3
+  other_costs: 5000
+
+- id: ofw_redeploy_tow
+  name: WTG re-deploy
+  tech_required: 6
+  tech_cost: 200
+  vessel1_id: V001
+  vessel1_qt: 3
+  other_costs: 5000

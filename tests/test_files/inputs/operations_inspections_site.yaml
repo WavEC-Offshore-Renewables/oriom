@@ -1,0 +1,238 @@
+- id: owc_CPO_A1
+  name: WEC visual inspection
+  overnight_stay: false
+  periodicity: 0.5
+  tech_per_device: 2
+  tech_cost: 300
+  dur_per_device: 6
+  device_shutdown: true
+  level: device
+  months: 04, 05, 10, 11
+  intervened_wtg: 0
+  intervened_wec: 80
+  intervened_pv: 0
+  wave_height: 1.5
+  vessel1_id: V101
+  parts_cost: 146400
+  to_be_grouped: false
+
+- id: owc_CPO_A2
+  name: WEC visual inspection and filter replacement
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 2
+  tech_cost: 300
+  dur_per_device: 6
+  device_shutdown: true
+  level: device
+  months: 06, 07, 08, 09
+  intervened_wtg: 0
+  intervened_wec: 80
+  intervened_pv: 0
+  wave_height: 1.5
+  vessel1_id: V101
+  parts_cost: 414000
+  to_be_grouped: true
+  to_group_with: ofw_SuAB_2
+
+- id: ofw_SuAB_1
+  name: Visual inspection - blades
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 3
+  tech_cost: 300
+  dur_per_device: 2.4
+  device_shutdown: true
+  level: device
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 0
+  intervened_pv: 0
+  wave_height: 3
+  wind_speed_hub: 10
+  vessel1_id: V005
+  rov_drone: stork_1
+  to_be_grouped: true
+
+- id: ofw_SuAB_2
+  name: Drive train inspection
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 3
+  tech_cost: 200
+  dur_per_device: 4
+  device_shutdown: true
+  level: device
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 0
+  intervened_pv: 0
+  wave_height: 2
+  vessel1_id: V101
+  to_be_grouped: false
+
+- id: ofw_SuAB_3
+  name: Inspection of control system and electrical
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 3
+  tech_cost: 200
+  dur_per_device: 3
+  device_shutdown: true
+  level: device
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 0
+  intervened_pv: 0
+  wave_height: 2
+  vessel1_id: V005
+  to_be_grouped: false
+
+- id: ofw_SuAB_4
+  name: Inspection of hydraulic and pneumatic systems
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 3
+  tech_cost: 200
+  dur_per_device: 3
+  device_shutdown: true
+  level: device
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 0
+  intervened_pv: 0
+  wave_height: 2
+  vessel1_id: V005
+  to_be_grouped: false
+
+- id: ofw_SuAB_5
+  name: Visual inspection to tower
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 2
+  tech_cost: 300
+  dur_per_device: 1.5
+  device_shutdown: true
+  level: device
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 0
+  intervened_pv: 0
+  wave_height: 2
+  wind_speed_hub: 10
+  vessel1_id: V005
+  to_be_grouped: false
+
+- id: ofw_SuAB_6
+  name: Inspection of mooring system (3 mooring lines)
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 6
+  tech_cost: 600
+  dur_per_device: 6.15
+  device_shutdown: false
+  level: device
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 0
+  intervened_pv: 0
+  wave_height: 2
+  current_speed: 1.5
+  vessel1_id: V004
+  to_be_grouped: false
+
+- id: oce_SuAB_cable_1
+  name: Inspection of WTG dynamic power cables
+  overnight_stay: false
+  periodicity: 2
+  tech_per_device: 6
+  tech_cost: 600
+  dur_per_device: 2
+  device_shutdown: false
+  level: device
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 70
+  intervened_pv: 4
+  wave_height: 2
+  current_speed: 1.5
+  vessel1_id: V004
+  to_be_grouped: false
+
+- id: oce_SuAB_cable_2
+  name: Inspection of export power cables
+  overnight_stay: false
+  periodicity: 2
+  tech_per_device: 6
+  tech_cost: 600
+  dur_per_device: 24
+  device_shutdown: false
+  level: exp_cable
+  months: 04, 05, 06, 07, 08, 09
+  intervened_wtg: 1
+  intervened_wec: 1
+  intervened_pv: 1
+  wave_height: 2
+  current_speed: 1.5
+  vessel1_id: V004
+  rov_drone: EVA_ROV_2
+  to_be_grouped: false
+
+- id: oce_OP001
+  name: General inspection
+  overnight_stay: true
+  periodicity: 1
+  tech_per_device: 3
+  tech_cost: 200
+  dur_per_device: 3
+  device_shutdown: true
+  level: device
+  months: 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 10
+  intervened_pv: 10
+  wave_height: 2
+  wave_period: 15
+  wind_speed: 20
+  vessel1_id: V101
+  other_costs: 10000
+  to_be_grouped: false
+
+- id: oce_OP002
+  name: Underwater inspection
+  overnight_stay: true
+  periodicity: 2
+  tech_per_device: 6
+  tech_cost: 600
+  dur_per_device: 1.5
+  device_shutdown: false
+  level: device
+  intervened_wtg: 3
+  intervened_wec: 10
+  intervened_pv: 10
+  wave_height: 2.5
+  wave_period: 15
+  vessel1_id: V004
+  rov_drone: EVA_ROV_2
+  other_costs: 10000
+  to_be_grouped: false
+
+- id: oce_OP003
+  name: General inspection with drone
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 3
+  tech_cost: 400
+  dur_per_device: 2
+  device_shutdown: true
+  level: device
+  months: 06, 07, 08, 09
+  intervened_wtg: 3
+  intervened_wec: 10
+  intervened_pv: 4
+  wave_height: 3
+  wind_speed: 10
+  vessel1_id: V101
+  rov_drone: stork_1
+  other_costs: 3000
+  to_be_grouped: false

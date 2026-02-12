@@ -1,0 +1,50 @@
+- id: ofw_fail_001
+  name: Minor repair
+  number_of_element_farm: 10
+  probability_failure: 0.9
+  maintenance_strategy: Specific month
+  level_failure: device
+  op_trigger: ofw_OPm001
+  preferred_month: 6
+  bath_tub: 0.0
+  potential_shutdown: false
+  perc_shutdown: 100
+
+- id: owc_fail_002
+  name: Mooring line brake
+  number_of_element_farm: 30
+  probability_failure: 0.015936
+  maintenance_strategy: Specific month
+  level_failure: device
+  op_trigger: owc_OP101
+  preferred_month: 6
+  lead_time: 168
+  bath_tub: 0.0
+  potential_shutdown: false
+  perc_shutdown: 100
+
+
+- id: ofw_fail_003
+  name: Blade malfunction
+  number_of_element_farm: 180
+  probability_failure: 0.0012
+  maintenance_strategy: Immediately
+  level_failure: device
+  op_trigger: ofw_OP103
+  lead_time: 96
+  potential_shutdown: true
+  perc_shutdown: 100
+
+
+- id: oce_fail_004
+  name: Export cable malfunction
+  number_of_element_farm: 6
+  probability_failure: 0.015
+  maintenance_strategy: Immediately
+  level_failure: exp_cable
+  op_trigger: oce_OP110
+  lead_time: 360
+  bath_tub: 0.0
+  potential_shutdown: false
+  perc_shutdown: 100
+

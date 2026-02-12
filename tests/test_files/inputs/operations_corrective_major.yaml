@@ -1,0 +1,25 @@
+- id: owc_OP101
+  name: Mooring line replacement
+  tow_to_port: false
+  tech_required: 3
+  tech_cost: 300
+  vessel1_id: V003
+  parts_cost: 20000
+  other_costs: 30000
+
+- id: ofw_OP103
+  name: Blade replacement
+  tow_to_port: true
+  tech_required: 5
+  tech_cost: 100
+  parts_cost: 250000
+  other_costs: 1500
+
+- id: oce_OP110
+  name: Export cable repair
+  tow_to_port: false
+  tech_required: 5
+  tech_cost: 500
+  vessel1_id: V002
+  parts_cost: 1000000
+  other_costs: 100000

@@ -1,0 +1,192 @@
+Date,Event,id,Name,En_loss_kWh,Time_shutdown
+2023-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2023-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2023-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2023-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2023-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2023-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2023-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2023-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2023-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2023-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2023-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2024-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2024-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2024-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2024-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2024-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2024-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2024-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2024-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2025-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2025-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2025-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2025-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2025-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2025-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2025-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2025-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2025-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2025-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2025-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2026-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2026-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2026-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2026-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2026-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2026-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2026-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2026-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2027-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2027-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2027-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2027-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2027-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2027-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2027-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2027-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2027-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2027-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2027-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2028-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2028-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2028-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2028-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2028-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2028-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2028-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2028-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2029-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2029-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2029-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2029-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2029-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2029-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2029-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2029-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2029-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2029-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2029-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2030-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2030-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2030-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2030-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2030-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2030-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2030-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2030-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2031-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2031-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2031-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2031-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2031-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2031-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2031-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2031-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2031-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2031-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2031-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2032-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2032-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2032-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2032-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2032-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2032-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2032-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2032-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2033-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2033-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2033-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2033-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2033-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2033-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2033-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2033-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2033-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2033-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2033-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2034-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2034-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2034-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2034-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2034-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2034-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2034-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2034-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2035-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2035-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2035-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2035-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2035-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2035-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2035-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2035-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2035-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2035-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2035-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2036-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2036-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2036-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2036-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2036-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2036-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2036-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2036-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2037-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2037-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2037-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2037-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2037-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2037-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2037-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2037-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2037-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2037-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2037-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2038-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2038-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2038-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2038-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2038-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2038-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2038-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2038-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2039-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2039-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2039-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2039-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2039-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2039-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2039-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2039-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2039-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2039-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2039-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2040-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2040-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2040-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2040-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2040-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2040-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2040-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2040-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2041-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0
+2041-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2041-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2041-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2041-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2041-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2041-08-10 08:00:00,inspection_site,oce_suab_cable_2,Inspection of export power cables,0.0,0.0
+2041-08-12 08:00:00,inspection_site,oce_suab_cable_1,Inspection of WTG dynamic power cables,0.0,0.0
+2041-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2041-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2041-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2042-08-01 08:00:00,inspection_site,ofw_suab_5,Visual inspection to tower,315498.55241935485,42.0
+2042-08-05 08:00:00,inspection_site,oce_op001,General inspection,608461.4939516129,81.0
+2042-08-05 08:00:00,inspection_site,ofw_suab_3,Inspection of control system and electrical,630997.1048387097,84.0
+2042-08-06 08:00:00,inspection_site,ofw_suab_6,Inspection of mooring system (3 mooring lines),0.0,0.0
+2042-08-08 08:00:00,inspection_site,ofw_suab_4,Inspection of hydraulic and pneumatic systems,630997.1048387097,84.0
+2042-08-13 08:00:00,inspection_site,ofw_suab_2,Drive train inspection,841329.4731182796,112.0
+2042-09-03 08:00:00,inspection_site,ofw_suab_1,Visual inspection - blades,426111.3266666667,67.2
+2042-09-09 08:00:00,inspection_site,oce_op003,General inspection with drone,507275.38888888893,80.0
+2043-05-05 08:00:00,inspection_site,oce_op002,Underwater inspection,0.0,0.0

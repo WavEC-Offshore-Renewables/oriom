@@ -1,0 +1,65 @@
+Date,Event,id,Comments,Name,Loc,Shutdown,Shut/Fix,Perc_availability,Power_loss_kW
+2010-01-01 00:00:00,commissioning_project,-,-,-,-,-,-,100.0,0.0
+2010-01-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-01-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-02-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-02-03 15:00:00,failure,ofw_fail_3.1,immediately,failure 3,2,True,shut,80.0,2322575.2700000005
+2010-02-28 23:59:59,Last Day of month,-,-,-,-,-,-,80.0,0.0
+2010-03-01 00:00:00,First Day of month,-,-,-,-,-,-,80.0,835386.715
+2010-03-14 06:10:12,operation,ofw_op002,oper_ofw_fail_3.1,Minor repair 2,2,True,shut,80.0,9931.675000000001
+2010-03-14 14:20:24,operation,ofw_op002,oper_ofw_fail_3.1,Minor repair 2,2,True,fix,100.0,0.0
+2010-03-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-04-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-04-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-05-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-05-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-06-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-06-17 06:00:00,failure,ofw_fail_2.1,immediately,failure 2,5,False,shut,100.0,0.0
+2010-06-18 05:10:12,operation,ofw_op001,oper_ofw_fail_2.1,Minor repair,5,True,shut,80.0,6071.645
+2010-06-18 13:20:24,operation,ofw_op001,oper_ofw_fail_2.1,Minor repair,5,True,fix,100.0,0.0
+2010-06-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-07-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-07-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-08-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-08-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-09-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-09-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-10-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-10-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-11-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-11-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2010-12-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2010-12-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-01-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-01-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-02-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-02-28 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-03-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-03-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-04-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-04-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-05-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-05-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-06-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-06-05 23:00:00,failure,ofw_fail_1.1,specific month,failure 1,4,False,shut,100.0,0.0
+2011-06-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-07-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-07-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-08-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-08-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-09-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-09-24 02:00:00,failure,ofw_fail_4.1,immediately,failure 4,6,True,shut,80.0,45871.66
+2011-09-30 23:59:59,Last Day of month,-,-,-,-,-,-,80.0,0.0
+2011-10-01 00:00:00,First Day of month,-,-,-,-,-,-,80.0,458883.335
+2011-10-07 16:00:00,failure,ofw_fail_1.2,specific month,failure 1,3,False,shut,80.0,271869.975
+2011-10-14 08:10:12,operation,ofw_op003,oper_ofw_fail_4.1,Medium repair,6,True,shut,80.0,96.67
+2011-10-14 14:20:24,operation,ofw_op003,oper_ofw_fail_4.1,Medium repair,6,True,fix,100.0,0.0
+2011-10-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-11-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-11-04 07:00:00,failure,ofw_fail_1.3,specific month,failure 1,4,False,shut,100.0,0.0
+2011-11-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
+2011-12-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-12-07 17:00:00,failure,ofw_fail_3.2,immediately,failure 3,3,True,shut,80.0,1292844.8750000002
+2011-12-27 07:00:00,failure,ofw_fail_5.1,immediately,failure 5,2,True,shut,60.0,328326.67
+2011-12-31 23:59:59,Last Day of month,-,-,-,-,-,-,60.0,0.0
+2012-01-01 23:59:00,decomissioning_project,-,-,-,-,-,-,60.0,0.0

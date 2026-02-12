@@ -1,0 +1,114 @@
+- id: V001
+  type: Tug
+  list_name: V001 - Tug
+  number_vessels: 2
+  speed_transit: 3
+  speed_towing: 2
+  daily_charter: 2500
+  mobilisation_time: 0
+  mobilisation_cost: 0
+  crew_capacity: 2
+  overnight: false
+  power: 600
+
+- id: V002
+  type: Multicat
+  list_name: V002 - Multicat
+  number_vessels: 1
+  speed_transit: 4
+  daily_charter: 3000
+  mobilisation_time: 336
+  mobilisation_cost: 25000
+  crew_capacity: 6
+  overnight: false
+  power: 350
+  fuel_cons_transit: 350
+  fuel_cons_maneuver: 220
+  fuel_cons_standby: 100
+
+- id: V003
+  type: AHTS
+  list_name: V003 - AHTS
+  number_vessels: 1
+  speed_transit: 5
+  speed_towing: 2
+  daily_charter: 4500
+  mobilisation_time: 0
+  mobilisation_cost: 0
+  crew_capacity: 2
+  overnight: true
+  power: 750
+
+- id: V004
+  type: DSV
+  list_name: V004 - DSV
+  number_vessels: 1
+  speed_transit: 4
+  daily_charter: 3500
+  mobilisation_time: 336
+  mobilisation_cost: 10000
+  crew_capacity: 12
+  overnight: false
+  power: 250
+  fuel_cons_transit: 320
+  fuel_cons_maneuver: 120
+  fuel_cons_standby: 50
+
+- id: V005
+  type: CTV
+  list_name: V005 - CTV
+  number_vessels: 5
+  speed_transit: 8
+  daily_charter: 2200
+  mobilisation_time: 0
+  mobilisation_cost: 0
+  crew_capacity: 12
+  overnight: false
+  power: 200
+  fuel_type: MDO
+  fuel_cons_transit: 400
+  fuel_cons_maneuver: 50
+  fuel_cons_standby: 10
+
+- id: V006
+  type: Multicat
+  list_name: V006 - Multicat
+  speed_transit: 12
+  speed_towing: 2
+  daily_charter: 5600
+  mobilisation_time: 0
+  mobilisation_cost: 0
+  crew_capacity: 6
+  overnight: false
+  power: 4046
+  fuel_type: MDO
+  notes: CPO vessel
+
+- id: V101
+  type: CTV
+  list_name: V101 - CTV
+  number_vessels: 2
+  speed_transit: 12
+  daily_charter: 0
+  annual_contract: 900000
+  mobilisation_time: 0
+  mobilisation_cost: 0
+  crew_capacity: 6
+  overnight: false
+  power: 200
+  fuel_type: MDO
+  notes: Farm dedicated vessel 1
+
+- id: V201
+  type: CTV
+  list_name: V201 - CTV
+  number_vessels: 2
+  speed_transit: 12
+  daily_charter: 0
+  mobilisation_time: 0
+  mobilisation_cost: 0
+  crew_capacity: 6
+  overnight: false
+  power: 200
+  fuel_type: MDO
+  notes: Farm dedicated vessel 1

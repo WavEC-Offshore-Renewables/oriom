@@ -1,0 +1,21 @@
+devices:
+    value: 100
+    units:
+rated power:
+    value: 0.5
+    units: MW
+power matrix file:
+    value: ./tests/test_files/pmatrix_wave.csv
+    units:
+number of strings:
+    value: 2
+    units:
+layout type:
+    value: 1
+    units:
+number of substations:
+    value: 1
+    units:
+number export cables:
+    value: 1
+    units:

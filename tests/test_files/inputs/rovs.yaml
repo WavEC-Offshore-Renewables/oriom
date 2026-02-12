@@ -1,0 +1,59 @@
+- id: stork_1
+  name: Stork
+  type: Aerial
+  daily_charter: 4920.0
+  weight:
+  dimensions: 1.5
+  useful_capacity: 5
+  speed_transit: 17
+  battery_capacity:
+  recharging_duration: 3
+  max_distance: 10.2
+  avg_autonomy: 0.6
+  on_site: true
+  support_vessel: CTV
+  nr_technicians: 1
+  ws_max: 10
+  hs_max:
+  daylight:
+  precipitation_max:
+
+- id: grifo_1
+  name: Grifo
+  type: Aerial
+  daily_charter: 4920.0
+  weight:
+  dimensions:
+  useful_capacity:
+  speed_transit: 17
+  battery_capacity:
+  recharging_duration: 3
+  max_distance:
+  avg_autonomy: 0.5
+  on_site: true
+  support_vessel: CTV
+  nr_technicians: 2
+  ws_max: 10
+  hs_max:
+  daylight:
+  precipitation_max:
+
+- id: EVA_ROV_2
+  name: EVA_ROV
+  type: Water
+  daily_charter: 7800.0
+  weight: 2540
+  dimensions: 1.8
+  useful_capacity:
+  speed_transit:
+  battery_capacity:
+  recharging_duration:
+  max_distance:
+  avg_autonomy:
+  on_site: false
+  support_vessel: DSV
+  nr_technicians: 3
+  ws_max:
+  hs_max:
+  daylight:
+  precipitation_max:

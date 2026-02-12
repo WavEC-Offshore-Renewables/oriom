@@ -1,0 +1,12 @@
+operation_id,percentile,1,2,3,4,5,6,7,8,9,10,11,12
+ofw_redeploy_tow,dur_total_p,168.39,45.39,32.39,25.39,21.39,19.39,19.39,21.39,22.39,25.39,32.39,38.39
+ofw_redeploy_tow,dur_net_port,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0
+ofw_redeploy_tow,dur_net_site,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0
+ofw_redeploy_tow,wait_start,153.0,30.0,17.0,10.0,6.0,4.0,4.0,6.0,7.0,10.0,17.0,23.0
+ofw_redeploy_tow,wait_port,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+ofw_redeploy_tow,wait_site,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+ofw_redeploy_tow,transit_to_site,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83,0.83
+ofw_redeploy_tow,transit_to_port,0.56,0.56,0.56,0.56,0.56,0.56,0.56,0.56,0.56,0.56,0.56,0.56
+ofw_redeploy_tow,dur_shutdown_wtg,14.83,14.83,14.83,14.83,14.83,14.83,14.83,14.83,14.83,14.83,14.83,14.83
+ofw_redeploy_tow,dur_shutdown_wec,,,,,,,,,,,,
+ofw_redeploy_tow,dur_shutdown_pv,,,,,,,,,,,,
