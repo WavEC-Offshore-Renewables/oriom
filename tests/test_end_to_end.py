@@ -93,7 +93,7 @@ class TestMainEndToEnd(unittest.TestCase):
             repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "public")
 
         self.assertTrue(excel_dir.exists(), f"Excel directory not found: {excel_dir}")
-        self.assertTrue((excel_dir / "form_v8_test.xlsx").exists(), "Missing form_v8_test.xlsx")
+        self.assertTrue((excel_dir / "form_test.xlsx").exists(), "Missing form_test.xlsx")
         self.assertTrue(expected_result0_dir.exists(), f"Expected golden output dir not found: {expected_result0_dir}")
 
         # Reproducibility for randomness (Monte Carlo etc.)
