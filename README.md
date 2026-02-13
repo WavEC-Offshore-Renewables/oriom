@@ -323,6 +323,10 @@ Please note - in order to run this project locally on your own system, you will 
     ```
     python main.py 
     ```
+    or
+    ```
+    python -m logistic_tools.main         
+    ```
     <br><br>
 
 

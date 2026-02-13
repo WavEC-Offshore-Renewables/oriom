@@ -52,6 +52,7 @@ from logistic_tools import test
 print()
 test.test()
 time.sleep(3)
+print()
 
 try:
     from logistic_tools.core.functions.private import check_files

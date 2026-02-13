@@ -116,7 +116,7 @@ class TestMainEndToEnd(unittest.TestCase):
             BASEFILES_FROM_EXCEL=False,
             EXCEL_FILE_PATH=str(excel_dir),
             SOURCE_PATH_SHAREPOINT="",
-            FORM_NAME="form_v8_test.xlsx",
+            FORM_NAME="form_test.xlsx",
             TIME_FAIL_OP_IMMEDIATELY=0.02,
         )
 
