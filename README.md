@@ -1,25 +1,158 @@
+# ORIOM — Offshore Renewables Installation and O&M
 
-## **ORIOM**
+ORIOM (Offshore Renewables Installation and O&M) is a Python-based modelling tool developed by **WavEC Offshore Renewables** to simulate and assess **installation** and **operations & maintenance (O&M)** logistics and costs for offshore renewable energy projects, including (but not limited to) **fixed-bottom offshore wind, floating wind, wave energy, and floating solar**.
 
-Offshore Renewables Installation and O&M (ORIOM) is a Python-based tool developed by WavEC to simulate the scheduling, marine spread, port logistics, and total costs of the installation and O&M operations in offshore renewable energy farms, including fixed-bottom offshore wind, floating wind, wave energy and floating solar. Various functionality can be implemented, averaged results show the most important KPI such as OPEX, availabilities and vessels logs
-<br><br>
+ORIOM supports scenario-based simulation of:
+- **Scheduling** and operational sequencing
+- **Marine spread** definition and vessel utilisation (including vessel logs)
+- **Port logistics**, mobilisation, and demobilisation assumptions
+- **Cost build-up** and aggregated project KPIs
+
+ORIOM has been developed and used over multiple years in WavEC R&D projects and consulting activities and is published primarily to improve **transparency, peer review, and reproducibility** of analyses.
+
+## Contents
+- [Licence](#licence)
+- [Intended use](#intended-use)
+- [Key features](#key-features)
+- [Installation](#installation)
+- [Running a simulation](#running-a-simulation)
+- [Testing](#testing)
+- [Citation](#citation)
+- [Contact](#contact)
+
+---
+
+## Licence
+
+ORIOM is made available under the **PolyForm Shield License 1.0.0** (see `LICENSE`).
+
+In summary:
+- ✅ You may **use, modify, and redistribute** ORIOM for purposes that **do not compete** with WavEC Offshore Renewables.
+- ❌ You may **not** use ORIOM to provide products or services that **compete** with WavEC’s line of business (see `LICENSE` for the governing definition of “compete”).
+- ❌ Use of the Software for **AI/ML training** is **prohibited** without a separate written licence (see `LICENSE`).
+
+If you are unsure whether a planned use competes, contact us: **oriom@wavec.org**.
+
+---
+
+## Intended use
+
+ORIOM is published as a **reference implementation** to support transparency and reproducibility.
+
+Examples of uses that are typically compatible (non-competing):
+- Academic research (MSc/PhD work, publications)
+- Teaching and internal training
+- Internal evaluation, benchmarking, or decision support within an organisation, where results are not offered as a competing external service/product
+
+Examples of uses that are typically competing and therefore **not permitted without a separate agreement**:
+- Providing third-party consulting, planning, optimisation, or design verification services based on ORIOM as a substitute for WavEC’s services
+- Packaging ORIOM into a product/SaaS offering offered to third parties in a competing market
+
+**This section is non-binding guidance. The `LICENSE` file governs.**
+
+---
+
+## Key features
+
+### Installation mode (under improvement)
+Simulates an installation campaign by representing installable devices as deferred “events” to be executed using a constrained set of available vessels.
+
+### Failure variation options
+Supports sensitivity studies through:
+- Failure-rate scaling
+- Bathtub-shaped failure distributions
+- Monthly failure distribution scenarios
+
+### Port distance differentiation
+Optional configuration to apply different port distances to subsets of vessel types.
+
+### Testing suite
+Automated tests are provided to cover key features and regression behaviour.
+
+---
+
+## Installation
+
+### Prerequisites
+- Python 3.10+
+- Git
+
+### Clone
+> Replace the repository URL below with the correct ORIOM repository URL.
+
+```bash
+git clone https://github.com/WavEC-Offshore-Renewables/ORIOM.git
+cd ORIOM
+```
+
+LUIS DEIXEI AQUI-----PROXIMAS COISAS A REVER------------
+
+---
+
+# **ORIOM — Offshore Renewables Installation and O&M**
+
+ORIOM (Offshore Renewables Installation and O&M) is a Python-based modelling tool developed by **WavEC Offshore Renewables** to simulate and assess **installation** and **operations & maintenance (O&M)** logistics and costs for offshore renewable energy projects, including (but not limited to) fixed-bottom offshore wind, Floating wind, Wave energy and Floating solar.
+
+ORIOM supports scenario-based simulation of:
+- **Scheduling** and operational sequencing
+- **Marine spread** definition and vessel utilisation (including vessel logs)
+- **Port logistics** and mobilisation/demobilisation assumptions
+- **Cost build-up** and aggregated project KPIs
+
+The tool has been developed by WavEC and used over multiple years in R&D projects and consulting services and is published primarily to improve **transparency, peer review, and reproducibility** of analyses.
 
 # INDEX
-- [**Table of Contents:**](#table-of-contents)
-    - [**License**](#license)
-    - [**Intended use**](#intended-use)
-    - [**Features**](#features)
-    - [**Technologies**](#technologies)
-    - [**Deployment**](#deployment)
-    - [**Contacts**](#contacts)
-<br><br>
+- [**License**](#license)
+- [**Intended use**](#intended-use)
+- [**Features**](#features)
+- [**Technologies**](#technologies)
+- [**Deployment**](#deployment)
+- [**Contacts**](#contacts)
+
 
 ## **License**
 
-ORIOM is made available by WavEC – Offshore Renewables under the PolyForm Noncommercial License 1.0.0.
+ORIOM is made available by WavEC – Offshore Renewables under the PolyForm Shield License 1.0.0 (see `LICENSE`).
 
-You may use, modify and share ORIOM for noncommercial purposes, including academic and public research. For any commercial use (e.g. integration into commercial tools or paid consulting services), a separate commercial licence from WavEC is required.
-<br><br>
+In summary:
+- ✅ You may **use, modify, and redistribute** ORIOM for any purpose **that does not compete** with WavEC Offshore Renewables (including internal use in commercial organisations).
+- ❌ You may **not** use ORIOM to provide products or services that **compete** with WavEC’s line of business (including consulting or software/services offered to third parties as a substitute for WavEC’s offerings).
+- ❌ Use of ORIOM for **AI/ML training** is **prohibited** without a separate written licence (see `LICENSE` for definitions and conditions).
+
+## Examples of acceptable uses:
+Allowed without a separate licence (noncommercial):
+
+- MSc and PhD theses using ORIOM.
+- University courses and internal teaching.
+- Public research institutes and universities using ORIOM in research projects.
+- Publicly funded R&D projects where results are not sold as a commercial product or service.
+
+Typically commercial (requires a commercial licence from WavEC):
+
+- Using ORIOM in paid consultancy studies for clients.
+- Integrating ORIOM into commercial software, SaaS platforms or internal commercial tools.
+- Using ORIOM to provide paid optimisation, planning or O&M scheduling services.
+
+If you are unsure whether your use is commercial, please contact us.
+
+For commercial licensing, permissions, or exceptions: **oriom@wavec.org**
+
+## Support and contributions
+
+ORIOM is published for transparency and reproducibility.
+
+- WavEC does **not** guarantee user support or onboarding.
+- External contributions may be reviewed, but acceptance is at WavEC’s discretion.
+- If you wish to discuss collaboration or funded improvements, contact **oriom@wavec.org**.
+
+---
+
+## Citation
+
+If you use ORIOM in academic work, reports, or benchmarking studies, please cite it as:
+
+> WavEC Offshore Renewables, *ORIOM — Offshore Renewables Installation and O&M*, 2026.  
+> (Include repository URL and version/tag used.)
 
 # Intended use:
 
