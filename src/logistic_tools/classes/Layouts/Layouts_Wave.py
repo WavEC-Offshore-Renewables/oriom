@@ -185,7 +185,7 @@ class Layout_Wave():
             
             *LAYOUT 3*: REDUNDANT EXPORT CABLE LAYOUT, n_export_cables=2, n_strings=2, n_wec=6
 
-        This layout is considering one hub/substation to which all the strings
+        This layout is considering one substation to which all the strings
         are connected and multiple export cable to shore to allow for redundancy
         '''
         G = self.layout1_wave(n_wec=n_wec,n_strings=n_strings,substation_node=n_exports, tow_string_shutdown=tow_string_shutdown)
@@ -332,7 +332,7 @@ class Layout_Wave():
                     nx.set_edge_attributes(G, attr_ef)
                     nx.set_node_attributes(G,values=att_w1)
                     h+=3
-                    if t == l:
+                    if t == wec_per_string[s][0]:
                         G.add_edge(count_nodes, connector_node)
                         attr_es = {(count_nodes, connector_node):{
                                 'name' : "array_cable",
@@ -391,10 +391,10 @@ class Layout_Wave():
         }}
         nx.set_node_attributes(G, values=attr_s)
 
-        # DEFINING HUB/SUBSTATION
+        # DEFINING SUBSTATION
         G.add_node(substation_node)
         attr_h = {substation_node: {
-                'name' : 'Hub/Sub',
+                'name' : 'Sub',
                 'coords' : (-2,-1),
                 'level' : 'substation',
                 'power' : 0
@@ -411,10 +411,10 @@ class Layout_Wave():
         }}
         nx.set_edge_attributes(G, attr_exp)
 
-        wec_per_string =  []
-        wec_per_string.append(1)
+        wecs = list(range(1, n_wec + 1))
+        wec_per_string = Layout_Aux.interval_extract(wecs, n_strings)
 
-        h = 2
+        h = 1
         l = 1
 
         count_nodes = substation_node
@@ -442,7 +442,7 @@ class Layout_Wave():
 
                 connector_node = count_nodes
 
-            for t in range(s+1):
+            for t in wec_per_string[s]:
                 count_nodes +=1
                 G.add_node(count_nodes)
                 att_w = {count_nodes:{
@@ -473,8 +473,8 @@ class Layout_Wave():
     # ---------------------------------------------------------------------
     def layout_wave(
                 self, n_layout: int, n_wec: int, n_strings: int,
-                n_substations: int = 1, n_exports: int = 1, tow_string_shutdown: bool = False,
-                save_dir: str = None, show_plot: bool = True
+                n_substations: int = 1, n_exports: int = 1, n_string_to_connector = 6,
+                tow_string_shutdown: bool = False, save_dir: str = None, show_plot: bool = True
         ):
         """Select and build the desired wind farm layout."""
         if n_layout == 1:
@@ -484,9 +484,9 @@ class Layout_Wave():
         elif n_layout == 3:
             G = self.layout3_wave(n_wec=n_wec,n_strings=n_strings,n_exports=n_exports, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         elif n_layout == 4:
-            G = self.layout4_wave(n_wec=n_wec, n_strings=n_strings, substation_node=1, n_string_to_connector = 6, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
+            G = self.layout4_wave(n_wec=n_wec, n_strings=n_strings, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         elif n_layout == 5:
-            G = self.layout5_wave(n_wec=n_wec, n_strings=n_wec, substation_node=1, n_string_to_connector = n_wec, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
+            G = self.layout5_wave(n_wec=n_wec, n_strings=n_wec, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         else:
             _e = f'Layout selected :´{n_layout}´ for wave technology. The present scenario does not exists'
             logging.error(_e)
@@ -497,9 +497,10 @@ class Layout_Wave():
 if '__main__' in __name__:
     lw = Layout_Wave()
     G = lw.layout_wave(
-        n_layout = 4, 
-        n_wec = 75,
-        n_strings = 6, 
+        n_layout = 5, 
+        n_wec = 10,
+        n_strings = 5,
+        n_string_to_connector = 2,
         n_substations = 1, 
         n_exports = 1,
         tow_string_shutdown = False

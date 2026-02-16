@@ -88,7 +88,7 @@ class Layout_PV:
             h=4
             l=1
             self._set_node(G, self.count_nodes, f"Inv_{i}", coords = (i,0), level = 'inverter')
-            self._set_edge(G, self.count_nodes, 1, "dyn_cable-hub/sub", level = 'dyn_cable-sub')
+            self._set_edge(G, self.count_nodes, 1, "dyn_cable-sub", level = 'dyn_cable-sub')
 
             for p in range(1, n_panel_per_island+1):
                 self.count_nodes += 1
@@ -242,7 +242,7 @@ class Layout_PV:
 
         for sub in range(1, n_substations + 1):
             self.count_nodes += 1
-            self._set_node(G, self.count_nodes, 'Hub/Sub', coords=((n_substations + 1) / 2 - (sub - 1), -2),
+            self._set_node(G, self.count_nodes, 'Sub', coords=((n_substations + 1) / 2 - (sub - 1), -2),
                            level='substation')
             self._set_edge(G, self.count_nodes, 0, 'export_cable', 'exp_cable')
             count_hub = self.count_nodes

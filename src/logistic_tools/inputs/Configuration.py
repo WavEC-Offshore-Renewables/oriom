@@ -3,7 +3,36 @@ from datetime import datetime
 
 
 class ConfigRun:
-    """Runtime configuration with explicit constructor arguments."""
+    """Runtime configuration with explicit constructor arguments.
+
+    Attribute:
+        STATISTICAL_CHART (bool): Flag to consider statistical time chart Pmax as end of contract ST
+            Default to True.
+        DIFF_DISTANCE (bool): Flag to consider different distance for port
+            Default to False.
+        DIFF_KM_DISTANCE (int): Distance of different port.
+            Default to 30.
+        KM_MOTHER_VESSEL (int): Distance of mother vessel anchor at site.
+            Default to 5.
+        VESSEL_DIST_REDUCED_LIST (list): List string for vessel.type that will use different km distance.
+            Default to [].
+        FUEL_TO_ADD (dict): key vessel id and value float of fuel cost to add on total lifetime.
+            Default to {}.
+        MOBILISATION_TO_ADD(dict): key vessel.id and value float of mobilisation cost to add on total lifetime.
+            Default to {}.
+        ENERGY_AVAILABILITY_CALCULATION (bool): Flag to consider energy calculation
+            Default to True.
+        ENERGY_STATISTICAL_CALCULATION (bool): Flag to consider statistical or timeseries energy calculation 
+            Default to False.
+        PROJECT_NAME (str): Name of the project choose. Default to ''.
+        BASEFILES_FROM_EXCEL (bool):  Flag to consider excel input file to read on sharepoint. 
+            Default to False.
+        EXCEL_FILE_PATH (str): Path to the excel input file to read. Default to None.
+        SOURCE_PATH_SHAREPOINT (str): Path to the excel input file to read in sharepoint folder. Default to None.
+        FORM_NAME (str): Name of the excel input file to read. Default to None.,
+        TIME_FAIL_OP_IMMEDIATELY(float): Reaction time of operation in consequence of failure. 
+            Default to 0.02.
+    """
 
     def __init__(
         self,
@@ -67,6 +96,7 @@ class ConfigRun:
         for k in mapping:
             lines.append("  - {0}: {1}".format(k, mapping[k]))
         return "\n".join(lines)
+
 
     def log_parameters(self, logger, inputs_gen=None):
         """Log main configuration blocks and optionally previous timeseries."""

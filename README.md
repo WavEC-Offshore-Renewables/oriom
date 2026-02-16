@@ -16,9 +16,11 @@ Offshore Renewables Installation and O&M (ORIOM) is a Python-based tool develope
 
 ## **License**
 
-ORIOM is made available by WavEC – Offshore Renewables under the PolyForm Noncommercial License 1.0.0.
+ORIOM is licensed under the PolyForm Noncommercial License 1.0.0.
 
-You may use, modify and share ORIOM for noncommercial purposes, including academic and public research. For any commercial use (e.g. integration into commercial tools or paid consulting services), a separate commercial licence from WavEC is required.
+You may use, modify, and share ORIOM for noncommercial purposes, including academic research and public projects.
+Commercial use is not permitted under this license.  
+For any commercial use (including consultancy, integration into commercial software, SaaS platforms, or paid services), a separate commercial license from WavEC – Offshore Renewables is required.
 <br><br>
 
 # Intended use:
@@ -111,7 +113,7 @@ If you are unsure whether your use is commercial, please contact us.
 
 <br>
 
-**Reuse preexisting file to retore previous simulation**
+**Reuse preexisting file to retore previous simulation (not available in open source mode)**
 
 - How to implement Reuse file
     ```
@@ -122,7 +124,7 @@ If you are unsure whether your use is commercial, please contact us.
 
 **Testing suite**
 
-    Unit testing accommodates all project features with test.
+Unit testing accommodates all project features with test.
 - To run coverage tests, use this command in terminal:
 
     ```
@@ -182,26 +184,8 @@ If you are unsure whether your use is commercial, please contact us.
 
 **Testing suite**
 
-    Unit testing accommodates all project features with test.
-- To run coverage tests, use this command in terminal:
+Unit testing accommodates all project features with test.
 
-    ```
-    python -m unittest
-    ```
-    
-    ```
-    coverage run --source="." -m pytest
-    ```
-- Coverage report available with command:
-
-    ```
-    coverage report
-    ```
-- You can also run the command bellow to test all software with a single command.
-
-    ```
-    make test_ORIOM:
-    ```
 
 ## Technologies:
 
@@ -222,12 +206,12 @@ Please note - in order to run this project locally on your own system, you will 
     To clone this repository, open a terminal, go to the directory you want to clone it to. For example `cd C:\Users\<USER_NAME>\ORIOM` and run:
 
     ```
-    git clone git@github.com:WavEC-Offshore-Renewables/eu-scores.git
+    git clone git@github.com:WavEC-Offshore-Renewables/oriom.git
     ```
     or
 
     ```
-    git clone https://github.com/WavEC-Offshore-Renewables/eu-scores.git
+    git clone https://github.com/WavEC-Offshore-Renewables/oriom.git
     ```
     ## 2. Stay in your current folder, don't navigate into O&M TOOL yet
 
@@ -334,4 +318,4 @@ Please note - in order to run this project locally on your own system, you will 
 For commercial licensing and collaboration enquiries:
 
 WavEC – Offshore Renewables
-mail@wavec.org
+oriom@wavec.org

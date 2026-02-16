@@ -1,6 +1,7 @@
 import networkx as nx
 import logging
 import os
+import math
 import matplotlib.pyplot as plt
 
 from logistic_tools.classes.Layouts.Layout_Auxiliary import Layout_Aux
@@ -256,12 +257,267 @@ class Layout_Wind():
         return G
 
     # ---------------------------------------------------------------------
+    # Layout 5
+    # ---------------------------------------------------------------------
+    def layout5_wind(
+            self,
+            n_turbines: int,
+            n_strings: int,
+            substation_node: int,
+            n_string_to_connector: int = 6,
+            tow_string_shutdown: bool = False,
+            save_dir=None, 
+            show_plot=False
+    ): 
+        
+        """
+        .. figure:: /_static/Layout_imgs/Wind_Layout_5.jpg
+            :width: 8000px
+            :alt: esempio
+            
+            LAYOUT 5, FISHBONE: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=2, n_strings=4, n_turbines=6
+
+        FISHBONE layout
+        Strings are connected to the same 66 kV feeder cable that bring power to offshore substation
+
+        Hard code to modify n_string_to_connector
+
+        Args:
+            n_string_to_connector (int): Number of string that are connect to the same connector (hub).
+                Default value to ´´6´´
+        """
+
+        G = nx.DiGraph()
+        G.graph['tow_string_shutdown'] = tow_string_shutdown
+        Layout_Aux.add_substation_and_shore(G, n_strings, substation_node)
+
+        turbines = list(range(1, n_turbines + 1))
+        turb_per_string = Layout_Aux.interval_extract(turbines, n_strings)
+        
+        h = 4
+
+        count_nodes = substation_node
+        connector_node = substation_node
+        list_connector = list(range(0, n_strings, n_string_to_connector))
+        for s in range(n_strings):
+            if s in list_connector:
+                count_nodes +=1
+                G.add_node(count_nodes)
+                att_w = {count_nodes:{
+                        'name' : "Connector_node",
+                        'coords' : (s+(n_string_to_connector/2)-0.5,1),
+                        'level' : 'hub',
+                        'power' : 0
+                }}
+                nx.set_node_attributes(G, values=att_w)
+
+                G.add_edge(count_nodes, substation_node)
+                attr_es = {(count_nodes, substation_node):{
+                        'name' : "feeder_cable",
+                        'level' : 'exp_cable_island',
+                        'visible': True,
+                        'p_limit': None
+                }}
+                nx.set_edge_attributes(G, attr_es)
+
+                connector_node = count_nodes
+
+            for t in turb_per_string[s][:]:
+                offset = (-0.25, 0.25) if t % 2 == 0 else (0.25, 0.25) 
+                count_nodes +=1
+                # Connector
+                G.add_node(count_nodes)
+                att_w = {count_nodes:{
+                        'name' : "Conn_%i" %t,
+                        'coords' : (s,h),
+                        'level' : 'circuit_braker',
+                        'power' : 0
+                }}
+                if t == turb_per_string[s][0]:
+                    G.add_edge(count_nodes, connector_node)
+                    attr_es = {(count_nodes, connector_node):{
+                            'name' : "array_cable",
+                            'level' : 'array_cable',
+                            'visible': True,
+                            'p_limit': None
+                    }}
+                nx.set_edge_attributes(G, attr_es)
+                nx.set_node_attributes(G, values=att_w)
+                
+                # Turbine
+                t_1 = t+1
+                G.add_node(count_nodes+1)
+                att_w1 = {count_nodes+1:{
+                        'name' : "WTG_%i" %t,
+                        'coords' : (s+offset[0],h+offset[1]),
+                        'level' : 'device',
+                        'power' : 1
+                }}
+                G.add_edge(count_nodes+1,count_nodes)
+                attr_ef = {(count_nodes+1,count_nodes):{
+                        'name' : "dyn_cable-sub",
+                        'level' : 'dyn_cable-sub',
+                        'visible': True,
+                        'p_limit': None
+                }}
+                nx.set_edge_attributes(G, attr_ef)
+                nx.set_node_attributes(G,values=att_w1)
+                h+=2
+                if t < turb_per_string[s][-1]:
+                    # Connector + 1
+                    t_1 = t+1
+                    G.add_node(count_nodes+2)
+                    att_w2 = {count_nodes+2:{
+                            'name' : "Conn_%i" %t_1,
+                            'coords' : (s,h),
+                            'level' : 'circuit_braker',
+                            'power' : 0
+                    }}
+                    G.add_edge(count_nodes+2,count_nodes)
+                    attr_ef2 = {(count_nodes+2,count_nodes):{
+                            'name' : "array_cable",
+                            'level' : 'array_cable',
+                            'visible': True,
+                            'p_limit': None
+                    }}
+                    
+                    nx.set_edge_attributes(G, attr_ef2)
+                    nx.set_node_attributes(G,values=att_w2)
+                    h+=3
+                count_nodes+=1
+            h=4
+
+        Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_5")
+        return G
+    
+    
+    # ---------------------------------------------------------------------
+    # Layout 6
+    # ---------------------------------------------------------------------
+    def layout6_wind(
+            self,
+            n_turbines: int,
+            n_strings: int,
+            substation_node: int,
+            n_string_to_connector: int = 1,
+            tow_string_shutdown: bool = False,
+            save_dir=None, 
+            show_plot=False
+    ): 
+        
+        """
+        .. figure:: /_static/Layout_imgs/Wind_Layout_6.jpg
+            :width: 800px
+            :alt: esempio
+
+            LAYOUT 6 STAR LAYOUT: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=3, n_turbines=15
+            
+        
+
+        Layout with 1 Substation, 1 Array Cable, hubs and string of 1 turbine connected to  connector
+        """
+
+        G = nx.DiGraph()
+        G.graph['tow_string_shutdown'] = tow_string_shutdown
+
+        # DEFINING SHORE
+        G.add_node(0)
+        attr_s = {0: {
+                'name' : 'SHORE',
+                'coords' : (n_turbines/2-0.5,-2),
+                'level' : '',
+                'power' : 0
+        }}
+        nx.set_node_attributes(G, values=attr_s)
+
+        # DEFINING SUBSTATION
+        G.add_node(substation_node)
+        attr_h = {substation_node: {
+                'name' : 'Sub',
+                'coords' : (n_turbines/2-0.5,-1),
+                'level' : 'substation',
+                'power' : 0
+        }}
+        nx.set_node_attributes(G, values=attr_h)
+
+        # CONNECTING HUB TO SHORE
+        G.add_edge(substation_node,0)
+        attr_exp = {(substation_node,0) : {
+                'name' : 'export_cable',
+                'level' : 'exp_cable',
+                'visible': True,
+                'p_limit': None,
+        }}
+        nx.set_edge_attributes(G, attr_exp)
+
+        turbs = list(range(1, n_turbines + 1))
+        turbs_per_string = Layout_Aux.interval_extract(turbs, n_strings)
+
+        list_connector = list(range(0, n_strings, n_string_to_connector))
+
+        h = 1
+        l = 1
+
+        count_nodes = substation_node
+        connector_node = substation_node
+
+        for s in range(n_strings):
+            if s in list_connector:
+                count_nodes +=1
+                G.add_node(count_nodes)
+                att_w = {count_nodes:{
+                        'name' : "Connector_node",
+                        'coords' : (s+(n_string_to_connector/2)-0.5,0),
+                        'level' : 'hub',
+                        'power' : 0
+                }}
+                nx.set_node_attributes(G, values=att_w)
+
+                G.add_edge(count_nodes, substation_node)
+                attr_es = {(count_nodes, substation_node):{
+                        'name' : "feeder_cable",
+                        'level' : 'exp_cable_island',
+                        'visible': True,
+                        'p_limit': None
+                }}
+                nx.set_edge_attributes(G, attr_es)
+
+                connector_node = count_nodes
+
+            for t in turbs_per_string[s]:
+                count_nodes +=1
+                G.add_node(count_nodes)
+                att_w = {count_nodes:{
+                        'name' : "WTG_%i" %t,
+                        'coords' : (s,h),
+                        'level' : 'device',
+                        'power' : 1
+                }}
+                nx.set_node_attributes(G, values=att_w)
+
+                G.add_edge(count_nodes, connector_node)
+                attr_es = {(count_nodes, connector_node):{
+                        'name' : "dyn_cable-sub",
+                        'level' : 'dyn_cable-sub',
+                        'visible': True,
+                        'p_limit': None
+                }}
+                nx.set_edge_attributes(G, attr_es)
+                
+            h=1
+            l += 1
+
+        Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_6",)
+        return G
+    
+
+    # ---------------------------------------------------------------------
     # Dispatcher
     # ---------------------------------------------------------------------
     def layout_wind(
                 self, n_layout: int, n_turbines: int, n_strings: int,
-                n_substations: int = 1, n_exports: int = 1, tow_string_shutdown: bool = True,
-                save_dir: str = None, show_plot: bool = True
+                n_substations: int = 1, n_exports: int = 1, n_string_to_connector = 6,
+                tow_string_shutdown: bool = True, save_dir: str = None, show_plot: bool = True
         ):
         """Select and build the desired wind farm layout."""
         if n_layout == 1:
@@ -280,25 +536,38 @@ class Layout_Wind():
                     raise ValueError("Layout 4: n_turbines must be divisible by n_strings or modify string_list manually")
                 string_list = [n_turbines // n_strings] * n_strings
             return self.layout4_wind(n_turbines, n_strings, 1, string_list, tow_string_shutdown, save_dir, show_plot)
+        elif n_layout == 5:
+            if n_turbines % n_strings != 0 or n_strings % n_string_to_connector:
+                raise ValueError("Layout 5: n_turbines must be divisible by n_strings or n_string_to_connector manually")
+            return self.layout5_wind(n_turbines=n_turbines, n_strings=n_strings, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
+        elif n_layout == 6:
+            if n_turbines % n_string_to_connector:
+                raise ValueError("Layout 5: n_turbines must be divisible by n_strings or n_string_to_connector manually")
+            return self.layout6_wind(n_turbines=n_turbines, n_strings=n_turbines, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
+        
         else:
             _e = f'Layout selected :´{n_layout}´ for wind technology. The present scenario does not exists'
             logging.error(_e)
             raise ValueError (_e)
 
 
+
 # ---------------------------------------------------------------------
 # Example usage
 # ---------------------------------------------------------------------
 if __name__ == "__main__":
-    for a in range(1,5):
-        lw = Layout_Wind()
-        G = lw.layout_wind(
-            n_layout=a,
-            n_turbines=12,
-            n_strings=2,
-            n_substations=2,
-            n_exports=3,
-            tow_string_shutdown = True,
-            show_plot=True
-        )
-        print(a, G.graph['tow_string_shutdown'])
+
+    lw = Layout_Wind()
+    G = lw.layout_wind(
+        n_layout=6,
+        n_turbines=12,
+        n_strings=4,
+        n_substations=1,
+        n_string_to_connector = 2,
+        n_exports=1,
+        tow_string_shutdown = True,
+        show_plot=True
+    )
+
+    print(choose_spec_loc_string(G,9))
+

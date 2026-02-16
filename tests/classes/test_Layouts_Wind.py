@@ -51,7 +51,7 @@ class TestLayout1Wind(unittest.TestCase):
         shore_n, _ = get_node_by_name(G, "SHORE")
         self.assertIsNotNone(shore_n)
         # Substation at requested id
-        sub_n, _ = get_node_by_name(G, "Hub/Sub")
+        sub_n, _ = get_node_by_name(G, "Sub")
         self.assertEqual(sub_n, 1)
         # Exactly one device
         self.assertEqual(count_nodes_by_level(G, "device"), 1)

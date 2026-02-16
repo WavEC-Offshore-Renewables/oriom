@@ -46,7 +46,7 @@ class TestLayout1Wave(unittest.TestCase):
         shore_n, shore_d = get_node_by_name(G, "SHORE")
         self.assertIsNotNone(shore_n)
         # Substation opn requested node
-        sub_n, sub_d = get_node_by_name(G, "Hub/Sub")
+        sub_n, sub_d = get_node_by_name(G, "Sub")
         self.assertIsNotNone(sub_n)
         self.assertEqual(sub_n, 1)
         # only one device
@@ -60,7 +60,7 @@ class TestLayout1Wave(unittest.TestCase):
         #Exiost connections array and connections substation
         levels = edge_levels(G)
         self.assertGreaterEqual(levels.count("array_cable"), 6 - 1)
-        sub_n, _ = get_node_by_name(G, "Hub/Sub")
+        sub_n, _ = get_node_by_name(G, "Sub")
         self.assertIsNotNone(sub_n)
 
 

@@ -28,7 +28,7 @@ class TestLayoutAuxAddSubstationAndShore(unittest.TestCase):
         # (n_strings-1)/2 = 1.5; shore_y = -3; sub_y = -1 for pv=False
         self.assertEqual(shore["coords"], ((4 - 1) / 2, -3))
         self.assertEqual(sub["coords"], ((4 - 1) / 2, -1))
-        self.assertEqual(sub["name"], "Hub/Sub")
+        self.assertEqual(sub["name"], "Sub")
         self.assertEqual(sub["level"], "substation")
 
         # edge and edge attributes

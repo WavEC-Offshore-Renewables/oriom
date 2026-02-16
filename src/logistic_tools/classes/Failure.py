@@ -218,6 +218,7 @@ class Failure():
             self.level_failure == 'cable_inv',
             self.level_failure == 'string_cable',
             self.level_failure == 'substation',
+            self.level_failure == 'hub',
             self.level_failure == 'mv_transformer',
             self.level_failure == 'circuit_braker',         
             self.level_failure == 'switcher',

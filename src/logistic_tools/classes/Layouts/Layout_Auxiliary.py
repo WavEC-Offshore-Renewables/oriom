@@ -37,7 +37,7 @@ class Layout_Aux():
             G.add_node(substation_node)
             nx.set_node_attributes(G, {
                 substation_node: {
-                    'name': 'Hub/Sub',
+                    'name': 'Sub',
                     'coords': ((n_strings - 1) / 2, sub_y),
                     'level': 'substation',
                     'power': 0
