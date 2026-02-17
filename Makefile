@@ -19,7 +19,7 @@ dev:
 	pip install -e .
 
 
-test_ORIOM:
+test:
 # Enter src package
 	cd src
 # Run the tests

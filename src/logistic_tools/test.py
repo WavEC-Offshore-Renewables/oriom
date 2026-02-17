@@ -1,3 +1,3 @@
 def test():
     print('ORIOM')
-    print('Hello from WavEC - Offshore Renewables Installation and O&M software')
+    print('Hello from ORIOM by WavEC - Offshore Renewables')
