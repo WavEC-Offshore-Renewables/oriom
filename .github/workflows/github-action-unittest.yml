@@ -1,4 +1,4 @@
-name: Run Python Unittest
+name: Run Python Tests (pytest + coverage)
 on: [push]
 jobs:
   build:
@@ -17,6 +17,9 @@ jobs:
           python -m pip install "cppy>=1.1.0" "kiwisolver==1.4.5"
           python -m pip install --prefer-binary -r requirements.txt
           python -m pip install -e .
+          python -m pip install pytest coverage
 
-      - name: Run tests with unittest
-        run: python -m unittest
+      - name: Run tests with pytest + coverage (min 80%)
+        run: |
+          python -m coverage run --source=logistic_tools -m pytest -q
+          python -m coverage report --fail-under=80
