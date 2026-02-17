@@ -17,7 +17,7 @@ def inspection_data(insp):
 
     insp_id = insp.id
     rov_cost_insp = getattr(getattr(insp.insp_class, "rov_drone", None), "daily_charter", 0)
-    n_tech_inps = getattr(insp.insp_class, "tech_per_device",0) 
+    n_tech_inps = getattr(insp.insp_class, "tech_per_device",0)
     c_tech_inps = getattr(insp.insp_class, "tech_cost",0)
     n_shifts_main = getattr(insp.insp_class, "days_main",0)
     n_shifts_last = getattr(insp.insp_class, "days_last",0)
@@ -37,13 +37,13 @@ def inspection_data(insp):
 
     except AttributeError:
         # site inspection
-        device_inspected = max(getattr(insp.insp_class, attr, 0) or 0 
+        device_inspected = max(getattr(insp.insp_class, attr, 0) or 0
                                 for attr in ['intervened_wtg', 'intervened_pv', 'intervened_wec'])
-        
+
         n_tech_inps_tot = kpi_aux.n_technicians(
-            device_inspected = device_inspected, 
-            n_tech_inps = n_tech_inps, 
-            n_shifts = n_shifts_last if n_shifts_main == 0 else n_shifts_main+n_shifts_last, 
+            device_inspected = device_inspected,
+            n_tech_inps = n_tech_inps,
+            n_shifts = n_shifts_last if n_shifts_main == 0 else n_shifts_main+n_shifts_last,
             n_vess = n_vess_last if n_shifts_main == 0 else n_vess_main
         )
 
@@ -54,16 +54,16 @@ def values_from_log_file(
     df: pd.DataFrame,
     ves: object,
     duration_shift: float,
-    oper_dict_tech: dict = None, 
-    rov_dict_cost: dict = None, 
+    oper_dict_tech: dict = None,
+    rov_dict_cost: dict = None,
     rov_tech_vessel_count = None
 
 ):
     """
-    This function calculates the time of transit, standby and maneuver for each operation. Furtermore, 
+    This function calculates the time of transit, standby and maneuver for each operation. Furtermore,
     it calculates the days of vessel use and the cost of ROV and technicians.
     """
-    
+
     # Time calculation of vessel use
     df['transit_ts'] = (df['d_end_transit_ts'] - df['d_end_dur_net_port']).dt.total_seconds()/3600
     df['transit_tp'] = (df['d_end_transit_tp'] - df['d_end_dur_net_site']).dt.total_seconds()/3600
@@ -72,17 +72,17 @@ def values_from_log_file(
     df['standby_p_start'] = (df['d_end_dur_net_port']-df['d_end_leadtime']).dt.total_seconds()/3600
     df['standby_p_end'] = (df['d_end']-df['d_end_transit_tp']).dt.total_seconds()/3600
     standby_time = df['standby_p_start'].sum() + df['standby_p_end'].sum()
-    
+
     df['maneuvre'] = (df['d_end_dur_net_site']-df['d_end_transit_ts']).dt.total_seconds()/3600
     maneuver_time = df['maneuvre'].sum()
-                
+
     df = kpi_aux.remove_row_vessel_double(df = df, ves = ves, rov_tech_vessel_count = rov_tech_vessel_count)
 
     if not df.empty:
         tot_tech_cost, rov_cost = kpi_aux.tech_rov_cost(
-            df = df, 
-            rov_dict_cost = rov_dict_cost, 
-            duration_shift = duration_shift, 
+            df = df,
+            rov_dict_cost = rov_dict_cost,
+            duration_shift = duration_shift,
             oper_dict_tech = oper_dict_tech
         )
     else:
@@ -93,9 +93,9 @@ def values_from_log_file(
 
 
 def find_time_log_events_insp(
-        log_events_merged_insp, 
-        operations_inspect_site, 
-        operations_inspect_port, 
+        log_events_merged_insp,
+        operations_inspect_site,
+        operations_inspect_port,
         duration_shift,
         ves: object,
         insp_port_data,
@@ -114,8 +114,8 @@ def find_time_log_events_insp(
     insp_port_data (:obj:`dict`): Dict with first key tech InspectionsPort.id, values with class with `OperationTow` or `InspectionsPort`
     rov_tech_vessel_count(:obj:`dict`): Dictionary of Vessels and operation that already account for ROV and tech cost
 
-    Returns: 
-        :obj:`float`:floats that represents the transit_time_insp, standby_time_insp, 
+    Returns:
+        :obj:`float`:floats that represents the transit_time_insp, standby_time_insp,
                     maneuver_time_insp, days_vessel_insp, tot_rov_cost_insp, tot_tech_cost_insp
     """
 
@@ -127,7 +127,7 @@ def find_time_log_events_insp(
         log_events_merged_insp_sing = log_events_merged_insp[log_events_merged_insp['id'] == insp_id].copy()
         if log_events_merged_insp_sing.empty:
             continue
-        
+
         # Check if the inspection costs for ROV and technician it has already been accounted for other vessels
         if any(insp.id in lst for lst in rov_tech_vessel_count.values()):
             rov_insp_day = 0
@@ -153,7 +153,7 @@ def find_time_log_events_insp(
             n_ves = row['n_vessel']
             start_day = approximate_hourly_data(start_day)
             row_oper_sched = oper_sched.loc[oper_sched['datetime'] == start_day]
-            
+
             # Take the hour of travel and net site
             transit_time_insp += (row_oper_sched['transit_to_port'].values[0]+row_oper_sched['transit_to_site'].values[0]) * n_ves           #important NOTE, approximation in case last shift, might be less vessel
             standby_time_insp += (row_oper_sched['wait_start'].values[0]+row_oper_sched['wait_port'].values[0]) * n_ves
@@ -171,7 +171,7 @@ def find_time_log_events_insp(
         tech_red = insp_port_data[insp_id][insp.insp_class.op_tow_site].tech_required * insp_port_data[insp_id][insp.insp_class.op_tow_site].tech_cost
         tech_rem_red = insp_port_data[insp_id][insp.insp_class.op_tow_site_port].tech_required * insp_port_data[insp_id][insp.insp_class.op_tow_site_port].tech_cost
         tech_tow_cost = (device_inspected-n_device_port)*tech_rem_red + n_device_port*(tech_rem+tech_red)
-        
+
         log_events_merged_insp_sing_port = log_events_merged_insp[log_events_merged_insp['id'] == insp_id]
 
         # Check if the inspection costs for ROV and technician it has already been accounted for other vessels
@@ -210,18 +210,18 @@ def find_time_log_events_insp(
             tot_tech_cost_insp += n_tech_inps_tot*dur_net_port_days*c_tech_inps + tech_tow_cost
 
         tot_rov_cost_insp += rov_c_insp_port
-        
+
     return transit_time_insp, standby_time_insp, maneuver_time_insp, tot_tech_cost_insp, tot_rov_cost_insp
 
 
 def calculate_event_costs(
-    log_df: pd.DataFrame, 
-    ves: object, 
+    log_df: pd.DataFrame,
+    ves: object,
     duration_shift: float,
-    fuel_cost_density: float, 
-    rov_dict_cost: dict = None, 
-    oper_dict_tech: dict  = None, 
-    insp_params: dict  = None, 
+    fuel_cost_density: float,
+    rov_dict_cost: dict = None,
+    oper_dict_tech: dict  = None,
+    insp_params: dict  = None,
     rov_tech_vessel_count: dict = None
 ):
     """
@@ -230,26 +230,26 @@ def calculate_event_costs(
     if not log_df.empty:
         if insp_params:
             transit_time, standby_time, maneuver_time, days_tech, rov_cost = find_time_log_events_insp(
-                log_events_merged_insp = log_df, 
+                log_events_merged_insp = log_df,
                 rov_tech_vessel_count = rov_tech_vessel_count,
                 **insp_params
             )
-        
+
         else:
             transit_time, standby_time, maneuver_time, days_tech, rov_cost = values_from_log_file(
-                df = log_df, 
+                df = log_df,
                 ves = ves,
                 duration_shift = duration_shift,
-                oper_dict_tech=oper_dict_tech, 
+                oper_dict_tech=oper_dict_tech,
                 rov_dict_cost=rov_dict_cost,
                 rov_tech_vessel_count = rov_tech_vessel_count
             )
-        
+
         transit_cost, maneuver_cost, standby_cost = kpi_aux.calculate_cost(
-            transit_time, 
-            maneuver_time, 
-            standby_time, 
-            ves, 
+            transit_time,
+            maneuver_time,
+            standby_time,
+            ves,
             fuel_cost_density
         )
     else:
@@ -259,7 +259,7 @@ def calculate_event_costs(
 
 
 def part_other_cost(
-        df: pd.DataFrame, 
+        df: pd.DataFrame,
         total_operations: list,
         find_element_class: object
 ):
@@ -297,7 +297,7 @@ def part_other_cost(
     other_cost = merged['other_costs'].sum() + (merged['port_costs'] * (merged['d_end'] - merged['d_end_leadtime']).dt.days).sum()
 
     return part_cost, other_cost
-    
+
 
 def zero_variables():
     return 0, 0, 0, 0, 0

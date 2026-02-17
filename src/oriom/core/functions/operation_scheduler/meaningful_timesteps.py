@@ -13,7 +13,7 @@ def get_meaningful_timesteps(
     Args:
         timeseries (:obj:`pd.DataFrame`): The input timeseries data
         timesteps (:obj:`list`): List of timesteps to consider
-        
+
     Returns:
         :obj:`list`: List of meaningful timesteps
     """

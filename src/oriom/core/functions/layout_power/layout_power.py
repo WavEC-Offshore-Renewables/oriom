@@ -17,7 +17,7 @@ def fix_values(
     '''
     Fix values of En_availab and Time_availab column due to the imprecision of summing preventive maintenance on failed component
     '''
-    
+
     df_fixing.loc[df_fixing[column_name] > 100, column_name] = 100
     df_fixing.loc[df_fixing[column_name] < 0.1, column_name] = 0
 
@@ -42,7 +42,7 @@ def calculate_energy(dict_power, dict_days, key, y, start_year, hour_energy,
             return dict_power[key] * dict_days[key] * hour_energy
         else:
             return sum_by_month_year(metocean_timeseries, y, key, power_col)
-        
+
 
 def get_energy_data(df, year, month=None, mode='preventive'):
     """
@@ -54,7 +54,7 @@ def get_energy_data(df, year, month=None, mode='preventive'):
         if month is not None:
             data = data[data['Date'].dt.month == month]
         list_months = data['Date'].dt.month if not data.empty else []
-        
+
         if mode == 'preventive':
             loss = data['En_loss_kWh'].sum()
             shutdown = data['Time_shutdown'].sum()
@@ -95,7 +95,7 @@ def energy_availability(
     ENERGY_STATISTICAL_CALCULATION: bool = False,
     result_dir_r: str = None
 )->dict:
-    
+
     """
     Based on the :func:`corrective_layout` and :func:`preventive_energy`, it returns the energy and time availability per month and year.
     This package is builted only on log_events dataframe as the log_events_merged does not give us the shutdown of the merged operations.
@@ -111,7 +111,7 @@ def energy_availability(
         start_year (:obj:`int`): Start_year of the project.
         start_month (:obj:`int`): Start_month of the project
         n_lifetime (:obj:`int`): Lifetime of the project in years.
-        find_element_class (Find_element_class): Initialized instance that provides fast access to operations, 
+        find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         dict_power_wind (dict, *optional*): dictionary with the average hourly power production [kW] of wind farm. Default as None
         dict_power_wave (dict,*optional*): dictionary with the average hourly power production [kW] of wave farm. Default as None
@@ -169,18 +169,18 @@ def energy_availability(
 
         """
 
-        # NOTE PV energy calculation differ from wave&wind with PV, 
+        # NOTE PV energy calculation differ from wave&wind with PV,
         # Assest the differences as wave, wind power is statisctical average of p_hour for each month so multiply for 24 and days month
         # PV calculation take the sum of hourly avg power so do not need to multiply for 24 h
         if tech == 'wind' or tech == 'wave':
             hour_energy = 24
         elif tech == 'PV':
-            hour_energy = 1 
+            hour_energy = 1
         else:
             _e = 'Technology analyzed not found, energy calculation error might occurs'
             logging.error('Layoutper: ' +_e)
             raise ValueError(_e)
-        
+
         # For Corrective operations
         if df_corrective.empty is False:
             df_corrective['hour_diff_next'] = (df_corrective['Date'].shift(-1) - df_corrective['Date']).dt.total_seconds()/3600
@@ -217,11 +217,11 @@ def energy_availability(
             # --- Annual preventive/corrective ---
             months_p, tot_loss_p, tot_shut_p, _ = get_energy_data(df_preventive, y, mode='preventive')
             months_c, tot_loss_c, tot_shut_c, tot_time = get_energy_data(df_corrective, y, mode='corrective')
-            
+
             list_months_file = list(set(months_p).union(set(months_c)))
             if tot_time is None:
                 tot_time = (12 - start_month) * 30.4 * 24  # fallback
-            
+
             # --- Annual energy calculation ---
             power_col = f'p_{tech}'
             en_total = [
@@ -231,7 +231,7 @@ def energy_availability(
                 for k in list_months_file
             ]
             en_total = sum(en_total)
-            
+
             # --- Update annual DataFrame ---
             cond_y = (energy_availability_y['Years'] == y)
             energy_availability_y.loc[cond_y, 'En_max_kWh'] = en_total
@@ -243,33 +243,33 @@ def energy_availability(
             for m in list_months_file:
                 _, tot_loss_c_m, tot_shut_c_m, time_c_m = get_energy_data(df_corrective, y, m, 'corrective')
                 _, tot_loss_p_m, tot_shut_p_m, _ = get_energy_data(df_preventive, y, m, 'preventive')
-                
+
                 en_month = calculate_energy(
                     dict_power, dict_days, m, y, start_year, hour_energy,
                     degradation_rate, ENERGY_STATISTICAL_CALCULATION,
                     metocean_timeseries, power_col
                 )
-                
+
                 cond_m = (energy_availability_m['Years'] == y) & (energy_availability_m['Months'] == m)
                 energy_availability_m.loc[cond_m, 'En_max_kWh'] = en_month
                 energy_availability_m.loc[cond_m, 'En_loss_kWh'] = tot_loss_c_m + tot_loss_p_m
                 energy_availability_m.loc[cond_m, 'En_availability'] = (en_month - (tot_loss_c_m + tot_loss_p_m)) / en_month * 100
                 energy_availability_m.loc[cond_m, 'Time_availability'] = ((n_devices * time_c_m - (n_devices * tot_shut_c_m + tot_shut_p_m)) / (n_devices * time_c_m)) * 100
-                
+
                 for colum_name in ['En_availability', 'Time_availability']:
                     fix_values(energy_availability_m, colum_name)
                     fix_values(energy_availability_y, colum_name)
 
         return energy_availability_m, energy_availability_y
 
-    
+
     def create_dict_power(
-            power_file, 
-            descr: str, 
+            power_file,
+            descr: str,
             degradation_rate: float=None,
             pv:bool=False
         )-> dict:
-        
+
         """
         Function that take as input the power file of a technology and return a dictionary if power file not empty, otherwise return none.
 
@@ -289,7 +289,7 @@ def energy_availability(
             ValueError: if the technology analyzed is pv and there is no degradation_rate defined
         """
 
-        
+
         if power_file is not None:
             if pv:
                 if isinstance(power_file, str):
@@ -326,32 +326,32 @@ def energy_availability(
                     _e = f'Power {descr} input format not recognized'
                     logging.error('Layout_power:' +_e)
                     raise ValueError(_e)
-                
+
         else: dict_power_file=None
 
         return dict_power_file
-    
-    
+
+
     def create_monthly_yearly_availability(
-            df_tech_p: pd.DataFrame, 
-            df_tech: pd.DataFrame, 
-            dict_power_tech: dict, 
-            n_device_tech: int, 
-            descr: str, 
+            df_tech_p: pd.DataFrame,
+            df_tech: pd.DataFrame,
+            dict_power_tech: dict,
+            n_device_tech: int,
+            descr: str,
             degradation_rate: float=None
         ):
-        
+
         """
         Funtion to create monthly_yearly_availability if tech under analysis
-        
+
         Args:
-            df_tech_p (pd.DataFrame): Dataframe of preventive energy availability 
-            df_tech (pd.DataFrame): Dataframe of corrective energy availability 
+            df_tech_p (pd.DataFrame): Dataframe of preventive energy availability
+            df_tech (pd.DataFrame): Dataframe of corrective energy availability
             dict_power_tech (dict): Dictionary of power production of the technology by months
             n_device_tech (int): Number of devices present for the tech
             descr (str): Description of the technology under analysis ('wind', 'wave', 'pv')
             degradation_rate (float): degradation_rate of the pv modules. Default as None
-            
+
         Returns:
             availability_tech_m (pd.DataFrame): Monthly dataframe of energy availability
             availability_tech_y (pd.DataFrame): Yearly dataframe of energy availability

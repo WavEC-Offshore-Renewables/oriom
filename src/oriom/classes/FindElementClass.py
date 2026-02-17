@@ -7,7 +7,7 @@ class Find_Element:
     Find_element_class is used to find the element in the various classes throughout dictionaries.
 
     ???For each corrective operations all statistical results are included in this class.???
-        
+
     Attributes:
         operations (:obj: `list`): List of object with attribute `id` for class `Operations`.
         operations_stats (:obj: `list`): List of object with attribute `id` for class `Operations_Stats`
@@ -18,7 +18,7 @@ class Find_Element:
         operations_stats_dict (:obj: `dict`): Dictionary of operations statistcs with items {oper.id: oper}
         vessels_dict (:obj: `dict`): Dictionary of vessels with items {vessels.id: vessels}
         failures_dict (:obj: `dict`): Dictionary of failures with items {failures.id: failures}
-        
+
     """
 
     def __init__(self, operations: list, operations_stats: list, operations_stats_pmax: list, vessels: list, failures: list):
@@ -51,7 +51,7 @@ class Find_Element:
 
             for f in self.failures:
                 if f.operation_triggered not in self.failures_dict:
-                    self.failures_dict[f.operation_triggered] = [] 
+                    self.failures_dict[f.operation_triggered] = []
                 self.failures_dict[f.operation_triggered].append(f)
 
 
@@ -94,8 +94,8 @@ class Find_Element:
             logging.error('LogDates: ' + _e)
             raise NameError(_e)
         return op
-    
-    
+
+
     def find_operation_stats(self, oper_id):
 
         """
@@ -117,7 +117,7 @@ class Find_Element:
             logging.error('LogDates: ' + _e)
             raise NameError(_e)
         return op
-    
+
     def find_operation_stats_pmax(self, oper_id):
 
         """
@@ -141,7 +141,7 @@ class Find_Element:
         return op
 
     def find_vessel(self, oper_vessel):
-        
+
         """
         Find a vessel associated to an operation
 
@@ -162,7 +162,7 @@ class Find_Element:
             logging.error(_e)
             raise NameError(_e)
         return v
-    
+
 
     def find_failure(self, oper):
 
@@ -187,7 +187,7 @@ class Find_Element:
             _e = f'LogDates: Failure not found {oper.id} \nThe operation is not triggered by a failure, or some error occurred'
             logging.warning(_e)
             raise NameError(_e)
-        
+
     def find_failure_from_id(self, fail_id):
 
         """
@@ -210,8 +210,8 @@ class Find_Element:
             _e = f'LogDates: Failure not found {fail_id} \nThe operation is not triggered by a failure, or some error occurred'
             logging.warning(_e)
             raise NameError(_e)
-        
- 
+
+
     def find_oper_schedule(self, inspe):
 
         """

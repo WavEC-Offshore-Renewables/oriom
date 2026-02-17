@@ -25,7 +25,7 @@ class TestMergebleOperation(unittest.TestCase):
         self.assertEqual(result["Vessel1"]["Group 1"]["Op2"]["Rank"], 1)
         self.assertEqual(result["Vessel1"]["Group 1"]["Op1"]["Rank"], 2)
         self.assertEqual(result["Vessel2"]["Group 1"]["Op3"]["Rank"], 1)
-        
+
 
         mock_save_file_csv.assert_called_once()
 

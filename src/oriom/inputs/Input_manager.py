@@ -67,25 +67,25 @@ class Input_Files:
         if must_exist and missing:
             raise FileNotFoundError("Missing required input files:\n" + "\n".join(missing))
         return missing
-    
+
 
 
 # -----------
-# Standalone 
+# Standalone
 # -----------
 
 
 def extract_input_from_excel(
     dirs: object,
-    base_file_excel: bool, 
+    base_file_excel: bool,
     sharepoint_file_path: str,
     excel_file_path: str,
     form_name: str
 ):
 
-    """ 
+    """
     Evaluate from which path input data is taken
-    
+
     Args:
         dirs (ProjectDirs): class of ProjectDirs on which are stored all the simulation path
         base_file_excel (bool): Boolean that indicate if the input file must be taken from the sharepoint
@@ -93,7 +93,7 @@ def extract_input_from_excel(
         excel_file_path (string): Path of input file in the local memory
         form_name (string): Name of the simulation choosen
     """
-    
+
     if base_file_excel is True:
         # Download Excel for from SharePoint
         msoffice365_sharepoint.download_file(
@@ -112,7 +112,7 @@ def extract_input_from_excel(
         excel_to_yaml(
                 file_excel=os.path.join(excel_file_path, form_name),
                 out_dir = dirs.base_dir
-        )      
+        )
 
     elif base_file_excel is False and excel_file_path is None:
         for file_name in os.listdir(os.path.join(os.getcwd(),'tests','test_files','inputs')):
@@ -128,7 +128,7 @@ def handle_overwrite_previous(inputs_gen, dirs):
     """
     Handle overwrite of previous run if requested by inputs_gen.
     If previous run is requested overwrite the simulation directory with old simulation dir
-    
+
     Args:
         inputs_gen (class: Inputs.General): class of general inputs
         dirs (class: ProjectDirs): class of simulation directory

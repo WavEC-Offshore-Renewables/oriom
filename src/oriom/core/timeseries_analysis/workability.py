@@ -19,7 +19,7 @@ def workability(
 
     Note:
         There are two types of operations, one defined with activities (CorrectiveMajor and OperationTow)
-        and one not defined with activities. The workability works for both but if activities 
+        and one not defined with activities. The workability works for both but if activities
         are defined than the operations should not be defined.
 
     Args:
@@ -289,8 +289,8 @@ def workability(
 
 
 def workability_tow(
-        df_metocean: pd.DataFrame, 
-        metocean_tow: dict, 
+        df_metocean: pd.DataFrame,
+        metocean_tow: dict,
         operation: object,
         op_dir: str = None
 )->pd.DataFrame:
@@ -307,7 +307,7 @@ def workability_tow(
         out_dir (:obj:`str`, *optional*): output directory folder path.
             Defaults to ``None``.
     """
-    
+
     def and_series_on_ref(df_works, act_name) ->pd.Series:
         """
         Function to evaluate the df_workability of all the df_metocean data for an activity
@@ -317,7 +317,7 @@ def workability_tow(
             df_works (dict): Dictionary of workability for the various location
             act_name (str): Name of the activity under analysis
 
-        Return: 
+        Return:
             (pd.Series) Series related to act_name with values True only if all are True, else False if df compliant
                 else return series related of site metocean data
 
@@ -354,11 +354,11 @@ def workability_tow(
 
             # cut df if longer than site metocean data
             s = df[act_name].loc[ref_index]
-            # Concatenate all boolean with AND 
+            # Concatenate all boolean with AND
             result_series &= s.fillna(False).astype(bool)
 
         return result_series
-    
+
     df_works = {}
 
     # Point workability (0 -> site, x -> point, -1 -> port)
@@ -368,7 +368,7 @@ def workability_tow(
             df_metocean=df_metocean if i == 0 else metocean_tow[i].df_timeseries,
             out_dir=op_dir
         )
-    
+
     # Overlap a unique workability depending by the activity
     df_workability = df_works[0].copy()
     for i, op_act in enumerate(operation.activities):

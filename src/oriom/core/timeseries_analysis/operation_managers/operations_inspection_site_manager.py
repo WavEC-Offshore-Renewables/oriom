@@ -27,18 +27,18 @@ def inspect_site_manager(
     inputs_tseries: object,
     Config: object
 ):
-    """ 
+    """
     Check if the operations_inspect_site is already existing
     If it exist assign ts_data attribute to the InspectSite object and pass to other inp
     If exist a similar inspection with all ATTRIBUTE_LIST_REUSE equal assign ts_data and pass to other inp
     If does not exist create the operation_schedule and assign it to the OperationTow object
-    
+
     Args:
         operation_dir (string): Path of operation directory
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
         max_wait (float): Maximum wait of time between operations activities
         operations_inspect_site (list): List of class `InspectionSite`
-        inputs_tseries (object): Object class `Input.TimeSeries`      
+        inputs_tseries (object): Object class `Input.TimeSeries`
         Config (object): Object class `Config_run`
 
     Raise:
@@ -47,7 +47,7 @@ def inspect_site_manager(
 
     dict_insp_oper, hash_to_key_insp = {}, {}
     ATTRIBUTE_LIST_REUSE = [
-        'dur_per_device', 'hs', 'tp', 'ws', 'ws_hub', 'cs', 'light', 'vessel1_id', 'rov_drone', 
+        'dur_per_device', 'hs', 'tp', 'ws', 'ws_hub', 'cs', 'light', 'vessel1_id', 'rov_drone',
         'technicians_per_device', 'vessel2_id', 'device_shutdown', 'intervened_wtg', 'intervened_wec',
         'intervened_pv','rov', 'overnight', 'double_shift'
     ]
@@ -57,9 +57,9 @@ def inspect_site_manager(
 
         # Check if is possible to recicle a similar inspection
         similar_inspection_id = recycle_other_oper_scheduler(
-            dict_insp_oper, 
-            hash_to_key_insp, 
-            operation, 
+            dict_insp_oper,
+            hash_to_key_insp,
+            operation,
             ATTRIBUTE_LIST_REUSE
         )
 
@@ -70,9 +70,9 @@ def inspect_site_manager(
         if check_files:
             # Check if there is a file to reuse
             file_exist = check_files.reuse_file_exist(
-                op_dir = op_dir, 
-                file_name_schedule = file_name_schedule, 
-                operation = operation, 
+                op_dir = op_dir,
+                file_name_schedule = file_name_schedule,
+                operation = operation,
                 similar_inspection_id = similar_inspection_id,
                 op_dir_other = op_dir_other,
                 shift_op = True
@@ -80,13 +80,13 @@ def inspect_site_manager(
 
             if file_exist:
                 continue
-                
+
         transit_duration = modify_distance(
             Config = Config,
             operation = operation,
             default_distance = inputs_tseries.distance["value"]
         )
-        
+
         # Get how many working shifts are required to preform this operation
         time_between_devices = inputs_tseries.find_time_between_devices(operation_obj_id = operation.id)
 
@@ -97,7 +97,7 @@ def inspect_site_manager(
                 transit_between_devices=time_between_devices,
                 operation_to_group_with=operation.to_group_with
         )
-        
+
         # Add attribute of shift to inspection_site
         operation.assign_shift_attributes(op_working_shifts)
 

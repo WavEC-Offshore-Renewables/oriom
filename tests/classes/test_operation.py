@@ -314,7 +314,7 @@ class TestOperation(unittest.TestCase):
                 os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'vessels_densities.yaml'),
                 self.vessels
         )
-        
+
 
     def test_get_inspection_operations_from_yaml(self):
         file_path = os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'operations_inspections_site.yaml')

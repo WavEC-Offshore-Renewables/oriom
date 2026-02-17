@@ -7,11 +7,11 @@ from oriom.utils import aux_functions
 from oriom.core.functions.logs_timeseries import logs_timeseries_func
 
 
-class VesselDayCounter(): 
+class VesselDayCounter():
     """
     Attr:
         self.dict_vess_long_term (dict): Dictionary of vessel with LT contract with subdict key month value nº vessels
-        self.usage_records (dict): Dictionary of vessel and date and value the nº of vessel used 
+        self.usage_records (dict): Dictionary of vessel and date and value the nº of vessel used
         self.vessels_calendar (pd.DataFrame): Calendar of vessel per each date
         self.log_event_day(pd.DataFrame): Dataframe of lof_events_date for only operations and inspection
         vessels (dict): Dictionary of month on which n_vessel are contracted
@@ -34,9 +34,9 @@ class VesselDayCounter():
         self.log_event_day = self.log_event_preparation(log_event_day)
         self.create_dict_vessel_contract_month(vessels)
 
-    
+
     def create_dict_vessel_contract_month(self, vessels):
-        """ 
+        """
         Create a dict with vessel id and months with n_ves_contracted corrispective
             {ves.id: {month_1: n_ves_contract_month_1, month_2: ...]}
         """
@@ -48,7 +48,7 @@ class VesselDayCounter():
             monthly_contract = getattr(v, 'months_contract', [])
             for month in monthly_contract:
                 dict_months_vessel_contract[month] += getattr(v, 'n_ves_monthly_contract', 0)
-            
+
             if any(val > 0 for val in dict_months_vessel_contract.values()):
                 self.dict_vess_long_term[v.id] = dict_months_vessel_contract
 
@@ -56,7 +56,7 @@ class VesselDayCounter():
     def log_event_preparation(self, log_event_day):
         """
         Filter the df only for the operations considering for campaign only start and end event
-        
+
         Return:
             pd.dataframe: Log_events_day filtered per operations
         """
@@ -80,7 +80,7 @@ class VesselDayCounter():
             # col to update from idx_min into idx_max
             cols_to_update = df.columns[:3]
 
-            # take value of idx_min and reindex into the destination index 
+            # take value of idx_min and reindex into the destination index
             src = df.loc[idx_min.values, cols_to_update].copy()
             src.index = idx_max.values
 
@@ -107,7 +107,7 @@ class VesselDayCounter():
     def date_evaluation(self, row, event, ST):
         col_end_no_effective = "d_end" if ST else "d_end_stat_chart"
         col_start_no_effective = "d_end_wait_start" if ST else "d_end_leadtime"
-        
+
         if event.startswith("inspection"):
             return row["d_trigger"], row[col_end_no_effective]
         else:
@@ -120,15 +120,15 @@ class VesselDayCounter():
         Account the number of vessels type for each day and select the dates of the operation
 
         This function has various type of use:
-            1) ST = True & contract_evaluation = True  
+            1) ST = True & contract_evaluation = True
                 - Evaluate calendar the TOTAL amount of vessels used and modify the log_events_merged ST
-            2) ST = False & contract_evaluation = True  
-                - After the chart SA to evaluate in calendar the TOTAL amount of vessels used that do not 
+            2) ST = False & contract_evaluation = True
+                - After the chart SA to evaluate in calendar the TOTAL amount of vessels used that do not
                     account for vessels that have already been reused
-            3) ST = False & contract_evaluation = False  
-                - After the chart SA to evaluate in calendar ONLY the ST amount vessels that do not 
+            3) ST = False & contract_evaluation = False
+                - After the chart SA to evaluate in calendar ONLY the ST amount vessels that do not
                     account for vessels that have already been reused
-            
+
         Args:
             log_events_merged (pd.DataFrame): Dataframe of lof_events_merged data
             ST (bool): Flag consider if update ST_contract column or add mobilisation
@@ -136,7 +136,7 @@ class VesselDayCounter():
 
         Return:
             pd.dataframe: log_events_merged updated with the ST_contract evaluation
-        
+
         # NOTE TODO might be added the mobiliation here. Remove mobilisation creation from log_events_file if vessel
             has long term contract. Add here a mobilisation creation when a ST vessel is required
         """
@@ -162,7 +162,7 @@ class VesselDayCounter():
             start_date, end_date = self.date_evaluation(row = row, event = event, ST = ST)
 
             vessel_columns = {1: ("vessel_1", n_vessel_1, "ST_contract_1"), 2: ("vessel_2", "n_vessel_2", "ST_contract_2")}
-            
+
             for vessel_slot, (vcol, ncol, ST_ch) in vessel_columns.items():
                 vessel = row.get(vcol)
                 n_vessel = row.get(ncol, 0)
@@ -195,23 +195,23 @@ class VesselDayCounter():
                             start_date, end_date = self.date_evaluation(row = row, event = event, ST = False)
                             if ST:
                                 log_events_merged.loc[idx, f'ST_contract_{vessel_slot}'] = True
-                        
+
                     days_needed = pd.date_range(start_date.normalize(), end_date.normalize())
                     for d in days_needed:
                         key = (d, vessel)
                         self.usage_records[key] = self.usage_records.get(key, 0) + n_vessel
-                        
+
                         """ TODO ???? NOTE it must be tuned with the rest of the code...
                         HERE IS TO ADD MOBILISATION IN THIS PART
                         NOTE should be done only once, create flag on input to decide when to do
-                        
+
                         if not ST
                             if self.dict_vess_long_term.get(vessel, {}):
-                        
+
                                 if mob_time != 0 and vessel.type not in vessel_to_merge:            # NOTE Mobilisation of merging vessel is considered in create_logs_merge
                                     mobilisation_date = date_op
                                     row_mob_line = logs_timeseries_func.create_mobilisation(
-                                        df = log_events, 
+                                        df = log_events,
                                         mobilisation_date = mobilisation_date,
                                         end_mobi = mobilisation_date,
                                         event = 'mobilisation',
@@ -223,7 +223,7 @@ class VesselDayCounter():
                     break
         if self.usage_records:
             vessels_calendar_use = (
-                pd.Series(self.usage_records) 
+                pd.Series(self.usage_records)
                 .unstack(fill_value=0)
                 .sort_index()
                 .astype(int)
@@ -242,7 +242,7 @@ class VesselDayCounter():
 
         Args:
             ves_id (string): Vessel id to consider
-            
+
         Return:
             float: number of short term day to count
         """
@@ -250,8 +250,8 @@ class VesselDayCounter():
             days_vessel_used = self.vessels_calendar[ves_id].sum()
             return days_vessel_used
         else: return 0
-    
-           
+
+
 if __name__ == '__main__':
     pass
 

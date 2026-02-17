@@ -7,7 +7,7 @@ from oriom.utils.aux_functions import save_file_csv
 def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
     """
     Evaluate and create a rank of operations diveded by the vessel, the OLC and the duration of the operations
-    The operations are grouped by: 
+    The operations are grouped by:
         - Same vessel
             - OLC feasible (if op1 have OLC on Hs and op2 on Ws they are not mergeble)
                 - Duration of the operation
@@ -20,15 +20,15 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
         OLC_LIST (:obj:`list`): A list of OLC keys to be considered for ranking.
     Returns:
         grouped_operations (:obj:`dict`): A dictionary containing the grouped and ranked operations.
-            
+
     """
-    
+
     def reorganize_operations(grouped_operations):
         reorganized_data = defaultdict(lambda: defaultdict(dict))
 
         for vessel, groups in grouped_operations.items():
             for group_id, operations in groups.items():
-                group_name = f"Group {group_id}"  
+                group_name = f"Group {group_id}"
                 for rank, (op_name, details) in enumerate(operations, start=1):
                     reorganized_data[vessel][group_name][op_name] = {
                         "Rank": rank,
@@ -37,7 +37,7 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
                     }
 
         return dict(reorganized_data)
-    
+
     # NOTE: a class can be implemented for the ranks and the functions
     def save_rank(data):
         rows = []
@@ -50,7 +50,7 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
                         "Operation": op_name,
                         "Rank": op_data["Rank"],
                         "Duration": op_data["duration"],
-                        "OLC": ', '.join(map(str, op_data["OLC"])) 
+                        "OLC": ', '.join(map(str, op_data["OLC"]))
                     }
                     rows.append(row)
 
@@ -60,12 +60,12 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
 
 
     def rank_operations(
-        op, 
+        op,
         details,
         oper_dict,
         oper_list
     ):
-            
+
         """
         This function create a dictionary that will group operation that can be conducted together ranking them by the Vessels, OLC and durations.
         Higher rank will mean more restrictive operation, OLC are considered before than duration of the operation
@@ -97,15 +97,15 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
         def duration(op1, op2):
             """ Returns True if op1 has lower duration di op2 """
             return op1.get('duration') < op2.get('duration')
-        
-        
+
+
         def insert_operation(j,op,details):
             """Insert operation in group and remove it from the list"""
 
             if op in oper_list:
                 oper_list.remove(op)
-            grouped_operations[vessel1][group_id].insert(j, (op, details)) 
-        
+            grouped_operations[vessel1][group_id].insert(j, (op, details))
+
         def create_new_group(op,details):
             """Create new group insert the operation and remove it from the list"""
 
@@ -114,13 +114,13 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
             except ValueError:
                 pass
             grouped_operations[vessel1][i].append((op, details))
-            
+
 
         dur_pos = 0
         vessel1 = details['vess_1']
         if vessel1 is not None:
             if not grouped_operations[vessel1]:  # Se non ci sono gruppi, creane uno
-                i = 1  
+                i = 1
                 grouped_operations[vessel1][i] = []  # Inizializza la lista
                 create_new_group(op,details)  # Aggiunge l'operazione
             else:
@@ -145,13 +145,13 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
                         other_group = is_olc_mixed(oper_dict[op], o_details)
                         if other_group:
                             break
-                        
+
                         group_found = True
                         this_group = True
                         higher_rank = is_olc_higher(oper_dict[op], o_details)
                         if higher_rank:
                             if not rank_equal_found:
-                                insert_operation(j-1, op, details)  
+                                insert_operation(j-1, op, details)
                             break
 
                         equal_rank = is_olc_equal(oper_dict[op], o_details)

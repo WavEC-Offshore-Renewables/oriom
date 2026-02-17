@@ -268,7 +268,7 @@ class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
             COLS=COLS_MERGED,
             find_element_class=finder,
             duration_shift=8.0,
-            
+
         )
 
         # One merged row expected

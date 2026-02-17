@@ -29,7 +29,7 @@ ORIOM has been developed and used over multiple years in WavEC R&D projects and 
 
 If you use ORIOM in academic work, reports, or benchmarking studies, please cite it as:
 
-> WavEC Offshore Renewables, *ORIOM — Offshore Renewables Installation and O&M*, 2026.  
+> WavEC Offshore Renewables, *ORIOM — Offshore Renewables Installation and O&M*, 2026.
 > (Please include repository URL and the version/tag used.)
 
 ---

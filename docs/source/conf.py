@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath('../../src'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [ 
+extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
@@ -95,9 +95,9 @@ def setup(app):
 def modify_name_rst():
     for dirpath, dirnames, filenames in os.walk("_api/"):
         for filename in filenames:
-            if filename.endswith(".rst"):  
+            if filename.endswith(".rst"):
                 filepath = os.path.join(dirpath, filename)
-                
+
                 with open(filepath, "r", encoding="utf-8") as f:
                     lines = f.readlines()
 

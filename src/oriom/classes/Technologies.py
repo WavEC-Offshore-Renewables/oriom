@@ -28,7 +28,7 @@ class PowerTechResult:
         pv_number_devices = None, pv_farm_prod = None,
         degradation_rate = None, pv_max_failure_module = None
     ):
-        
+
         self.wtg_number_devices = wtg_number_devices
         self.wtg_pcurve = wtg_pcurve
         self.wec_number_devices = wec_number_devices
@@ -182,7 +182,7 @@ class TechnologyBuilder:
     def build_technologies(
         cls,
         run_dir: str,
-        wtg_file: str, 
+        wtg_file: str,
         wec_file: str,
         pv_file: str
     ):
@@ -194,9 +194,9 @@ class TechnologyBuilder:
         - return TechBundle(wtg, wec, pv, power)
 
         Args:
-            run_dir (string): path of the run directory 
-            wtg_file (string): path of the wtg techology 
-            wec_file (string): path of the wec techology 
+            run_dir (string): path of the run directory
+            wtg_file (string): path of the wtg techology
+            wec_file (string): path of the wec techology
             pv_file (string): path of the pv techology
 
         Return:

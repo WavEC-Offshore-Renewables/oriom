@@ -11,7 +11,7 @@ class Scenario():
     Note:
         The scenario defines per month a probability. A higher probability leads to a higher likelihood
         of failure events happening. These probabilities are used as weights when randomly deciding when the
-        failure events are occurring. 
+        failure events are occurring.
 
     Attributes:
         scenario(:obj:`str`): The scenario to be represented.
@@ -92,9 +92,9 @@ class Scenario():
 
     def _check_inputs(self):
         """
-        This method validates the attributes of the `Scenario` class to ensure they 
+        This method validates the attributes of the `Scenario` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         percentage_month = 0

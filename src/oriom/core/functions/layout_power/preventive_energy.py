@@ -36,7 +36,7 @@ def preventive_energy(
     metocean_timeseries: pd.DataFrame = pd.DataFrame(),
     STATISTIC_ENERGY = False
 )->pd.DataFrame:
-    
+
     """
     Being the events chronologically ordered, for every event the function
     uses the graphs (layout) to understand the percentage of farm available at that
@@ -124,11 +124,11 @@ def preventive_energy(
         log_inspections = pd.DataFrame(columns=COLS)
 
         power_level_dict = aux_layout_power_func.take_power_level_inspections(
-            G_tech = G_tech, 
-            inspections_port_stat=inspections_port_stat, 
+            G_tech = G_tech,
+            inspections_port_stat=inspections_port_stat,
             inspections_site_stat=inspections_site_stat
         )
-        
+
         for inspection in list_inspections:
             inspection_class = find_element_class.find_operation_stats(inspection)
             insp = inspection_class.insp_class
@@ -147,8 +147,8 @@ def preventive_energy(
                     shutdown_hours_dict = {int(k): v for k, v in shutdown_hours_dict.items()}
 
                     selected_month = aux_layout_power_func.take_month_inspection(
-                        start_insp_date = start_insp_date, 
-                        row = r, 
+                        start_insp_date = start_insp_date,
+                        row = r,
                         shutdown_hours_dict = shutdown_hours_dict
                     )
 
@@ -181,7 +181,7 @@ def preventive_energy(
                     inspection_dates = aux_layout_power_func.take_date_inspection_oper_scheduler(
                         log_aux = log_aux, oper_schedule=insp.ts_data.oper_sched
                     )
-                  
+
                 energy_list, shutdown_hour_list = aux_layout_power_func.timeseries_power_preventive_evaluation(
                     insp = insp,
                     inspection_dates = inspection_dates,
@@ -206,7 +206,7 @@ def preventive_energy(
         log_inspections.reset_index(drop=True,inplace=True)
 
         return log_inspections
-    
+
 
     if power_wind is not None:
         dict_power_wind = power_wind
@@ -220,14 +220,14 @@ def preventive_energy(
     df_wind = pd.DataFrame()
     df_wave = pd.DataFrame()
     df_pv = pd.DataFrame()
-    
+
     if n_device_wtg is not None:
         prefix_list = ['ofw', 'oce']
         if dict_power_wind is None:
             _e = '"n_device_wtg" defined and "power_wind" not defined.'
             logging.error('Layout perc: '+_e)
             raise ValueError(_e)
-        
+
         df_wind = preventive_rows(
             log_events=log_events,
             prefix_list=prefix_list,
@@ -249,7 +249,7 @@ def preventive_energy(
             _e = '"n_device_wec" defined and "power_wave" not defined.'
             logging.error('Layout perc: '+_e)
             raise ValueError(_e)
-        
+
         df_wave = preventive_rows(
             log_events=log_events,
             prefix_list=prefix_list,
@@ -271,7 +271,7 @@ def preventive_energy(
             _e = '"n_device_pv" defined and "power_pv" not defined.'
             logging.error('Layout perc: '+_e)
             raise ValueError(_e)
-        
+
         df_pv = preventive_rows(
             log_events=log_events,
             prefix_list=prefix_list,

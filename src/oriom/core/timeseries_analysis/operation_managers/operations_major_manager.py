@@ -27,18 +27,18 @@ def operation_major_manager(
     inputs_tseries: object,
     timesteps: pd.DataFrame
 ):
-    """ 
+    """
     Check if the operations_inspect_site is already existing
     If it exist assign ts_data attribute to the InspectSite object and pass to other inp
     If exist a similar inspection with all ATTRIBUTE_LIST_REUSE equal assign ts_data and pass to other inp
     If does not exist create the operation_schedule and assign it to the CorrectiveMajor object
-    
+
     Args:
         operation_dir (string): Path of operation directory
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
         operations_corr_major (list): List of class `CorrectiveMajor`
         Config (object): Object class `Config_run`
-        inputs_tseries (object): Object class `Input.TimeSeries`      
+        inputs_tseries (object): Object class `Input.TimeSeries`
         timesteps (pd.DataFrame): Timestep to consider in the analysis (not used)
 
 
@@ -58,7 +58,7 @@ def operation_major_manager(
                 operation.ts_data = OperationTimeSeriesData.create_timeseries_data(operation, 'operation_schedule.csv', op_dir)
                 continue
 
-        _ = modify_distance(            
+        _ = modify_distance(
             Config = Config,
             operation = operation,
             default_distance = inputs_tseries.distance["value"]
@@ -74,16 +74,16 @@ def operation_major_manager(
                 df_workability=df_workability,
                 out_dir=op_dir
         )
-        
+
         # Check if exist a operation scheduler equal that can be recicled for the operation under analysis
         file_exist = recycle_major_other_oper_scheduler(
-                operations = operations_corr_major, 
-                actual_oper = operation, 
+                operations = operations_corr_major,
+                actual_oper = operation,
                 df_startability = df_startability,
                 counter_op = i,
                 operation_dir = operation_dir,
         )
-        
+
         if file_exist:
             continue
 

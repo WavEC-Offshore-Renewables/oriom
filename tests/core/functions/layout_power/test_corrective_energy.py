@@ -502,7 +502,7 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
             df_wave_out["Power_loss_kW"].tolist(), [200.0, 1000.0]
         )
 
-    
+
 class TestCorrectiveLayoutPV(unittest.TestCase):
     """
     Tests for PV branch inside corrective_layout.

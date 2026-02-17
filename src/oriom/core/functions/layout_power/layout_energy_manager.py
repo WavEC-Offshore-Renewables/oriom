@@ -7,13 +7,13 @@ from oriom.core.functions.layout_power.aux_layout_power_func import choose_loc
 from oriom.core.functions.layout_power.aux_layout_power_func import string_location
 
 def manage_string_tow_operation(
-    G: nx.DiGraph, 
-    loc: int, 
+    G: nx.DiGraph,
+    loc: int,
     action: bool,
 ):
     """  Manage the disconnection/reconnection of the full string if a device is towed
     Args:
-        G (:obj:`nx.DiGraph`): DiGraph. 
+        G (:obj:`nx.DiGraph`): DiGraph.
         loc (:obj:`int or tuple`): location of the failure
         action (:obj:`boolean`): define the action for the visibility of the node
     """
@@ -35,14 +35,14 @@ def shut(
     list_failed: set = (),
     string_inverter: set = (),
     event: str = ''
-):  
-    
+):
+
     """
-    It azzerate the power production of the nodes on which the power is implemented due to the shutting down of the component 
-    if it lead to a shutdown. It also close the edges on wich the component is attached in the graph 
-    
+    It azzerate the power production of the nodes on which the power is implemented due to the shutting down of the component
+    if it lead to a shutdown. It also close the edges on wich the component is attached in the graph
+
     For PV case
-    device and string level are not implemented in G, so reduce power production for the loc of the inverter of 1 device or 
+    device and string level are not implemented in G, so reduce power production for the loc of the inverter of 1 device or
     n_pv_per_string. In PV the power of the component that fail is never putted to 0 as the restoration will be problematic
     after (difficult to establish at which power to restore). Anyway the closure of the edge in the graph will filter the
     power for that device failed.
@@ -62,7 +62,7 @@ def shut(
         n_pv_per_strings (:obj:`int`, *optional*): number of modules each string
         max_failure_module (:obj:`int`, *optional*): number of failed module allowed each string
         device_shutted_string_level (:obj:`dict`, *optional*): Dictionary of string power layout
-        list_failed (:obj:`set`, *optional*): set of already failed component. 
+        list_failed (:obj:`set`, *optional*): set of already failed component.
         string_inverter (:obj:`set`, *optional*): Set of string for the inverter
         event (:obj:`str`, *optional*): Type of event
 
@@ -72,16 +72,16 @@ def shut(
 
     # Switching on or off the node in the graph
     if shutdown:
-        if isinstance(loc, int): 
-            livello = G.nodes[loc]['level'] 
+        if isinstance(loc, int):
+            livello = G.nodes[loc]['level']
             if tech == 'PV':
                 #remove one PV from inverter
                 if 'device' in names_tech:
-                    G.nodes[loc]['power'] -= 1     
+                    G.nodes[loc]['power'] -= 1
                     livello = 'device'
                 #remove one string from inverter
                 elif 'string' in names_tech:
-                    G.nodes[loc]['power'] -= n_pv_per_string   
+                    G.nodes[loc]['power'] -= n_pv_per_string
                     livello = 'string'
                 #close a string if excess of failed PV module considering the failed one
                 elif 'opv_fail_INV_V_min_exceded' in names_tech:
@@ -116,7 +116,7 @@ def shut(
 
                     loc = random.choice(list(list_nG_not_failed))
 
-                    try: 
+                    try:
                         failed_strings = set(device_shutted_string_level[loc].keys())
                     except KeyError:
                         failed_strings = set()
@@ -185,7 +185,7 @@ def fix(
         levels_component_no_power (:obj:`set`): level of node with level without power characteristic
         tech (:obj:`str`): name of tech analyzed
         names_tech (:obj:`str`): level of the component analyzed
-        n_pv_per_string (:obj:`str`): number of pv modules per string 
+        n_pv_per_string (:obj:`str`): number of pv modules per string
         event (:obj:`str`, *optional*): Type of event
 
     Returns:
@@ -199,16 +199,16 @@ def fix(
             G.edges[loc[0],loc[1]]['visible'] = True
         else: pass
     elif isinstance(loc, int) is True:
-        livello = G.nodes[loc]['level'] 
-        
+        livello = G.nodes[loc]['level']
+
         if tech == 'PV':
             #restore one PV from string
             if 'device' in names_tech:
-                G.nodes[loc]['power'] += 1              
+                G.nodes[loc]['power'] += 1 
                 livello = 'device'
             #restore one string from inverter
             elif 'string' in names_tech:
-                G.nodes[loc]['power'] += n_pv_per_string   
+                G.nodes[loc]['power'] += n_pv_per_string
                 livello = 'string'
         elif tech == 'wind' or tech == 'wave':
             if G.nodes[loc]['level'] == 'device':
@@ -272,12 +272,12 @@ def reassign_loc(
 
     df.at[index, 'Loc'] = row['Loc']     # Modify the value in the dataframe for the failure
 
-    # Find position for operation correlated in df 
+    # Find position for operation correlated in df
     row_index = df.index[(df['Comments'] == id_fix_failure) & (df['Shut/Fix'] == 'fix')]
-    if len(row_index) == 1:  
+    if len(row_index) == 1:
         row_index = row_index.item()  # Converte intex
 
     # Update the location in the correlated operation
-    df.at[row_index, 'Loc'] = row['Loc']  
+    df.at[row_index, 'Loc'] = row['Loc']
 
     return row['Loc']

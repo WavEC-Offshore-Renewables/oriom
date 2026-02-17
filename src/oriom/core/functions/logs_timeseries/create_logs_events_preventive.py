@@ -14,10 +14,10 @@ def create_logs_preventive(
     percentile: float,
     mother_vessels_list: list,
 )->pd.DataFrame:
-    
-    """ 
+
+    """
     Manage the creation of the log of preventive inspections
-    
+
     Args:
         COLS (list): List of columns of the log dataframe
         inputs (object): Object from class `Inputs` that contains all the inputs of the simulation
@@ -61,13 +61,13 @@ def create_logs_preventive(
             rows_to_add = []
             for _, row in df_row_dates.iterrows():
                 row_mob_prev = logs_timeseries_func.create_mobilisation(
-                    df = log_preventive, 
-                    mobilisation_date = row['d_trigger'], 
-                    end_mobi = row['d_trigger'] + timedelta(days = 1), 
+                    df = log_preventive,
+                    mobilisation_date = row['d_trigger'],
+                    end_mobi = row['d_trigger'] + timedelta(days = 1),
                     event = 'mobilisation',
-                    vessel = insp.vessel1, 
-                    oper_list = [insp.insp_class.id], 
-                    count_fail = insp.id, 
+                    vessel = insp.vessel1,
+                    oper_list = [insp.insp_class.id],
+                    count_fail = insp.id,
                     concat = False
                 )
                 rows_to_add.append(row_mob_prev)
@@ -96,19 +96,19 @@ def create_logs_preventive(
             rows_to_add = []
             for _, row in df_row_dates.iterrows():
                 row_mob_prev = logs_timeseries_func.create_mobilisation(
-                    df = log_preventive, 
-                    mobilisation_date = row['d_trigger'], 
-                    end_mobi = row['d_trigger'] + timedelta(days=1), 
+                    df = log_preventive,
+                    mobilisation_date = row['d_trigger'],
+                    end_mobi = row['d_trigger'] + timedelta(days=1),
                     event = 'mobilisation',
-                    vessel = insp.vessel1, 
-                    oper_list = [insp.insp_class.id], 
-                    count_fail = insp.id, 
+                    vessel = insp.vessel1,
+                    oper_list = [insp.insp_class.id],
+                    count_fail = insp.id,
                     concat = False
                 )
                 rows_to_add.append(row_mob_prev)
-                
+
             log_preventive = pd.concat([log_preventive] + rows_to_add, axis=0, ignore_index=True)
-                
+
     return log_preventive
 
 

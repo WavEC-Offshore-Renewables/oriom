@@ -62,12 +62,12 @@ class Layout_PV:
             save_dir = None,
             show_plot = False
     ):
-        """ 
+        """
         .. figure:: /_static/Layout_imgs/Solar_Layout_1.jpg
             :width: 800px
             :alt: esempio
 
-            LAYOUT 1: Inverter = 2, Strings = 2,  n_panels = 36*4 
+            LAYOUT 1: Inverter = 2, Strings = 2,  n_panels = 36*4
 
         Layout with 1 is composed by exp_cable, 1 Substation, Inverter with strings and modules
 
@@ -114,34 +114,34 @@ class Layout_PV:
         Layout_Aux.draw_layout(G, save_dir, show_plot= show_plot, title="Solar_Layout_1", color = COLOR)
 
         return G
-    
-    
+
+
     # ---------------- Layout 2 ----------------
     def layout2_pv(
             self, n_panels: int, n_strings: int, n_inverters: int, n_mvtransformers: int,
-            n_substations: int = 1, n_island_per_array_cable: int = 3, 
+            n_substations: int = 1, n_island_per_array_cable: int = 3,
             tow_string_shutdown: bool = False, save_dir=None, show_plot=False):
         """
 
         .. figure:: /_static/Layout_imgs/Solar_Layout_2.jpg
             :width: 8000px
             :alt: esempio
-            
-            LAYOUT 2: n_substations = 6, n_island_per_array_cable = 3, Inverter = 12, Strings = 2, n_panels = 36*6 
+
+            LAYOUT 2: n_substations = 6, n_island_per_array_cable = 3, Inverter = 12, Strings = 2, n_panels = 36*6
 
         This layout create a complex pv farm layout with the resolution of the inverter level.
-            The power node are the lowest node implemented (inverter) with the power of pv module connected. 
+            The power node are the lowest node implemented (inverter) with the power of pv module connected.
             Possibility to reduce resolution adjusting this code to string or PV level (high computational time)
 
         For this layout are presents:
-          - 1 offshore substation 
+          - 1 offshore substation
           - N number (n_island_per_array_cable) of array island connected to it
           - n_substations represent the number of island
 
         SCHEME:
-            - Shore - Exp_cable - Substation - Exp_cable_island - 
-                Island_1 - Array_cable - Island_2 ... 
-                    |  CB - dyn_cable_sub - Transf - cable_cb - Switch - cable_trans - invert -  
+            - Shore - Exp_cable - Substation - Exp_cable_island -
+                Island_1 - Array_cable - Island_2 ...
+                    |  CB - dyn_cable_sub - Transf - cable_cb - Switch - cable_trans - invert -
 
         Args:
             n_panels (: int): Total number of solar panels
@@ -270,13 +270,13 @@ class Layout_PV:
                         array_inv = f"array_{i}_i{st}"
                         self._set_node(G, self.count_nodes, array_inv, coords=(l,p), level='device', power = 1)
                         self._set_edge(G, self.count_nodes, node_inv, 'opv-cable', 'array_cable')
-                   
+
         Layout_Aux.draw_layout(G, save_dir, show_plot=show_plot, title="Solar_Layout_3", color = COLOR)
         return G
 
     # ---------------- Layout Selector ----------------
     def layout_pv(self, n_layout: int, n_panels: int, n_strings: int, n_inverters: int,
-                  n_mvtransformers: int = 1, n_island_per_array_cable: int = 1, 
+                  n_mvtransformers: int = 1, n_island_per_array_cable: int = 1,
                   n_substations: int = 1,  tow_string_shutdown: bool = False,
                   save_dir: str = None, show_plot: bool = True):
         """
@@ -310,12 +310,12 @@ class Layout_PV:
             _e = f'Layout selected :´{n_layout}´ for pv technology. The present scenario does not exist'
             logging.error(_e)
             raise ValueError(_e)
-        
+
 
 if '__main__' in __name__:
     lw = Layout_PV()
     G_pv = lw.layout_pv(
-        n_layout = 1, 
+        n_layout = 1,
         n_panels = 36*2,
         n_strings = 2,
         n_inverters= 2,

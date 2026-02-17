@@ -62,9 +62,9 @@ class Curve():
 
     def _check_attributes(self):
         """
-        This method validates the attributes of the `Power` class to ensure they 
+        This method validates the attributes of the `Power` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         if self.c_in < 0:
@@ -184,7 +184,7 @@ class Matrix():
             rated: float
     ):
         """Initializes :class:`Matrix` class.
-        
+
         Args:
             file_ (:obj:`str`): The path to the CSV file containing the power matrix data.
             rated (:obj:`float`): The rated power value.
@@ -323,7 +323,7 @@ class PVPower():
 
 def interpolate(df: pd.DataFrame, new_index: list):
     """Return a new DataFrame with all columns values interpolated to the new_index values.
-    
+
     Args:
         df (:obj:`pd.DataFrame`)
         new_index (:obj:`list`)

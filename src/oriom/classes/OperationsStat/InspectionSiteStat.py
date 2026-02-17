@@ -61,7 +61,7 @@ class InspectionSiteStat():
     ):
         '''
         Args:
-            inspection (:class:`~oriom.classes.Operations.InspectionSite`): 
+            inspection (:class:`~oriom.classes.Operations.InspectionSite`):
                 Inspection at site with its attributes.
             PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
             run_dur (:obj:`str`): Folder in which there is the statistical analysis.
@@ -129,7 +129,7 @@ class InspectionSiteStat():
             self.wec_shutdown_dict = dict_statistics['wec_shutdown_dict']
         if dict_statistics['pv_shutdown_dict'] is not None:
             self.pv_shutdown_dict = dict_statistics['pv_shutdown_dict']
-        
+
         if inspection.vessel2_id is not None:
             self.n_vessel_2 = 1
 

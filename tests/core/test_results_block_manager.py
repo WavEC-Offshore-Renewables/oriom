@@ -668,7 +668,7 @@ class TestResultsBlock(unittest.TestCase):
                 dict_power_wave=dict_power_wave,
                 metocean_timeseries=metocean_timeseries,
             )
-            
+
             if KPI_Insight_spec:
                 # Check KPI insight Excel is created
                 mock_vessel_sched.assert_called_once()
@@ -679,7 +679,7 @@ class TestResultsBlock(unittest.TestCase):
                 )
             else:
                 pass
-            
+
 
     # ------------------------------------------------------------------
     # 5) empty log_events → exception

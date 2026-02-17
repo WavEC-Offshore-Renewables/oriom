@@ -84,7 +84,7 @@ class Layout_Wave():
             n_strings: int,
             n_substations: int,
             tow_string_shutdown: bool,
-            save_dir=None, 
+            save_dir=None,
             show_plot=False
     ):
         '''
@@ -92,7 +92,7 @@ class Layout_Wave():
         .. figure:: /_static/Layout_imgs/Wave_Layout_2.jpg
             :width: 8000px
             :alt: esempio
-            
+
             LAYOUT 2: DOUBLE FARM REDUNDANT LAYOUT, n_substations=2, n_strings=2, n_wec=8
 
         This layout allows to create two identical independent farms, each
@@ -103,7 +103,7 @@ class Layout_Wave():
             _e = 'N_wec and N_substations must be divisible'
             logging.error('Layout: '+_e)
             raise ValueError(_e)
-        
+
         n_wecs = int(n_wec/n_substations)
         shore_node = 0
         sub_nodes = []
@@ -111,7 +111,7 @@ class Layout_Wave():
         positions = {}
 
         conn_offset = 1  # counter
-        
+
         # Independent farm creations
         for s in range(n_substations):
             sub_node = conn_offset
@@ -150,12 +150,12 @@ class Layout_Wave():
                 else:
                     positions[node] = (pos[node][0] - x_shift, pos[node][1])
             x_shift += n_strings+1
-        
+
         names = nx.get_node_attributes(G_composed, "name")
         edges_names = nx.get_edge_attributes(G_composed, "name")
         nx.draw(G_composed, pos=positions, with_labels=True, node_color='lightblue', node_size=100, alpha=0.8, labels=names)
         nx.draw_networkx_edge_labels(G_composed, pos=positions, edge_labels=edges_names, font_size=5)
-        
+
         if save_dir is not None:
             plt.savefig(os.path.join(save_dir, 'Wave_Layout_2.jpg'))
         else:
@@ -174,7 +174,7 @@ class Layout_Wave():
             n_strings: int,
             n_exports: int,
             tow_string_shutdown: bool,
-            save_dir=None, 
+            save_dir=None,
             show_plot=False
     ):
         '''
@@ -182,7 +182,7 @@ class Layout_Wave():
         .. figure:: /_static/Layout_imgs/Wave_Layout_3.jpg
             :width: 8000px
             :alt: esempio
-            
+
             *LAYOUT 3*: REDUNDANT EXPORT CABLE LAYOUT, n_export_cables=2, n_strings=2, n_wec=6
 
         This layout is considering one substation to which all the strings
@@ -237,15 +237,15 @@ class Layout_Wave():
             substation_node: int,
             n_string_to_connector: int = 6,
             tow_string_shutdown: bool = False,
-            save_dir=None, 
+            save_dir=None,
             show_plot=False
-    ): 
-        
+    ):
+
         """
         .. figure:: /_static/Layout_imgs/Wave_Layout_4.jpg
             :width: 8000px
             :alt: esempio
-            
+
             LAYOUT 4: CORPOWER LAYOUT, n_export_cables=1, substation_node=1, n_string_to_connector=6 (Default), n_strings=12, n_wec=150
 
         CORPOWER layout
@@ -273,7 +273,7 @@ class Layout_Wave():
             _e = 'Layout: n_wec must be equal to CORPOWER layout strings'
             logging.error(_e)
             raise ValueError(_e)
-        
+
         h = 4
         l = 2
 
@@ -355,7 +355,7 @@ class Layout_Wave():
 
         Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wave_Layout_4", color = COLOR)
         return G
-    
+
 
     # ---------------------------------------------------------------------
     # Layout 5
@@ -367,14 +367,14 @@ class Layout_Wave():
             substation_node: int,
             n_string_to_connector: int = 1,
             tow_string_shutdown: bool = False,
-            save_dir=None, 
+            save_dir=None,
             show_plot=False
-    ): 
-        
+    ):
+
         """
         Layout with 1 Substation, 1 Array Cable, 1 Connector and n_wec connected to the same connector
         2 mode of use:
-            1) The n_wec can be considered as module of the wec, the wec itself might be the connector 
+            1) The n_wec can be considered as module of the wec, the wec itself might be the connector
             2) Otherwise more devices connected by umbilicals to Connector that goes to Substation
         """
 
@@ -461,7 +461,7 @@ class Layout_Wave():
                         'p_limit': None
                 }}
                 nx.set_edge_attributes(G, attr_es)
-                
+
             h=1
             l += 1
 
@@ -492,17 +492,17 @@ class Layout_Wave():
             logging.error(_e)
             raise ValueError (_e)
         return G
-        
+
 
 if '__main__' in __name__:
     lw = Layout_Wave()
     G = lw.layout_wave(
-        n_layout = 5, 
+        n_layout = 5,
         n_wec = 10,
         n_strings = 5,
         n_string_to_connector = 2,
-        n_substations = 1, 
+        n_substations = 1,
         n_exports = 1,
         tow_string_shutdown = False
-    ) 
+    )
 

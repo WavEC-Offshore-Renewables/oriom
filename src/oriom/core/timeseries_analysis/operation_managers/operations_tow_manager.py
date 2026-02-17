@@ -30,11 +30,11 @@ def operation_tow_manager(
         metocean_tow: dict = {}
     ):
 
-    """ 
+    """
     Check if the operation_tow is already existing
     If it exist assign ts_data attribute to the OperationTow object
     If does not exist create the operation_schedule and assign it to the OperationTow object
-    
+
     Args:
         operation_dir (string): Path of operation directory
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
@@ -42,10 +42,10 @@ def operation_tow_manager(
         operations_tow (list): List of class `OperationTow`
         timesteps (pd.DataFrame): Timestep to consider in the analysis (not used)`
         Config (object): Object class `Config_run`
-        inputs_tseries (object): Object class `Input.TimeSeries`  
+        inputs_tseries (object): Object class `Input.TimeSeries`
         metocean_tow (dictionary, *Optional*): dictionary with key int value and value Metocean object of
             weather data for towing operations (metocean data of point from site to port). Default to {}
-        
+
     Raise:
         InterruptedError: 'The operation can never occur. OLCs may be to resctric.'
     """
@@ -57,16 +57,16 @@ def operation_tow_manager(
 
         # Check if there is already an operation_schedule file
         file_name_schedule = 'operation_schedule.csv'
-        
+
         if check_files:
             file_exist = check_files.reuse_file_exist(
-                op_dir = op_dir, 
-                file_name_schedule = file_name_schedule, 
+                op_dir = op_dir,
+                file_name_schedule = file_name_schedule,
                 operation = operation
             )
             if file_exist:
                 continue
-        
+
         transit_duration = modify_distance(
             Config = Config,
             operation = operation,
@@ -76,13 +76,13 @@ def operation_tow_manager(
         # Create workability file considering various timestep
         if metocean_tow:
             df_workability = workability.workability_tow(
-                df_metocean = df_metocean, 
-                metocean_tow = metocean_tow, 
+                df_metocean = df_metocean,
+                metocean_tow = metocean_tow,
                 operation = operation,
                 op_dir = op_dir
             )
 
-        # Consider only site metocean timeseries 
+        # Consider only site metocean timeseries
         else:
             df_workability = workability.workability(
                     activities=operation.activities,
@@ -98,8 +98,8 @@ def operation_tow_manager(
 
         # Check if exist a operation scheduler equal that can be recicled for the operation under analysis
         file_exist = recycle_major_other_oper_scheduler(
-                operations = operations_tow, 
-                actual_oper = operation, 
+                operations = operations_tow,
+                actual_oper = operation,
                 df_startability = df_startability,
                 counter_op = i,
                 operation_dir = operation_dir,

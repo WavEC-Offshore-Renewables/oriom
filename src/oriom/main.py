@@ -103,9 +103,9 @@ def run(config: ConfigRun | None = None):
 
     ### ---------- CONVERT EXCEL FORM TO YAML BASE FILES ---------- ###
     extract_input_from_excel(
-        dirs = dirs, 
-        base_file_excel = Config.BASEFILES_FROM_EXCEL, 
-        sharepoint_file_path = Config.SOURCE_PATH_SHAREPOINT, 
+        dirs = dirs,
+        base_file_excel = Config.BASEFILES_FROM_EXCEL,
+        sharepoint_file_path = Config.SOURCE_PATH_SHAREPOINT,
         excel_file_path = Config.EXCEL_FILE_PATH,
         form_name = Config.FORM_NAME
     )
@@ -236,9 +236,9 @@ def run(config: ConfigRun | None = None):
     # Create and prepare a run folder for each operation
     for operation in total_operations:
         aux_functions.create_run_folder_operation(
-            operation = operation, 
-            operation_dir = dirs.operation_dir, 
-            inputs_gen = inputs.general, 
+            operation = operation,
+            operation_dir = dirs.operation_dir,
+            inputs_gen = inputs.general,
             operation_files = Config.OPERATION_FILES
         )
 
@@ -272,15 +272,15 @@ def run(config: ConfigRun | None = None):
     for operation in operations_corr_minor:
         if operation.duration_net >= inputs.tseries.shift_duration["value"]:
             raise ValueError("OperMinor: Duration too long, define the operation as a major", operation.id)
-        
+
     # Populate Major Corrective ant Tow Operations Operations with activities
     for operation in (operations_corr_major + operations_tow):
         op_dir = os.path.join(dirs.operation_dir, operation.id)
         # Check if there is already an activities file
         if check_files and check_files.check_file_exists(path=op_dir, file_name='activities.csv'):
             aux_operation.recycle_activities(
-                operation = operation, 
-                dir=op_dir, 
+                operation = operation,
+                dir=op_dir,
                 file_name='activities',
                 tow_op = operation in operations_tow
             )
@@ -363,9 +363,9 @@ def run(config: ConfigRun | None = None):
     logging.info('---------------------------------------------------------------')
 
     operation_tow_manager(
-        operation_dir = dirs.operation_dir, 
+        operation_dir = dirs.operation_dir,
         df_metocean = metocean.df_timeseries,
-        max_wait = inputs.tseries.max_wait["value"], 
+        max_wait = inputs.tseries.max_wait["value"],
         operations_tow = operations_tow,
         timesteps = timesteps,
         Config = Config,
@@ -374,32 +374,32 @@ def run(config: ConfigRun | None = None):
     )
 
     inspect_site_manager(
-        operation_dir = dirs.operation_dir, 
-        df_metocean = metocean.df_timeseries, 
+        operation_dir = dirs.operation_dir,
+        df_metocean = metocean.df_timeseries,
         operations_inspect_site = operations_inspect_site,
         inputs_tseries = inputs.tseries,
         Config = Config
     )
 
     operation_inspect_port_manager(
-        operation_dir = dirs.operation_dir, 
-        df_metocean = metocean.df_timeseries, 
-        duration_shift = inputs.tseries.shift_duration["value"], 
+        operation_dir = dirs.operation_dir,
+        df_metocean = metocean.df_timeseries,
+        duration_shift = inputs.tseries.shift_duration["value"],
         operations_inspect_port = operations_inspect_port
     )
 
     operation_major_manager(
         operation_dir = dirs.operation_dir,
-        df_metocean = metocean.df_timeseries, 
+        df_metocean = metocean.df_timeseries,
         operations_corr_major = operations_corr_major,
         inputs_tseries = inputs.tseries,
-        Config = Config, 
+        Config = Config,
         timesteps = timesteps
     )
 
     opeartion_minor_manager(
-        operation_dir = dirs.operation_dir, 
-        df_metocean = metocean.df_timeseries, 
+        operation_dir = dirs.operation_dir,
+        df_metocean = metocean.df_timeseries,
         operations_corr_minor = operations_corr_minor,
         inputs_tseries = inputs.tseries,
         Config = Config
@@ -460,10 +460,10 @@ def run(config: ConfigRun | None = None):
         )
 
     find_element = Find_Element.create(
-        operations = operations_tow + operations_inspect_site + operations_inspect_port + operations_corr_major + operations_corr_minor, 
+        operations = operations_tow + operations_inspect_site + operations_inspect_port + operations_corr_major + operations_corr_minor,
         operations_stats = operations_tow_stats['pmain'] + inspections_site_stats['pmain'] + inspections_port_stats['pmain'] + operations_corrective_stats['pmain'],
         operations_stats_pmax = operations_tow_stats['pmax'] + inspections_site_stats['pmax'] + inspections_port_stats['pmax'] + operations_corrective_stats['pmax'],
-        vessels = vessels, 
+        vessels = vessels,
         failures = failures
     )
 

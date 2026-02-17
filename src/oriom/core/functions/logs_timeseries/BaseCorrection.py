@@ -13,7 +13,7 @@ from oriom.utils.read_dataframe_value import approximate_hourly_data
 class BaseCorrection:
     """
     Base class for all corrections.
-    
+
     Attributes:
         date_failure (datetime): Date to consider as start of the operation (failure date or end of tow)
         vessel (:obj:`object`): Objectts :class:`Vessel`
@@ -95,7 +95,7 @@ class BaseCorrection:
 class CorrectionImmediate(BaseCorrection):
     """
     CorrectionImmediate class for immediate corrections.
-    
+
     Attributes:
         tow_op (bool): Flag to reconnize if a towing operation have been conducted
     """
@@ -115,7 +115,7 @@ class CorrectionImmediate(BaseCorrection):
 class CorrectionDeferred(BaseCorrection):
     """
     CorrectionDeferred class for deferred corrections.
-    
+
     Attributes:
         tow_op (bool): Flag to reconnize if a towing operation have been conducted
     """
@@ -137,12 +137,12 @@ class CorrectionDeferred(BaseCorrection):
         else:
             self.time_fail_op_immediately = 0
             self.date_op = date_failure
-    
+
 
     def add_leadtime_tow(self, lead_mob_time: float):
         self.date_end_leadtime = self.date_op + timedelta(hours=lead_mob_time)
 
-        
+
 
 # ===========================
 # CORRECTION TOW / PORT

@@ -25,11 +25,11 @@ def failures_event(
 
     Note:
         The failure generation considers:
-            - if the FR*N_device*years > 1: a fixed total value of events for each type of failures 
-            - if the FR*N_device*years < 1: a poisson distribution of total value of events for each type of failures 
+            - if the FR*N_device*years > 1: a fixed total value of events for each type of failures
+            - if the FR*N_device*years < 1: a poisson distribution of total value of events for each type of failures
         Then takes all failure rates and randomly picks dates of occurrence within the lifetime of the project.
         If a non-uniform scenario is chosen, failures will most likely happen more in months with a higher probability.
-        Also there is the option to simulate a bath tub along the project lifetime. Based on the ``fail_ratio`` (ratio between 
+        Also there is the option to simulate a bath tub along the project lifetime. Based on the ``fail_ratio`` (ratio between
         likelihood of failure during the infant mortality (or wear out) and the constant failure rate in the bath tub distribution),
         failure are more concentrated in the initial year (as many as the ``infant_mortality``) and lasts years (as many as ``wear_out``).
 
@@ -86,7 +86,7 @@ def failures_event(
         }
         for failure in failures
         }
-    
+
     failures_id = list(dict_failures.keys())
     columns= columns + failures_id
     df_failures_per_scenario= pd.DataFrame(columns=columns)
@@ -198,7 +198,7 @@ def failures_event(
             raise KeyError(msg)
 
         dates_failures = dates_failures_OLD
-            
+
     else:
         list_dates = []
         list_ids = []
@@ -233,7 +233,7 @@ def failures_event(
                     list_maintenance_strategy.append(dict_failures_variables[id_][0])
                     list_operation_triggered.append(dict_failures_variables[id_][1])
                     list_preferred_month.append(dict_failures_variables[id_][2])
-    
+
         dates_failures = pd.DataFrame(columns=[
                 'datetime',
                 'id',
@@ -248,7 +248,7 @@ def failures_event(
         dates_failures['operation_triggered'] = list_operation_triggered
         dates_failures['preferred_month'] = list_preferred_month
         dates_failures = dates_failures.sort_values(by ='datetime').reset_index(drop=True)
-    
+
 
     return dates_failures
 

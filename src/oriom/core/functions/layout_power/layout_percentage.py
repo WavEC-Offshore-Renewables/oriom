@@ -30,14 +30,14 @@ def return_percentage(
     n_pv_per_string: int = None,
     max_failure_module: int = None
 ) -> pd.DataFrame:
-    
+
 
     """
     It calls :func:log_corrective_locations and created a DataFrame with all the dates of each event
-    that lead to a shutdown the location and the percentage of the farm. 
+    that lead to a shutdown the location and the percentage of the farm.
 
     From log_events dates procede row by row to evaluate the failure/operation. If is a failure it
-    assign a location through :func:log_corrective_locations and store this location in a list 
+    assign a location through :func:log_corrective_locations and store this location in a list
     in order to not repeat the failure location in a failed component. Than consider if the device need to be
     shutted down or if is restored. Evaluate so the percentage available of power output at that
     timestep. Returns a df with all these information per timesteps
@@ -56,7 +56,7 @@ def return_percentage(
         n_lifetime (:obj:int): lifetime of the project in years.
         n_device (:obj:int): number of devices.
         tech (:obj:str): name of technology analyzed
-        find_element_class (Find_element_class): Initialized instance that provides fast access to operations, 
+        find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         n_strings_per_inv (:obj:int, *optional*): number of string each inverter
         n_pv_per_strings (:obj:int, *optional*): number of modules each string
@@ -71,8 +71,8 @@ def return_percentage(
 
 
     def update_string_PV_shutdown(
-            loc: int, 
-            device_string_level: dict, 
+            loc: int,
+            device_string_level: dict,
             device_shutted_string_level: dict,
             max_failure_module: int,
             string_inverter: set
@@ -96,28 +96,28 @@ def return_percentage(
         if loc not in device_string_level:
             device_string_level[loc] = {}
         # Check if this inverter has already some string failed
-        try: 
+        try:
             failed_strings = set(device_shutted_string_level[loc].keys())
         except KeyError:
             failed_strings = set()
 
         k = aux_layout_power_func.string_location(failed_strings = failed_strings, string_inverter = string_inverter)
-        
+
         device_string_level[loc][k] = device_string_level[loc].get(k, 0) + 1
 
         if device_string_level[loc][k] >= max_failure_module:
             device_shutted_string_level[loc] = {}
             device_shutted_string_level[loc][k] = True
-            
+
             return True
         return False
-    
+
 
     # Create commissioning/decommissioning and monthly markers
     def make_row(date, event):
         return [date, event, '-', '-', '-', '-', '-', '-', 100.0, None]
-    
-    
+
+
     COMPONENT_LEVEL_POWER = aux_layout_power_func.find_highest_power_node(G)
     LEVELS_NO_POWER = {data.get("level") for _, data in G.nodes(data=True)}
     LEVELS_NO_POWER.discard(COMPONENT_LEVEL_POWER)
@@ -196,7 +196,7 @@ def return_percentage(
 
             # Store the shutdown of the device and evaluate the power of the farm
             if shut_fix == 'shut':
-                # Analyze PV technology components below last component defined (inverter) 
+                # Analyze PV technology components below last component defined (inverter)
                 # NOTE: This need to be modified in case we select other layout resolution
                 if event == 'failure':
                     if tech == 'PV':
@@ -223,19 +223,19 @@ def return_percentage(
                         device_failed.add(loc)
                         close_device = True
 
-                    
+
                 # Shutdown the component if is a failure that requires it or the op require shutdown and was not already shutted
                 if loc not in device_shutted or event == 'tow':
                     G, power_farm = shut(
-                        loc, 
+                        loc,
                         shutdown if loc not in device_shutted else False, # Manage case device failed but need tow and create string disconn
-                        G, 
+                        G,
                         COMPONENT_LEVEL_POWER,
                         LEVELS_NO_POWER,
-                        tech, 
-                        name, 
-                        n_pv_per_string, 
-                        max_failure_module, 
+                        tech,
+                        name,
+                        n_pv_per_string,
+                        max_failure_module,
                         device_shutted_string_level,
                         list_failed = device_shutted,
                         string_inverter = string_inverter,
@@ -243,20 +243,20 @@ def return_percentage(
                     )
 
                     perc = power_farm / n_devices * 100
-                    
-                    # Store the closed device if lead to a shutdown and is a component that can be closed or the event 
+
+                    # Store the closed device if lead to a shutdown and is a component that can be closed or the event
                     if shutdown and close_device:
                         device_shutted.add(loc)
 
             # Store the fix of the device and evaluate the power of the farm
-            elif shut_fix == 'fix':                    
+            elif shut_fix == 'fix':
                 G, power_farm = fix(
-                    loc, 
-                    G, 
+                    loc,
+                    G,
                     COMPONENT_LEVEL_POWER,
                     LEVELS_NO_POWER,
-                    tech, 
-                    name, 
+                    tech,
+                    name,
                     n_pv_per_string,
                     event = event
                 )

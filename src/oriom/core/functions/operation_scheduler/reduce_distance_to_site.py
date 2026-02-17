@@ -3,13 +3,13 @@ import re
 
 
 def modify_distance_to_site(
-        operation: object, 
+        operation: object,
         vessel_1: object,
         KM_DISTANCE: int = 5
 ):
     """
     Modify the distance to site for an operation
-    
+
     Args:
         operation (object): object from class ´CorrectiveMinor´, ´CorrectiveMajor´ or ´InspectionSite´
         vessel_1 (object): vessel 1 used in the operation, element for class ´Vessels´
@@ -18,7 +18,7 @@ def modify_distance_to_site(
     Return:
         float: duration of transit if the operation is not ´CorrectiveMajor´
         """
-    
+
     duration_transit = ((KM_DISTANCE * 1000) / vessel_1.speed_transit) / 3600
 
     if hasattr(operation, 'failures'):
@@ -40,10 +40,10 @@ def modify_distance_to_site(
 
 
 def modify_distance(
-        Config: object, 
-        operation: object, 
+        Config: object,
+        operation: object,
         default_distance: float
-)-> float: 
+)-> float:
     """
     Calculate and modify the transit distance for vessels in an operation.
 

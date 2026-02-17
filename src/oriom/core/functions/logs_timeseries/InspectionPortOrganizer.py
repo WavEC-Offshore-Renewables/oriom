@@ -11,7 +11,7 @@ from oriom.core.functions.logs_timeseries import logs_preventive_aux
 class InspectionPortCreation():
     """
     Class to generate and manage the Inspection at Port considering towing, inspection, WoW, n_vessels and port spaces
-    
+
     Attributes:
         inspection (: object): object of class ``InspectionPort`` containing inspection metadata and schedules.
         n_device_at_port (: int) Number of devices that can be handled at the port simultaneously.
@@ -63,7 +63,7 @@ class InspectionPortCreation():
         self.oper_schedule_tow_site_port = logs_preventive_aux.take_op_schedule_tow(inspection = inspection, find_element_class = find_element_class, op_tow = 'op_tow_site_port')
 
         self.dev_idx_station_port = 1
-            
+
 
     def tow_inspection_schedule(self, oper_schedule_tow, d, name_op):
         """
@@ -88,7 +88,7 @@ class InspectionPortCreation():
             logging.warning(f'LogPreventive: {e_}')
             logging.warning(f'The inspection tow {name_op} cannot be completed at date {d}')
             return None, None, None
-        
+
         d_insp = d + timedelta(hours=dur_tot_tow_port)
         d_wait = d + timedelta(hours=wait_tow_port)
         return d_insp, d_wait, d
@@ -96,19 +96,19 @@ class InspectionPortCreation():
 
     def overlap_shift_tow(
         self,
-        overlap_date, 
-        tow_at_site, 
-        d_insp, 
-        d_tow_port_wait, 
-        inspection, 
+        overlap_date,
+        tow_at_site,
+        d_insp,
+        d_tow_port_wait,
+        inspection,
         n_device_at_port,
         d_start_tow
     ):
         """
         Verify and resolve overlaps between a proposed towing interval and existing tow intervals.
 
-        Take the operation under analysis and the dict_towing operations presents, 
-        If overlaps are found that would exceed the number of available vessels/devices at port 
+        Take the operation under analysis and the dict_towing operations presents,
+        If overlaps are found that would exceed the number of available vessels/devices at port
         new dates set for looking of possible operation is at the end of oldes operation conducted
         Algorithm repeated until it finds a non-overlapping interval
 
@@ -137,7 +137,7 @@ class InspectionPortCreation():
             overlap_date_count = 0
             overlap_date = False
             for end_2, start_2 in tow_at_site.values():
-                overlap_day = logs_preventive_aux.date_ranges_overlap(d_tow_port_wait, d_insp, start_2, end_2) 
+                overlap_day = logs_preventive_aux.date_ranges_overlap(d_tow_port_wait, d_insp, start_2, end_2)
                 if overlap_day:
                     overlap_date_count +=1
                 if overlap_date_count >= n_vessel:
@@ -150,9 +150,9 @@ class InspectionPortCreation():
 
 
     def tow_to_port(
-        self, 
-        device_n, 
-        date_continuous, 
+        self,
+        device_n,
+        date_continuous,
         duration_shutdown_month,
         month_insp
     ):
@@ -162,7 +162,7 @@ class InspectionPortCreation():
         This method computes the start candidate for the tow operation.
 
         Call tow_inspection_schedule and overlap_shift_tow methods.
-        If a shutdown column is provided the method aggregates shutdown duration 
+        If a shutdown column is provided the method aggregates shutdown duration
         into `duration_shutdown_month` for the given month index.
 
         Args:
@@ -173,7 +173,7 @@ class InspectionPortCreation():
 
         Returns
             datetime: corresponding to the end of the tow-to-port operation for the device
-            None: if the schedule could not be determined 
+            None: if the schedule could not be determined
         """
 
         if device_n <= self.n_device_at_port:
@@ -184,11 +184,11 @@ class InspectionPortCreation():
             else: start_day_op = self.tow_at_port[self.dev_idx_station_port-1][1]
 
             d_insp, d_tow_port_wait, d_start_tow_port = self.tow_inspection_schedule(self.oper_schedule_tow_port, start_day_op, self.inspection.id)
-            
+
             if d_insp is None or d_tow_port_wait is None:
                 self.operation_completed = False
                 return
-            
+
             # Check if there is an overlap of the tow
             overlap_date = True
             if self.tow_at_site:
@@ -196,7 +196,7 @@ class InspectionPortCreation():
                     **{f"port_{k}": v for k, v in self.tow_at_port.items()},
                     **{f"site_{k}": v for k, v in self.tow_at_site.items()}
                 }
-                
+
                 d_insp, d_tow_port_wait, d_start_tow_port = self.overlap_shift_tow(overlap_date, overlap_dict, d_insp, d_tow_port_wait, self.inspection, self.n_device_at_port, start_day_op)
                 if d_insp is None or d_tow_port_wait is None:
                     self.operation_completed = False
@@ -206,7 +206,7 @@ class InspectionPortCreation():
             # Add the shutdown to tow to port
             if self.shutdown_col:
                 duration_shutdown_month[month_insp] += self.oper_schedule_tow_port.loc[self.oper_schedule_tow_port['datetime'] == d_start_tow_port, self.shutdown_col].values[0]
-        else: 
+        else:
             # else take the end date of last redeploy_remove
             self.dev_idx_station_port = min(self.tow_at_site, key=lambda k: self.tow_at_site[k][0])
             d_insp, d_tow_port_wait = self.tow_at_site[self.dev_idx_station_port]
@@ -222,19 +222,19 @@ class InspectionPortCreation():
         duration_shutdown_month,
         month_insp
     ):
-        """ 
+        """
         Code to inspect the device at port, return the date of end of end inspection device at port
-        
+
         Args:
             d_insp (: datetime): Candidate datetime for starting the sequence of operations (used for the first device).
             duration_shutdown_month (: list): Mutable list that accumulates shutdown durations per month; this function may add to it.
             month_insp (: int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
         """
-        
+
         d_tow, d_insp_wait, _ = self.tow_inspection_schedule(self.oper_schedule_insp, d_insp, self.inspection.id)
         if d_tow is None or d_insp_wait is None:
             self.operation_completed = False
-            return 
+            return
         self.insp_at_port[self.dev_idx_station_port] = d_tow, d_insp_wait
         # Add shutdown considered in port waiting to start inspection
         duration_shutdown_month[month_insp] += self.oper_schedule_insp.loc[self.oper_schedule_insp['datetime'] == d_insp, 'wait_start'].values[0]
@@ -249,7 +249,7 @@ class InspectionPortCreation():
         duration_shutdown_month,
         month_insp
     ):
-        """ 
+        """
         Smilarly to tow_op_port method schedule the towing of a single device to port and return the computed end datetime.
 
         Args:
@@ -258,11 +258,11 @@ class InspectionPortCreation():
             duration_shutdown_month (: list): Mutable list that accumulates shutdown durations per month; this function may add to it.
             month_insp (: int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
         """
-        
+
         if device_n > self.tot_device - self.n_device_at_port:
             # Only site tow (only connecting device)
             oper_schedule_tow_site = self.oper_schedule_tow_site_only
-        else: 
+        else:
             # Port-site tow (connecting and disconnecting device)
             oper_schedule_tow_site = self.oper_schedule_tow_site_port
 
@@ -274,11 +274,11 @@ class InspectionPortCreation():
         overlap_date = True
         if self.tow_at_site:
             d_end_device, d_tow_site_wait, d_start_tow_site = self.overlap_shift_tow(
-                overlap_date, 
-                self.tow_at_site, 
-                d_end_device, 
-                d_tow_site_wait, 
-                self.inspection, 
+                overlap_date,
+                self.tow_at_site,
+                d_end_device,
+                d_tow_site_wait,
+                self.inspection,
                 self.n_device_at_port,
                 d_start_tow_site
             )
@@ -286,7 +286,7 @@ class InspectionPortCreation():
             if d_end_device is None or d_tow_site_wait is None:
                 self.operation_completed = False
                 return
-            
+
         self.tow_at_site[self.dev_idx_station_port] = d_end_device, d_tow_site_wait
         # Add the shutdown to tow to port
         if self.shutdown_col:
@@ -307,7 +307,7 @@ class InspectionPortCreation():
     ):
         """
         Main code to evaluate the inspection at port for all the devices
-        
+
         The code evaluate for each device the tow to port, the inspection at port and the tow to site.
         To evaluate the date of start for each operation the code consider if there is an overlap with other operations
         in the same time interval, if there is an overlap the code reevaluate the date of start and date of end of the operation
@@ -338,14 +338,14 @@ class InspectionPortCreation():
         for device_n in range(1, self.tot_device+1):
             ## Tow the device to port ##
             d_insp = self.tow_to_port(
-                device_n = device_n, 
-                date_continuous = date_continuous, 
+                device_n = device_n,
+                date_continuous = date_continuous,
                 duration_shutdown_month = duration_shutdown_month,
                 month_insp = month_insp
             )
             if self.operation_completed is False:
                 break
-            
+
             ## Inspect the device at port ##
             d_insp = self.inspection_at_port(
                 d_insp = d_insp,
@@ -354,7 +354,7 @@ class InspectionPortCreation():
             )
             if self.operation_completed is False:
                 break
-            
+
             ## Tow the device to site ##
             d_end_device = self.tow_to_site(
                 device_n = device_n,
@@ -364,17 +364,17 @@ class InspectionPortCreation():
             )
             if self.operation_completed is False:
                 break
-            
+
             actual_df_port_inspection_log.loc[len(actual_df_port_inspection_log)] = [d, self.tow_at_port[self.dev_idx_station_port][1], self.tow_at_site[self.dev_idx_station_port][0], device_n]
             self.dev_idx_station_port+=1
-        
+
         # Add the results to the lists if the inspection is completed
         if self.operation_completed:
             end_datetimes.append(d_end_device)
             end_stat_chart_datetimes.append(d_end_device) # effectuate statistical analysis after
             valid_datetimes.append(d)
             df_port_inspection_log = pd.concat([df_port_inspection_log, actual_df_port_inspection_log], ignore_index=True)
-            
+
         return df_port_inspection_log
 
 

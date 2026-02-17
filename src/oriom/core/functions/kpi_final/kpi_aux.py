@@ -14,7 +14,7 @@ def calculate_cost(
 ):
     """
     Calculate transit fuel costs
-    
+
     Args:
         transit_time_merged (float): time of transit in hours
         maneuver_time_merged (float): time of manuver in hours
@@ -23,30 +23,30 @@ def calculate_cost(
         fuel_cost_times_density (float): fuel cost*density of fuel
 
     Return:
-        float: cost of transitfuel 
-        float: cost of manuver fuel 
-        float: cost of stand_by fuel 
+        float: cost of transitfuel
+        float: cost of manuver fuel
+        float: cost of stand_by fuel
     """
     transit_cost = transit_time_merged*vessel.fuel_cons_transit*fuel_cost_times_density
     maneuver_cost = maneuver_time_merged*vessel.fuel_cons_maneuver*fuel_cost_times_density
     standby_cost = standby_time_merged*vessel.fuel_cons_standby*fuel_cost_times_density
-    
+
     return transit_cost, maneuver_cost, standby_cost
-    
+
 
 
 def count_day(
-        df: pd.DataFrame, 
+        df: pd.DataFrame,
 )->int:
     """
     This function create a new column on the dataframe indicating for each row the nº days that a ROV is used
 
     Args:
-    df (:obj:`pd.DataFrame`): Log of events file 
+    df (:obj:`pd.DataFrame`): Log of events file
     ves (:obj:`object`): object of class `Vessel`
 
-    Returns: 
-        int: days of ROV use 
+    Returns:
+        int: days of ROV use
     """
 
     df = df.copy()
@@ -58,7 +58,7 @@ def count_day(
     df['days_used'] = ((df['d_end'].dt.normalize() - df['start'].dt.normalize())/np.timedelta64(1, 'D')).astype(int) + 1
     df['days_used'] = df['days_used'] * df['n_vessel']
     days_vessel = mt.ceil(df['days_used'].sum())
-    
+
     return days_vessel
 
 
@@ -67,7 +67,7 @@ def safe_get_tech_tot(
 ):
     """
     This function take the technician cost from the log_events_merged file
-    It is needed as for merged function is difficult to reestablish che cost of tech 
+    It is needed as for merged function is difficult to reestablish che cost of tech
     """
     if isinstance(x, dict):
         return x.get('tech_cost')
@@ -88,9 +88,9 @@ def n_technicians(
 
     """
     This function evaluate if technicians used in the inspections conduct consecutive inspections in one day.
-    If consecutive inspections are done, the TOT number of technicians needed is divided by the number of devices 
+    If consecutive inspections are done, the TOT number of technicians needed is divided by the number of devices
     inspected in 1 day.
-    This is an appriximate number of tech needed cause the last shift is not considered, there could be less tech 
+    This is an appriximate number of tech needed cause the last shift is not considered, there could be less tech
     in last shift (negligible).
 
     Example:
@@ -105,7 +105,7 @@ def n_technicians(
     Args:
         device_inspected (int): number of devices inspected,
         n_tech_inps (int): number of technicians needed for each devices,
-        n_shifts (int): number of shift conducted, 
+        n_shifts (int): number of shift conducted,
         n_vess (int): number of vessels used
 
     """
@@ -115,16 +115,16 @@ def n_technicians(
     if consecutive_inspections < 1:
         # in case long operation that requires more than one shift to be concluded
         consecutive_inspections = 1
-    # if so, reduce the tech need for the inspection 
+    # if so, reduce the tech need for the inspection
     return n_tech_inps_tot/consecutive_inspections
-    
+
 
 def filter_df_events_per_vessel(
-    df: pd.DataFrame, 
-    vessel_id: str, 
+    df: pd.DataFrame,
+    vessel_id: str,
     second_vessel: bool = True
 ) -> pd.DataFrame:
-    
+
     """
     This function filters the dataframe for the given vessel_id and creates a column 'n_vessel'
     that corresponds to 'n_vessel_1' if vessel_id == vessel_1, or 'n_vessel_2' if vessel_id == vessel_2.
@@ -181,7 +181,7 @@ def remove_row_vessel_double(
         )
 
         df.drop(df[mask_double_vessel].index, inplace=True)
-        
+
     return df
 
 
@@ -192,7 +192,7 @@ def define_fuel_cost(
     fuel_cost_mgo: float
 )->float:
     """
-    Auxiliary Function: 
+    Auxiliary Function:
     Calculate the cost of fuel based on the vessel's fuel type, density, and fuel costs.
 
     Args:
@@ -231,9 +231,9 @@ def define_fuel_cost(
 
 
 def tech_rov_cost(
-        df: pd.DataFrame, 
-        rov_dict_cost: dict, 
-        duration_shift: float, 
+        df: pd.DataFrame,
+        rov_dict_cost: dict,
+        duration_shift: float,
         oper_dict_tech: dict
 ):
     """
@@ -242,7 +242,7 @@ def tech_rov_cost(
     Args:
         df (pd.DataFrame): Dataframe of Log_events for the operation type analysed
         rov_cost_dict (:obj:`dict`): Dict of rov per operations
-        duration_shift (float): 
+        duration_shift (float):
         tech_per_oper_dict (:obj:`dict`): Dict of technicians costs per operations
 
     Returns:
@@ -262,7 +262,7 @@ def tech_rov_cost(
 
     # Cost of tot tech on each operation in case merged operation
     df['tech_cost'] = df['comments'].apply(safe_get_tech_tot)
-    
+
     # In case is single operation, fill the tech_cost with the value from oper_dict_tech
     if oper_dict_tech:
         mask_none = df['tech_cost'].isna()
@@ -273,8 +273,8 @@ def tech_rov_cost(
 
 if __name__ == '__main__':
     pass
-    
-    
-    
+
+
+
 
     

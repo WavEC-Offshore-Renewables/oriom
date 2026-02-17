@@ -20,7 +20,7 @@ class Define_operation():
             vessels: dict
     ):
         """
-        Create Vessel object for the operation called for the operation that correspond to 
+        Create Vessel object for the operation called for the operation that correspond to
             operation.Vessel1 e operation.Vessel2. Update the vessels dictionary if needed
 
         Args:
@@ -43,7 +43,7 @@ class Define_operation():
                 in :attr:`file_vessels` YAML file
 
         """
-        
+
         vessels_ops = {}
 
         # Read YAML file
@@ -212,7 +212,7 @@ class Define_operation():
         for vessel_id, vessel in vessels_ops.items():
             if vessel_id not in vessels:
                 vessels[vessel_id] = vessel
-        
+
     @staticmethod
     def define_rovs(
             operation,

@@ -9,10 +9,10 @@ from oriom.classes.Activity import Activity
 
 
 def get_graph_levels(G: nx.Graph) -> set:
-    """ Take all the levels of the graphs and return it as a set""" 
-    node_levels = {data.get('level', None) for _, data in G.nodes(data=True) if 'level' in data} 
-    edge_levels = {data.get('level', None) for _, _, data in G.edges(data=True) if 'level' in data} 
-    # Unite the levels and avoid None or empty values 
+    """ Take all the levels of the graphs and return it as a set"""
+    node_levels = {data.get('level', None) for _, data in G.nodes(data=True) if 'level' in data}
+    edge_levels = {data.get('level', None) for _, _, data in G.edges(data=True) if 'level' in data}
+    # Unite the levels and avoid None or empty values
     all_levels = {lvl for lvl in node_levels.union(edge_levels) if lvl and lvl.strip()}
     return all_levels
 
@@ -26,7 +26,7 @@ def level_component_check(Gs: dict, operations: list, failure: bool = False):
         operations (list): List of objects to check (InspectionPort, InspectionSite, Failures)
         failure (bool): If True, check 'level_failure'; else 'level'
     """
-    
+
     tech_map = {'G_wind': 'ofw', 'G_pv': 'opv', 'G_wave': 'owc'}
     attr_to_check = 'level_failure' if failure else 'level'
     object_name = 'failure' if failure else 'inspection'
@@ -59,7 +59,7 @@ def operation_check_identities(total_operations: list):
     Args:
         total_operations (list): List of Operation objects
 
-    Raise: 
+    Raise:
         ValueError: If there are operations with the same id
     """
 
@@ -73,8 +73,8 @@ def operation_check_identities(total_operations: list):
         e_ = f"Duplicate operation id found: '{duplicate_ids}', please give unique id to the operations"
         logging.error(e_)
         raise ValueError(e_)
-        
-    
+
+
 def define_activities(
         operation: object,
         file_activities: str,
@@ -84,10 +84,10 @@ def define_activities(
     ):
         """
         Define activities for :class:`CorrectiveMajor` or :class:`OperationTow` based on a YAML file path :attr:`file_activities` if
-        the operation ID of the activity matches the ID of this CorrectiveMajor, that 
+        the operation ID of the activity matches the ID of this CorrectiveMajor, that
         :class:`~oriom.classes.Activity.Activity` is assumed as part
         of the :class:`CorrectiveMajor` or :class:`OperationTow`.
-        
+
         Args:
             operation (:obj: `object`): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
             file_activities (:obj:`str`): The path to the YAML file containing activities.
@@ -125,7 +125,7 @@ def define_activities(
             wtg_shutdown_dur = 0
             wec_shutdown_dur = 0
             pv_shutdown_dur = 0
-            
+
             if tow_op and all([
                     'transit' in act["name"].lower(),
                     'next' in act["name"].lower()

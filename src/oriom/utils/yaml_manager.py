@@ -7,11 +7,11 @@ from oriom.utils.aux_functions import update_dict
 
 def inputs_to_yaml(inputs_object, out_dir: str, out_name: str):
     """Saves ~Inputs.X as a YAML file.
-    
+
     Args:
-        out_dir (:obj:`str`): The path where the YAML file is saved. 
-        out_name (:obj:`str`): The name of the YAML file. 
-    
+        out_dir (:obj:`str`): The path where the YAML file is saved.
+        out_name (:obj:`str`): The name of the YAML file.
+
     """
     input_file_name = str(out_name) + '.yaml'
     f_inputs = open(os.path.join(out_dir, input_file_name), 'w')
@@ -130,7 +130,7 @@ def load_shift_values_from_yaml(file_dir: str, file_name: str):
 
 def load_similar_op_yaml(file_dir: str, file_name: str) -> dict:
     """
-    Recycling the values obtained from another operation, extrapolate from the similar operation the values 
+    Recycling the values obtained from another operation, extrapolate from the similar operation the values
     regarding the shifts and return them in two dictionaries
     """
 
@@ -146,7 +146,7 @@ def load_similar_op_yaml(file_dir: str, file_name: str) -> dict:
         "id_grouped", "days_grouped", "duration_grouped", "rov_grouped",
         "n_vessels_main", "n_vessels_last",
     ]
-    
+
     # Upload the similar operation file YAML
     file_path = os.path.join(file_dir, file_name)
     yaml = YAML(typ='safe')

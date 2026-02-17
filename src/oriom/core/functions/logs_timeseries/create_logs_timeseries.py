@@ -58,7 +58,7 @@ def create_logs_timeseries_file(
             - date end trasit to port: d_end_dur_net_site + operation_scheduler[transit_to_port] (hours)
             - date end: d_end_transit_tp + operation_scheduler[dur_net_port] (hours)
             - date end statistical chart: date end leadtime + operation_statistic[wait_start] (hours)
-        
+
         Failure event only have the trigger date representing the time of occurrence.
         Inspections only have the trigger date and end date since the statistical analysis returns an overall duration.
         Vessel mobilisation is also logged defined by the trigger date in which the mobilisation starts.
@@ -99,7 +99,7 @@ def create_logs_timeseries_file(
 
     # NOTE: Avoid to consider event and failure on the last month for maintenance
     CUTOFF_DATE = pd.to_datetime(f"{end_year}-{end_month}-{DICT_DAYS[end_month]} 23:59:59")
-    
+
     log_corrective = create_logs_events_corrective.create_logs_corrective_file(
         COLS = COLS,
         CUTOFF_DATE = CUTOFF_DATE,
@@ -122,15 +122,15 @@ def create_logs_timeseries_file(
 
     inspection_campaign_stat = Stat_chart_inspection_campaign(inspections_site_stat = inspections_site_stat)
     log_preventive = inspection_campaign_stat.create_stat_chart_inspection_campaign(
-        df = log_preventive, 
-        vessels = vessels, 
+        df = log_preventive,
+        vessels = vessels,
         percentile = inputs.stats.percentile_max["value"]
     )
 
     log_events = pd.concat([log_corrective,log_preventive], axis=0, ignore_index=True)
 
     log_events = logs_timeseries_func.shutdown_evaluation(
-        log_events = log_events, 
+        log_events = log_events,
         failures = failures,
         operation_log_file_stats = operation_log_file_stats,
         inspections_port_stat = inspections_port_stat,

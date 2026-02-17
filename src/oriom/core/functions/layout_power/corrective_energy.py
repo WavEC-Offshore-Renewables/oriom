@@ -11,8 +11,8 @@ from oriom.core.functions.layout_power.pv_power_calculation import calculate_ene
 
 
 def timeseries_energy_calculation(df_tech: pd.DataFrame, timeseries: pd.DataFrame, tech1: str)-> list:
-    """ 
-    For each relevant event date take the sum of power produced 
+    """
+    For each relevant event date take the sum of power produced
     by the entire farm from start date to end date. Return a list of energy values."""
 
     energy_list = []
@@ -30,10 +30,10 @@ def timeseries_energy_calculation(df_tech: pd.DataFrame, timeseries: pd.DataFram
 
 
 def manage_energy_calculation(
-            df_tech: pd.DataFrame, 
-            series_power: pd.Series, 
-            STATISTIC_ENERGY: bool, 
-            metocean_timeseries: pd.DataFrame, 
+            df_tech: pd.DataFrame,
+            series_power: pd.Series,
+            STATISTIC_ENERGY: bool,
+            metocean_timeseries: pd.DataFrame,
             tech1: str
     ):
 
@@ -76,12 +76,12 @@ def corrective_layout(
     metocean_timeseries: pd.DataFrame = pd.DataFrame(),
     STATISTIC_ENERGY = False
 )-> pd.DataFrame:
-    
+
     """Based on the log of events it picks the locations at which the operation is being performed.
     When the operation starts -> shutdown(Y/N)
     When the operation end -> the failure is fixed
     Being the events chronologically ordered, for every event the function uses the graphs (layout)
-    to understand the percentage of farm available at that instant and returns the relative power farm 
+    to understand the percentage of farm available at that instant and returns the relative power farm
     (power averaged among the month).
 
     Args:
@@ -150,7 +150,7 @@ def corrective_layout(
 
     # Filter the log_events file for the corrective events and only if create a shutdown of a component
     log_events = log_events[~log_events['event'].isin(['inspection_site','inspection_port', 'mobilisation', 'mobilisation_merged'])]
-    
+
     if n_device_wtg is not None:
         tech1 = 'wind'
         prefix_list = ['ofw', 'oce']
@@ -171,12 +171,12 @@ def corrective_layout(
             _e = '"n_device_wtg" defined and "power_wind" not defined.'
             logging.error('Layout perc: '+_e)
             raise ValueError(_e)
-        
+
         df_wind = manage_energy_calculation(
-            df_tech = df_wind, 
-            series_power = series_power_wind, 
-            STATISTIC_ENERGY = STATISTIC_ENERGY, 
-            metocean_timeseries = metocean_timeseries, 
+            df_tech = df_wind,
+            series_power = series_power_wind,
+            STATISTIC_ENERGY = STATISTIC_ENERGY,
+            metocean_timeseries = metocean_timeseries,
             tech1 = tech1
         )
 
@@ -202,10 +202,10 @@ def corrective_layout(
             raise ValueError(_e)
 
         df_wave = manage_energy_calculation(
-            df_tech = df_wave, 
-            series_power = series_power_wave, 
-            STATISTIC_ENERGY = STATISTIC_ENERGY, 
-            metocean_timeseries = metocean_timeseries, 
+            df_tech = df_wave,
+            series_power = series_power_wave,
+            STATISTIC_ENERGY = STATISTIC_ENERGY,
+            metocean_timeseries = metocean_timeseries,
             tech1 = tech1
         )
 
@@ -233,7 +233,7 @@ def corrective_layout(
             _e = '"n_device_pv" defined and "power_pv" not defined.'
             logging.error('Layout perc: '+_e)
             raise ValueError(_e)
-        
+
         df_pv = aux_functions.convert_stringtime(df = df_pv, dt_column = 'Date')
         df_pv["Power_loss_kW"] = 0.0
         # Statistical calculation of energy losses
@@ -249,7 +249,7 @@ def corrective_layout(
                 lambda r: calculate_energy_loss_pv(r, series_power_pv, start_year, degradation_rate),
                 axis=1
             )
-                        
+
             df_pv.loc[df_month.index, 'Power_loss_kW'] = df_month['Power_loss_kW']
 
         # Sort and reset index

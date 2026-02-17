@@ -5,7 +5,7 @@ from distutils.util import strtobool
 
 
 class Activity():
-    """Operations are decomposed in Activities. Each Activity has a specific 
+    """Operations are decomposed in Activities. Each Activity has a specific
     duration, Operating Limit Criteria, etc.
 
     Note:
@@ -138,9 +138,9 @@ class Activity():
 
     def _check_attributes(self):
         """
-        This method validates the attributes of the `Activity` class to ensure they 
+        This method validates the attributes of the `Activity` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         if self.duration < 0:

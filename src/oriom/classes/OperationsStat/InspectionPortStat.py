@@ -91,7 +91,7 @@ class InspectionPortStat():
             self.standby_time_dict= dict_statistics['standby_time_dict']
         if dict_statistics['shutdown_dict'] is not None:
             self.shutdown_dict = dict_statistics['shutdown_dict']
-        
+
         op_path_file_perc = os.path.join(run_dir, inspection.id, 'statistical_analysis_P' + str(PERCENTILE) + '.csv')
         shutdown_insp_port = self.shutdown_dict_insp_port(op_path = op_path_file_perc)
 
@@ -489,7 +489,7 @@ class InspectionPortStat():
                 return d
 
         return {}
-    
+
     def get_inspection_statistics(
         insepctions_port: list,
         PERCENTILE: int,

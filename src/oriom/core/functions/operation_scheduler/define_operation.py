@@ -20,12 +20,12 @@ def define_operation_values(
     """
     This function is to be used only in case of operations defined by activities.
 
-    For a timeseries (df_startability) this function schedule a given operation and, for each timestep, 
-    calculates what are the operation durations and waitings. Major and TOW operations are definded by 
+    For a timeseries (df_startability) this function schedule a given operation and, for each timestep,
+    calculates what are the operation durations and waitings. Major and TOW operations are definded by
     activities. To schedule such operations are firtly analyzed the most restrictive activities
     and from it is check if the other activities can be conducted in a range of MAX_WAIT hours.
     To reduce computational time, if the operation in such timestep has waiting hours to start,
-    the function jump directly at the timestep after the operation has been scheduled. Then, 
+    the function jump directly at the timestep after the operation has been scheduled. Then,
     evaluate the next time step. This is done for all the timesteps till no more operation can
     be scheduled (end of timeseries analysis)
 
@@ -361,8 +361,8 @@ def define_operation_values(
                 }
 
         return metocean_ts
-    
-    if len(operation.activities) <= 3:          
+
+    if len(operation.activities) <= 3:
         MAX_WAIT = 0
     logging.info(f'Operation_scheduler: For {operation.id} the maximum waiting on weather between activities is {MAX_WAIT} hours')
 
@@ -438,7 +438,7 @@ def define_operation_values(
                             **base_other
                         }
                         new_entries.append(new_entry)
-                    
+
                 # Create a shallow copy for shared structure (except mutable parts)
                 else:
                     base = deepcopy(first_entry)
@@ -456,7 +456,7 @@ def define_operation_values(
 
                 list_st_dur_wt.extend(new_entries)
 
-                timestep += int(wow+1)           
+                timestep += int(wow+1)
 
                 # Check that we do not exceed the final index
                 if timestep >= final_idx:

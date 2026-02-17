@@ -242,7 +242,7 @@ class TestLoadSimilarOpYaml(unittest.TestCase):
             "duration_grouped": 40.0,
             "rov_main": True,
             "rov_grouped": False,
-            
+
             # working_shifts section
             "working_shifts": {
                 "id_main": "op_A",

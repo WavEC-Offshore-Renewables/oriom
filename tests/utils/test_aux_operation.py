@@ -92,7 +92,7 @@ class TestLevelComponentCheck(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             operation_check_identities(ops)
-        
+
         self.assertIn("Duplicate operation id found", str(context.exception))
 
 class TestOperation(unittest.TestCase):

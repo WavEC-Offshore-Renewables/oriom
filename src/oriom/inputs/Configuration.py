@@ -22,15 +22,15 @@ class ConfigRun:
             Default to {}.
         ENERGY_AVAILABILITY_CALCULATION (bool): Flag to consider energy calculation
             Default to True.
-        ENERGY_STATISTICAL_CALCULATION (bool): Flag to consider statistical or timeseries energy calculation 
+        ENERGY_STATISTICAL_CALCULATION (bool): Flag to consider statistical or timeseries energy calculation
             Default to False.
         PROJECT_NAME (str): Name of the project choose. Default to ''.
-        BASEFILES_FROM_EXCEL (bool):  Flag to consider excel input file to read on sharepoint. 
+        BASEFILES_FROM_EXCEL (bool):  Flag to consider excel input file to read on sharepoint.
             Default to False.
         EXCEL_FILE_PATH (str): Path to the excel input file to read. Default to None.
         SOURCE_PATH_SHAREPOINT (str): Path to the excel input file to read in sharepoint folder. Default to None.
         FORM_NAME (str): Name of the excel input file to read. Default to None.,
-        TIME_FAIL_OP_IMMEDIATELY(float): Reaction time of operation in consequence of failure. 
+        TIME_FAIL_OP_IMMEDIATELY(float): Reaction time of operation in consequence of failure.
             Default to 0.02.
     """
 
@@ -168,7 +168,7 @@ class ProjectDirs:
     """Container for all project directories."""
 
     def __init__(
-            self, 
+            self,
             project_name: str,
             time_prefix: datetime = ''
         ):
@@ -207,7 +207,7 @@ class ProjectDirs:
 
     @classmethod
     def create(
-            cls, 
+            cls,
             project_name: str = "My_project",
             time_prefix: datetime = ''
         ) -> "ProjectDirs":

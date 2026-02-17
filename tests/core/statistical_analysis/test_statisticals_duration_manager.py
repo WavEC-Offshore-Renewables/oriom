@@ -65,7 +65,7 @@ class TestStatisticalDurationManager(unittest.TestCase):
         inputs_stats = SimpleNamespace(percentiles={"value": [50]}, percentile_max=None)
         for op in ops:
             delattr(op, 'ts_data')
-            
+
         #with self.assertLogs(level='WARNING') as log_cm:
         statistical_duration_manager(
             operation_dir="dummy_dir",

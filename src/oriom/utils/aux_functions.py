@@ -19,14 +19,14 @@ def update_dict(d, u):
 
 def save_file_csv(
     df_to_save: pd.DataFrame,
-    save_dir: str, 
-    filename: str = None, 
+    save_dir: str,
+    filename: str = None,
     indexing: bool = False
 ):
-    
-    """ 
+
+    """
     Function to save csv
-    
+
     Args:
         df_to_save (pd.DataFrame): dataframe to save in csv
         save_dir (str): address to save file
@@ -59,7 +59,7 @@ def convert_stringtime(
     df: pd.DataFrame,
     dt_column: str='datetime'
 ) -> pd.DataFrame:
-    
+
     """
     Convert column in datetime. It tries different format till it find one
     Args:
@@ -71,10 +71,10 @@ def convert_stringtime(
     Raises:
         ValueError: If the column is not in datetime format and no format is found
     """
-    
+
     if pd.api.types.is_datetime64_any_dtype(df[dt_column]):
-        return df  
-    
+        return df
+
     # Mask value to convert (exclude 'reuse_vessel')
     if dt_column == 'd_end_stat_chart':
         mask_convert = df[dt_column] != 'reuse_vessel'
@@ -87,7 +87,7 @@ def convert_stringtime(
         "%d/%m/%y %H:%M:%S",
         "%d-%m-%y %H:%M:%S",
         "%d-%m-%y %H:%M",
-        "%d-%m-%Y %H:%M", 
+        "%d-%m-%Y %H:%M",
         "%Y/%m/%d %H:%M:%S",
         "%Y/%m/%d %H:%M"
     ]
@@ -100,19 +100,19 @@ def convert_stringtime(
                 df.loc[mask_convert, dt_column] = pd.to_datetime(df.loc[mask_convert, dt_column], format=fmt)
             else:
                 df[dt_column] = pd.to_datetime(df[dt_column], format=fmt)
-            return df  
+            return df
         except ValueError as _e:
             if i == len(formats):
                 logging.error(f'LogDates: {_e} for {df}')
                 raise ValueError(f'LogDates: {_e} for {df}')
-            continue  
+            continue
     return df
 
 
 def log_event_convert_stringtime(
     df_log_event_: pd.DataFrame
 ) -> pd.DataFrame:
-    
+
     """
     Convert the string time to datetime format for the log events
     Args:
@@ -130,13 +130,13 @@ def log_event_convert_stringtime(
 
 
 def take_attribute(op_id, find_element_class):
-    """ 
+    """
     Auxiliary function to take the parameters of the operation
     Args:
         op_id (:obj:`str`): The id of the operation to take the parameters
         operation_log_file (:obj:`list`): The list of class that contains the operation to analyse
         time_between_devices (:obj:`dict`): The dictionary that contains the time between devices for various technologies
-        find_element_class (Find_element_class): Initialized instance that provides fast access to operations, 
+        find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
 
     """
@@ -166,13 +166,13 @@ def take_attribute(op_id, find_element_class):
 
 
 def create_run_folder_operation(
-        operation, 
-        operation_dir: str, 
-        inputs_gen, 
+        operation,
+        operation_dir: str,
+        inputs_gen,
         operation_files: list
 ):
     """ Function used to create the operations folders and copy previous result if exists"""
-    
+
     op_dir = os.path.join(operation_dir, operation.id)
     if not os.path.exists(op_dir):
         os.makedirs(op_dir)
@@ -186,7 +186,7 @@ def create_run_folder_operation(
         if not os.path.exists(src_dir):
             # This operation was not considered in the previous run.
             # Nothing to copy.
-            return 
+            return
         dst_dir = os.path.join(operation_dir, operation.id)
         for file_name in os.listdir(src_dir):
             if file_name in operation_files:
@@ -205,9 +205,9 @@ def safe_copy_df(
         df_orig: pd.DataFrame,
         deep_cols: list
 )-> pd.DataFrame:
-    
+
     """
-    Creates a shallow copy of the DataFrame, and applies deepcopy only to selected columns 
+    Creates a shallow copy of the DataFrame, and applies deepcopy only to selected columns
     (e.g., those containing lists, dicts, or other mutable objects).
 
     Args:

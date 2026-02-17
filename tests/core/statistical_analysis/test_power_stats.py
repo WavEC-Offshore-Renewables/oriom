@@ -25,7 +25,7 @@ class Testapower_stat(unittest.TestCase):
         class DummyStatInputs:
             start_year = {"value": 2018}
             lifetime = {"value": 1}
-    
+
         metocean = Metocean(
                 file_=os.path.join(os.getcwd(), 'tests', 'test_files', 'metocean', 'metocean_dummy.csv'),
                 latitude=41.0,

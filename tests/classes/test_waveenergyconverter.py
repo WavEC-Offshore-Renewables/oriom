@@ -5,7 +5,7 @@ from copy import deepcopy
 from oriom.classes.WaveEnergyConverter import WaveEnergyConverter
 
 
- 
+
 class TestWaceEnergyConverter(unittest.TestCase):
     @classmethod
     def setUpClass(self):

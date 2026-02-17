@@ -20,7 +20,7 @@ try:
     )
 except ModuleNotFoundError:
     check_files_spec = None
-    
+
 skip_if_no_check_files = unittest.skipIf(
     check_files_spec is None,
     "check_files module not available, skipping related tests"

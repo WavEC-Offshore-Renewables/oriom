@@ -5,11 +5,11 @@ from oriom.core.functions.logs_timeseries.logs_timeseries_func import create_mob
 
 
 def tow_deferred_mobi(
-        COLS: list, 
+        COLS: list,
         log_events_tow_def: pd.DataFrame,
         find_element_class: object
 ):
-    """ 
+    """
     Create one mobilisation for deferred tow each campaign
 
     Args:
@@ -20,8 +20,8 @@ def tow_deferred_mobi(
     Returns
         pd.DataFrame: dataframe of mobilisation
     """
-    
-    row_merged_def_tow = pd.DataFrame(columns=COLS) 
+
+    row_merged_def_tow = pd.DataFrame(columns=COLS)
 
     log_events_tow_deferred = deepcopy(log_events_tow_def)
     log_events_tow_deferred['year_month'] = log_events_tow_deferred['d_trigger'].dt.to_period('M')
@@ -33,7 +33,7 @@ def tow_deferred_mobi(
 
         for vessel_id in vessels_tow:
             vessel = find_element_class.find_vessel(vessel_id)
-            operation_number_analysed = 0  
+            operation_number_analysed = 0
 
             if vessel.mobilisation_time != 0:
                 for op_id, op_row in df_ops.groupby('id'):

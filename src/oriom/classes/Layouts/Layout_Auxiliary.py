@@ -12,9 +12,9 @@ class Layout_Aux():
             """
             Add the shore and substation nodes, and the export cable between them.
             Args:
-                G (networkx): 
-                n_strings (int): number of string 
-                substation_node (int): number of substation node 
+                G (networkx):
+                n_strings (int): number of string
+                substation_node (int): number of substation node
                 pv (bool): Correction of y coordinates if pv tech. Default to ``False``
             """
             if pv:
@@ -54,7 +54,7 @@ class Layout_Aux():
                 }
             })
             return G
-    
+
 
     @staticmethod
     def draw_layout(G, save_dir=None, show_plot=False, title=None, color = 'grey'):

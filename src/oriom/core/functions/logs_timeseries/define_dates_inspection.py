@@ -21,11 +21,11 @@ def define_dates(
     find_element_class: object,
     mother_vessel_inspection_campaign: dict = {}
 )->pd.DataFrame:
-    
+
     """Auxiliary function: It defines the dates for the inspection called based on the periodicity.
 
     For inspection at port evaluates the tow to port, inspection at port and tow to site time
-    from the respective operation_schedule file. A maximum number of device can be inspected 
+    from the respective operation_schedule file. A maximum number of device can be inspected
     at port simultaneously and towing operation that require a specific vessel are considered
     with only one (for now) available vessel (no intersection of shifts).
 
@@ -43,8 +43,8 @@ def define_dates(
 
     Returns:
         pd.DataFrame: dataframe with all the inspection event.
-    """            
-            
+    """
+
     df_dates_inspection = pd.DataFrame(columns=COLS)
     df_port_inspection_log = pd.DataFrame(columns=['d_trigger', 'd_TTP_start', 'd_TTP_end', 'n_device'])
 
@@ -53,16 +53,16 @@ def define_dates(
     n_device_at_port = aux_functions.safe_getattr(inspection, ['insp_class', 'n_device_at_port'])
     n_device_stored_at_port = aux_functions.safe_getattr(inspection, ['insp_class', 'n_device_stored_at_port'])
     duration_shift_main = aux_functions.safe_getattr(inspection, ['insp_class', 'duration_main'])
-    days_main = aux_functions.safe_getattr(inspection, ['insp_class', 'days_main'])                                  
-    days_last = aux_functions.safe_getattr(inspection, ['insp_class', 'days_last'])                                  
-    
+    days_main = aux_functions.safe_getattr(inspection, ['insp_class', 'days_main'])
+    days_last = aux_functions.safe_getattr(inspection, ['insp_class', 'days_last'])
+
     if max(days_main,days_last) == 0:
         return df_dates_inspection
-    
+
     if aux_functions.safe_getattr(inspection, ['insp_class', 'op_tow_port']):
         port_inspection_flag = True
     else: port_inspection_flag = False
-    
+
     datetimes = logs_preventive_aux.start_date_inspection(
         inspection = inspection,
         start_year = start_year,
@@ -89,7 +89,7 @@ def define_dates(
         # If oper_schedule need to combine tow to port, tow to site, insp at port and consider n_device at port
         if port_inspection_flag:
             # Find n_vessel
-            n_vessel = inspection.n_vessel_1 
+            n_vessel = inspection.n_vessel_1
             if n_vessel > n_device_at_port:
                 n_vessel = n_device_at_port
 
@@ -116,8 +116,8 @@ def define_dates(
         # If inspection at site
         else:
             # Find n_vessel
-            n_vessel = (aux_functions.safe_getattr(inspection,['insp_class', 'n_vessel_last']) 
-                if days_main == 0 
+            n_vessel = (aux_functions.safe_getattr(inspection,['insp_class', 'n_vessel_last'])
+                if days_main == 0
                 else aux_functions.safe_getattr(inspection,['insp_class', 'n_vessel_main'])
             )
 
@@ -138,7 +138,7 @@ def define_dates(
                 break
 
 
-    
+
     # Create the dataframe with the results obtained
     df_dates_inspection = pd.DataFrame(columns=COLS)
     df_dates_inspection['d_trigger'] = valid_datetimes
@@ -158,7 +158,7 @@ def define_dates(
     if inspection.insp_class.vessel2_id is not None:
         df_dates_inspection['n_vessel_2'] = [1] * len(valid_datetimes)
     else:
-        df_dates_inspection['n_vessel_2'] = [None] * len(valid_datetimes)              
+        df_dates_inspection['n_vessel_2'] = [None] * len(valid_datetimes) 
     df_dates_inspection['comments'] = [comment] * len(valid_datetimes)
 
     # Create inspection statistical chart for port inspection

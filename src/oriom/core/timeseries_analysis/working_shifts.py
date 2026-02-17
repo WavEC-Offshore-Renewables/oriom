@@ -18,12 +18,12 @@ def working_shifts(
         a campaign and the duration of the working day. Two possibilities:
             - One inspection:
                 The inspection is studied in order ot understand how many days of work are needed. Since not all
-                workdays are always identical, there is "main" number of days with its duration and one "last" day 
+                workdays are always identical, there is "main" number of days with its duration and one "last" day
                 which may have a different durations if only some devices are left.
                 The functions considers the possibility of dropping off personnel according to the shift and inspection
                 time as well if any equipment (rob drone) is needed for which the vessel shall be nearby. Moreover multiple
                 number of vessel can be dedicated to the campaign and overall duration is calculated accordingly.
-            - Two inspections (if :attr:`merge` from :file:`C_inputs` is True): 
+            - Two inspections (if :attr:`merge` from :file:`C_inputs` is True):
                 Two inspections are grouped and studied. Inspections are not required to have the same olcs, the operation
                 schedule has a dedicated function that tries to schedule both inspections considering the different olcs
                 requirements in the order that is more convenient based on the metocean conditions. In this case
@@ -65,7 +65,7 @@ def working_shifts(
         else:
             y=max(x1,x2)
         return y
-    
+
 
     def wt_inspection_within_shift(
             id_: str,
@@ -103,10 +103,10 @@ def working_shifts(
             N_vessels = 1
 
         dict_operation_schedule_1 = output_working_shifts(
-            N_devices_to_inspect, 
-            duration_shift, 
-            duration_inspection, 
-            rov, 
+            N_devices_to_inspect,
+            duration_shift,
+            duration_inspection,
+            rov,
             transit,
             transit_between_devices,
             vessel_type,
@@ -128,12 +128,12 @@ def working_shifts(
             N_vessels: int
         ):
         """
-        This function calculates the number of working shifts, duration of shifts, number of inspections per shift, 
-        and number of technicians needed for a given inspection if the inspection time of each device is beyond 
+        This function calculates the number of working shifts, duration of shifts, number of inspections per shift,
+        and number of technicians needed for a given inspection if the inspection time of each device is beyond
         the personnel shift.
 
-        IMPORTANT NOTE: This function is not used in the current version of the code. Anyway it could be taken into account 
-            the fact of using more crew on the vessel to conduct parallel inspections. Not mandatory as usually long inspection 
+        IMPORTANT NOTE: This function is not used in the current version of the code. Anyway it could be taken into account
+            the fact of using more crew on the vessel to conduct parallel inspections. Not mandatory as usually long inspection
             require high amout of personnel and the presence of the vessel itself along the operation
 
         Args:
@@ -157,14 +157,14 @@ def working_shifts(
 
             This function does not consider the number of vessels, as it is assumed that the number of vessels cause such
             parameter has been taken into consideration before the call of the function.
-            
+
             Args:
                 N_devices (:obj:`int`): Number of devices to inspect
                 duration_inspection (:obj:`float`): Duration of each inspection
                 op_ (:obj:`Inspection_Site`): Class of inspection `Inspection_Site`.
 
             Returns:
-                :obj:`dict`: Dictionary containing information about the main and last working shifts, 
+                :obj:`dict`: Dictionary containing information about the main and last working shifts,
                 including the number of shifts, duration, number of inspections per shift, and number of technicians needed.
             """
             i = 1
@@ -189,7 +189,7 @@ def working_shifts(
                 number_crew = int(op_.tech_per_device)
             except AttributeError:
                 number_crew = int(op_.tech_required)
-                
+
 
             dict_operation_schedule = {
                     'main_working_shift': {
@@ -451,7 +451,7 @@ def working_shifts(
                             'ws':operation_to_group_with.ws,
                             'ws_hub':operation_to_group_with.ws_hub,
                             'cs':operation_to_group_with.cs
-                        }                    
+                        }
                 else:
                     op2 = operation
                     op1 = operation_to_group_with

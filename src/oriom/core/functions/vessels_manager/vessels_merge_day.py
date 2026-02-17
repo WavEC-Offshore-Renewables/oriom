@@ -8,9 +8,9 @@ def vessel_day_func(
     ):
 
     """
-    This function take the vessel file and evaluate the maximum amount of each vessel that we have each day 
+    This function take the vessel file and evaluate the maximum amount of each vessel that we have each day
     showing all the operations made per day as dict where key = idx of log_event and value is oper.id.
-    
+
     Arguments:
         n_ves: {pd.DataFrame} Dataframe of hourly vessel used
 
@@ -22,12 +22,12 @@ def vessel_day_func(
         combined_operations = {}
         for col in operation_columns:
             if isinstance(row[col], dict):
-                combined_operations.update(row[col])  
-        
+                combined_operations.update(row[col])
+
         return combined_operations
 
-    n_ves['date'] = pd.to_datetime(n_ves['date']).dt.date  
-    daily_vessel = pd.DataFrame(index=pd.to_datetime(n_ves['date'].unique()))  
+    n_ves['date'] = pd.to_datetime(n_ves['date']).dt.date
+    daily_vessel = pd.DataFrame(index=pd.to_datetime(n_ves['date'].unique()))
 
     # Identify vessel columns
     v_columns = [col for col in n_ves.columns if col.startswith('v')]
@@ -59,14 +59,14 @@ def vessel_day_func(
 
 
 def number_vessels_func_with_oper(
-    log_events: pd.DataFrame, 
+    log_events: pd.DataFrame,
     col_to_count: str ='d_end_wait_start',
     mobilisation: bool = False
 )->pd.DataFrame:
 
     """
-    This function calculates the number of vessel type charted per day 
-    to obtain a dataframe with vessel used and opeartion conducted along same day 
+    This function calculates the number of vessel type charted per day
+    to obtain a dataframe with vessel used and opeartion conducted along same day
     It also add the operation.id conducted and the index of it which appears on the log_event file.
 
     Take into consideration also mobilisation of the vessel to merge operation
@@ -116,7 +116,7 @@ def number_vessels_func_with_oper(
         mask = (new_df.index >= start_date) & (new_df.index <= end_date)
 
         if code_1 not in new_df.columns:
-            new_df[code_1] = 0 
+            new_df[code_1] = 0
         new_df.loc[mask, code_1] += row['n_vessel_1']
 
         new_df.loc[mask, 'operations'] = new_df.loc[mask, 'operations'].apply(lambda x: {
@@ -124,7 +124,7 @@ def number_vessels_func_with_oper(
             )
 
         if code_2 is not None:
-            try: 
+            try:
                 mt.isnan(float(code_2))
             except ValueError:
                 if code_2 not in new_df.columns:
@@ -158,8 +158,8 @@ def df_vessel_merge_use(
     )->pd.DataFrame:
 
         df_vessel_mobi = number_vessels_func_with_oper(
-            log_events = log_events, 
-            col_to_count = col_to_count, 
+            log_events = log_events,
+            col_to_count = col_to_count,
         )
 
         # Create date vessel log

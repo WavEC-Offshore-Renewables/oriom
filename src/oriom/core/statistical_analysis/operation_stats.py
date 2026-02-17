@@ -5,7 +5,7 @@ import logging
 import math
 
 """
-Based on the operation schedule of each operation it calculates the statistical analysis considering 
+Based on the operation schedule of each operation it calculates the statistical analysis considering
 the main percentile (50 by default) and the other percentiles (typically 10,90).
 """
 
@@ -15,7 +15,7 @@ def operation_stats(
         out_dir: str=None
 )-> pd.DataFrame:
     """
-    Calculate statistical analysis for each operation based on the input file containing various durations and wait times. 
+    Calculate statistical analysis for each operation based on the input file containing various durations and wait times.
     The analysis is done based on the specified percentile and month.
 
     A statistical analysis is done for every operation based on the input file containing:
@@ -37,7 +37,7 @@ def operation_stats(
         percentile (:obj:`int`): Percentile choosen for the statistical analysis
             It comes from general inputs
         out_dir (:obj:`str`, *optional*): Folder directory to save the
-            operation schedule. Defaults to ``None``.  
+            operation schedule. Defaults to ``None``.
     Returns:
         :obj:`pd.DataFrame`: DataFrame with statistical analysis results for each operation.
     """
@@ -51,14 +51,14 @@ def operation_stats(
             'dur_shutdown_wec',
             'dur_shutdown_pv'
     ]
-    
+
     missing_columns = [col for col in columns_mandatory if col not in df_operation_schedule.columns]
 
     if missing_columns:
         _e = f'Mandatory columns missing: {missing_columns}'
         logging.error(_e)
         raise NameError(_e)
-    
+
 
     if all([
         'dur_net_site' not in df_operation_schedule,
@@ -97,7 +97,7 @@ def operation_stats(
 
     columns = ['operation_id', 'percentile'] + month
     percentiles = pd.DataFrame(columns=columns)
-    
+
     for m in month:
         list_duration = []
         df_op = pd.DataFrame()
@@ -190,7 +190,7 @@ def operation_stats(
                 list_duration.append(duration_row['dur_shutdown_wtg'].mean())
                 list_duration.append(duration_row['dur_shutdown_wec'].mean())
                 list_duration.append(duration_row['dur_shutdown_pv'].mean())
-        
+
         percentiles['percentile'] = list_names_duration
         percentiles[m] = list_duration
 

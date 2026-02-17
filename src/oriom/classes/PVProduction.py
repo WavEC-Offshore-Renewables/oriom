@@ -129,11 +129,11 @@ class PVProduction():
             self.number_substations = 1
         if number_export_cables != 0 and number_export_cables is not None:
             self.number_export_cables = int(number_export_cables)
-        else:    
+        else:
             self.number_export_cables = 1
         if number_island_per_array_cable != 0 and number_island_per_array_cable is not None:
             self.number_island_per_array_cable = int(number_island_per_array_cable)
-        else:    
+        else:
             self.number_island_per_array_cable = 1
         if max_failure_module != 0 and max_failure_module is not None:
             self.max_failure_module = int(max_failure_module)
@@ -401,7 +401,7 @@ class PVProduction():
     ):
         """
         Write the PV system parameters to a YAML file.
-        
+
         Args:
             out_dir (:obj:`str`): The output directory where the YAML file will be saved.
         """

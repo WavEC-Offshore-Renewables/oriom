@@ -26,7 +26,7 @@ class OperationTow():
         tech_cost (:obj:`float`): The daily cost of each technician [€/day].
             Its value is ``0`` if not defined.
         vessel1_id (:obj:`str`): The ID of the main vessel.
-        vessel1_qt (:obj:`int`): Number of main vessel. Its value is 
+        vessel1_qt (:obj:`int`): Number of main vessel. Its value is
             ``1`` if not defined.
         vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
@@ -42,7 +42,7 @@ class OperationTow():
         vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary
             vessel used in this operation. Its value is ``None`` if not
             defided.
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`): 
+        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         tow_operation (:obj:`bool`): Define if is a towing opreation. Default to ``True``
 
@@ -95,7 +95,7 @@ class OperationTow():
         self.activities = None
         self.vessel1 = None
         self.vessel2 = None
-        
+
         self.ts_data = None
         self.tow_operation = True
 
@@ -117,9 +117,9 @@ class OperationTow():
 
     def _check_attributes(self):
         """
-        This method validates the attributes of the `CorrectiveMajor` class to ensure they 
+        This method validates the attributes of the `CorrectiveMajor` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         if self.id[0:3] not in ['oce','ofw','owc','opv']:
@@ -133,7 +133,7 @@ class OperationTow():
         if self.vessel1_qt < 1:
             raise ValueError('"vessel1_qt" must be positive')
         if self.vessel2_id is not None:
-            if self.vessel2_qt < 1: 
+            if self.vessel2_qt < 1:
                 raise ValueError('"vessel2_qt" must be positive if a "vessel2_id" is defined')
 
         logging.debug('OperationTow: operation %s attributes within ranges and valid.' % self.id)
@@ -155,7 +155,7 @@ class OperationTow():
         with open(file_path, "r") as f_yaml:
             yaml = YAML(typ="safe")
             operations_yaml = yaml.load(f_yaml)
-            
+
         # All operations keys to lower case
         operations_yaml = [
                 {key.lower(): val for key, val in op.items()}
@@ -207,7 +207,7 @@ class OperationTow():
                     other_costs=operation["other_costs"]
                 )
             )
-            
+
         logging.info('OperationTow: operations defined based on file "%s"' % file_path)
         return operations_list
 

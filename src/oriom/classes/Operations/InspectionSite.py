@@ -74,22 +74,22 @@ class InspectionSite():
             grouped. Its value is ``False`` if not defined.
         to_group_with : Inspection at site id that can be performed with. It can be a string or a
             :class:`~oriom.classes.Operations.InspectionSite`
-            Its value is ``None`` if not defined. 
-        n_vessel_main (:obj:`int`): Number of vessels used for the main part of the 
-            inspections. Its values is ``None`` if not defined. 
-        n_vessel_last (:obj:`int`): Number of vessels used for the last part of the 
-            inspections. Its values is ``None`` if not defined. 
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`): 
+            Its value is ``None`` if not defined.
+        n_vessel_main (:obj:`int`): Number of vessels used for the main part of the
+            inspections. Its values is ``None`` if not defined.
+        n_vessel_last (:obj:`int`): Number of vessels used for the last part of the
+            inspections. Its values is ``None`` if not defined.
+        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
             Default to True
-        days_main (:obj:`int`): Number of total days of shift needed to conclude the insp. 
+        days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
-        duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.  
+        duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
             Defaults to ``0``
-        days_last (:obj:`int`): Number of total days of shift needed to conclude the insp. 
+        days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
-        duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.  
+        duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
             Defaults to ``0``
         crew_main (:obj:`int`): Number of crew members for main shift. Defaults to ``0``
         crew_last (:obj:`int`): Number of crew members for last shift. Defaults to ``0``
@@ -97,8 +97,8 @@ class InspectionSite():
             Defaults to ``0``
         n_dev_done_last_shift (:obj:`int`): Number of devices inspected during last shift
             Defaults to ``0``
-        
-        
+
+
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
     """
@@ -181,20 +181,20 @@ class InspectionSite():
             other_costs (:obj:`float`, *optional*): Other costs (port, cranes,
                 insurance, etc.). Defaults to :obj:`0.0`.
             to_group_with: Inspection at site id that can be performed with.
-                Its value is ``None`` if not defined. 
+                Its value is ``None`` if not defined.
             to_be_grouped (:obj:`False`): True or False if the inspection can be grouped.
                 Its value is ``False`` if not defined.
-            n_vessel_main (:obj:`int`): Number of vessels used for the main part of the 
-                inspections. Its values is ``0`` if not defined. 
-            n_vessel_last (:obj:`int`): Number of vessels used for the last part of the 
-                inspections. Its values is ``0`` if not defined. 
-            days_main (:obj:`int`): Number of total days of shift needed to conclude the insp. 
+            n_vessel_main (:obj:`int`): Number of vessels used for the main part of the
+                inspections. Its values is ``0`` if not defined.
+            n_vessel_last (:obj:`int`): Number of vessels used for the last part of the
+                inspections. Its values is ``0`` if not defined.
+            days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.  
+            duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
-            days_last (:obj:`int`): Number of total days of shift needed to conclude the insp. 
+            days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.  
+            duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
             double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
                 Default to True
@@ -318,7 +318,7 @@ class InspectionSite():
                 self.to_group_with = str(to_group_with).lower()
             else:
                 self.to_group_with = to_group_with
-        
+
         if to_be_grouped is not None:
             self.to_be_grouped = bool(to_be_grouped)
 
@@ -346,9 +346,9 @@ class InspectionSite():
 
     def _check_attributes(self):
         """
-        This method validates the attributes of the `CorrectiveMajor` class to ensure they 
+        This method validates the attributes of the `CorrectiveMajor` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
 
@@ -378,7 +378,7 @@ class InspectionSite():
             self.level == 'string_cable',
             self.level == 'substation',
             self.level == 'mv_transformer',
-            self.level == 'circuit_braker',         
+            self.level == 'circuit_braker',
             self.level == 'switcher',
             self.level == 'inverter',
             self.level == 'device'
@@ -535,7 +535,7 @@ class InspectionSite():
                     to_be_grouped=operation["to_be_grouped"],
                     n_vessel_main=operation["n_vessel_main"],
                     n_vessel_last=operation["n_vessel_last"],
-                    double_shift=operation["double_shift"],       
+                    double_shift=operation["double_shift"],
                 )
             )
 
@@ -566,12 +566,12 @@ class InspectionSite():
             if key in self.id:
                 return value
         return None
-    
+
 
     def define_level(self, G_layouts:dict):
         """
         If the level of the inspection is not defined, select the node with the power defined in the nx Graph.
-        
+
         Args:
             G_layouts (dict): dictionary with the graph of the layouts for wind, wave and pv
 

@@ -41,14 +41,14 @@ def create_logs_merge(
     find_element_class,
     time_between_devices: dict,
     percentile: float,
-    vessel_to_merge: list, 
+    vessel_to_merge: list,
     time_fail_op_immediately: float,
     duration_shift: float
 )->pd.DataFrame:
 
     """
     This function it runs after that the log_event file is created. It will merge only CORERCTIVE operations that can be conducted
-    together considering the OLC. 
+    together considering the OLC.
     Merge dividing the DEFERRED OPERATION and the IMMEDIATE OPERATION.
     It use the number_ves function to obtain the number of vessels out
     For each day it check if another operation is made and analyze the share of vessel is possible
@@ -80,8 +80,8 @@ def create_logs_merge(
     def open_oper_schedule(oper, operation_scheduler_dict):
         """
         Open the file operation_schedule of the operation under analysis append it on a dictionary with key as the operation name
-        
-        
+
+
         Args:
             oper (:obj:`object`): The operation object to be analyzed.
         Returns:
@@ -90,11 +90,11 @@ def create_logs_merge(
         operation_scheduler_dict[oper.id] = [oper.ts_data.oper_sched]
         operation_scheduler_dict[oper.id].append(oper.ts_data.last_valid_index)
         return operation_scheduler_dict
-    
-    def op_to_dict(oper, OLC_LIST, oper_dict):  
+
+    def op_to_dict(oper, OLC_LIST, oper_dict):
         """
         Create a dictionary of the operations to merge with their values only if they:
-         - do not require tow to port 
+         - do not require tow to port
          - do not require a use of drone
          - are immediate operations
          - are vessel_to_merge
@@ -135,7 +135,7 @@ def create_logs_merge(
                         return attr_int
                 except (ValueError, TypeError, AttributeError):
                         return 100
-        
+
         op = oper.id
         duration = oper.ts_data.dur_net_site
 
@@ -153,10 +153,10 @@ def create_logs_merge(
         for olc in OLC_LIST:
             try:
                 olc_value = [olc_act(oper, activity, olc) for activity in oper.activities]
-                olc_value = [v for v in olc_value if v is not None] 
+                olc_value = [v for v in olc_value if v is not None]
             except AttributeError:
                 olc_value = [(olc_act(oper, 'activity', olc))]
-            if olc_value:  
+            if olc_value:
                 minor_olc = min(olc_value)
                 oper_dict[op][olc] = minor_olc
 
@@ -169,7 +169,7 @@ def create_logs_merge(
     oper_per_vessel, oper_dict, operation_scheduler_dict = {}, {}, {}
 
     #------------------
-    # ALL OTHER LOG 
+    # ALL OTHER LOG
     #------------------
     # Copy all log_files that is not going to be merged
     log_event_filt = log_events.loc[log_events['event'].isin(FILTER_EVENT)]
@@ -177,9 +177,9 @@ def create_logs_merge(
 
     # Deferred operation merging, create a dict with 1st key vessel used and value deferred operation
     creation_oper_vessel_dict(
-        failures = failures, 
-        find_element_class = find_element_class, 
-        oper_per_vessel = oper_per_vessel, 
+        failures = failures,
+        find_element_class = find_element_class,
+        oper_per_vessel = oper_per_vessel,
         deferred_failures_correction = deferred_failures_correction
     )
 
@@ -191,7 +191,7 @@ def create_logs_merge(
     log_event_tow = log_events.loc[log_events['event'] == 'tow']
 
     if not log_event_tow.empty:
-        comments_failure_id_tow = log_event_tow['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]  
+        comments_failure_id_tow = log_event_tow['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
         log_events_tow_def = log_event_tow[comments_failure_id_tow.isin(deferred_failures_correction)]
         if not log_events_tow_def.empty:
             log_events_merged = pd.concat([log_events_merged, log_events_tow_def],ignore_index=False)
@@ -202,13 +202,13 @@ def create_logs_merge(
         log_events_tow_ = log_event_tow[~comments_failure_id_tow.isin(deferred_failures_correction)]
         if not log_events_tow_.empty:
             log_events_merged = pd.concat([log_events_merged, log_events_tow_],ignore_index=False)
-    
+
 
     #------------------
     # DEFERRED OPERATION
     #------------------
     # Filter log_events by the failure that require deferred intervention (failure extrapolated from 'comments' column)
-    comments_failure_id = log_events['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]  
+    comments_failure_id = log_events['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
     log_events_def = log_events[comments_failure_id.isin(deferred_failures_correction)]
 
     if not log_events_def.empty:
@@ -255,7 +255,7 @@ def create_logs_merge(
             keys_dict_oper = set(oper_dict.keys())
             log_events_to_merge = log_events_oper_imm[log_events_oper_imm['id'].isin(keys_dict_oper)]
             log_events_not_to_merge = log_events_oper_imm[~log_events_oper_imm['id'].isin(keys_dict_oper)]
-            
+
             if not log_events_to_merge.empty:
                 # Merge immediate corrective operations
                 log_events_merged_immediate = merge_operation(
@@ -267,7 +267,7 @@ def create_logs_merge(
                     oper_dict=oper_dict,
                     COLS = COLS
                 )
-            
+
                 log_events_merged = pd.concat([log_events_merged, log_events_merged_immediate],ignore_index=False)
 
             # copy non mergeble operations

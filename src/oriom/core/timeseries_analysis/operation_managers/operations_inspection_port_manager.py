@@ -23,11 +23,11 @@ def creation_data_working_shift_port(
 )->dict:
     """
     Create a dictionary with the main and last shift details
-    
+
     Args:
         operation (object): Object of the class OperationTow
         shift_duration (float): duration of the working shift
-        
+
     Return:
         dict: Dictionary of the working shift at port
     """
@@ -38,7 +38,7 @@ def creation_data_working_shift_port(
     total_hours = n_devices * operation.dur_per_device
     n_shifts = total_hours / shift_duration
     number_shifts_main, h = divmod(n_shifts, 1)
-    
+
     duration_shifts_main = shift_duration if number_shifts_main != 0 else 0
     number_shifts_last = 1 if h != 0 else 0
     duration_shifts_last = round(h * duration_shifts_main, 1) if h != 0 else 0
@@ -59,12 +59,12 @@ def operation_inspect_port_manager(
     duration_shift: float,
     operations_inspect_port: list,
 ):
-    """ 
+    """
     Check if the operations_inspect_site is already existing
     If it exist assign ts_data attribute to the InspectPort object and pass to other inp
     If exist a similar inspection with all ATTRIBUTE_LIST_REUSE equal assign ts_data and pass to other inp
     If does not exist create the operation_schedule and assign it to the OperationTow object
-    
+
     Args:
         operation_dir (string): Path of operation directory
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
@@ -75,27 +75,27 @@ def operation_inspect_port_manager(
         InterruptedError: 'The operation can never occur. OLCs may be to resctric.'
 
     """
-    
+
     for operation in tqdm(operations_inspect_port, desc='Looping through Inspections at Port.', position=0):
         logging.info('InspectionPort: %s - %s.' % (operation.id, operation.name))
         op_dir = os.path.join(operation_dir, operation.id)
         operation.insp_port_dir = op_dir
 
         # For the inspections at port, the timeseries analysis is done for a single device
-        
+
         data_working_shifts_port = creation_data_working_shift_port(
             operation = operation,
             shift_duration = duration_shift
         )
-         
+
         # Check if there is already an operation_schedule file
         file_name_schedule = 'operation_schedule.csv'
 
         if check_files:
             file_exist = check_files.reuse_file_exist(
-                op_dir = op_dir, 
-                file_name_schedule = file_name_schedule, 
-                operation = operation, 
+                op_dir = op_dir,
+                file_name_schedule = file_name_schedule,
+                operation = operation,
                 shift_op = True
             )
 

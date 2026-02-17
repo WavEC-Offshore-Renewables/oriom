@@ -26,7 +26,7 @@ def find_highest_power_node(G):
         str: of the component level
     '''
     max_power = float('-inf')  # Lowest value
-    
+
     for node in G.nodes():
         power = G.nodes[node].get('power', 0)  # Get power, 0 if not max
         if power > max_power:
@@ -49,23 +49,23 @@ def get_nearest_month_value(month: int, month_dict: dict):
     """
     if month in month_dict:
         return month
-    
+
     available_months = sorted(month_dict.keys())
     nearest_month = min(available_months, key=lambda m: abs(m - month))
     return nearest_month
 
-    
+
 def create_end_start_lifetime(
-    date: datetime, 
-    event: str, 
+    date: datetime,
+    event: str,
     cols: list
 ):
-    
-    """ 
-    Function to create last and first row of the lifetime for the energy availability dataframe 
+
+    """
+    Function to create last and first row of the lifetime for the energy availability dataframe
 
     Args:
-        date (datetime): dates of the row 
+        date (datetime): dates of the row
         event (string): event of the row (decommissioning or commissioning)
         cols (list): name of the columns of the dataframe
     """
@@ -105,7 +105,7 @@ def choose_loc(
         component_level_power (str): level where the power is implemented in the layout farm (usually lowest level implemented)
         list_failed (:obj:`set`): set of already failed component
         tech (:obj:`str`): technology analyzed
-        
+
 
     Raises:
         ValueError: if the level of failure is not recognized.
@@ -124,18 +124,18 @@ def choose_loc(
         level == 'switcher'
     ]):
 
-        
+
         if tech == 'PV':
             if any(keyword in level for keyword in ['device', 'string']):
                 level = component_level_power
 
-        #list_nG = list(n for n, attr in G.nodes(data=True) if attr['level'] == level) 
+        #list_nG = list(n for n, attr in G.nodes(data=True) if attr['level'] == level)
         list_nG = [n for n, attr in G.nodes(data='level') if attr == level]
 
         if list_failed is None:
             list_failed = set()
 
-        #list_nG_not_failed = [x for x in list_nG if x not in set_2]    
+        #list_nG_not_failed = [x for x in list_nG if x not in set_2]
         list_nG_not_failed = set(list_nG) - list_failed
 
         if not list_nG_not_failed:
@@ -153,7 +153,7 @@ def choose_loc(
         level == 'dyn_cable-transf',
         level == 'dyn_cable-cb'
     ]) is True:
-        
+
         list_eG = [(s, e) for s, e, attr in G.edges(data=True) if attr.get('level') == level and attr.get('visible') is True]
         if list_failed is None:
             list_failed = set()
@@ -211,7 +211,7 @@ def fix_percentage_markers_dates(
 
     # Apply only at target row
     df.loc[is_target, 'Perc_availability'] = perc[is_target]
-   
+
     return df
 
 def fix_percentage_simultaneousy_op(
@@ -233,20 +233,20 @@ def fix_percentage_simultaneousy_op(
 
 
 def string_location(
-    failed_strings: dict, 
+    failed_strings: dict,
     string_inverter: set,
     )-> int:
 
-    """ 
+    """
     Find a random string location that is not already closed in the inverter location
 
     Args:
         device_shutted_string_level_inverter (dict): nested dictionary with 1st key:node inverter, 2nd key:position of string closed, value True
-        string_inverter (set): Set of string for the inverter   
-        
+        string_inverter (set): Set of string for the inverter
+
     Returns:
         int: a random string location that is not already closed in the inverter location
-    
+
     """
 
     valid_k_string = list(string_inverter - failed_strings)
@@ -260,7 +260,7 @@ def string_location(
 
 
 def add_markers_month_year(
-        df: pd.DataFrame, 
+        df: pd.DataFrame,
         df_extra: pd.DataFrame
     ):
 
@@ -290,7 +290,7 @@ def add_markers_month_year(
         df_parts.append(df_extra.iloc[[extra_idx]])
         last_idx = insert_idx
 
-    # Add eventual finals rows 
+    # Add eventual finals rows
     if last_idx < len(df):
         df_parts.append(df.iloc[last_idx:])
 
@@ -336,7 +336,7 @@ def find_power_at_node(G_tech: nx.DiGraph, level: str):
 
 
 def take_date_inspection_oper_scheduler(
-        log_aux: pd.DataFrame, 
+        log_aux: pd.DataFrame,
         oper_schedule: pd.DataFrame
 )->list:
     """
@@ -371,7 +371,7 @@ def timeseries_power_preventive_evaluation(
     Extrapolates all the dates of start and end of the inspections
     Filter the metocean timeseries data for each inspection.
     Evaluate the energy losses considering possible multiple operations in a shift and last shift opeartion.
-    
+
     Args:
         insp (:obj:`Inspection`): Inspection object.
         inspection_dates (list): List of inspection dates.
@@ -448,7 +448,7 @@ def timeseries_power_preventive_evaluation(
         energy_list.append(0)
     if not shutdown_hour_list:
         shutdown_hour_list.append(0)
-        
+
     return energy_list, shutdown_hour_list
 
 
@@ -485,7 +485,7 @@ def create_list_date_port(towing_log: pd.DataFrame,)->tuple[list[list[pd.Timesta
 
     Returns:
         tuple[list[list[float]], list[list[float]]]: Energy loss and shutdown hours lists.
-    """   
+    """
 
     inspection_date_starts, inspection_date_ends = [], []
     for _, group in towing_log.groupby("d_trigger"):
@@ -497,24 +497,24 @@ def create_list_date_port(towing_log: pd.DataFrame,)->tuple[list[list[pd.Timesta
 
 
 def statistical_power_preventive_evaluation(
-    dict_power: dict, 
-    shutdown_hours_dict: dict, 
-    date: datetime, 
-    n_device_tot: int, 
+    dict_power: dict,
+    shutdown_hours_dict: dict,
+    date: datetime,
+    n_device_tot: int,
     power_level: float,
     degradation_rate: float,
     start_year: int,
     double_shift : bool,
     selected_month: int
 )-> float:
-    """ 
+    """
     Evaluate energy loss for the preventive inspection
     - PV tech:
         The power dict is averaged in month and hour of the mont
         For each hour of the shutdown_hours dict count the energy loss in that hour
             Consider only day hour if cannot be worked in the night
     - Wind-Wave tech:
-        Take power production per device and power level of the component and multiply 
+        Take power production per device and power level of the component and multiply
             per h shutted
 
     Args:

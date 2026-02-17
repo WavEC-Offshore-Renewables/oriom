@@ -39,7 +39,7 @@ class DummyFailure():
 class DummyFindFailure():
     def __init__(self, failures):
         self.failures_dict_id = {f.id: f for f in failures}
-    
+
     def find_failure_from_id(self, fail_id):
         f = self.failures_dict_id.get(fail_id)
         if f:

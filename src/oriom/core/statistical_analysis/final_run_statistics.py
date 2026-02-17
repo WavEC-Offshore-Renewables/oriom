@@ -1,4 +1,4 @@
-import os 
+import os
 import pandas as pd
 import openpyxl
 import logging
@@ -30,25 +30,25 @@ def return_statistics_runs(
         save_dir: str = None
     ):
 
-    """ 
+    """
     Create averaged data for each simulation. Consider yearly costs, total costs and ctv costs strategy.
 
     Save all resutls in sheets of excels file and create graphs
-    
+
     Args:
         n_lifetime (int): number of year of lifetime,
         find_element_class (Find_Element): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         results_dict (object): Object of class `Results`
-        fuel_add (dict): dictionary of vessel_type and fuel yearly cost to add 
-        mobilisation_add (dict): dictionary of vessel_type and mobilisation yearly cost to add 
+        fuel_add (dict): dictionary of vessel_type and fuel yearly cost to add
+        mobilisation_add (dict): dictionary of vessel_type and mobilisation yearly cost to add
         electricity_cost_dict: (dict): jey of tech and value cost of electricity per kWh
         n_runs (int): number of simulations
         vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
         operations_total (:obj: `list`): List of object for all the classes `Operations`
         save_dir (str, optional): directory to averaged results. Defaults to None.
     """
-    
-    
+
+
     def restructure_df_year(kpi_om_year_final: pd.DataFrame) -> pd.DataFrame:
         """
         Create a MultiIndex for yearly KPIs from columns like '1990', '1990.1', etc.
@@ -61,7 +61,7 @@ def return_statistics_runs(
                 year = col
                 metric = 'direct_costs'
             return (int(year), metric)
-        
+
         vessel_ids = kpi_om_year_final['vessel_id']
         data = kpi_om_year_final.drop(columns='vessel_id')
         data = data.iloc[1:]
@@ -94,7 +94,7 @@ def return_statistics_runs(
         kpi_tot_sim['lifetime_direct_costs'] = kpi_tot_sim['lifetime_direct_costs'].astype(float)
         fuel_to_add = sum(fuel_add.values())
         mobilisation_to_add = sum(mobilisation_add.values())
-        
+
         lifetime_fixed_insurance_cost.append(kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'insurance', 'lifetime_direct_costs'].values[0])
         lifetime_fixed_port_cost.append(kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'port', 'lifetime_direct_costs'].values[0])
         lifetime_fixed_tech_cost.append(kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'technician', 'lifetime_direct_costs'].values[0])
@@ -125,7 +125,7 @@ def return_statistics_runs(
         'lifetime_fixed_tech_cost €':lifetime_fixed_tech_cost_avg,
         'lifetime_fixed_insurance_cost €':lifetime_fixed_insurance_cost_avg,
     }
-    
+
     df_cost = pd.DataFrame([{'cost_type': k, 'value': v} for k, v in dict_cost.items()])
     final_cost['lifetime_direct_cost'] = df_cost['value'].sum()
 
@@ -138,7 +138,7 @@ def return_statistics_runs(
 
     # Save on excel
     df_cost.loc[len(df_cost)] = ['lifetime_direct_cost', df_cost['value'].sum()]
-    
+
     ws2 = wb.create_sheet(title="Lifetime_costs")
     for row in dataframe_to_rows(df_cost, index=False, header=True):
         ws2.append(row)
@@ -207,20 +207,20 @@ def return_statistics_runs(
             legend_bbox_to_anchor = (1.05, 0.9),
             text = 'mobilisation cost not included',
             save_dir = save_dir,
-            file_name_save = 'O&M type cost' 
+            file_name_save = 'O&M type cost'
         )
 
     # Availability year average and year_month avg
     final_cost['AEP_kWh'] = 0
     final_cost['En_loss_€'] = 0
     final_cost['En_loss_kWh'] = 0
-    
+
     for k in results_dict.dfs_energy_yearly_dict.keys():
         if results_dict.dfs_energy_yearly_dict[k]:
             df_yearly_mean = (
                 pd.concat([
                         df.astype(float) for df in results_dict.dfs_energy_yearly_dict[k]],
-                        axis=0, 
+                        axis=0,
                         keys=range(len(results_dict.dfs_energy_yearly_dict[k]
                     )))
                 .groupby(level=1)
@@ -250,15 +250,15 @@ def return_statistics_runs(
             final_cost['En_loss_€'] += final_energy[f'{tech}_En_loss_€']
             final_cost['En_loss_kWh'] += final_energy[f'{tech}_En_loss_kWh']
             report_graphs.indirect_costs_per_year(df = df_yearly_mean, electricity_price = electricity_cost_tech, name_file = k[17:], save_dir = save_dir)
-    
+
     # Monthly
     combined = {}
     for k in results_dict.dfs_energy_yearly_month_dict.keys():
         if results_dict.dfs_energy_yearly_month_dict[k]:
             df_monthly_mean = (
                 pd.concat(
-                        [df.astype(float) for df in results_dict.dfs_energy_yearly_month_dict[k]], 
-                        axis=0, 
+                        [df.astype(float) for df in results_dict.dfs_energy_yearly_month_dict[k]],
+                        axis=0,
                         keys=range(len(results_dict.dfs_energy_yearly_month_dict[k]
                     )))
                 .groupby(level=1)
@@ -272,12 +272,12 @@ def return_statistics_runs(
 
     if len(combined.keys())>1:
         report_graphs.energy_yield_combined(dfs = combined, save_dir = save_dir)
-    
+
     if KPI_Insight is not None:
         # Add insights from log events
         run_insight = KPI_Insight(N_SIMULATION = n_runs, n_lifetime = n_lifetime)
-        cost_insight, vessel_insight = run_insight.kpi_insight(results_dict = results_dict, vessels = vessels, operations_total = operations_total)   
-        
+        cost_insight, vessel_insight = run_insight.kpi_insight(results_dict = results_dict, vessels = vessels, operations_total = operations_total)
+
         if not vessel_insight.empty:
             final_cost['reuse_ctv'] = vessel_insight.loc["ctv", "reuse %"]
             final_cost['merge_ctv'] = vessel_insight.loc["ctv", "merge %"]
@@ -302,19 +302,19 @@ def return_statistics_runs(
         ws5 = wb.create_sheet(title="Energy_results")
         for row in dataframe_to_rows(df_energy_production, index=False, header=True):
             ws5.append(row)
-    
+
         wb._sheets = [ws5] + [s for s in wb._sheets if s != ws5]
 
     # Reorder sheets and create final file
     wb._sheets = [ws] + [s for s in wb._sheets if s != ws]
     wb.save(os.path.join(save_dir,"Average_results.xlsx"))
-    
-    if (KPI_Insight is not None and 
+
+    if (KPI_Insight is not None and
         (vessel_insight is not None and not vessel_insight.empty)
          or (cost_insight is not None and not cost_insight.empty)
     ):
         with pd.ExcelWriter(
-            os.path.join(save_dir, 'KPI_insight.xlsx'), 
+            os.path.join(save_dir, 'KPI_insight.xlsx'),
             engine='openpyxl'
         ) as writer:
             v_ins, c_ins = False, False
@@ -324,10 +324,10 @@ def return_statistics_runs(
             if not cost_insight.empty:
                 cost_insight.to_excel(writer, sheet_name='KPI_failure_contribution', index=True)
                 c_ins = True
-            
+
             if v_ins or c_ins:
                 worksheet = writer.sheets['KPI_failure_contribution']
-            if c_ins:  
+            if c_ins:
                 # Write notes
                 worksheet.cell(row=len(cost_insight)+3, column=1, value="The failure contribution is made evaluating for each failure the FR*devices")
                 worksheet.cell(row=len(cost_insight)+4, column=1, value="This show the failure per year that occur in the farm and they are correlated with the vessel_type")

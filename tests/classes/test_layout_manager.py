@@ -7,7 +7,7 @@ from oriom.classes.Layouts.Layouts_Managers import LayoutManager
 def test_layout_manager_all():
     class Dummy:
         pass
-    
+
     power_farm = Dummy()
     power_farm.wtg_number_devices = 5
     power_farm.wec_number_devices = 3
@@ -42,7 +42,7 @@ def test_layout_manager_all():
     assert result["G_wave"] is not None
     assert result["G_pv"] is not None
 
-    
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 

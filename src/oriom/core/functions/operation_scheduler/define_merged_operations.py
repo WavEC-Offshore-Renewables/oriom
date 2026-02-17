@@ -42,13 +42,13 @@ def define_merged_operations_values(
             operation that last longer alone.
         shift_data (:obj:`dict`): Information about the shift with the
             following format:
-        number_shifts_main (:obj:`int`): 
+        number_shifts_main (:obj:`int`):
             Number of shifts required for doing two operations in parallel.
-        duration_shift_main (:obj:`float`): 
+        duration_shift_main (:obj:`float`):
             Duration of the shifts for doing the operations in parallel.
-        number_shifts_last (:obj:`int`): 
+        number_shifts_last (:obj:`int`):
             Number of shifts required for the operation that lasts longer when done solo.
-        duration_shift_last (:obj:`float`): 
+        duration_shift_last (:obj:`float`):
             Duration of the shift for the operation that lasts longer when done solo.
         transit_duration (:obj:`float`): Duration of the transit btween the port
             and the site.

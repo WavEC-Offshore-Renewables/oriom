@@ -33,7 +33,7 @@ def create_mobilisation(
     Returns:
         pd.DataFrame: The dataframe with the new row added or the row itself if concat is False
     """
-    
+
     if count_fail:
         id_mobilisation = 'mobi_' + count_fail
     else: id_mobilisation = None
@@ -50,7 +50,7 @@ def create_mobilisation(
         end_mobi,
         None,
         event,
-        id_mobilisation, 
+        id_mobilisation,
         vessel.id,
         vessel.n_vessels,
         None,
@@ -60,11 +60,11 @@ def create_mobilisation(
         False,
         False
     ]
-    
+
     # Manage the case of 16 columns in the dataframe (missing "shutdown", "ST_contract_1", "ST_contract_2" column in log_event that is added consecutevly)
     if len(df.columns) == len(row_values) - 3:
         row_values = row_values[:-3]
-    
+
     # Create the row to add to the dataframe
     row_mob_line = pd.DataFrame([row_values], columns=df.columns)
     if concat:
@@ -117,7 +117,7 @@ def failure_df_to_logevent_df(
     Returns:
         pd.DataFrame: dataframe with all the failures.
     """
-    
+
     dates_failures = dates_failures
     dates_failures = count_failures(dates_failures)
 
@@ -170,11 +170,11 @@ def inspection_statistic_duration(oper_schedule, date_continuous, inspection):
     This is cause if an inspection start at the end of the month
     most likely will end in the next month, and the statistics is influenced by this P90
     """
-    
+
     month = date_continuous.month
     month_prev = 12 if month == 1 else month - 1
     month_next = 1 if month == 12 else month + 1
-    
+
     dur_month = inspection.dur_total_dict[str(month)]
     dur_month_prev = inspection.dur_total_dict[str(month_prev)]
     dur_month_next = inspection.dur_total_dict[str(month_next)]
@@ -183,7 +183,7 @@ def inspection_statistic_duration(oper_schedule, date_continuous, inspection):
         dur_month/dur_month_prev > 2 or
         dur_month/dur_month_next > 2 or
         dur_month/dur_month_prev < 0.5 or
-        dur_month/dur_month_next < 0.5 
+        dur_month/dur_month_next < 0.5
     ):
 
         df_sept = oper_schedule[oper_schedule['datetime'].dt.month == month ]
@@ -196,17 +196,17 @@ def inspection_statistic_duration(oper_schedule, date_continuous, inspection):
 
 
 def shutdown_evaluation(
-    log_events: pd.DataFrame, 
+    log_events: pd.DataFrame,
     failures: list,
     operation_log_file_stats: list,
     inspections_port_stat: list,
     inspections_site_stat: list,
 ):
-    """ 
+    """
     Add the shutdown parameter to the dataframe due to failures and operations
-    
+
     Args:
-        log_events (:obj:`pd.DataFrame`): Log of all the events 
+        log_events (:obj:`pd.DataFrame`): Log of all the events
             (failure,operation, inspection_port, inspection_site, mobilisation).
         failures (:obj:`list`): List of objects :class:`failures`
         operation_log_file_stats (:obj:`list`): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
@@ -237,7 +237,7 @@ def shutdown_evaluation(
         # Use perc shutdown for each failure
         for f_id in dict_failures_shutdown:
             perc_fail = dict_failures_shutdown[f_id]
-            perc_fail_adjusted = perc_fail / 100 
+            perc_fail_adjusted = perc_fail / 100
             df_specific_failure = df_failures_shutdown[df_failures_shutdown['id_'] == f_id]
             idxs = df_specific_failure.index.tolist()
             n = int(np.ceil(len(idxs) * (perc_fail_adjusted)))
@@ -257,7 +257,7 @@ def shutdown_evaluation(
             )
         except AttributeError:
             op_shutdown[op.id] = op.shutdown_dict
-            
+
     op_shutdown = {op: v for op, v in op_shutdown.items() if v}
     # Overwrite the shutdown column in log_events
     mask = log_events['id'].isin(op_shutdown.keys())

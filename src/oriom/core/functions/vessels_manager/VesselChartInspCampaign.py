@@ -11,23 +11,23 @@ class Stat_chart_inspection_campaign():
 
     The class receive `InspectionsSiteStat`, build various dictionaries used to map
     the groups of inspection campaign based on day and month of start. Then value the
-    statistical analysis of duration for each group of inspection_campaign and 
+    statistical analysis of duration for each group of inspection_campaign and
     return the updated dataframe
 
     Attributes:
         inspections_site_stat (list): List of object :class:`InspectionsSiteStat`.
-        campaign_inspection_dict (dict): 
+        campaign_inspection_dict (dict):
             Dict with key `(month, day)` value `list` of `inspection.id`
             represent group of inspections belonging to the same campagna.
-        id_to_groups (dict): 
+        id_to_groups (dict):
             Inverted map that associate `inspection.id` → list of tuple `(month, day)`.
-        id_month_to_group (dict): 
+        id_month_to_group (dict):
             Map `(inspection.id, inspection.month)` → `(inspection.month, inspection.day)`.
     """
 
 
     def __init__(
-            self, 
+            self,
             inspections_site_stat: list
     ):
         """
@@ -46,7 +46,7 @@ class Stat_chart_inspection_campaign():
         self.create_id_to_groups()
         # map id -> campaign group key
         self.map_id_campaign_group_key()
-        
+
 
     def create_campaign_inspection_dict(self):
         """ Create a dictionary with key the tuple (inspection.month, inspection.day) of start inspection and value list of inspection.id"""
@@ -61,7 +61,7 @@ class Stat_chart_inspection_campaign():
                             self.campaign_inspection_dict[(m, day)] = [inspection.id]
                         else:
                             self.campaign_inspection_dict[(m, day)].append(inspection.id)
-    
+
 
     def create_id_to_groups(self):
         """ Create a dictionary with key the inspection.id and value list of tuple (inspection.month, inspection.day)"""
@@ -80,7 +80,7 @@ class Stat_chart_inspection_campaign():
         for key, ids in self.campaign_inspection_dict.items():
             for id_ in ids:
                 self.id_month_to_group[(id_, key[0])] = key
-    
+
 
     def map_campaign_group(self, row:pd.Series):
         """ take row of df as parameter and return campaign of the group"""
@@ -113,8 +113,8 @@ class Stat_chart_inspection_campaign():
             percentile: float = 0.9
     )->pd.DataFrame:
         """
-        Create the statistic chart date for the 'operation_deferred_merged' or 'inspection_site' 
-            that are inside mother vessel campaign. Considering statistical durations 
+        Create the statistic chart date for the 'operation_deferred_merged' or 'inspection_site'
+            that are inside mother vessel campaign. Considering statistical durations
             of the entire campaign operations insthead of single operations.
 
         Algorithm work:
@@ -140,7 +140,7 @@ class Stat_chart_inspection_campaign():
         df_deferred = deepcopy(df[df['comments'] == 'inspection_site_campaign'])
         if df_deferred.empty:
             return df
-        
+
         df_deferred = log_event_convert_stringtime(df_deferred)
         df_deferred.sort_values(by=["d_trigger", "d_end"], inplace=True)
         df_deferred["month"] = df_deferred["d_trigger"].dt.month
@@ -150,14 +150,14 @@ class Stat_chart_inspection_campaign():
         # remove inspcetion that are not considere as deferred campaign
         df_deferred = df_deferred[df_deferred["id"].isin({_id for _id, _ in self.id_month_to_group.keys()})]
         df_deferred['year'] = df_deferred['d_trigger'].dt.year
-        
+
         # iterate for vessel used
         for vessel in vessels:
             df_deferred_vessel = df_deferred[df_deferred['vessel_2'] == vessel.id]
 
             if df_deferred_vessel.empty:
                 continue
-            
+
             # Regroup by year and month, evaluate start and end of deferred op for each month, year
             grouped = df_deferred_vessel.groupby(['year', 'campaign_group']).agg(
                 min_trigger=('d_trigger', 'min'),
@@ -166,7 +166,7 @@ class Stat_chart_inspection_campaign():
 
             # Evaluate duration of deferred operations in days for each deferred month
             grouped['duration_days'] = (grouped['max_end'] - grouped['min_trigger']).dt.total_seconds() / 86400  # in days
-            
+
             # CHIAVE DI RAGGRUPPAMENTO: "stesso d_trigger iniziale"
             # uso la data normalizzata (00:00) per evitare problemi di ore/minuti
             grouped["start_key"] = list(zip(grouped["min_trigger"].dt.month,
@@ -202,7 +202,7 @@ class Stat_chart_inspection_campaign():
             df = log_event_convert_stringtime(df)
 
         return df
-    
+
 
 if __name__ == "__main__":
     pass

@@ -8,13 +8,13 @@ class Results:
         self.dfs_log_events = []
         self.dfs_log_events_merged = []
         self.kpi_om_type_cost_list = []
-        
+
         self.dfs_energy_yearly_dict = {
             "Availability_year_wind": [],
             "Availability_year_wave": [],
             "Availability_year_pv": []
         }
-        
+
         self.dfs_energy_yearly_month_dict = {
             "Availability_month_wind": [],
             "Availability_month_wave": [],

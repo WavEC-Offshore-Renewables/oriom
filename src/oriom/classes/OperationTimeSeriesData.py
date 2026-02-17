@@ -22,7 +22,7 @@ class OperationTimeSeriesData:
         transit_ts (:obj:`float`): Total transit duration to site
 
     Note:
-        When the class is initialized, :func:`_extract_from_sched` is run.        
+        When the class is initialized, :func:`_extract_from_sched` is run.
     """
 
     def __init__(self, operation, id: str, oper_sched: pd.DataFrame, startability: pd.DataFrame = pd.DataFrame()):
@@ -49,7 +49,7 @@ class OperationTimeSeriesData:
     def _extract_from_sched(self):
         if self.oper_sched.empty:
             raise ValueError(f"The oper_sched file for the operation {self.id} is empty")
-        
+
         self.dur_net_site = self.oper_sched['dur_net_site'].iloc[0]
         self.transit_tp = self.oper_sched['transit_to_port'].iloc[0]
         self.transit_ts = self.oper_sched['transit_to_site'].iloc[0]
@@ -59,7 +59,7 @@ class OperationTimeSeriesData:
         else:
             self.dur_net_port = 0
 
-        
+
     @classmethod
     def create_timeseries_data(cls, operation, file_name_dir, op_dir, save = None):
         """ The save argument is used in case we want to return the df to save it in the folder (in case we recycle files from other operations)"""
@@ -86,7 +86,7 @@ class OperationTimeSeriesData:
         if 'datetime' not in oper_sched.columns:
             oper_sched.rename(columns={oper_sched.columns[0]: 'datetime'}, inplace=True)
         oper_sched = convert_stringtime(oper_sched,'datetime')
-        
+
         if save:
             df_workability = pd.read_csv(os.path.join(op_dir, 'workability.csv'))
             return cls(operation, operation.id, oper_sched, startability_df), oper_sched, df_workability

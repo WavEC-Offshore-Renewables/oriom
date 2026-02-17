@@ -26,8 +26,8 @@ class InspectionPort():
         dur_per_device (:obj:`float`): Amount of time to inspect one device [hours].
         op_tow_port (:obj:`str`): ID of the tow-to-port operation.
         op_tow_site (:obj:`str`): ID of the tow-to-site operation.
-        op_tow_site_port (:obj:`str`): ID of the tow-to-site operation, connection of 
-            device, disconnection of another device, tow-to-port. 
+        op_tow_site_port (:obj:`str`): ID of the tow-to-site operation, connection of
+            device, disconnection of another device, tow-to-port.
             Its value is :obj:`0.0` if not defided.
         intervened_devices (:obj:`int`): Number of devices that are intervened in case
             this inspection occurs.
@@ -45,7 +45,7 @@ class InspectionPort():
         vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary
             vessel used in this operation. Its value is ``None`` if not
             defided.
-        rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): The ID of the ROV/Drone. 
+        rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): The ID of the ROV/Drone.
             Its value is ``None`` if not defided.
         parts_cost (:obj:`float`): Cost of replacement parts. Its value is
             :obj:`0.0` if not defided.
@@ -56,10 +56,10 @@ class InspectionPort():
             at port simultaneously
         n_device_stored_at_port(:obj:`int`): Number of devices that can be
             stored at port
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`): 
+        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
-        towing_log (:obj:`pd.DataFrame`): Dataframe that log the towing to port and to site operation. 
+        towing_log (:obj:`pd.DataFrame`): Dataframe that log the towing to port and to site operation.
             Default to empty dataframe.
         insp_port_dir (:obj:`str`): Directory where the inspection port is stored.
             Default to None.
@@ -67,14 +67,14 @@ class InspectionPort():
             at port simultaneously. Defaults to :obj:`1`
         n_device_stored_at_port(:obj:`int`): Number of devices that can be
             stored at port when not in maintenance. Defaults to :obj:`0.0`
-        n_days_main (:obj:`int`): Number of total days of shift needed to conclude the insp. 
+        n_days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
         duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
             Defaults to ``0``
         n_days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
-        duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.  
-            Defaults to ``0``   
+        duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
+            Defaults to ``0``
         n_crew_main (:obj:`int`): Number of crew members needed for main shift.
             Defaults to ``0``
         n_crew_last (:obj:`int`): Number of crew members needed for last shift.
@@ -130,7 +130,7 @@ class InspectionPort():
                 Default to ``None``.
             wind_speed (:obj:`float`, *optional*): Limit wind speed. Defaults to ``None``.
             light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
-            level (:obj:`str`): Level at which the failure occurs for the graph. 
+            level (:obj:`str`): Level at which the failure occurs for the graph.
             rov_drone (:obj:`str`, *optional*): The ID of the ROV/Drone.
                 Defaults to ``None``.
             parts_cost (:obj:`float`, *optional*): Cost of replacement parts.
@@ -142,17 +142,17 @@ class InspectionPort():
                 at port simultaneously. Defaults to :obj:`1`
             n_device_stored_at_port(:obj:`int`): Number of devices that can be
                 stored at port when not in maintenance. Defaults to :obj:`0.0`
-            days_main (:obj:`int`): Number of total days of shift needed to conclude the insp. 
+            days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.  
+            duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
-            days_last (:obj:`int`): Number of total days of shift needed to conclude the insp. 
+            days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.  
+            duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
             double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
                 Default to True
-            towing_log (:obj:`pd.DataFrame`): Dataframe that log the towing to port and to site operation. 
+            towing_log (:obj:`pd.DataFrame`): Dataframe that log the towing to port and to site operation.
                 Default to empty dataframe.
 
         Raises:
@@ -259,16 +259,16 @@ class InspectionPort():
                     e_ = f'InspectionPort: For operation {self.id}, "double_shift" must be a boolean value'
                     logging.error(e_)
                     raise ValueError(_e)
-                
+
         self._check_attributes()
         self._define_tow_operations(towing_ops)
 
 
     def _check_attributes(self):
         """
-        This method validates the attributes of the `CorrectiveMajor` class to ensure they 
+        This method validates the attributes of the `CorrectiveMajor` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
 
@@ -312,12 +312,12 @@ class InspectionPort():
             self.level == 'string_cable',
             self.level == 'substation',
             self.level == 'mv_transformer',
-            self.level == 'circuit_braker',         
+            self.level == 'circuit_braker',
             self.level == 'switcher',
             self.level == 'inverter',
             self.level == 'device'
         ]) is False:
-            raise ValueError('"level" must be "device", "array_cable", "string_cable", "exp_cable" or "dyn_cable-sub"')        
+            raise ValueError('"level" must be "device", "array_cable", "string_cable", "exp_cable" or "dyn_cable-sub"')
         if self.intervened_devices < 0:
             raise ValueError('"intervened_devices" must not be negative')
         if self.ws is not None and self.ws < 0:
@@ -332,14 +332,14 @@ class InspectionPort():
             raise ValueError('"n_device_at_port" must not be negative')
         if self.n_device_stored_at_port is not None and self.n_device_stored_at_port < 0:
             raise ValueError('"n_device_stored_at_port" must not be negative')
-  
+
         logging.debug('InspectionPort: inspection %s attributes within ranges and valid.' % self.id)
 
 
     def _define_tow_operations(self, towing_ops:list):
         """
         Define tow operations based on the given towing operations and the technology identifier.
-        
+
         Args:
             towing_ops (:obj:`list`): List of object :class:`OperationTow`.
         """
@@ -379,11 +379,11 @@ class InspectionPort():
             _w = 'For operation %s, could not define a tow-to-site operation.' % self.id
             logging.warning('InspectionPort: ' + _w)
 
-    
+
     def define_level(self, G_layouts:dict):
         """
         If the level of the inspection is not defined, select the node with the power defined in the nx Graph.
-        
+
         Args:
             G_layouts (dict): dictionary with the graph of the layouts for wind, wave and pv
         """
@@ -399,7 +399,7 @@ class InspectionPort():
                         break
                     except AttributeError:
                         continue
-        
+
 
     def get_inspections_from_yaml(
             file_path: object,
@@ -410,7 +410,7 @@ class InspectionPort():
 
         Args:
             file_path (:obj:`string`): The path to the YAML file.
-            towing_operations (:obj:`list`, *optional*): A list containing 3 towing operations: tow-to-port and tow-to-site. 
+            towing_operations (:obj:`list`, *optional*): A list containing 3 towing operations: tow-to-port and tow-to-site.
                 The first item is the tow-to-port operation and the second item is the tow-to-site operation then also tow_port_site is present
                 Defaults to None if not provided.
         Raises:
@@ -545,7 +545,7 @@ class InspectionPort():
             if key in self.id:
                 return value
         return None
-    
+
 
     def to_yaml(
             self,

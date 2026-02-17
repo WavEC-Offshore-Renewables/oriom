@@ -43,10 +43,10 @@ Different feature consent to:
 -  Reutilize vessels or recall vessel that have do not complete the operations inside the contracting chart time (not available in open source mode)
 ====================================================================================================================================================
 
--  Consider joint operations for different operations to optimize the O&M plan when possible 
+-  Consider joint operations for different operations to optimize the O&M plan when possible
 ============================================================================================
 
--  Intermediate results analysis 
+-  Intermediate results analysis
 ================================
 
 

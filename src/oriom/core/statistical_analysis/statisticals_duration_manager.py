@@ -12,17 +12,17 @@ def statistical_duration_manager(
     total_operations :list,
     inputs_stats: object
 ):
-    """ 
+    """
     Create for each opeartion a statistical analysis for the duration from its operation_schedule
-    
+
     Args:
         operation_dir (string): Path of operation directory
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
-        total_operations (list): List of class 
+        total_operations (list): List of class
             `CorrectiveMinor`, `CorrectiveMajorr`,  `InspectionSite`,  `InspectionPort`, `OperationTow`
         inputs_tseries (object): Object class `Input.TimeSeries`
     """
-    
+
     # Initizalize a DataFrame to save operations sttistical analysis
     df_stat_analysis_duration = pd.DataFrame()
 

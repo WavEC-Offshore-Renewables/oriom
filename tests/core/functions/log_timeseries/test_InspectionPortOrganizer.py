@@ -718,7 +718,7 @@ class TestInspectionPortCreation(unittest.TestCase):
             end = date_continuous + timedelta(hours=1)
             inst.tow_at_port[inst.dev_idx_station_port] = (start, end)
             return end
-        
+
         def fake_inspection_at_port(d_insp, duration_shutdown_month, month_insp):
             return d_insp + timedelta(hours=1)
 
@@ -727,7 +727,7 @@ class TestInspectionPortCreation(unittest.TestCase):
             end = d_tow + timedelta(hours=1)
             inst.tow_at_site[inst.dev_idx_station_port] = (start, end)
             return end
-        
+
         inst.tow_to_port = fake_tow_to_port
         inst.inspection_at_port = fake_inspection_at_port
         inst.tow_to_site = fake_tow_to_site
@@ -780,7 +780,7 @@ class TestInspectionPortCreation(unittest.TestCase):
             end = date_continuous + timedelta(hours=1)
             inst.tow_at_port[inst.dev_idx_station_port] = (start, end)
             return end
-                
+
         def fake_inspection_at_port(d_insp, duration_shutdown_month, month_insp):
             return d_insp + timedelta(hours=1)
 
@@ -789,7 +789,7 @@ class TestInspectionPortCreation(unittest.TestCase):
             end = d_tow + timedelta(hours=1)
             inst.tow_at_site[inst.dev_idx_station_port] = (start, end)
             return end
-        
+
         inst.tow_to_port = faketow_to_port
         inst.inspection_at_port = fake_inspection_at_port
         inst.tow_to_site = fake_tow_to_site

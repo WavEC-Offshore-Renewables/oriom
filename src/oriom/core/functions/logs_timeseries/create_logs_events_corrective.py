@@ -56,13 +56,13 @@ def compute_operation_datetimes(df_filtered_start, oper_stat):
 
 
 def _check_index_row_validity(
-            idx_end_leadtime:int, 
-            last_valid_idx: int, 
-            row: pd.Series, 
+            idx_end_leadtime:int,
+            last_valid_idx: int,
+            row: pd.Series,
             oper_sched: pd.DataFrame
     ):
         """ Check first if index leadtime and df_filtered are valid"""
-        
+
         # Check if the opeartion can be conducted before the end of lifetime of the farm
         if idx_end_leadtime > last_valid_idx:
             try:
@@ -77,7 +77,7 @@ def _check_index_row_validity(
         # Check if exist any NaN value on the oper_schedule file filtered
         if df_filtered_start.iloc[1:-4].isna().any().any():
             raise ValueError(f"Log_dates: NaN row in oper_schedul {row['id']} at index {idx_end_leadtime}, last valid index: {last_valid_idx}")
-        
+
         return df_filtered_start
 
 
@@ -88,7 +88,7 @@ def _take_vessel_data(find_element_class, op):
     ves_2 = None
     if op.vessel2_id:
         ves_2 = op.vessel2_qt
-    
+
     return vessel, ves_2, mob_time
 
 
@@ -115,7 +115,7 @@ def create_logs_corrective_file(
             - date end net work at site: d_end_wait_site + dur_net_site (hours)
             - date end trasit to port: d_end_dur_net_site + transit_to_port (hours)
             - date end: d_end_transit_tp + dur_net_port (hours)
-        
+
         Failure event only have the trigger date representing the time of occurrence.
         Vessel mobilisation is also logged defined by the trigger date in which the mobilisation starts.
 
@@ -134,15 +134,15 @@ def create_logs_corrective_file(
         ValueError: "preferred_months" in a inspection of periodicity lower than 1 year
             should be at least as many times as the occurences per year.
         FileNotFoundError: LogDates: "oper.ts_data" or "oper.ts_data.oper_sched" is missing for operation
-        KeyError: Maintenance strategy not found: "failure.maintenance_strategy") 
+        KeyError: Maintenance strategy not found: "failure.maintenance_strategy")
     Returns:
         pd.DataFrame: dataframe with all the events of the farm.
     """
-    
+
     log_events = pd.DataFrame(columns=COLS)
     if dates_failures.empty:
         return log_events
-    
+
     # creations of failures line for log events
     log_events = logs_timeseries_func.failure_df_to_logevent_df(dates_failures = dates_failures, cols = COLS)
 
@@ -175,7 +175,7 @@ def create_logs_corrective_file(
 
         if oper_sched is None:
             raise FileNotFoundError(f'LogDates: oper.ts_data or oper.ts_data.oper_sched is missing for operation {oper.id}')
-            
+
         #Filter the failure_event file for each operation corrispondent
         failure_filter = deepcopy(dates_failures)
         failure_filter = failure_filter[failure_filter['operation_triggered'] == oper.id.lower()]
@@ -211,15 +211,15 @@ def create_logs_corrective_file(
                     failure = failure,
                     time_fail_op_immediately = time_fail_op_immediately
                 )
-                
+
                 # Evaluate differently for deferred and immediate towing
                 if not towing_port.tow_deferred:
                     if mob_time != 0:
                         row_mob_line = towing_port.mobilitate_vessel(log_events = log_events, row = row)
 
                     towing_port.add_hours_for_noon_shift(
-                            fail_index = fail_index, 
-                            lead_mob_time = mob_time, 
+                            fail_index = fail_index,
+                            lead_mob_time = mob_time,
                             oper_sched = tow_port_op_oper_sched,
                         )
                 else:
@@ -228,20 +228,20 @@ def create_logs_corrective_file(
                     index_found = towing_port.check_leadtime_index(oper_sched = tow_port_op_oper_sched, CUTOFF_DATE = CUTOFF_DATE)
                     if not index_found:
                         continue
-                
+
                 # Create row_tow with data
                 date_op = towing_port.date_op
 
                 df_filtered_start_tow = _check_index_row_validity(
-                    idx_end_leadtime = towing_port.idx_end_leadtime, 
-                    last_valid_idx= last_valid_idx_tow_port, 
-                    row = row, 
+                    idx_end_leadtime = towing_port.idx_end_leadtime,
+                    last_valid_idx= last_valid_idx_tow_port,
+                    row = row,
                     oper_sched = tow_port_op_oper_sched
                 )
 
                 if df_filtered_start_tow.empty:
                     continue
-            
+
                 dates_tow_port = compute_operation_datetimes(df_filtered_start_tow, tow_op_port_stat)
                 date_end_wait_start = dates_tow_port['date_end_wait_start']
                 row_tow_port = pd.DataFrame([[
@@ -263,8 +263,8 @@ def create_logs_corrective_file(
                     tow_op_port.vessel2_qt,
                     'tow_' + row['id']
                 ]],columns=COLS)
-                
-                # Check if tow ends before lead_time_compontent 
+
+                # Check if tow ends before lead_time_compontent
                 diff = (dates_tow_port['date_end'] - (date_failure + timedelta(hours=time_fail_op_immediately))).total_seconds() / 3600
                 lead_mob_time_tow = int(max(component_lead_time - diff, 0))
 
@@ -294,9 +294,9 @@ def create_logs_corrective_file(
                 # Find the start of the vessel use
                 if failure.maintenance_strategy == 'immediately':
                     immediate_correction = CorrectionImmediate(
-                        date_failure = date_failure, 
-                        vessel = vessel, 
-                        oper = oper, 
+                        date_failure = date_failure,
+                        vessel = vessel,
+                        oper = oper,
                         time_fail_op_immediately = time_fail_op_immediately,
                         tow_op = tow_op_flag
                     )
@@ -305,28 +305,28 @@ def create_logs_corrective_file(
                         row_mob_line = immediate_correction.mobilitate_vessel(log_events = log_events, row = row)
                     # Row at operation schedule with idx at 5 AM
                     immediate_correction.add_hours_for_noon_shift(
-                        fail_index = fail_index, 
-                        lead_mob_time = lead_mob_time, 
+                        fail_index = fail_index,
+                        lead_mob_time = lead_mob_time,
                         oper_sched = oper_sched,
                     )
                     date_op = immediate_correction.date_op
                     idx_end_leadtime = immediate_correction.idx_end_leadtime
-            
+
                 elif failure.maintenance_strategy == 'specific month':
                     deferred_correction = CorrectionDeferred(
-                        date_failure = date_failure, 
-                        vessel = vessel, 
-                        oper = oper, 
+                        date_failure = date_failure,
+                        vessel = vessel,
+                        oper = oper,
                         preferred_month = failure.preferred_month,
                         tow_op = tow_op_flag
                     )
-  
+
                     # Evaluate end of leadtime date
                     if not tow_op_flag:
                         deferred_correction.leadtime_evaluation(lead_mob_time = lead_mob_time)
                     else:
                         deferred_correction.add_leadtime_tow(
-                            lead_mob_time = lead_mob_time, 
+                            lead_mob_time = lead_mob_time,
                         )
 
                     index_found = deferred_correction.check_leadtime_index(oper_sched = oper_sched, CUTOFF_DATE = CUTOFF_DATE)
@@ -335,15 +335,15 @@ def create_logs_corrective_file(
                     date_op = deferred_correction.date_op
                     idx_end_leadtime = deferred_correction.idx_end_leadtime
                 else:
-                    raise KeyError(f'Maintenance strategy not found: {failure.maintenance_strategy}')  
+                    raise KeyError(f'Maintenance strategy not found: {failure.maintenance_strategy}')
             else:
                 logging.error(f"LogDates: Operation trigger not found for failure {row['id']}")
                 raise KeyError
-            
+
             df_filtered_start = _check_index_row_validity(
-                idx_end_leadtime = idx_end_leadtime, 
-                last_valid_idx= last_valid_idx, 
-                row = row, 
+                idx_end_leadtime = idx_end_leadtime,
+                last_valid_idx= last_valid_idx,
+                row = row,
                 oper_sched = oper_sched
             )
 
@@ -405,9 +405,9 @@ def create_logs_corrective_file(
                 date_op = dates_op['date_end'] - timedelta(hours = mob_time)
 
                 df_filtered_start_tow = _check_index_row_validity(
-                    idx_end_leadtime = towing_site.idx_end_leadtime, 
-                    last_valid_idx= last_valid_idx_tow_site, 
-                    row = row, 
+                    idx_end_leadtime = towing_site.idx_end_leadtime,
+                    last_valid_idx= last_valid_idx_tow_site,
+                    row = row,
                     oper_sched = tow_site_oper_sched
                 )
 
@@ -435,7 +435,7 @@ def create_logs_corrective_file(
                     ves_2,
                     'tow_' + row['id']
                 ]],columns=COLS)
-                
+
             ### CONCAT TO THE LOG_EVENTS
             if row_tow_port is not None:
                 row_dates = pd.concat([row_dates,row_tow_port], axis=0, ignore_index=True)
@@ -447,7 +447,7 @@ def create_logs_corrective_file(
                 row_dates = pd.concat([row_dates,row_mob_line], axis=0, ignore_index=True)
 
             log_events = pd.concat([log_events,row_dates], axis=0, ignore_index=False)
-            
+
     return log_events
 
 if __name__ == '__main__':

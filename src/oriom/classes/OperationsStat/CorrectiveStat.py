@@ -56,7 +56,7 @@ class CorrectiveStat():
     ):
         '''
         Args:
-            operation (:class:`~oriom.classes.Operations.CorrectiveMinor/Major`): 
+            operation (:class:`~oriom.classes.Operations.CorrectiveMinor/Major`):
                 Corrective operation class.
             PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
             run_dur (:obj:`str`): Folder in which there is the statistical analysis.
@@ -191,7 +191,7 @@ class CorrectiveStat():
             wait_site_row = df_stats[
                 df_stats['percentile'] == 'wait_site'
             ]
-            
+
             wait_site_row = wait_site_row.fillna(0)
             wait_site_dict=wait_site_row[list_months].to_dict(orient='records')[0]
         else: wait_site_dict = None

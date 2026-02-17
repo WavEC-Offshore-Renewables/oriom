@@ -219,7 +219,7 @@ def excel_to_yaml(
 
             elif 'failure' in name and 'scenario' in name:
                 inputs["failure scenario"] = {"value": int(value), "units": None}
-            
+
             elif 'length' in name and 'export' in name:
                 inputs["length export cable"] = {"value": float(value), "units": str(units)}
 
@@ -228,7 +228,7 @@ def excel_to_yaml(
 
             elif 'double' in name and 'shifts' in name:
                 inputs["double shifts"] = {"value": (value), "units": str(units)}
-            
+
             elif 'merge' in name and 'vessel' in name:
                 values_list = [v.strip().lower() for v in str(value).split(',')]
                 inputs["merge vessel"] = {"value": values_list, "units": str(units)}
@@ -529,7 +529,7 @@ def excel_to_yaml(
             elif 'export' in name and 'cable' in name:
                 value = int(value)
                 wtg["number export cables"] = {"value": value, "units": None}
-            
+
             elif "number" in name and "device" in name and "port" in name and "stored" not in name:
                 value = int(value)
                 wtg[name] = {"value": value, "units": None}
@@ -651,7 +651,7 @@ def excel_to_yaml(
             raise PermissionError('Could not open the Excel file. Make sure the file is not opened.')
         df_pv.columns = df_pv.columns.str.lower()
         df_pv.dropna(axis='rows', how='any', inplace=True)
-    
+
         # Verify PV in df_pv and organize them in a dictionary
         for _, row in df_pv.iterrows():
             name = row['input'].lower()
@@ -685,11 +685,11 @@ def excel_to_yaml(
             elif 'inverters' in name:
                 value = int(value)
                 pv["number of inverters"] = {"value": value, "units": None}
-            
+
             elif 'transformers' in name:
                 value = int(value)
                 pv["number of mv transformers"] = {"value": value, "units": None}
-            
+
             elif 'substations' in name:
                 value = int(value)
                 pv["number of substations"] = {"value": value, "units": None}
@@ -697,7 +697,7 @@ def excel_to_yaml(
             elif 'export' in name and 'cable' in name:
                 value = int(value)
                 pv["number export cables"] = {"value": value, "units": None}
-            
+
             elif 'island' in name and 'array' in name:
                 value = int(value)
                 pv["number island per array"] = {"value": value, "units": None}

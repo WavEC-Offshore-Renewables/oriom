@@ -15,7 +15,7 @@ def copy_row_wait_start(
     ts: int,
     wait_start: float
 ) -> tuple[pd.DataFrame, int, bool]:
-    
+
     """
     Copies operation values forward in time while 'wait_start' is active,
     filling future time steps with the same values from time `ts`,
@@ -121,7 +121,7 @@ def define_shift_operation_values(
     if df_workability.shape[1] > 1:
         _e = 'Workability: This function only works with operations.'
         raise ValueError(_e)
-    
+
     df_workability = deepcopy(df_workability)
 
     df_op_values = pd.DataFrame(
@@ -164,10 +164,10 @@ def define_shift_operation_values(
         df_op_values['dur_total'] = df_op_values.iloc[:, 1:6].sum(axis=1)
 
         df_op_values['wait_start'] = df_op_values['wait_start'].astype(int)
-        
+
         df_op_values.reset_index(inplace=True)
         df_op_values.rename(columns={"index": 'datetime'}, inplace=True)
-        
+
         # Save schedule as a CSV
         if out_dir is not None:
             save_file_csv(df_to_save = df_op_values, save_dir = out_dir)
@@ -234,11 +234,11 @@ def define_shift_operation_values(
 
     df_op_values.reset_index(inplace=True)
     df_op_values.rename(columns={"index": 'datetime'}, inplace=True)
-    
+
     ds_hours_group_main = pd.Series(hours_group_main)
     ds_hours_group_last = pd.Series(hours_group_last)
 
-    ts = df_op_values.index[0]  
+    ts = df_op_values.index[0]
     final_idx = df_op_values.index[-1]
 
     pbar = tqdm(
@@ -246,7 +246,7 @@ def define_shift_operation_values(
         desc='Inspection "%s - %s"' % (operation.id, operation.name),
         leave=False
     )
-    
+
     while ts < final_idx:
         days_inspected = []
         # Check when is the first oportunity to start the main shift
@@ -325,7 +325,7 @@ def define_shift_operation_values(
                         wait_start = np.nan
                         wait_port = np.nan
                         ts_unfeasible = True
-                        
+
                 days_inspected.append(insp_last_day)
 
             except IndexError:
@@ -365,12 +365,12 @@ def define_shift_operation_values(
         df_op_values, wait_start_idx, wait_start, success = copy_row_wait_start(df_op_values, ts=ts, wait_start=wait_start)
 
         if not success:
-            break  
-        
+            break
+
         if wait_start_idx > final_idx:
             wait_start_idx = final_idx
-        
-        pbar.update(wait_start+1) 
+
+        pbar.update(wait_start+1)
         # Update the next timestep to evaluate
         ts = wait_start_idx+1
     pbar.close()

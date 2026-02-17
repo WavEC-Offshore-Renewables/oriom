@@ -5,14 +5,14 @@ from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 
 
 def data_ctv_long_term_strategy(
-        v: object, 
+        v: object,
         log_events_merged: pd.DataFrame,
         n_lifetime: int
     ):
-    
+
     """
     This function return a dictionary where show the total costs (short term + long term) of the ctv vessel in case
-    different number of long term vessel are charted. 
+    different number of long term vessel are charted.
 
     Args:
         v (object): object of class `~oriom.classes.Vessel.Vessel`
@@ -36,7 +36,7 @@ def data_ctv_long_term_strategy(
     log_events_merged_reset['ST_contract_2'] = False
     log_events_merged_reset['d_end_stat_chart'] = log_events_merged_reset['d_end_stat_chart_orig']
     log_events_merged_reset['n_vessel_1_effective'] = log_events_merged_reset['n_vessel_1']
-    
+
 
     for n_long_term_try in len_simulation:
         ctv_strategy_cost[n_long_term_try] = {}
@@ -62,7 +62,7 @@ def data_ctv_long_term_strategy(
 
         # Filter daily_vessel for the relevant vessel
         short_term_days_chart = vessel_day_count_count.count_day_vessel(ves.id)
-            
+
         ST_ctv_cost = short_term_days_chart * ves.charter
         LT_monthly_charter_cost = getattr(ves, 'monthly_contract_cost', 0)*getattr(ves, 'n_ves_monthly_contract', 0)*len(getattr(ves, 'months_contract', []))
         LT_ctv_cost = n_lifetime * (ves.annual_contract * n_long_term_try + LT_monthly_charter_cost)

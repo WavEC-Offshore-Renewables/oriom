@@ -11,7 +11,7 @@ except ImportError:
 def recycle_other_oper_scheduler(
         minor_oper_dict: dict,
         hash_to_key: dict,
-        operation, 
+        operation,
         attribute_list:list
 ) -> str:
     """
@@ -37,7 +37,7 @@ def recycle_other_oper_scheduler(
         minor_oper_dict[operation.id] = list(op_values)
         hash_to_key[op_values] = operation.id
         return operation.id
-    
+
 
 def recycle_major_other_oper_scheduler(
         operations: object,
@@ -65,9 +65,9 @@ def recycle_major_other_oper_scheduler(
             if df_startability.equals(start):
                 if compare_operations(actual_oper,oper) and check_files:
                     file_exist = check_files.reuse_file_exist(
-                            op_dir = os.path.join(operation_dir, actual_oper.id), 
-                            file_name_schedule = 'operation_schedule.csv', 
-                            operation = actual_oper, 
+                            op_dir = os.path.join(operation_dir, actual_oper.id),
+                            file_name_schedule = 'operation_schedule.csv',
+                            operation = actual_oper,
                             similar_inspection_id = oper.id,
                             op_dir_other = os.path.join(operation_dir, oper.id)
                     )

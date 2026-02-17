@@ -29,9 +29,9 @@ def kpi_final_total_cost(
     technician_cost_annual: float,
     mother_vessels: list,
 )->pd.DataFrame:
-    
+
     """
-    Auxiliary Function: 
+    Auxiliary Function:
     Based on the log of events it calculates the direct costs for corrective
         operations.
 
@@ -42,7 +42,7 @@ def kpi_final_total_cost(
             operation, inspection_port, inspection_site).
         vessels (:obj:`list`): List of objects :class:`Vessel`
         inputs (object): object of class `Inputs` that contains all the input data from input file,
-        find_element_class (Find_element_class): Initialized instance that provides fast access to operations, 
+        find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         operations_corrective_stat (:obj:`list`): List of obejcts :class:`OperationsCorrectiveStat`.
         operations_tow_stat (:obj:`list`): List of objects :class:`OperationsTowStat`.
@@ -58,8 +58,8 @@ def kpi_final_total_cost(
         mother_vessels (list): list of object from class ´´Vessels´´ considered for mother vessel campaign
 
     Returns:
-        :obj:`pd.DataFrame`: dataframe lifetime directs costs for all the operations divided by vessels . 
-        :obj:`pd.DataFrame`: dataframe yearly directs costs for all the operations divided by vessels . 
+        :obj:`pd.DataFrame`: dataframe lifetime directs costs for all the operations divided by vessels .
+        :obj:`pd.DataFrame`: dataframe yearly directs costs for all the operations divided by vessels .
     """
 
     def restructure_df_year(kpi_om_year_final: pd.DataFrame) -> pd.DataFrame:
@@ -80,14 +80,14 @@ def kpi_final_total_cost(
         data.insert(0, 'vessel_id', vessel_ids)
 
         return data
-    
-    
+
+
 
     def consider_other_fixed_annual_cost(kpi_om, kpi_om_year_final, port_cost_annual, insurance_cost_annual, technician_cost_annual, n_lifetime):
         """
         This function adds to the cost the port, insurance, and technician costs
         """
-        
+
         # Fixed costs for kpi_om
         df_cost = pd.Series(0, index=kpi_om.columns)
         for name, annual_cost in zip (['port', 'technician', 'insurance'],[port_cost_annual,technician_cost_annual,insurance_cost_annual]):
@@ -109,8 +109,8 @@ def kpi_final_total_cost(
         kpi_om_year_final = pd.concat([kpi_om_year_final, fixed_row.to_frame().T], ignore_index=True)
 
         return kpi_om, kpi_om_year_final
-    
-    
+
+
     def filter_log_file_per_operations(log_events,log_events_merged):
         """ Function to create filtered dataframes of log events for cost evaluations"""
         log_events_op = log_events[log_events['event'].isin(['operation', 'inspection_port', 'inspection_site', 'tow'])].copy()
@@ -125,11 +125,11 @@ def kpi_final_total_cost(
             (~log_events_merged['event'].str.contains('fail|mobi', na=False))
             & (log_events_merged['vessel_1'].isna())
         ]
-        
+
         return (
-            log_events_op, log_events_op_ST, log_events_op_merged, 
-            log_events_op_def_merged, log_events_op_merged_oper, 
-            log_events_insp_merged, log_events_mobi_merged, 
+            log_events_op, log_events_op_ST, log_events_op_merged,
+            log_events_op_def_merged, log_events_op_merged_oper,
+            log_events_insp_merged, log_events_mobi_merged,
             log_events_tow, log_event_op_port
         )
 
@@ -154,13 +154,13 @@ def kpi_final_total_cost(
     tech_per_oper_dict, rov_cost_dict, insp_port_data, dict_vess_long_term = {},{},{},{}
     ctv = None
     total_operations = operations_corr_stat + inspections_site_stat + inspections_port_stat  + operations_tow_stat
-    
+
     log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
-    
+
     # Dataframe preparations
-    (log_events_op, log_events_op_ST, log_events_op_merged, 
-    log_events_op_def_merged, log_events_op_merged_oper, 
-    log_events_insp_merged, log_events_mobi_merged, 
+    (log_events_op, log_events_op_ST, log_events_op_merged,
+    log_events_op_def_merged, log_events_op_merged_oper,
+    log_events_insp_merged, log_events_mobi_merged,
     log_events_tow, log_event_op_port ) = filter_log_file_per_operations(log_events, log_events_merged)
 
     vessel_day_count_ST = VesselDayCounter(log_events_merged = log_events_op_ST, vessels=vessels)
@@ -189,7 +189,7 @@ def kpi_final_total_cost(
     for op in operations_corr_stat + operations_tow_stat:
         tech_per_oper_dict[op.id] = op.op_class.tech_required * op.op_class.tech_cost
         rov_cost_dict[op.id] = getattr(getattr(op.op_class, "rov_drone", None), "daily_charter", 0)
-    
+
     # Total lifetime costs
     kpi_om, kpi_om_type_cost = kpi_cost_vessel_internal(
         log_events_op_orig = log_events_op,
@@ -241,9 +241,9 @@ def kpi_final_total_cost(
         ]
 
         if not log_events_merged_year.empty:
-            (log_events_op_y, log_events_op_ST, log_events_op_merged_y, 
-            log_events_op_def_merged_y, log_events_op_merged_oper_y, 
-            log_events_insp_merged_y, log_events_mobi_merged_y, 
+            (log_events_op_y, log_events_op_ST, log_events_op_merged_y,
+            log_events_op_def_merged_y, log_events_op_merged_oper_y,
+            log_events_insp_merged_y, log_events_mobi_merged_y,
             log_events_tow_y, log_event_op_port_y) = filter_log_file_per_operations(log_events_year,log_events_merged_year)
 
             kpi_year, kpi_om_type_cost_year = kpi_cost_vessel_internal(
@@ -274,7 +274,7 @@ def kpi_final_total_cost(
 
             df_costs = kpi_year[['vessel_id', 'lifetime_direct_costs']].copy()
             df_days = kpi_year[['vessel_id', 'n_chart_days']].copy()
-            
+
         else:
             df_costs = pd.DataFrame({
                 'vessel_id': [v.id for v in vessels],
@@ -297,28 +297,28 @@ def kpi_final_total_cost(
             kpi_om_year_called = pd.merge(kpi_om_year_called, df_days, on='vessel_id', how='outer')
 
     kpi_om_year_final = pd.merge(kpi_om_year, kpi_om_year_called, on='vessel_id', how='outer')
-    
+
     kpi_om_year_final = restructure_df_year(kpi_om_year_final)
 
     daily_vessel = vessel_day_count_ST.vessels_calendar
-    
+
     kpi_om, kpi_om_year_final = consider_other_fixed_annual_cost(
-            kpi_om = kpi_om, 
-            kpi_om_year_final = kpi_om_year_final, 
-            port_cost_annual = port_cost_annual, 
-            insurance_cost_annual = insurance_cost_annual, 
-            technician_cost_annual = technician_cost_annual, 
+            kpi_om = kpi_om,
+            kpi_om_year_final = kpi_om_year_final,
+            port_cost_annual = port_cost_annual,
+            insurance_cost_annual = insurance_cost_annual,
+            technician_cost_annual = technician_cost_annual,
             n_lifetime = n_lifetime
         )
 
     kpi_om = create_lifetime_cost(df = kpi_om)
 
     kpi_om = create_total_row(df = kpi_om)
-    
+
     #Create dict for strategy of nº long_term_ctv
     if ctv:
         ctv_dict = kpi_extra.data_ctv_long_term_strategy(
-            v = ctv, 
+            v = ctv,
             log_events_merged = log_events_merged,
             n_lifetime = n_lifetime,
         )

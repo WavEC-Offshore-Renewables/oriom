@@ -21,19 +21,19 @@ class Inputs():
 
         Note:
             Possible actions:
-            
+
             - Use previous run directory:
                 A previous directory is used to copy the files related to the metocean and technologies.
                 If "consider_tseries" is True per operations the "activity", "workability", "startability",
-                and "operation_schedule" file are copied. 
-                If the code only finds some of the mentioned files or finds them for only some of the operations, 
+                and "operation_schedule" file are copied.
+                If the code only finds some of the mentioned files or finds them for only some of the operations,
                 the missing ones will be studied.
                 This is relevant when only the statistical analysis wants to be studied or if some attributes of
-                some operations were changed for which only those need to be analysed. 
+                some operations were changed for which only those need to be analysed.
             - Number of runs:
-                If this is higher than 1, for the same timeseries the O&M plan (log_event file) is produced as many times as the 
+                If this is higher than 1, for the same timeseries the O&M plan (log_event file) is produced as many times as the
                 number of runs, associated costs are calculated and then avaraged.
-            - Overwrite the previous directory: 
+            - Overwrite the previous directory:
                 If a previous directory is used instead of creating a new out_dir copying all relevant files,
                 that same previous directory can be used and updated with the new results.
             - Use a previous logevents_file:
@@ -42,13 +42,13 @@ class Inputs():
             - Use a previous failureevent_file:
                 To avoid new randomness of failure generation the path to an existing failure file can be provided. If a path is provided, the number
                 of runs is set automatically to 1.
-        
+
         Attributes:
             previous_run_dir (:obj:`dict`): Path to a previous run directory
                 to be considered. Its value is ``None`` if not defined.
                 **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-            number_runs (:obj:`int`): Number of times running for the same 
-                statistical analysis. Its values is ``1`` if not defined. 
+            number_runs (:obj:`int`): Number of times running for the same
+                statistical analysis. Its values is ``1`` if not defined.
                 **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
             overwrite_previous (:obj:`dict`): True if results want to be
                 saved in the previous run path.
@@ -92,8 +92,8 @@ class Inputs():
             Keyword Args:
                 previous_run_dir (:obj:`str`,*optional*): Path to a previous run directory
                     to be considered. Defaults to ``None``.
-                number_runs (:obj:`int`,*optional*): Number of times running for the same 
-                    statistical analysis. Its values is ``1`` if not defined. 
+                number_runs (:obj:`int`,*optional*): Number of times running for the same
+                    statistical analysis. Its values is ``1`` if not defined.
                 overwrite_previous (:obj:`dict`,*optional*): True if results want to be
                     saved in the previous run path. Defaults to ``None``.
                 consider_tseries (:obj:`bool`,*optional*): Consider the TimeSeries
@@ -277,9 +277,9 @@ class Inputs():
 
         def _check_attributes(self):
             """
-            This method validates the attributes of the `Inputs.General` class to ensure they 
+            This method validates the attributes of the `Inputs.General` class to ensure they
             have valid values and fall within specified ranges.
-            
+
             Raises errors if any attribute is outside the specified range.
             """
             if self.out_dir is None:
@@ -315,7 +315,7 @@ class Inputs():
             ):
                 _e = 'Not possible to overwrite because previous run not provided'
                 logging.error('Inputs.General: ' + _e)
-                
+
             logging.debug('Inputs.General: attributes within ranges and valid.')
 
 
@@ -333,7 +333,7 @@ class Inputs():
         Note:
             The :attr:`max_wait` defines the maximum wait on weather allowed between activities
             (from :class:`activities`). If the wait is higher than the allowed time the operation
-            cannot be scheduled and gets postponed. 
+            cannot be scheduled and gets postponed.
 
         Attributes:
             site_lat (:obj:`dict`): Site latitude, in degrees.
@@ -364,7 +364,7 @@ class Inputs():
                 **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
             merge_vessel (:obj:`dict`): Vessel type that can be merged in corrective operation
                 **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-            file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs. 
+            file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs.
                 Its value is ``None`` if not defined.
             time_between_devices_dict (:obj:`dict`): Time between device per each tech
             file_metocean_tow_location (:obj:`dict`): Dictionary of X Path location of the metocean date timeseries X  file between site and port.
@@ -422,7 +422,7 @@ class Inputs():
                 file_inputs (:obj:`str`,*optional*): Path for the file with all previous mandatory inputs. Defaults to ``None``.
                 file_metocean_tow_location (:obj:`dict`): Dictionary of Path location of the X metocean date timeseries from site to port.
                 file_metocean_tow_number (:obj:`int`): Number of Path location of the X metocean date timeseries from site to port.
-                
+
 
             Raises:
                 NameError: units of :attr:`site_latitude` not recognized.
@@ -548,7 +548,7 @@ class Inputs():
                     elif 'shifts' in name and 'double' in name:
                         self.inputs["double shifts"] = {"value": bool(value), "units": str(units)}
 
-                    elif 'merge' in name and 'vessel' in name:  
+                    elif 'merge' in name and 'vessel' in name:
                         self.inputs["merge vessel"] = {"value": str(value), "units": str(units)}
 
                     elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' in name:
@@ -600,7 +600,7 @@ class Inputs():
                                 "value": float(value),
                                 "units": 'hours'
                         }
-                    
+
                     elif key.lower() == 'time_between_devices_wt':
                         self.inputs["time between devices wt"] = {
                                 "value": float(value),
@@ -688,7 +688,7 @@ class Inputs():
                 self.inputs.pop('metocean file tow location')
             self.scenario = 0
             self.time_between_devices_dict = {
-                'opv': self.time_between_devices_pv["value"], 
+                'opv': self.time_between_devices_pv["value"],
                 'ofw': self.time_between_devices_wt["value"],
                 'owc': self.time_between_devices_wec["value"]
             }
@@ -703,9 +703,9 @@ class Inputs():
 
         def _check_attributes(self):
             """
-            This method validates the attributes of the `Inputs.TimeSeries` class to ensure they 
+            This method validates the attributes of the `Inputs.TimeSeries` class to ensure they
             have valid values and fall within specified ranges.
-            
+
             Raises errors if any attribute is outside the specified range.
             """
             if self.site_lat is None:
@@ -757,7 +757,7 @@ class Inputs():
             if self.file_metocean_tow_number["value"] < 0:
                 raise ValueError('"Metocean tow file number" must not be negative')
             if self.file_metocean_tow_number["value"] > 0:
-                if getattr(self, "file_metocean_tow_location", None):       
+                if getattr(self, "file_metocean_tow_location", None):
                     if len(self.file_metocean_tow_location) != self.file_metocean_tow_number["value"]:
                         raise ValueError('Number of "Metocean tow file location" and "Metocean tow file number" must coincide')
                     for i in range(1, self.file_metocean_tow_number["value"]+1):
@@ -771,7 +771,7 @@ class Inputs():
         @classmethod
         def from_yaml(cls, dir: str, name: str):
             """Recycle previous ~Inputs.TimeSeries from a YAML file.
-            
+
             Args:
                 name (:obj:`str`): Name of the YAML file.
             """
@@ -798,7 +798,7 @@ class Inputs():
                     "metocean_ws_height": input_yaml["metocean ws height"]["value"],
                     "file_metocean_tow_number": input_yaml["metocean file tow number"]["value"],
             }
-            
+
             number_tow_file = input_yaml["metocean file tow number"]["value"]
             if number_tow_file > 0:
                 for i in range(1, number_tow_file + 1):
@@ -806,7 +806,7 @@ class Inputs():
 
 
             input_args = {k: v for k, v in input_args.items() if v is not None}
-                    
+
             inputs = cls(**input_args)
 
             logging.info('Inputs.TimeSeries: inputs recycled from "%s"', input_file_path)
@@ -832,7 +832,7 @@ class Inputs():
             if check_file_exists and check_file_exists(run_dir, file_name="inputs_tseries.yaml"):
                 return cls.from_yaml(dir=run_dir, name="inputs_tseries")
             return cls(file_inputs=file_inputs, out_dir=run_dir)
-        
+
 
         def get_inputs(self):
             """Prints :class:`Inputs.TimeSeries` to the command line."""
@@ -861,16 +861,16 @@ class Inputs():
         the other parameters will not be considered.
 
         Note:
-            last_day_operation: 
+            last_day_operation:
                 When assessing the lifetime costs, the statistical monthly durations of the operations are used
                 (output of the statistical analysis module). Setting the "last_day_operation" potentially avoids
-                using a monthly durations for an event that is considered to be happening towards the end of the months 
+                using a monthly durations for an event that is considered to be happening towards the end of the months
                 (where the statistical representation is less representative). 15 is suggested.
-            failure_ratio: 
+            failure_ratio:
                 The overall failure rate of the farm(s) can be assumed to follow a bath tub in the overall lifetime
-                of the project (in years). For this the "failure_ratio" expresses the ratio between the number of failures 
-                happening in the "period_infant_mortality" years + "period_wear_out" years, and the number of failures 
-                happening in the constant section of the  bath tub (corresponding to the lifetime of the project minus the 
+                of the project (in years). For this the "failure_ratio" expresses the ratio between the number of failures
+                happening in the "period_infant_mortality" years + "period_wear_out" years, and the number of failures
+                happening in the constant section of the  bath tub (corresponding to the lifetime of the project minus the
                 "period_infant_mortality" and "period_wear_out").
 
         Attributes:
@@ -935,7 +935,7 @@ class Inputs():
                 period_wear_out (:obj:`int`,*optional*): Number of years in the end of the project with a higher probability of
                     failure. Defaults to ``0``.
                 failure_ratio (:obj:`float`,*optional*): Failure ratio for the above periods. Defaults to ``None``.
-                failure_ratio_sensitivity (:obj:`float`, *optional*): Failure ratio sentitivity factor. Default to ``1`` 
+                failure_ratio_sensitivity (:obj:`float`, *optional*): Failure ratio sentitivity factor. Default to ``1``
                 file_inputs (:obj:`str`,*optional*): Path for the file with all previous mandatory inputs. Defaults to ``None``.
 
             Raises:
@@ -1104,9 +1104,9 @@ class Inputs():
 
         def _check_attributes(self):
             """
-            This method validates the attributes of the `Inputs.Statistical` class to ensure they 
+            This method validates the attributes of the `Inputs.Statistical` class to ensure they
             have valid values and fall within specified ranges.
-            
+
             Raises errors if any attribute is outside the specified range.
             """
             if self.lifetime is None:
@@ -1192,7 +1192,7 @@ class Inputs():
                 **keys**: *value*: :obj:`float` ; *units*: : obj:``
             technicians_year (:obj:`dict`): Cost of Technicians per year.
                 **keys**: *value*: :obj:`float` ; *units*: : obj:``
-            file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs. 
+            file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs.
                 Its value is ``None`` if not defined.
             electricity_price_dict (:obj:`dict`): Electricity price per each tech
 
@@ -1219,7 +1219,7 @@ class Inputs():
                 electricity_selling_price (:obj:`float`): Electricity selling price in euros/Mwh.
                 fuel_cost_HFO (:obj:`float`): Heavy Fuel Oil cost, in euros/ton.
                 fuel_cost_MGO (:obj:`float`): Marine Gas Oil cost, in euros/ton.
-                fuel_cost_MDO (:obj:`float`): Marine Diesel Oil cost, in euros/ton. 
+                fuel_cost_MDO (:obj:`float`): Marine Diesel Oil cost, in euros/ton.
                 port_cost_year (:obj:`float`,*optional*): Cost of a dedicated port terminal per year, in euros. Defaults to ``0.0``.
                 merge (:obj:`dict`,*optional*): Boolean, if True the log_dates will look for operation to merge. Defaults to ``False``.
                 time_between_merge (:obj:`int`,*optional*): Number of days within which the operation can be merged. Defaults to ``None``.
@@ -1399,7 +1399,7 @@ class Inputs():
             self.insurance_cost_year = self.inputs.get('insurance annual')
             self.port_cost_year = self.inputs.get('port cost year')
             self.merge = self.inputs.get("merge")
-            self.time_between_merge = self.inputs.get("time between merge")         
+            self.time_between_merge = self.inputs.get("time between merge")
             self.electricity_price = self.inputs.get('electricity price')
             self.electricity_price_pv = self.inputs.get('electricity price pv')
             self.electricity_price_wec = self.inputs.get('electricity price wec')
@@ -1407,18 +1407,18 @@ class Inputs():
             self.technicians_year = self.inputs.get('technicians year')
 
             if any([
-                self.electricity_price_pv["value"] is not None, 
-                self.electricity_price_wt["value"] is not None, 
+                self.electricity_price_pv["value"] is not None,
+                self.electricity_price_wt["value"] is not None,
                 self.electricity_price_wec["value"] is not None
             ]):
                 self.electricity_price_dict = {
-                    'pv': self.electricity_price_pv["value"], 
+                    'pv': self.electricity_price_pv["value"],
                     'wt': self.electricity_price_wt["value"],
                     'wec': self.electricity_price_wec["value"]
                 }
             else:
                 self.electricity_price_dict = {
-                    'pv': self.electricity_price["value"], 
+                    'pv': self.electricity_price["value"],
                     'wt': self.electricity_price["value"],
                     'wec': self.electricity_price["value"]
                 }
@@ -1434,9 +1434,9 @@ class Inputs():
 
         def _check_attributes(self):
             """
-            This method validates the attributes of the `Inputs.Cost` class to ensure they 
+            This method validates the attributes of the `Inputs.Cost` class to ensure they
             have valid values and fall within specified ranges.
-            
+
             Raises errors if any attribute is outside the specified range.
             """
             if self.fuel_cost_hfo is not None and self.fuel_cost_hfo["value"] < 0:
@@ -1463,7 +1463,7 @@ class Inputs():
                 raise ValueError('"Electricity Price WEC" cannot be negative')
             if self.time_between_merge['value'] is not None and self.time_between_merge["value"] < 0:
                 raise ValueError('"Time distance between operations to merge" cannot be negative')
-            
+
             logging.debug('Inputs.Cost: attributes within ranges and valid.')
 
 

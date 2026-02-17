@@ -4,15 +4,15 @@ import numpy as np
 
 
 def calculate_energy_loss_pv(
-    r, 
-    series_power_pv, 
-    start_year, 
+    r,
+    series_power_pv,
+    start_year,
     degradation_rate
 ):
-    
+
     """
     Based on the pv_df for each event evaluate the days between one event and the other
-    Take into consideration the energy production along the hours of the day of the previous event after that event occur 
+    Take into consideration the energy production along the hours of the day of the previous event after that event occur
     Take into consideration the energy production along the hours of the day of the actual event considered before that event occur
     Evaluate then the energy losses of the previous event overwriting the df
 
@@ -24,16 +24,16 @@ def calculate_energy_loss_pv(
 
     Return:
         float: Estimated energy loss due to shutdown between the two events.
-        
+
     Raises:
         ValueError: On missing data or calculation errors.
         float: on valid data
     """
-    
+
     try:
-        # last row does not have losses 
+        # last row does not have losses
         if pd.isna(r['Date_next']):
-            return 0               
+            return 0
 
         date_start = r['Date']
         date_end = r['Date_next']

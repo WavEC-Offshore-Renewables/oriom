@@ -312,7 +312,7 @@ class TestStatChartInspectionCampaign(unittest.TestCase):
         self.assertTrue(
             pd.api.types.is_datetime64_any_dtype(df_out["d_end_stat_chart"]),
         )
-        
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

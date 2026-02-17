@@ -97,9 +97,9 @@ class Metocean():
 
     def _check_attributes(self):
         """
-        This method validates the attributes of the `Metocean` class to ensure they 
+        This method validates the attributes of the `Metocean` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         if self.latitude < -90 or self.latitude > 90:
@@ -170,7 +170,7 @@ class Metocean():
         if df_metocean_diff.mean() < timedelta(hours=1):
             logging.error('Metocean: timeseries timestep is lower than 1 hour')
             raise ValueError('Metocean timestep is lower than 1 hour')
-        
+
         start_year = stat_inputs.start_year["value"]
         end_year = start_year + stat_inputs.lifetime["value"] - 1
         if not (df_timeseries["datetime"].dt.year.iloc[0] <= start_year and df_timeseries["datetime"].dt.year.iloc[-1] >= end_year):
@@ -184,7 +184,7 @@ class Metocean():
         :attr:`df_timeseries` with a timestep of 1 hour.
 
         Args:
-            out_dir (:obj:`str`): Path to save the timeseries file. 
+            out_dir (:obj:`str`): Path to save the timeseries file.
         Example:
             >>> metocean.df_timeseries
                                   hs    tp    ws    cs
@@ -463,7 +463,7 @@ class Metocean():
         }
 
         metocean_args = {k: v for k, v in metocean_args.items() if v is not None}
-        
+
         metocean = cls(**metocean_args)
 
         logging.info('Metocean: metocean recycled from "%s".' % input_file_path)
@@ -493,7 +493,7 @@ class Metocean():
         wtg=None,              # expects .hub_height if power_farm.wtg_number_devices is not None
         z0=None,                # surface roughness (e.g., inputs_tseries.surface_roughness["value"])
         tow_metocean=False
-    )-> (object | dict): 
+    )-> (object | dict):
         """
         Build or reuse Metocean from a run directory.
         - If timeseries.csv exists: reuse YAML + load CSV.
@@ -502,9 +502,9 @@ class Metocean():
         """
 
         def check_create_metocean(
-                run_dir, 
-                file_name = "timeseries.csv", 
-                file = tseries_inputs.file_metocean["value"], 
+                run_dir,
+                file_name = "timeseries.csv",
+                file = tseries_inputs.file_metocean["value"],
                 loc = "metocean file location"
             ):
             if check_file_exists and check_file_exists(run_dir, file_name):
@@ -529,7 +529,7 @@ class Metocean():
         # reuse path or create new
         if not tow_metocean:
             met = check_create_metocean(run_dir)
-    
+
             # add wind speed at hub height column
             if power_farm is not None and getattr(power_farm, "wtg_number_devices", None) is not None:
                 if wtg is None or z0 is None:
@@ -543,7 +543,7 @@ class Metocean():
             met = {}
             for i in range(1, tseries_inputs.file_metocean_tow_number["value"]+1):
                 met[int(i)] = check_create_metocean(
-                    run_dir = run_dir, 
+                    run_dir = run_dir,
                     file_name=f"timeseries_{i}.csv",
                     file = tseries_inputs.file_metocean_tow_location[i]["value"],
                     loc = f"metocean file tow location {i}"

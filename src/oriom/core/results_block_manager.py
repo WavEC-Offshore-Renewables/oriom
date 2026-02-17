@@ -19,7 +19,7 @@ except ImportError:
 
 
 def results_block(
-    result_dir_r: str, 
+    result_dir_r: str,
     r: int,
     inputs: object,
     Config: object,
@@ -39,7 +39,7 @@ def results_block(
     metocean_timeseries: pd.DataFrame
 ):
 
-    """ 
+    """
     Create for each iteration failures, log_events and KPIs
 
     Is the creation of a simulation block that includes:
@@ -49,25 +49,25 @@ def results_block(
         - Energy availability calculation
         - KPI calculation
         - Report graphs creation
-    
+
     Args:
-        result_dir_r (str): string of the folder on which the results are stored, 
+        result_dir_r (str): string of the folder on which the results are stored,
         r (int): number of the simulation,
         inputs (object): object of class `Inputs` that contains all the input data from input file,
         Config (object): object of class `ConfigRun` that contains all the configuration data from config file,
-        find_element (Find_Element): Initialized instance that provides fast access to operations, 
+        find_element (Find_Element): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
-        farm_technologies (object): object of class `FarmTechnologies` 
+        farm_technologies (object): object of class `FarmTechnologies`
             that contains all the technologies data from input file,
         results_dict (object): Object of class `Results`
         failures (:obj: `list`): List of object for class `Failures`
-        operations_tow_stats (:obj: `list`): List of object for class `OperationTowStat` 
+        operations_tow_stats (:obj: `list`): List of object for class `OperationTowStat`
             with Pmain and pmax for towing operations,
-        inspections_port_stats (:obj: `list`): List of object for class `InspectionPortStat` 
+        inspections_port_stats (:obj: `list`): List of object for class `InspectionPortStat`
             with Pmain and pmax stats for port inspections operations,
-        inspections_site_stats (:obj: `list`): List of object for class `InspectionSiteStat` 
+        inspections_site_stats (:obj: `list`): List of object for class `InspectionSiteStat`
             with Pmain and pmax stats for inspections site operations,
-        operations_corrective_stats (:obj: `list`): List of object for class `Corrective_Stats` 
+        operations_corrective_stats (:obj: `list`): List of object for class `Corrective_Stats`
             with Pmain and pmax stats for port inspections operations,
         vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
         mother_vessels (:obj: `list`): List with the id of the mother vessels
@@ -76,7 +76,7 @@ def results_block(
         dict_power_wave (dict): dictionary with the average hourly power production [kW] of wave farm
         metocean_timeseries (pd.DataFrame): Timeseries dataframe with power column
         """
-    
+
     dates_failures_OLD = pd.DataFrame ()
 
     try:
@@ -86,7 +86,7 @@ def results_block(
         logging.info('Uploading Failure file from previous run %d folder', r)
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 
-    except (TypeError, FileNotFoundError) as e_:   
+    except (TypeError, FileNotFoundError) as e_:
         logging.info('Creating a failure scenario for run %d', r)
         dates_failures = failures_event(
             s = inputs.tseries.failure_scenario["value"],
@@ -112,8 +112,8 @@ def results_block(
         log_events_dir = os.path.join(inputs.general.logevents_file["value"], f"{'result_'}{r}", 'log_events.csv')
         log_events = pd.read_csv(log_events_dir, sep=',')
         logging.info('Uploading Log events csv file file from previous folder')
-        
-    except (TypeError, FileNotFoundError) as e_:   
+
+    except (TypeError, FileNotFoundError) as e_:
         log_events = create_logs_timeseries_file(
             inputs = inputs,
             dates_failures = dates_failures,
@@ -139,7 +139,7 @@ def results_block(
         logging.info('Uploading Log events merged file from previous folder')
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
 
-    except (TypeError, FileNotFoundError) as e_:   
+    except (TypeError, FileNotFoundError) as e_:
         log_events_merged = create_logs_merge(
             log_events = log_events,
             failures = failures,
@@ -164,22 +164,22 @@ def results_block(
                 log_events_merged = log_events_merged,
                 mother_vessel_list = mother_vessels,
             )
-        
+
         log_events_merged = vessel_mobilisation_manager.reduce_redundant_mobilisations_inspection(
                 log_events_merged = log_events_merged,
                 vessels = vessels
             )
 
         if Config.STATISTICAL_CHART and VesselMobilisationScheduler is not None:
-            # Consider statistical charting contract time 
+            # Consider statistical charting contract time
             vessel_analyser = VesselMobilisationScheduler()
-        
+
             log_events_merged = vessel_analyser.charts_manager(
-                    log_events_merged = log_events_merged, 
-                    vessels = vessels, 
+                    log_events_merged = log_events_merged,
+                    vessels = vessels,
                     find_element = find_element
                 )
-            
+
             # Recreate the usage_record considering the reused vessels
             vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
             _ = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged)
@@ -197,11 +197,11 @@ def results_block(
     logging.info('--------------------\tGraphs and power availability\t----------------')
     graph_dir_r = os.path.join(result_dir_r,'graph_dir')
     os.makedirs(graph_dir_r)
-    
+
     if Config.ENERGY_AVAILABILITY_CALCULATION:
         try:
             G_wind_copy = G_layouts["G_wind"].copy()
-        except AttributeError: 
+        except AttributeError:
             G_wind_copy = None
 
         try:
@@ -226,11 +226,11 @@ def results_block(
             n_strings_per_inv = farm_technologies.pv.number_strings
             max_failure_module = farm_technologies.power.pv_max_failure_module
 
-        else: 
+        else:
             n_strings_per_inv = None
             n_modules_per_strings = None
             max_failure_module = None
-        
+
         availability_total = energy_availability(
             log_events_energy = log_events,
             operations_corrective_stat = operations_corrective_stats["pmain"],
@@ -264,7 +264,7 @@ def results_block(
                 df = availability_total[k]
                 name = k
                 aux_functions.save_file_csv(df,result_dir_r,name +'.csv')
-                
+
                 if 'month' in name:
                     results_dict.dfs_energy_yearly_month_dict[k].append(df)
                     combined.update({k:df})
@@ -283,7 +283,7 @@ def results_block(
 
         if len(combined.keys())>1:
             report_graphs.energy_yield_combined(dfs = combined, save_dir = graph_dir_r)
-    
+
     logging.info('----------------------------------------------------')
     logging.info('----------------------------------------------------')
     logging.info('--------------------\tKPIs\t----------------')

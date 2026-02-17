@@ -11,9 +11,9 @@ def average_pwind(
 )->dict:
     """
     Args:
-        timeseries_with_power (:obj:`pd.DataFrame`): DataFrame with 
+        timeseries_with_power (:obj:`pd.DataFrame`): DataFrame with
         the timeseries of the power of the entire wind farm. Data in kW
-        out_dir (:obj:`str`*optional*): Output directory to save the 
+        out_dir (:obj:`str`*optional*): Output directory to save the
         	power averaged per month.
     """
     # Check input file
@@ -54,7 +54,7 @@ def average_pwind(
         save_file_csv(df_power_wind, out_dir,'power_wind_stat.csv')
         _i = 'Wind Power statistics: saved as '
         _i += '"%s".' % os.path.join(out_dir, 'power_wind_stat.csv')
-        
+
         logging.info(_i)
 
     return dict_power_wind
@@ -66,7 +66,7 @@ def average_pwave(
 ):
     """
     Args:
-        timeseries_with_power (:obj:`pd.DataFrame`): DataFrame with 
+        timeseries_with_power (:obj:`pd.DataFrame`): DataFrame with
         the timeseries of the power of the wave farm. Data in kW
         out_dir (:obj:`str`*optional*): Output directory to save the hourly
         power averaged per month.
@@ -109,7 +109,7 @@ def average_pwave(
         save_file_csv(df_power_wave, out_dir,'power_wave_stat.csv')
         _i = 'Wave Power statistics: saved as '
         _i += '"%s".' % os.path.join(out_dir, 'power_wave_stat.csv')
-        
+
         logging.info(_i)
 
     return dict_power_wave

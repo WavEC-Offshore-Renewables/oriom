@@ -53,7 +53,7 @@ class TestModifyDistanceToSite(unittest.TestCase):
 
         vessel = MagicMock()
         vessel.speed_transit = 20  # m/s
-    
+
         duration = modify_distance_to_site(operation, vessel, KM_DISTANCE=5)
 
         # Activity 1 must be updated

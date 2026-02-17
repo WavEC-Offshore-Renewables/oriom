@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from oriom.classes.Operations.InspectionSite import InspectionSite
 from oriom.classes.Operations.InspectionPort import InspectionPort
-from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor 
+from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
 from oriom.classes.Operations.OperationTow import OperationTow
 from oriom.classes.OperationsStat.InspectionSiteStat import InspectionSiteStat
 from oriom.classes.OperationsStat.InspectionPortStat import InspectionPortStat

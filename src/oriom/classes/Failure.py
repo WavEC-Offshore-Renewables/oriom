@@ -17,7 +17,7 @@ class Failure():
             - oce: Offshore Common Events
 
         Individual failures can follow a bath tub trend.
-    
+
     Attributes:
         id_(:obj:`str`): The unique identifier of the Failure.
         name (:obj:`str`): Failure name.
@@ -42,12 +42,12 @@ class Failure():
         bath_tub (:obj:`bool`): True if the failure rate follows a
             bath-tub trend during the lifetime, False if it doesn't. Its value
                 is False if not defined.
-        fail_variation (:obj:`bool`): True if the failure rate will variate in the 
+        fail_variation (:obj:`bool`): True if the failure rate will variate in the
             sensitivity analysis. Its value is False if not defined.
         perc_shutdown (:obj:`int`): Is the probability that the component shut
             down, or the percentage reduction of power output due to the failure. Use int value between 0 and 100.
-        
-    
+
+
     Note:
         When the class is initialized, :func:`_check_inputs` is run.
     """
@@ -95,7 +95,7 @@ class Failure():
             bath_tub (:obj:`bool`, *optional*): True if the failure rate follows a
                 bath-tub trend during the lifetime, False if it doesn't. Defaults
                 to ``False``.
-            fail_variation (:obj:`bool`, *optional*): True if the failure rate will variate in the 
+            fail_variation (:obj:`bool`, *optional*): True if the failure rate will variate in the
                 sensitivity analysis. Defaults to ``False``.
             perc_shutdown_fail (:obj:`int`, *optional*): Is the probability that the component shut
                 down, or the percentage reduction of power output due to the failure. Use int value
@@ -168,9 +168,9 @@ class Failure():
 
     def _check_inputs(self):
         """
-        This method validates the inputs of the `Failure` class to ensure they 
+        This method validates the inputs of the `Failure` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         if self.id[0:3] not in ['oce','ofw','owc','opv']:
@@ -220,7 +220,7 @@ class Failure():
             self.level_failure == 'substation',
             self.level_failure == 'hub',
             self.level_failure == 'mv_transformer',
-            self.level_failure == 'circuit_braker',         
+            self.level_failure == 'circuit_braker',
             self.level_failure == 'switcher',
             self.level_failure == 'inverter',
             self.level_failure == 'device'
@@ -245,7 +245,7 @@ class Failure():
             raise ValueError(_e)
         if self.parts_cost is not None and self.parts_cost < 0:
             raise ValueError('"parts_cost" must not be negative')
-        
+
 
     def get_failures_from_yaml(file_path: str) -> list:
         """Returns a list of :class:`Failure` based on a YAML file.

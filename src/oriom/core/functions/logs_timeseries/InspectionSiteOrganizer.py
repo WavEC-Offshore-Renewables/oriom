@@ -32,7 +32,7 @@ class InspectionSiteCreation():
     ):
         """
         Main code to evaluate the inspection at site for all the devices
-        
+
         The code evaluate for each device the tow to port, the inspection at port and the tow to site.
         To evaluate the date of start for each operation the code consider if there is an overlap with other operations
         in the same time interval, if there is an overlap the code reevaluate the date of start and date of end of the operation

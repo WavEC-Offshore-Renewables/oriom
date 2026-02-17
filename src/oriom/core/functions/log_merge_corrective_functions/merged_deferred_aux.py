@@ -12,10 +12,10 @@ def create_stat_chart_campaign_operation(
         vessels: list,
         percentile: float = 0.9
     )->pd.DataFrame:
-    
+
     """
-    Create the statistic chart date for the 'operation_deferred_merged' or 'inspection_site' 
-        that are inside mother vessel campaign. Considering statistical durations 
+    Create the statistic chart date for the 'operation_deferred_merged' or 'inspection_site'
+        that are inside mother vessel campaign. Considering statistical durations
         of the entire campaign operations insthead of single operations.
 
     Args:
@@ -32,11 +32,11 @@ def create_stat_chart_campaign_operation(
 
     # Filter the df for deferred_merged_operation
     df_deferred = deepcopy(df[df['event'] == 'operation_deferred_merged'])
-    
+
     # Extract month for grouping
     df_deferred['year'] = df_deferred['d_trigger'].dt.year
-    df_deferred['month'] = df_deferred['d_trigger'].dt.month 
-    
+    df_deferred['month'] = df_deferred['d_trigger'].dt.month
+
     # iterate for vessel used
     for vessel in vessels:
         df_deferred_vessel = df_deferred[df_deferred['vessel_1'] == vessel.id]
@@ -57,7 +57,7 @@ def create_stat_chart_campaign_operation(
 
         # Add the monthly percentiles to the d_trigger only for the deferred operations
         mask = (df['event'] == 'operation_deferred_merged') & (df['vessel_1'] == vessel.id)
-        
+
         stat_end_dict = {
             (row['year'], row['month']): row['min_trigger'] + timedelta(
                 days=month_percentiles_dict.get(row['month'], 0)
@@ -76,17 +76,17 @@ def create_stat_chart_campaign_operation(
 
 
 def vessel_reuse(
-    vessel_n: int, 
-    n_vessel_used: int, 
+    vessel_n: int,
+    n_vessel_used: int,
     day_start_idx_previous: int,
     day_start_idx_next: int,
     vessel_busy: int
 ) -> tuple[int, int]:
-    
+
     """
-    This function check if all the vessels have been used for this deferred shift. 
+    This function check if all the vessels have been used for this deferred shift.
     If not, there are some vessel available to conduct other deferred operations, so return nº of
-    vessels that are not used and the start index date of the shift on which such vessel can 
+    vessels that are not used and the start index date of the shift on which such vessel can
     be used for other deferred maintenances.
 
     Args:
@@ -100,7 +100,7 @@ def vessel_reuse(
         vessel_available (int): The number of vessel that have not been used for this shift
         day_start_idx (int): The time and date to consider for the next shift
     """
-    
+
     # Check if used all the vessel
     if n_vessel_used < vessel_n:
         vessel_available = vessel_n - n_vessel_used
@@ -116,7 +116,7 @@ def vessel_reuse(
 
         else:
             day_start_idx = day_start_idx_previous
-    else: 
+    else:
         vessel_available = vessel_n
         day_start_idx = day_start_idx_next
 
@@ -125,14 +125,14 @@ def vessel_reuse(
 
 
 def find_start_time(
-    day_start_oper: datetime, 
+    day_start_oper: datetime,
     day_start_oper_single_op: datetime,
-    day_start_idx: int, 
-    oper_sched: pd.DataFrame, 
+    day_start_idx: int,
+    oper_sched: pd.DataFrame,
     index_wait_at_site_col: int | None,
     index_wait_to_start_col:int | None
 )->pd.DataFrame:
-    
+
     """
     Function to find in the operation schedule the next day of work.
 
@@ -147,14 +147,14 @@ def find_start_time(
         oper_sched (pd.DataFrame): The operation schedule dataframe.
         index_wait_at_site_col (int | None): The index of the wait at site column.
         index_wait_to_start_col (int | None): The index of the wait to start column.
-        
+
     Returns:
         day_start_oper (pd.Timestamp): The date on which the operation can start.
         day_start_idx (int): The index of the operation schedule on which the operation can start.
-        wait_to_start (int): The wait to start time in hours.  
+        wait_to_start (int): The wait to start time in hours.
     """
 
-    # Find first time on which wait_to_start = 0 
+    # Find first time on which wait_to_start = 0
     while True:
         # Try to see if there is a wait_at_site < 1
         wait_to_start = int(round(oper_sched.iat[day_start_idx, index_wait_to_start_col]))
@@ -165,7 +165,7 @@ def find_start_time(
                 wait_at_site = 0
             break
 
-        day_start_idx += 1 
+        day_start_idx += 1
 
     day_start_oper = oper_sched.iat[day_start_idx, 0]
     day_start_oper = approximate_hourly_data(day_start_oper)
@@ -174,9 +174,9 @@ def find_start_time(
 
 
 def creation_oper_vessel_dict(
-        failures: list, 
-        find_element_class: object, 
-        oper_per_vessel: dict, 
+        failures: list,
+        find_element_class: object,
+        oper_per_vessel: dict,
         deferred_failures_correction:list
 ):
     """ Create list of failures and dict vess: deferred_op"""

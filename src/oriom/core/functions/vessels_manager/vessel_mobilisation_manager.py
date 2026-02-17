@@ -12,9 +12,9 @@ def create_yearly_mobilisation_mother_vessel(
         mother_vessel_list: list,
     )->pd.DataFrame:
 
-    """ 
+    """
     Create for each year of the log_events_merged file a mobilisation of a mother vessel from the first use
-    
+
     NOTE This code is run as mother_vessel are defined as second vessels and second vessel do not generate a mobilisation
     Generate 1 mobilisation per year. To add externaly more mobilisation if more call are made
 
@@ -35,7 +35,7 @@ def create_yearly_mobilisation_mother_vessel(
                 (log_events_merged['vessel_1'] == mother_vessel.id) |
                 (log_events_merged['vessel_2'] == mother_vessel.id)
             ]
-        
+
         if not df_mother_vessel.empty:
             # For each year
             for year in df_mother_vessel['d_trigger'].dt.year.unique():
@@ -45,7 +45,7 @@ def create_yearly_mobilisation_mother_vessel(
                 if not df_mother_vessel_year.empty:
                     first_year_date_row = df_mother_vessel_year.iloc[0]
                     count_failure = get_first_failure(first_year_date_row['comments']).split("_", 1)[1]
-                
+
                     # Calculate the start of mobilisation
                     first_year_data_start = first_year_date_row['d_trigger'] - timedelta(hours = int(mother_vessel.mobilisation_time))
 
@@ -59,28 +59,28 @@ def create_yearly_mobilisation_mother_vessel(
                             count_fail = count_failure,
                             concat = True
                         )
-                    
 
-                else: 
+
+                else:
                     continue
         else:
             continue
-    
+
     log_events_merged = pd.concat([log_events_merged, log_event_mother_vessel_mobi], axis=0, ignore_index=False)
 
     log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
 
     return log_events_merged
-    
 
-    
+
+
 def reduce_redundant_mobilisations_inspection(
         log_events_merged: pd.DataFrame,
         vessels: list,
     )->pd.DataFrame:
 
-    """ 
-    Eliminate for each year of the log_events_merged file a mobilisation of a vessel used in inspection that is used 
+    """
+    Eliminate for each year of the log_events_merged file a mobilisation of a vessel used in inspection that is used
     in another inspection of the same month
 
     Args:
@@ -142,7 +142,7 @@ def reduce_redundant_mobilisations_inspection(
     # Drop all identified rows in a single call on the original DataFrame
     if all_indices_to_remove:
         log_events_merged.drop(index=all_indices_to_remove, inplace=True)
-    
+
     return log_events_merged
 
 

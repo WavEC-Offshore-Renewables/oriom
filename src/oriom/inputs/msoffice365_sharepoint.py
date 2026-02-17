@@ -19,7 +19,7 @@ def download_file(
         _e = 'File ".env" does not exist. Create this file with your '
         _e += 'MS Office credencials. For more info, read README.md'
         raise FileNotFoundError(_e)
-    
+
     if dotenv_path is None:
         load_dotenv()
     else:

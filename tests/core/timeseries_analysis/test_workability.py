@@ -20,7 +20,7 @@ class TestWorkability(unittest.TestCase):
         class DummyStatInputs:
             start_year = {"value": 2018}
             lifetime = {"value": 1}
-    
+
         file_metocean = os.path.join(
             os.getcwd(),
             "tests",
@@ -107,7 +107,7 @@ class TestWorkability(unittest.TestCase):
         self.assertRaises(
             AssertionError, workability, metocean.df_timeseries, [activtiy], None
         )
-        
+
 
     def test_errors_missing_ws_hub_and_light(self):
         """

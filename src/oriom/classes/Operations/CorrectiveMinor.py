@@ -38,7 +38,7 @@ class CorrectiveMinor():
         vessel1_id (:obj:`str`): The ID of the main vessel.
         vessel1_qt (:obj:`int`): Number of main vessel.
             Its value is ``1`` if not defined.
-        vessel2_id (:obj:`str`): The ID of the auxiliary vessel. 
+        vessel2_id (:obj:`str`): The ID of the auxiliary vessel.
             Its value is ``None`` if not defided.
         vessel2_qt (:obj:`int`): Number of secondary vessel.
             Its value is ``1`` if not defined.
@@ -54,7 +54,7 @@ class CorrectiveMinor():
         rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): Rov/Drone
             used in this operation. Its value is ``None`` if not
             defided.
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`): 
+        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
 
@@ -123,7 +123,7 @@ class CorrectiveMinor():
                 Defaults to ``None``.
             current_speed (:obj:`float`, *optional*): Limit current speed.
                 Defaults to ``None``.
-            light (:obj:`bool`, *optional*): If the operation is light. 
+            light (:obj:`bool`, *optional*): If the operation is light.
                 Default to ``False``
             month (:obj:`int`, *optional*): Month when the operation is preformed.
                 Defaults to ``None``.
@@ -135,9 +135,9 @@ class CorrectiveMinor():
                 insurance, etc.). Defaults to :obj:`0.0`.
             double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
                 Forced to False
-            
+
         Raises:
-            ValueError: if any of :attr:`months` values is not an integer.   
+            ValueError: if any of :attr:`months` values is not an integer.
             ValueError: if more than one technology is defined.
             ValueError: if :attr:`light` is not a boolean value.
         """
@@ -237,7 +237,7 @@ class CorrectiveMinor():
             self.other_costs = float(other_costs)
         if rov_drone is not None:
             self.rov_drone = str(rov_drone).lower()
-        
+
 
         self._check_attributes()
 
@@ -245,7 +245,7 @@ class CorrectiveMinor():
     def _check_attributes(self):
         """
         Validate the attributes of the `CorrectiveMinor` class to ensure they are within acceptable ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         if self.id[0:3] not in ['ofw','owc','opv']:
@@ -264,7 +264,7 @@ class CorrectiveMinor():
             self.level == 'string_cable',
             self.level == 'substation',
             self.level == 'mv_transformer',
-            self.level == 'circuit_braker',         
+            self.level == 'circuit_braker',
             self.level == 'switcher',
             self.level == 'inverter',
             self.level == 'device'
@@ -290,12 +290,12 @@ class CorrectiveMinor():
             raise ValueError('"current_speed" must not be negative')
         if self.other_costs is not None and self.other_costs < 0:
             raise ValueError('"other_costs" must not be negative')
-        if self.vessel1_qt < 1: 
+        if self.vessel1_qt < 1:
             raise ValueError('"vessel1_qt" must be positive')
         if self.vessel2_id is not None:
-            if self.vessel2_qt < 1: 
+            if self.vessel2_qt < 1:
                 raise ValueError('"vessel2_qt" must be positive if a "vessel2_id" is defined')
-        
+
 
         logging.debug('CorrectiveMinor: operation %s attributes within ranges and valid.' % self.id)
 
@@ -305,7 +305,7 @@ class CorrectiveMinor():
         ) -> list:
         """
         Read a YAML file and extract operations from it, ensuring all mandatory keys are present.
-       
+
         Args:
             file_path (:obj:`string`): The path to the YAML file.
         Raises:
@@ -409,8 +409,8 @@ class CorrectiveMinor():
     ):
         """
         Loop through a list of failures and allocate to this operation failures that trigger it.
-        
-        Args:       
+
+        Args:
             failures_list (:obj:`list`): List of
                 :class:`~oriom.classes.Failure.Failure`.
         Raises:
@@ -430,7 +430,7 @@ class CorrectiveMinor():
     def define_months_operations(self):
         """
         Define the months in which corrective operations may take place based on operation failures.
-        If any failure is to be immediately corrected, all months are considered. 
+        If any failure is to be immediately corrected, all months are considered.
         If a failure is to be corrected in a specific month, only that month is included.
         """
         if self.failures is None:
@@ -451,7 +451,7 @@ class CorrectiveMinor():
     ):
         """
         Write the object attributes to a YAML file in the specified output directory.
-        
+
         Args:
             out_dir (:obj:`str`): The directory where the YAML file will be saved.
         """

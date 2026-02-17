@@ -21,7 +21,7 @@ class LayoutManager:
                 n_substations=wtg.number_substations,
                 n_exports=wtg.number_exportcables,
                 tow_string_shutdown = getattr(wtg, "tow_string_shutdown", True),
-                save_dir=graph_dir, 
+                save_dir=graph_dir,
                 show_plot=False
             )
             logging.info("Layout: Wind farm layout defined")
@@ -34,7 +34,7 @@ class LayoutManager:
                 n_substations=getattr(wec, "number_substations", 1),
                 n_exports=getattr(wec, "number_exportcables", 1),
                 tow_string_shutdown = getattr(wec, "tow_string_shutdown", False),
-                save_dir=graph_dir, 
+                save_dir=graph_dir,
                 show_plot=False
             )
             logging.info("Layout: Wave farm layout defined")
@@ -49,7 +49,7 @@ class LayoutManager:
                 n_mvtransformers=pv.number_mv_transformers,
                 n_island_per_array_cable = pv.number_island_per_array_cable,
                 tow_string_shutdown = getattr(pv, "tow_string_shutdown", False),
-                save_dir=graph_dir, 
+                save_dir=graph_dir,
                 show_plot=False,
             )
             logging.info("Layout: PV farm layout defined")

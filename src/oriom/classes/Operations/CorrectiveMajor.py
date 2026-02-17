@@ -32,7 +32,7 @@ class CorrectiveMajor():
             ``None`` if not defided.
         vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
-        vessel1_qt (:obj:`int`): The number of the main vessel. Its value si 
+        vessel1_qt (:obj:`int`): The number of the main vessel. Its value si
             ``None`` if not defined.
         other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
@@ -50,7 +50,7 @@ class CorrectiveMajor():
         rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): Rov/Drone
             used in this operation. Its value is ``None`` if not
             defided.
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`): 
+        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
 
     Note:
@@ -79,7 +79,7 @@ class CorrectiveMajor():
         Args:
             id_ (:obj:`str`): The unique identifier of the CorrectiveMajor.
             name (:obj:`str`): CorrectiveMajor short description.
-            tow_to_port (:obj:`bool`): Indicates if the operation requires device 
+            tow_to_port (:obj:`bool`): Indicates if the operation requires device
                 removal and redeployment.
             tech_required (:obj:`int`): Number of technicians required to
                 preform the operation.
@@ -102,15 +102,15 @@ class CorrectiveMajor():
             towing_ops (:obj:`list`, *optional*): List of all towing operations.
                 Defaults to an empty list.
             rov_drone (:obj:`str`, *optional*): The ID of the ROV/Drone.
-                Defaults to ``None``.  
-        Raises: 
+                Defaults to ``None``.
+        Raises:
             ValueError: if any of :attr:`months` values is not an integer.
         """
         self.id = str(id_).lower()
         self.name = str(name)
         self.tow_to_port = bool(tow_to_port)
         self.tech_required = int(tech_required)
-        
+
         self.tech_cost = 0
         self.months = list(range(1, 13))
         self.vessel1_id = None
@@ -176,9 +176,9 @@ class CorrectiveMajor():
 
     def _check_attributes(self):
         """
-        This method validates the attributes of the `CorrectiveMajor` class to ensure they 
+        This method validates the attributes of the `CorrectiveMajor` class to ensure they
         have valid values and fall within specified ranges.
-        
+
         Raises errors if any attribute is outside the specified range.
         """
         if self.tech_required < 1:
@@ -196,10 +196,10 @@ class CorrectiveMajor():
         if self.tow_to_port and (self.vessel1_id or self.vessel2_id):
             raise ValueError('"Vessel must not be defined if is a port operation. Leave it empty "vessel1_id" and "vessel2_id"')
         if self.vessel1_id is not None:
-            if self.vessel1_qt < 1: 
+            if self.vessel1_qt < 1:
                 raise ValueError('"vessel1_qt" must be positive if a "vessel1_id" is defined')
         if self.vessel2_id is not None:
-            if self.vessel2_qt < 1: 
+            if self.vessel2_qt < 1:
                 raise ValueError('"vessel2_qt" must be positive if a "vessel2_id" is defined')
         logging.debug('CorrectiveMajor: operation %s attributes within ranges and valid.' % self.id)
 
@@ -251,10 +251,10 @@ class CorrectiveMajor():
 
         Args:
             file_path (:obj:`string`): The path to the YAML file.
-            towing_operations (:obj:`list`, *optional*): A list containing two towing operations: tow-to-port and tow-to-site. 
+            towing_operations (:obj:`list`, *optional*): A list containing two towing operations: tow-to-port and tow-to-site.
                 The first item is the tow-to-port operation and the second item is the tow-to-site operation.
                 Defaults to None if not provided.
-            
+
         Raises:
             KeyError: if one of the YAML entries does not have all the mandatory keys.
 
@@ -356,7 +356,7 @@ class CorrectiveMajor():
     def define_months_operations(self):
         """
         Define the months in which corrective operations may take place based on operation failures.
-        If any failure needs immediate correction, all months are considered. 
+        If any failure needs immediate correction, all months are considered.
         If a failure is to be corrected in a specific month, that month is included.
         """
         if self.failures is None:

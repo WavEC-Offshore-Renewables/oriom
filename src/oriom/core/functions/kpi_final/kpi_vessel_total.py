@@ -45,7 +45,7 @@ def create_lifetime_cost(df):
 def averaged_res(value, days):
     if days>0:
         return value/days
-    else: 
+    else:
         return 0
 
 
@@ -75,9 +75,9 @@ def kpi_cost_vessel_internal(
     find_element_class: object,
     years: int = 1
 )->tuple[pd.DataFrame,pd.DataFrame]:
-    
+
     """
-    Here are calculated all the costs sustained for the lifetime separating the various operations conducted 
+    Here are calculated all the costs sustained for the lifetime separating the various operations conducted
     (single operations, merged operations, deferred merged operations, site inspections and tow inspections)
 
     Args:
@@ -103,21 +103,21 @@ def kpi_cost_vessel_internal(
         fuel_cost_hfo (:obj:`int`): Fuel cost €/ton.
         fuel_cost_mdo (:obj:`int`): Fuel cost €/ton.
         fuel_cost_mgo (:obj:`int`): Fuel cost €/ton.
-        find_element_class (Find_element_class): Initialized instance that provides fast access to operations, 
+        find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         years (:obj:`int`): lifetime of the project. Default = 1
 
     Returns:
-        :obj:`pd.DataFrame`: dataframe directs costs for all the operations divided by vessels . 
-    """    
+        :obj:`pd.DataFrame`: dataframe directs costs for all the operations divided by vessels .
+    """
 
-    kpi_om = pd.DataFrame(columns=COLS)     
+    kpi_om = pd.DataFrame(columns=COLS)
     rov_tech_vessel_count = {}
 
     op_cost = 0 ## VALUE NOT RETURNED, USEFULL FOR A DEBUG AND CHECK THE INSPECTION vs CORRECTION COST
     insp_cost = 0   ## VALUE NOT RETURNED, USEFULL FOR A DEBUG AND CHECK THE INSPECTION vs CORRECTION COST
 
-    # Start of the code 
+    # Start of the code
     log_events_op = safe_copy_df(log_events_op_orig, ['id', 'comments'])
     log_events_op_merged = safe_copy_df(log_events_op_merged_orig, ['id', 'comments'])
     log_events_op_def_merged = safe_copy_df(log_events_op_def_merged_orig, ['id', 'comments'])
@@ -132,7 +132,7 @@ def kpi_cost_vessel_internal(
         # Find fuel cost
         fuel_cost_times_density = kpi_aux.define_fuel_cost(ves, fuel_cost_hfo, fuel_cost_mdo, fuel_cost_mgo)
 
-        # Prepare the datasets        
+        # Prepare the datasets
         log_o = kpi_aux.filter_df_events_per_vessel(log_events_op, ves.id, False)
         log_o_m = kpi_aux.filter_df_events_per_vessel(log_events_op_merged, ves.id)
         log_o_m_o = kpi_aux.filter_df_events_per_vessel(log_events_op_merged_oper, ves.id)
@@ -146,72 +146,72 @@ def kpi_cost_vessel_internal(
 
         # Calculate for merged corrective operations
         transit_cost_1, maneuver_cost_1, standby_cost_1, days_tech_merged, rov_cost_merged = calculate_event_costs(
-            log_df = log_o_m, 
-            ves = ves, 
-            duration_shift = duration_shift, 
-            fuel_cost_density = fuel_cost_times_density, 
-            rov_dict_cost = rov_cost_dict, 
-            oper_dict_tech = None, 
-            insp_params = None, 
+            log_df = log_o_m,
+            ves = ves,
+            duration_shift = duration_shift,
+            fuel_cost_density = fuel_cost_times_density,
+            rov_dict_cost = rov_cost_dict,
+            oper_dict_tech = None,
+            insp_params = None,
             rov_tech_vessel_count = rov_tech_vessel_count
         )
 
         # Calculate for merged deferred corrective operations
         transit_cost_1_def, maneuver_cost_1_def, standby_cost_1_def, days_tech_merged_def, rov_cost_def = calculate_event_costs(
-            log_df = log_o_m_d, 
-            ves = ves, 
+            log_df = log_o_m_d,
+            ves = ves,
             duration_shift = duration_shift,
-            fuel_cost_density = fuel_cost_times_density, 
-            rov_dict_cost=rov_cost_dict, 
-            oper_dict_tech=None, 
-            insp_params=None, 
+            fuel_cost_density = fuel_cost_times_density,
+            rov_dict_cost=rov_cost_dict,
+            oper_dict_tech=None,
+            insp_params=None,
             rov_tech_vessel_count = rov_tech_vessel_count
         )
 
         # Calculate for single corrective operations that are not merged
         transit_cost_1_op, maneuver_cost_1_op, standby_cost_1_op, days_tech_merged_op, rov_cost_merged_op = calculate_event_costs(
-            log_df = log_o_m_o, 
-            ves = ves, 
-            duration_shift = duration_shift, 
-            fuel_cost_density = fuel_cost_times_density, 
-            rov_dict_cost=rov_cost_dict, 
-            oper_dict_tech=tech_per_oper_dict, 
-            insp_params=None, 
+            log_df = log_o_m_o,
+            ves = ves,
+            duration_shift = duration_shift,
+            fuel_cost_density = fuel_cost_times_density,
+            rov_dict_cost=rov_cost_dict,
+            oper_dict_tech=tech_per_oper_dict,
+            insp_params=None,
             rov_tech_vessel_count = rov_tech_vessel_count
         )
 
         # Calculate for tow operations
         transit_cost_tow, maneuver_cost_tow, standby_cost_tow, days_tech_tow, rov_cost_tow = calculate_event_costs(
-            log_df = log_o_t, 
-            ves = ves, 
-            duration_shift = duration_shift, 
-            fuel_cost_density = fuel_cost_times_density, 
-            rov_dict_cost=rov_cost_dict, 
-            oper_dict_tech=tech_per_oper_dict, 
-            insp_params=None, 
+            log_df = log_o_t,
+            ves = ves,
+            duration_shift = duration_shift,
+            fuel_cost_density = fuel_cost_times_density,
+            rov_dict_cost=rov_cost_dict,
+            oper_dict_tech=tech_per_oper_dict,
+            insp_params=None,
             rov_tech_vessel_count = rov_tech_vessel_count
         )
-        
+
         # Calculate for operations other costs, parts costs and daily port costs
         if not log_o.empty:
             log_o = kpi_aux.remove_row_vessel_double(df = log_o, ves = ves, rov_tech_vessel_count = rov_tech_vessel_count)
             part_cost, other_cost = part_other_cost(
-                df = log_o, 
-                total_operations = total_operations, 
+                df = log_o,
+                total_operations = total_operations,
                 find_element_class = find_element_class
             )
-        else: 
-            part_cost = 0 
+        else:
+            part_cost = 0
             other_cost = 0
 
         rov_tech_vessel_count[ves.id] = []
-        
+
         # Calculate for inspections
         transit_cost_insp, maneuver_cost_insp, standby_cost_insp, tech_net_insp, rov_insp = calculate_event_costs(
-            log_df = log_i_m, 
-            ves = ves, 
-            duration_shift = duration_shift, 
-            fuel_cost_density = fuel_cost_times_density, 
+            log_df = log_i_m,
+            ves = ves,
+            duration_shift = duration_shift,
+            fuel_cost_density = fuel_cost_times_density,
             rov_tech_vessel_count = rov_tech_vessel_count,
             insp_params={
                 'operations_inspect_site': inspections_site_stat,
@@ -223,7 +223,7 @@ def kpi_cost_vessel_internal(
         )
         vessel_day_count_insp = VesselDayCounter(log_events_merged = log_i_m, vessels = vessels)
         days_vessel_insp = vessel_day_count_insp.count_day_vessel(ves_id = ves.id)
-                    
+
         # Calculate for mobilisations
         if not log_m_m.empty:
             mobilisation_days = log_m_m['n_vessel_1'].sum()
@@ -250,7 +250,7 @@ def kpi_cost_vessel_internal(
 
         # Charter Cost
         ST_charter_cost = charter_days_ST * getattr(ves, "charter", 0)
-        LT_yearly_charter_cost = getattr(ves, "annual_contract", 0)*getattr(ves, 'n_ves_annual_contract', 0) 
+        LT_yearly_charter_cost = getattr(ves, "annual_contract", 0)*getattr(ves, 'n_ves_annual_contract', 0)
         LT_monthly_charter_cost = getattr(ves, 'monthly_contract_cost', 0)*getattr(ves, 'n_ves_monthly_contract', 0)*len(getattr(ves, 'months_contract', []))
         charter_cost = ST_charter_cost + (LT_yearly_charter_cost + LT_monthly_charter_cost)*years
 
@@ -264,7 +264,7 @@ def kpi_cost_vessel_internal(
         insp_cost += rov_insp
 
         vessel_cost = charter_cost+transit_cost+maneuver_cost+standby_cost
-        
+
         vessel_cost_avg = averaged_res(vessel_cost,charter_days)
         tech_cost_avg = averaged_res(tech_cost,charter_days)
         part_cost_avg = averaged_res(part_cost,charter_days)
@@ -298,15 +298,15 @@ def kpi_cost_vessel_internal(
 
         # Tech and ROV costs
         tot_tech_cost_port, rov_cost_port = kpi_aux.tech_rov_cost(
-            df = log_events_op_port, 
-            rov_dict_cost = rov_cost_dict, 
-            duration_shift = duration_shift, 
+            df = log_events_op_port,
+            rov_dict_cost = rov_cost_dict,
+            duration_shift = duration_shift,
             oper_dict_tech = tech_per_oper_dict
         )
         # Part and Other costs
         part_cost_port, other_cost_port = part_other_cost(
-            df = log_events_op_port, 
-            total_operations = total_operations, 
+            df = log_events_op_port,
+            total_operations = total_operations,
             find_element_class = find_element_class
         )
 

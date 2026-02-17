@@ -20,7 +20,7 @@ try:
     )
 except ModuleNotFoundError:
     check_files_spec = None
-    
+
 skip_if_no_check_files = unittest.skipIf(
     check_files_spec is None,
     "check_files module not available, skipping related tests"
@@ -446,7 +446,7 @@ class TestOperationTowManager(unittest.TestCase):
         # First reuse_file_exist (for this operation) returns False
         m_reuse_file.return_value = None
         m_reuse_file.__bool__.return_value = False
-        
+
 
         # Workability / Startability DataFrames
         df_work = pd.DataFrame({"ok": [True, True]}, index=self.df_metocean.index[:2])

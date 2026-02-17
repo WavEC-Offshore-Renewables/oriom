@@ -8,11 +8,11 @@ from datetime import datetime
 
 
 def take_op_schedule_tow(
-    inspection: object, 
-    find_element_class: object, 
+    inspection: object,
+    find_element_class: object,
     op_tow: str
 )->pd.DataFrame:
-    
+
     """ Take the operation_scheduler for the towing operation required"""
 
     tow_id = safe_getattr(inspection, ['insp_class', op_tow])
@@ -23,8 +23,8 @@ def take_op_schedule_tow(
 
 
 def create_sublists(numbers, n):
-    """This function splits a list of elements (numbers) into n sublists with sizes as evenly distributed as possible. 
-    If the number of elements in the original list is not perfectly divisible by n, the remaining elements are 
+    """This function splits a list of elements (numbers) into n sublists with sizes as evenly distributed as possible.
+    If the number of elements in the original list is not perfectly divisible by n, the remaining elements are
     distributed one by one to the first few sublists.
 
     Args:
@@ -32,9 +32,9 @@ def create_sublists(numbers, n):
         n (int): The number of sublists to create.
 
     Returns:
-        list of lists: A list containing n sublists where each sublist contains a subset of the original elements. 
+        list of lists: A list containing n sublists where each sublist contains a subset of the original elements.
         The first sublists may contain one more element than the others to ensure that all elements are included.
-        
+
     """
     sublist_length = len(numbers) // n
     remainder = len(numbers) % n
@@ -68,16 +68,16 @@ def date_ranges_overlap(start1, end1, start2, end2):
         return False
     else:
         return max(start1, start2) <= min(end1, end2)
-    
+
 
 def start_date_inspection(
     inspection: object,
-    start_year: int, 
+    start_year: int,
     start_month: int,
     n_lifetime: int,
 )->list:
-    """ 
-    This function create a list of dates on which the all the 
+    """
+    This function create a list of dates on which the all the
     preventive maintenances of the lifetime will starts
 
     Args:
@@ -109,7 +109,7 @@ def start_date_inspection(
     start_date = datetime(start_year,start_month,1,8,0,0)                   ##### TODO HERE to add the day of start for deferred maintenance
     end_date = start_date + relativedelta(years=tot_years)
 
-    # Take the dates to start preventive maintenance. If more months are selected to start it take the one with the lowest duration from statistic file 
+    # Take the dates to start preventive maintenance. If more months are selected to start it take the one with the lowest duration from statistic file
     if inspection.insp_class.periodicity >=1:
         random.seed()
         if isinstance(inspection.insp_class.months,list) is True:
@@ -129,7 +129,7 @@ def start_date_inspection(
             else:
                 continue
         datetimes = []
-        
+
         day = inspection.insp_class.day_start                              # NOTE putted start of inspection of start of the month
         for i in list_year:
             month = int(month)
@@ -156,12 +156,12 @@ def start_date_inspection(
                     if v == min(filtered_dict.values())]
             random.seed(n)
             month_n = random.choice(month_n)
-            day = inspection.insp_class.day_start                            
+            day = inspection.insp_class.day_start
             for i in list_year:
                 month_n = int(month_n)
                 if datetime(i,month_n,day,0,0,0) < end_date:
                     datetimes.append(datetime(i, month_n, day,6,0,0))           ##### IMPORTANT NOTE the hour choosen is at 6 AM, might put it at 00 of the day choosen
-    
+
     return datetimes
 
 

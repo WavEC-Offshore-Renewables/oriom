@@ -145,9 +145,9 @@ class TestWorkingShifts(unittest.TestCase):
                 transit_between_devices=0.5,
                 operation_to_group_with=operation_4.to_group_with
         )
-  
+
     def test_case_1(self):
-        
+
         self.assertEqual(self.work_shifts_1['number_shifts_main'], 1)
         self.assertEqual(self.work_shifts_1['number_shifts_last'], 1)
         self.assertEqual(self.work_shifts_1['duration_shift_main'], 11.0)

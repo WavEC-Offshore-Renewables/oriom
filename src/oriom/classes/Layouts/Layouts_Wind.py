@@ -27,9 +27,9 @@ class Layout_Wind():
         .. figure:: /_static/Layout_imgs/Wind_Layout_1.jpg
             :width: 8000px
             :alt: esempio
-            
+
             LAYOUT 1: SIMPLE LAYOUT, n_strings=2, n_turbines=6
-            
+
         Layout 1: One substation, one export cable to shore, uniform strings.
         """
         self.check_input_wind(n_turbines, n_strings)
@@ -84,7 +84,7 @@ class Layout_Wind():
         .. figure:: /_static/Layout_imgs/Wind_Layout_2.jpg
             :width: 8000px
             :alt: esempio
-            
+
             LAYOUT 2: DOUBLE FARM REDUNDANT LAYOUT, n_substations=2, n_strings=2, n_turbines=8
 
         Layout 2: Multiple independent farms, each with one substation and one export cable.
@@ -141,7 +141,7 @@ class Layout_Wind():
         edges_names = nx.get_edge_attributes(G_composed, "name")
         nx.draw(G_composed, pos=positions, with_labels=True, node_color='lightblue', node_size=100, alpha=0.8, labels=names)
         nx.draw_networkx_edge_labels(G_composed, pos=positions, edge_labels=edges_names, font_size=5)
-        
+
         if save_dir is not None:
             plt.savefig(os.path.join(save_dir, 'Wind_Layout_2.jpg'))
         if show_plot:
@@ -159,13 +159,13 @@ class Layout_Wind():
         .. figure:: /_static/Layout_imgs/Wind_Layout_3.jpg
             :width: 8000px
             :alt: esempio
-            
-            LAYOUT 3: REDUNDANT EXPORT CABLE LAYOUT, n_exports=3,, n_strings=2, n_turbines=6,       
+
+            LAYOUT 3: REDUNDANT EXPORT CABLE LAYOUT, n_exports=3,, n_strings=2, n_turbines=6,
 
         Layout 3: Layout 1 with multiple export cables to shore for redundancy.
         """
         G = self.layout1_wind(n_turbines=n_turbines, n_strings=n_strings, substation_node=n_exports, tow_string_shutdown = tow_string_shutdown, show_plot=False)
-        
+
         max_node = max(G.nodes)
         # Creation ficticial node for redundancy export cable
         for i in range(n_exports - 1):
@@ -210,7 +210,7 @@ class Layout_Wind():
         .. figure:: /_static/Layout_imgs/Wind_Layout_4.jpg
             :width: 8000px
             :alt: esempio
-            
+
             LAYOUT 4: CUSTOM STRINGS, string_list = [5, 8, 5, 8, 6, 8], n_strings=6, n_turbines=40
 
         Layout 4: Custom non-uniform string configuration.
@@ -266,15 +266,15 @@ class Layout_Wind():
             substation_node: int,
             n_string_to_connector: int = 6,
             tow_string_shutdown: bool = False,
-            save_dir=None, 
+            save_dir=None,
             show_plot=False
-    ): 
-        
+    ):
+
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_5.jpg
             :width: 8000px
             :alt: esempio
-            
+
             LAYOUT 5, FISHBONE: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=2, n_strings=4, n_turbines=6
 
         FISHBONE layout
@@ -293,7 +293,7 @@ class Layout_Wind():
 
         turbines = list(range(1, n_turbines + 1))
         turb_per_string = Layout_Aux.interval_extract(turbines, n_strings)
-        
+
         h = 4
 
         count_nodes = substation_node
@@ -323,7 +323,7 @@ class Layout_Wind():
                 connector_node = count_nodes
 
             for t in turb_per_string[s][:]:
-                offset = (-0.25, 0.25) if t % 2 == 0 else (0.25, 0.25) 
+                offset = (-0.25, 0.25) if t % 2 == 0 else (0.25, 0.25)
                 count_nodes +=1
                 # Connector
                 G.add_node(count_nodes)
@@ -343,7 +343,7 @@ class Layout_Wind():
                     }}
                 nx.set_edge_attributes(G, attr_es)
                 nx.set_node_attributes(G, values=att_w)
-                
+
                 # Turbine
                 t_1 = t+1
                 G.add_node(count_nodes+1)
@@ -380,7 +380,7 @@ class Layout_Wind():
                             'visible': True,
                             'p_limit': None
                     }}
-                    
+
                     nx.set_edge_attributes(G, attr_ef2)
                     nx.set_node_attributes(G,values=att_w2)
                     h+=3
@@ -389,8 +389,8 @@ class Layout_Wind():
 
         Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_5")
         return G
-    
-    
+
+
     # ---------------------------------------------------------------------
     # Layout 6
     # ---------------------------------------------------------------------
@@ -401,18 +401,18 @@ class Layout_Wind():
             substation_node: int,
             n_string_to_connector: int = 1,
             tow_string_shutdown: bool = False,
-            save_dir=None, 
+            save_dir=None,
             show_plot=False
-    ): 
-        
+    ):
+
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_6.jpg
             :width: 800px
             :alt: esempio
 
             LAYOUT 6 STAR LAYOUT: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=3, n_turbines=15
-            
-        
+
+
 
         Layout with 1 Substation, 1 Array Cable, hubs and string of 1 turbine connected to  connector
         """
@@ -503,13 +503,13 @@ class Layout_Wind():
                         'p_limit': None
                 }}
                 nx.set_edge_attributes(G, attr_es)
-                
+
             h=1
             l += 1
 
         Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_6",)
         return G
-    
+
 
     # ---------------------------------------------------------------------
     # Dispatcher
@@ -544,7 +544,7 @@ class Layout_Wind():
             if n_turbines % n_string_to_connector:
                 raise ValueError("Layout 5: n_turbines must be divisible by n_strings or n_string_to_connector manually")
             return self.layout6_wind(n_turbines=n_turbines, n_strings=n_turbines, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
-        
+
         else:
             _e = f'Layout selected :´{n_layout}´ for wind technology. The present scenario does not exists'
             logging.error(_e)

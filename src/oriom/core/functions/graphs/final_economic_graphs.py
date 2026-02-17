@@ -30,12 +30,12 @@ def plot_ctv_annual_chart_strategy(df_ctv: pd.DataFrame, title: str = '', save_d
 
 
 def lifetime_cost(
-        df: pd.DataFrame, 
+        df: pd.DataFrame,
         title: str,
         file_name: str = 'lifetime_cost',
         save_dir: str = None
     ):
-    
+
     """   Plot the lifetime costs based   """
 
     colors = ['#4E79A7','#F28E2B','#E15759','#76B7B2','#59A14F','#EDC948', '#B07AA1', '#FF9DA7', '#BAB0AC', '#86BCB6', '#FABFD2', '#D37295',  '#8CD17D', '#C49C94', '#7F7F7F']
@@ -78,12 +78,12 @@ def lifetime_cost(
 
 
 def yearly_vessel_cost(
-        df: pd.DataFrame, 
+        df: pd.DataFrame,
         title: str,
         find_element_class: dict,
         save_dir: str = None
     ):
-    
+
     """   Plot the lifetime costs based   """
 
     # df preparation
@@ -105,7 +105,7 @@ def yearly_vessel_cost(
 
     # Plot
     colors = ['#4E79A7','#F28E2B','#E15759','#76B7B2','#59A14F','#EDC948', '#B07AA1', '#FF9DA7', '#BAB0AC', '#86BCB6', '#FABFD2', '#D37295',  '#8CD17D', '#C49C94', '#7F7F7F']
-    
+
     data_aggregated = df_filtered.groupby('cost_type')['value'].sum()
 
     raw_labels = data_aggregated.index
@@ -143,7 +143,7 @@ def yearly_vessel_cost(
 
 
 def pie_chart(
-        df: pd.DataFrame, 
+        df: pd.DataFrame,
         description: str,
         value: str,
         title: str = 'Pie Chart',
@@ -157,12 +157,12 @@ def pie_chart(
         text: str = None
     ):
 
-    """   Plot the pie chart graph. Input data must be in dataframe format with two columns 
-    
+    """   Plot the pie chart graph. Input data must be in dataframe format with two columns
+
     Args:
-        df (pd.DataFrame): Dataframe containing the data to plot. 
+        df (pd.DataFrame): Dataframe containing the data to plot.
         description (string): Column name of the data description.
-        value (string): Column name of the data value. 
+        value (string): Column name of the data value.
         title (string): Title of the pie chart. Defalut to ´´Pie Chart´´,
         tot_in_title (bool): If True, the total value will be included in the title. Default to ´´False´´,
         coefficient_number (float): Coefficient to multiply the total value in the title by. Default to ´´1´´,

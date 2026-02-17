@@ -50,7 +50,7 @@ class Vessel():
             fuel densities per fuel type. Defaults to ``None``.
         vessel_cost (:class:`~oriom.classes.Vessels_costs.Vessels_costs`): Cost
             associated to the vessel use. Defaults to ``None``.
-        
+
 
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
@@ -527,7 +527,7 @@ class Vessel():
             operation (:obj:`str`): ID of the operation
             sfoc: Bu default ``210``
         Returns:
-            Fuel consumption :obj:`float` 
+            Fuel consumption :obj:`float`
         """
         if (
                 self.file_vessels == 'None' or
@@ -652,8 +652,8 @@ class Vessel():
 
             n_vessels = vessel.get("number_vessels",None)
             crew_berths = vessel.get("num_berths",None)
-            charter = vessel.get("daily_charter",None)  
-            mother_vessel = vessel.get("mother_vessel",None)  
+            charter = vessel.get("daily_charter",None)
+            mother_vessel = vessel.get("mother_vessel",None)
             annual_contract = vessel.get("annual_contract",None)
             n_ves_annual_contract = vessel.get("n_ves_annual_contract",None)
             months_contract = vessel.get("months_contract",None)

@@ -102,7 +102,7 @@ class WaveEnergyConverter():
             self.number_exportcables = int(number_exportcables)
         except ValueError:
             self.number_exportcables = 1
-        
+
         if n_device_at_port != 0 and n_device_at_port is not None:
             try:
                 self.n_device_at_port = int(n_device_at_port)
@@ -110,7 +110,7 @@ class WaveEnergyConverter():
                 self.n_device_at_port = 1
         else:
             self.n_device_at_port = 1
-            
+
         if n_device_stored_at_port != 0 and n_device_stored_at_port is not None:
             try:
                 self.n_device_stored_at_port = int(n_device_stored_at_port)
@@ -118,7 +118,7 @@ class WaveEnergyConverter():
                 self.n_device_stored_at_port = 0
         else:
             self.n_device_stored_at_port = 0
-            
+
         try:
             self.wec_layout = int(wec_layout)
         except ValueError:
@@ -207,7 +207,7 @@ class WaveEnergyConverter():
         f_yaml.close()
 
         for key, _value in inputs_yaml.items():
-            
+
             key = key.lower()
             value = _value["value"]
             try:
@@ -322,7 +322,7 @@ class WaveEnergyConverter():
     ):
         """
         Write the Wave system parameters to a YAML file.
-        
+
         Args:
             out_dir (:obj:`str`): The output directory where the YAML file will be saved.
         """

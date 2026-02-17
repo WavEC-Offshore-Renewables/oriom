@@ -48,7 +48,7 @@ def distribution_failures(
 
     if save_dir is not None:
         plt.savefig(os.path.join(save_dir, 'distribution_failure.jpg'))
-    
+
     plt.close()
 
 
@@ -72,7 +72,7 @@ def energy_yield(
         df_month['Produced'] = df_month['En_max_kWh']-df_month['En_loss_kWh']
         energy_produced.append(df_month['Produced'].sum()/(1000*len(df_month.axes[0])))
         energy_potential.append(df_month['En_max_kWh'].sum()/(1000*len(df_month.axes[0])))
-    
+
     fig2 = plt.figure(figsize=(10,6))
     plt.plot(months,energy_potential,'-k')
     plt.grid()
@@ -126,12 +126,12 @@ def energy_yield_combined(
             energy_potential.append(df_month['En_max_kWh'].sum()/(1000*len(df_month.axes[0])))
         energy_potential_sublist.update({name:energy_potential})
         energy_produced_sublist.update({name:energy_produced})
-    
+
     energy_produced_overall = [sum(x) for x in zip(*energy_produced_sublist.values())]
     energy_potential_overall = [sum(x) for x in zip(*energy_potential_sublist.values())]
-    energy_produced_sublist.update({'combined_produced':energy_produced_overall}) 
-    energy_potential_sublist.update({'combined_produced':energy_potential_overall})  
-    
+    energy_produced_sublist.update({'combined_produced':energy_produced_overall})
+    energy_potential_sublist.update({'combined_produced':energy_potential_overall})
+
     fig3 = plt.figure(figsize=(10,6))
     for k,v in energy_potential_sublist.items():
         plt.plot(months,v,label=k)
@@ -337,7 +337,7 @@ def direct_cost_pie(
         df: pd.DataFrame,
         save_dir: str=None
     ):
-    '''It produces a graph representing a pie chart. 
+    '''It produces a graph representing a pie chart.
 
     Args:
         df (:obj:`DataFrame`): kpi_om.
@@ -360,7 +360,7 @@ def direct_cost_pie(
         plt.savefig(os.path.join(save_dir, 'pie_direct_costs.jpg'))
     plt.close()
 
-    
+
 def compare_quartiles_direct_costs(
     df_25: pd.DataFrame,
     df_50: pd.DataFrame,
@@ -487,7 +487,7 @@ def distribution_mobilization(
             fontsize=10,
             color='blue'
         )
-        
+
         plt.xticks(years)
         plt.xlabel('Years')
         plt.ylabel('Mobilisation vessel')

@@ -424,7 +424,7 @@ class WindTurbineGenerator():
     ):
         """
         Write the Wave system parameters to a YAML file.
-        
+
         Args:
             out_dir (:obj:`str`): The output directory where the YAML file will be saved.
         """
@@ -473,11 +473,11 @@ class WindTurbineGenerator():
                 "tow_string_shutdown": wtg_yaml["wtg tow string shutdown"]["value"],
                 "wtg_layout": wtg_yaml["wtg type of layout"]["value"]
         }
-        
+
         for key, value in list(wtg_args.items()):
             if value is None:
                 del wtg_args[key]
-        
+
         wtg = WindTurbineGenerator(**wtg_args)
 
         logging.info('WindTurbineGenerator: WTG recycled from "%s".' % input_file_path)

@@ -5,8 +5,8 @@
 <span style="font-size: 20px; font-weight: bold;">INSTALLATION MODE</span>
 
 
-To use ORIOM as Installation mode 
--   Generate a pre existing failure file that corrispond to the component to install. 
+To use ORIOM as Installation mode
+-   Generate a pre existing failure file that corrispond to the component to install.
 -   Create deferred operation to fix them.
 
 The failures that occurs annually will be the amounts of component to install each year and they will undergoes to an installation plan considered from the start of the deffered maintenance
@@ -17,7 +17,7 @@ The failures that occurs annually will be the amounts of component to install ea
 <span style="font-size: 20px; font-weight: bold;">HARD CODED PARAMETERS</span>
 
 - TO CONSIDER DIFFERENT CHANGE IN DISTANCE DUE TO CLOSER PORT FOR CERTAIN TYPE OF VESSEL
-    - **diff_distance**: boolean value to say that there are vessel that are considered with other port distance    
+    - **diff_distance**: boolean value to say that there are vessel that are considered with other port distance
 
     - **distance from coast**: The distance might change for vessel type (port facilities differ)
 
@@ -53,8 +53,8 @@ The failures that occurs annually will be the amounts of component to install ea
 
 - **The Merge operation vessel**:
 
-    This parameter will set the vessels that will be merged together along the immediate corrective operations that will occurs in the same day. 
-    
+    This parameter will set the vessels that will be merged together along the immediate corrective operations that will occurs in the same day.
+
     **ADVICE merge only CTV**
 
     This merging strategy can be only done for immediate correction that can drop off personnel. If the vessel is required do not merge
@@ -77,7 +77,7 @@ The failures that occurs annually will be the amounts of component to install ea
 
 - **Layout**: Layout 2 has the layout implemented till the inverter level. Lower component are considered for energy losses evaluation and corrections
     - **NODE/EDGE**: in failure sheet the components level must be:
-    
+
             a
             b
             c
@@ -93,13 +93,13 @@ The failures that occurs annually will be the amounts of component to install ea
 </span>
 
 
-- **Charter**: put values equal to zero only if you only have long term vessel. No short term vessel will be rented, ideal for inspections or deferred maintenace that do use a vessel only if previous shift is completed. Usually consider both (long_term and short term) so fill both short and long term charts. 
+- **Charter**: put values equal to zero only if you only have long term vessel. No short term vessel will be rented, ideal for inspections or deferred maintenace that do use a vessel only if previous shift is completed. Usually consider both (long_term and short term) so fill both short and long term charts.
 Example of not consider short_term: particular vessel charted that should not be used with more than n_vessel long term chart in the same time
 
 
-- **Fuel_cons**: Do never put the consumptions equal to zero if you do not want to evaluate the fuel consumptions apart. 
+- **Fuel_cons**: Do never put the consumptions equal to zero if you do not want to evaluate the fuel consumptions apart.
 
-    -   **Fuel Consumption must be in l/h!** If you want to have them included in the costs calculations insert specifics values or leave it empty. 
+    -   **Fuel Consumption must be in l/h!** If you want to have them included in the costs calculations insert specifics values or leave it empty.
     -   If the transit is particularly calculated (example a vessel that stay overnight), put fuel_cons_transit = 0 and in postprocess add the time and cost of the transit.
 
 
@@ -172,7 +172,7 @@ the devisce at port and stored at port must be present (if not know = 0)
 - Do not put in the same operations in vessel 1 & vessel 2 the same vessel type
 
 
-- Each major and minor corrective operation must have a failure that triggers it. 
+- Each major and minor corrective operation must have a failure that triggers it.
 
 
 - Each operation should start with the same prefix:
@@ -181,7 +181,7 @@ the devisce at port and stored at port must be present (if not know = 0)
     opv
     ```
     - for wave converter:
-    ```  
+    ```
     owc
     ```
     - for offshore wind:
@@ -192,7 +192,7 @@ the devisce at port and stored at port must be present (if not know = 0)
     ```
     oce
     ```
-      
+
 
 
 - The ROV must be present in the first vessel called (vessel_1) otherwhise its cost will not be shown in the economic results
@@ -205,11 +205,11 @@ the devisce at port and stored at port must be present (if not know = 0)
 
 
 - **mother Vessel**:
-        
-    - should always be the second vessel of the operations vessel_2. 
 
-    - Its mobilisation is calculated after log_events_calculation by a specific function. It calculate only one mobilisation so if more are required add externally. 
-    
+    - should always be the second vessel of the operations vessel_2.
+
+    - Its mobilisation is calculated after log_events_calculation by a specific function. It calculate only one mobilisation so if more are required add externally.
+
     - If a mother vessel is used for inspection campaign, to consider inspection campaign to be done together all the inspections must have the same month of start, otherwise they will be considered in another campaign.
 
     - Only use a mother vessel for corrective operations if the failure to correct are deferred
@@ -238,13 +238,13 @@ the devisce at port and stored at port must be present (if not know = 0)
 - **Day_start** if the inpection is conducted in the same month of another inspection/deferred opeartions, use this value to decide when to schedule the day of inspection. Try to not sovrappose the inspections
 
 
-- **mother Vessel**: 
+- **mother Vessel**:
 
 
 - **Part Cost**: insert the total part cost of all the inspection, part cost * n_dev_inspected
 
 
-- **mother vessel**: 
+- **mother vessel**:
     if a mother vessel is used for inspection campaign, to consider inspection campaign to be done together consecutevly:
 
     - mother vessel should always be the vessel_2 of the operations. Its mobilisation is calculated by a specific function after the end of log_events_calculation. It calculate only one mobilisation per year, so if more are required add need to be added externally.
@@ -259,45 +259,45 @@ the devisce at port and stored at port must be present (if not know = 0)
 
     - Do not create different campaign of the same inspection in the same month
 
-        
+
 
 <span style="font-size: 20px; font-weight: bold;">Corrective MAJOR</span>
 
 
 - rov_drone column leave empty if no rov are used
-- If a drone is used the operation cannot be merged 
+- If a drone is used the operation cannot be merged
 - An operation that need tow cannot be done with deferred operation, it must be immediate. Otherwise implement an inspection
 
 
 <span style="font-size: 20px; font-weight: bold;">Operation TOW</span>
 
-- Tow Operation must be inserted as: 
+- Tow Operation must be inserted as:
     Technology prefix_action of tow in "id"
     They cannot be changed. For different tech tow use other prefix (ofw,owc,opv)
-    
+
     The actions of tow are the following:
 
     - redeploy
     ```
-    must contain "deplo" and "tow" int the id_short and *NOT* "deplo" 
-    
+    must contain "deplo" and "tow" int the id_short and *NOT* "deplo"
+
     must contain "tow" in the name of the activities defined that will tow the device at port
     ```
-    - removal  
-    ```               
+    - removal
+    ```
     must contain "remov" and "tow" int the id_short and *NOT* "deplo"
-                
+
     must contain "tow" in the name of the activities defined that will tow the device at port
     ```
 
-    - redeploy_removal        
+    - redeploy_removal
     ```
     must contain "remov" and "tow" and "deplo" int the id_short
 
     must contain "tow" in the name of the activities defined that will tow the device at port
     ```
 
-    Example:    
+    Example:
     ```
     ofw_redeploy        "id of tow to site operation"
     ```

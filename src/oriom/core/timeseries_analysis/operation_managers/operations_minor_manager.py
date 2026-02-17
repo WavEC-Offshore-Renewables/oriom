@@ -29,12 +29,12 @@ def opeartion_minor_manager(
     inputs_tseries: object,
     Config: object
 ):
-    """ 
+    """
     Check if the operations_inspect_site is already existing
     If it exist assign ts_data attribute to the InspectSite object and pass to other inp
     If exist a similar inspection with all ATTRIBUTE_LIST_REUSE equal assign ts_data and pass to other inp
     If does not exist create the operation_schedule and assign it to the CorrectiveMinor object
-    
+
     Args:
         operation_dir (string): Path of operation directory
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
@@ -49,15 +49,15 @@ def opeartion_minor_manager(
 
     dict_minor_oper, hash_to_key = {}, {}
     ATTRIBUTE_LIST = ['duration_net', 'hs', 'tp', 'ws', 'ws_hub', 'cs', 'light', 'vessel1_id', 'vessel2_id', 'shutdown', 'technology', 'rov']
-        
+
     for operation in tqdm(operations_corr_minor, desc='Looping through Minor Corrective Operations.', position=0):
         logging.info('CorrectiveMinor: %s - %s.' % (operation.id, operation.name))
 
         # Check if there is an equivalent operation_schedule already calculated for another operation
         similar_operation_id = recycle_other_oper_scheduler(
-            minor_oper_dict = dict_minor_oper, 
-            hash_to_key = hash_to_key, 
-            operation = operation, 
+            minor_oper_dict = dict_minor_oper,
+            hash_to_key = hash_to_key,
+            operation = operation,
             attribute_list = ATTRIBUTE_LIST
         )
 
@@ -66,9 +66,9 @@ def opeartion_minor_manager(
 
         if check_files:
             file_exist = check_files.reuse_file_exist(
-                op_dir = op_dir, 
-                file_name_schedule = 'operation_schedule.csv', 
-                operation = operation, 
+                op_dir = op_dir,
+                file_name_schedule = 'operation_schedule.csv',
+                operation = operation,
                 similar_inspection_id = similar_operation_id,
                 op_dir_other = op_dir_other,
             )
@@ -83,7 +83,7 @@ def opeartion_minor_manager(
         )
 
         shutdown_wtg = shutdown_wec = shutdown_pv = np.nan
-        
+
         # Get how many working shifts are required to preform this operation
         if operation.device_shutdown:
             if 'opv' in operation.id:
@@ -123,7 +123,7 @@ def opeartion_minor_manager(
                 file_name='attributes.yaml',
                 data=data_working_shifts
         )
-        
+
         try:
             oper_sched = define_shift_operation_values(
                     df_metocean = df_metocean,
