@@ -1,4 +1,4 @@
-# ORIOM — Offshore Renewables Installation and O&M
+# ORIOM - Offshore Renewables Installation and O&M
 
 ![PyPI - Python Version](https://img.shields.io/badge/python-3.9%20%7C%203.10-blue)
 [![PolyForm-Shield 1.0.0](https://img.shields.io/badge/Licence-PolyForm--Shield%201.0.0-green)](https://polyformproject.org/licences/shield/1.0.0/)
