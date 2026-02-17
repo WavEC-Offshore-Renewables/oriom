@@ -6,8 +6,8 @@ import tempfile
 
 from ruamel.yaml import YAML
 
-from logistic_tools.utils import yaml_manager
-from logistic_tools.utils.aux_functions import update_dict
+from oriom.utils import yaml_manager
+from oriom.utils.aux_functions import update_dict
 
 
 class DummyInputs:
@@ -242,7 +242,7 @@ class TestLoadSimilarOpYaml(unittest.TestCase):
             "duration_grouped": 40.0,
             "rov_main": True,
             "rov_grouped": False,
-            
+
             # working_shifts section
             "working_shifts": {
                 "id_main": "op_A",

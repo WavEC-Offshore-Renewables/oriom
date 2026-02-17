@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pandas as pd
 import numpy as np
 
-from logistic_tools.core.functions.vessels_manager.VesselDayCount import (
+from oriom.core.functions.vessels_manager.VesselDayCount import (
     VesselDayCounter,
 )
 

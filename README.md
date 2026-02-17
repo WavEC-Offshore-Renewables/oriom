@@ -29,7 +29,7 @@ ORIOM has been developed and used over multiple years in WavEC R&D projects and 
 
 If you use ORIOM in academic work, reports, or benchmarking studies, please cite it as:
 
-> WavEC Offshore Renewables, *ORIOM — Offshore Renewables Installation and O&M*, 2026.  
+> WavEC Offshore Renewables, *ORIOM — Offshore Renewables Installation and O&M*, 2026.
 > (Please include repository URL and the version/tag used.)
 
 ---
@@ -169,7 +169,7 @@ Run:
 python
 ```
 ```python
->>> from logistic_tools.test import test
+>>> from oriom.test import test
 >>> test()
 ORIOM
 Hello from ORIOM by WavEC - Offshore Renewables
@@ -179,10 +179,10 @@ Hello from ORIOM by WavEC - Offshore Renewables
 
 ## Usage
 
-ORIOM is currently run via repository entry points (e.g., `main.py` or the `logistic_tools.main` module). The key requirement is to point the configuration to your Excel input file.
+ORIOM is currently run via repository entry points (e.g., `main.py` or the `oriom.main` module). The key requirement is to point the configuration to your Excel input file.
 
 ### 1) Configure your run
-In [`main.py`](src\logistic_tools\main.py), update the configuration (lines 72-86) so that:
+In [`main.py`](src\oriom\main.py), update the configuration (lines 72-86) so that:
 - `EXCEL_FILE_PATH` points to the directory containing your Excel input file
 - `FORM_NAME` matches the Excel filename
 
@@ -215,7 +215,7 @@ python main.py
 
 Or as a module:
 ```bash
-python -m logistic_tools.main
+python -m oriom.main
 ```
 
 ### 3) Logging
@@ -239,7 +239,7 @@ python -m pip install sphinx sphinx-rtd-theme
 
 Generate API stubs and build HTML docs:
 ```bash
-sphinx-apidoc -f -e -o docs/source/_api ./src/logistic_tools src/logistic_tools/main.py
+sphinx-apidoc -f -e -o docs/source/_api ./src/oriom src/oriom/main.py
 sphinx-build -b html docs/source/ docs/build/html
 ```
 
@@ -276,7 +276,7 @@ python -m pip install coverage
 
 Run tests with coverage:
 ```bash
-python -m coverage run --source=logistic_tools -m pytest -q
+python -m coverage run --source=oriom -m pytest -q
 python -m coverage report
 ```
 

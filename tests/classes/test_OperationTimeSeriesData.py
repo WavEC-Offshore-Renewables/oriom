@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 # SUT
-from logistic_tools.classes.OperationTimeSeriesData import OperationTimeSeriesData
+from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
 
 
 # ----------------- Helpers -----------------
@@ -36,7 +36,7 @@ def make_sched_df(cols=None, rows=None):
 
 class TestOperationTimeSeriesData_Init(unittest.TestCase):
 
-    @patch("logistic_tools.classes.OperationTimeSeriesData.convert_stringtime")
+    @patch("oriom.classes.OperationTimeSeriesData.convert_stringtime")
     def test_extracts_core_fields_and_dur_total_with_port_dur(self, conv_mock):
         """__init__ sets fields from oper_sched and computes dur_total including dur_net_port."""
         conv_mock.side_effect = lambda df, col: df  # no-op
@@ -62,7 +62,7 @@ class TestOperationTimeSeriesData_Init(unittest.TestCase):
         # last_valid_index should be an integer index (0 here)
         self.assertEqual(obj.last_valid_index, 0)
 
-    @patch("logistic_tools.classes.OperationTimeSeriesData.convert_stringtime")
+    @patch("oriom.classes.OperationTimeSeriesData.convert_stringtime")
     def test_missing_dur_net_port_defaults_to_zero(self, conv_mock):
         """If 'dur_net_port' is missing, it defaults to 0 in _extract_from_sched."""
         conv_mock.side_effect = lambda df, col: df  # no-op
@@ -96,7 +96,7 @@ class TestOperationTimeSeriesData_CreateTimeseries(unittest.TestCase):
             rows=[[pd.Timestamp("2025-06-01 08:00:00"), 5.0, 2.0, 3.0, 1.0]],
         )
 
-    @patch("logistic_tools.classes.OperationTimeSeriesData.convert_stringtime")
+    @patch("oriom.classes.OperationTimeSeriesData.convert_stringtime")
     def test_with_csv_path_returns_instance_and_reads_optional_startability(self, conv_mock):
         """Passing a filename (str) loads CSV from op_dir and returns an instance (no 'save')."""
         conv_mock.side_effect = lambda df, col: df  # no-op
@@ -118,7 +118,7 @@ class TestOperationTimeSeriesData_CreateTimeseries(unittest.TestCase):
         self.assertEqual(ts.id, "ofw_123")
         self.assertEqual(ts.dur_total, 5.0 + 1.0 + 2.0 + 3.0)  # site + port + tp + ts
 
-    @patch("logistic_tools.classes.OperationTimeSeriesData.convert_stringtime")
+    @patch("oriom.classes.OperationTimeSeriesData.convert_stringtime")
     def test_with_csv_path_rename_first_column_if_not_datetime(self, conv_mock):
         """If first column is not named 'datetime', it is renamed before conversion."""
         conv_mock.side_effect = lambda df, col: df  # no-op
@@ -141,7 +141,7 @@ class TestOperationTimeSeriesData_CreateTimeseries(unittest.TestCase):
         self.assertIsInstance(ts, OperationTimeSeriesData)
         self.assertEqual(ts.dur_total, 2.0 + 0.0 + 1.0 + 1.0)
 
-    @patch("logistic_tools.classes.OperationTimeSeriesData.convert_stringtime")
+    @patch("oriom.classes.OperationTimeSeriesData.convert_stringtime")
     def test_with_dataframe_input_and_no_startability(self, conv_mock):
         """Passing a DataFrame directly should build the instance; missing startability is tolerated."""
         conv_mock.side_effect = lambda df, col: df  # no-op
@@ -151,7 +151,7 @@ class TestOperationTimeSeriesData_CreateTimeseries(unittest.TestCase):
         self.assertIsInstance(ts, OperationTimeSeriesData)
         self.assertEqual(ts.dur_total, 5.0 + 1.0 + 2.0 + 3.0)
 
-    @patch("logistic_tools.classes.OperationTimeSeriesData.convert_stringtime")
+    @patch("oriom.classes.OperationTimeSeriesData.convert_stringtime")
     def test_save_true_returns_tuple_with_oper_sched_and_workability(self, conv_mock):
         """
         With save=True, returns (instance, oper_sched_df, workability_df).

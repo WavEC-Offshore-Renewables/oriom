@@ -8,7 +8,7 @@ import importlib.util
 
 import pandas as pd
 
-from logistic_tools.core.timeseries_analysis.operation_managers.operation_recycler import (
+from oriom.core.timeseries_analysis.operation_managers.operation_recycler import (
     recycle_other_oper_scheduler,
     recycle_major_other_oper_scheduler,
     compare_operations,
@@ -17,7 +17,7 @@ from logistic_tools.core.timeseries_analysis.operation_managers.operation_recycl
 # --- check if module check_files is present otherwise skip that files---
 try:
     check_files_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.check_files"
+        "oriom.core.functions.private.check_files"
     )
 except ModuleNotFoundError:
     check_files_spec = None
@@ -169,7 +169,7 @@ class TestRecycleMajorOtherOperScheduler(unittest.TestCase):
         self.operations_list = [self.prev_oper, self.curr_oper]
         self.operation_dir = "/fake/path"
 
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
     def test_reuse_true_when_startability_and_activities_match(self, m_reuse_file):
         m_reuse_file.return_value = True
         result = recycle_major_other_oper_scheduler(
@@ -190,7 +190,7 @@ class TestRecycleMajorOtherOperScheduler(unittest.TestCase):
             op_dir_other=expected_prev_dir,
         )
 
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
     def test_reuse_false_when_startability_differs(self, m_reuse_file):
         m_reuse_file.return_value = True
         df_other = pd.DataFrame([[False, False], [False, False]], columns=["A0", "A1"])
@@ -204,7 +204,7 @@ class TestRecycleMajorOtherOperScheduler(unittest.TestCase):
         self.assertFalse(result)
         m_reuse_file.assert_not_called()
 
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
     def test_reuse_false_when_compare_operations_is_false(self, m_reuse_file):
         m_reuse_file.return_value = True
         acts_curr = [make_activity(2.0, "port", 0.0), make_activity(3.0, "site", 1.0)]
@@ -219,7 +219,7 @@ class TestRecycleMajorOtherOperScheduler(unittest.TestCase):
         self.assertFalse(result)
         m_reuse_file.assert_not_called()
 
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operation_recycler.check_files.reuse_file_exist")
     def test_reuse_false_when_reuse_file_exist_returns_false(self, m_reuse_file):
         m_reuse_file.return_value = False
         result = recycle_major_other_oper_scheduler(

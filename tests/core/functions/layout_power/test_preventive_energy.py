@@ -7,7 +7,7 @@ from datetime import datetime
 import pandas as pd
 import networkx as nx
 
-from logistic_tools.core.functions.layout_power import preventive_energy
+from oriom.core.functions.layout_power import preventive_energy
 
 
 COLS = [
@@ -57,7 +57,7 @@ class TestPreventiveEnergyNoDevices(unittest.TestCase):
     """
 
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
+        "oriom.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     def test_returns_empty_dataframes_when_no_devices(self, _mock_convert):
@@ -127,11 +127,11 @@ class TestPreventiveEnergyWind(unittest.TestCase):
         )
 
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
+        "oriom.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.aux_layout_power_func.statistical_power_preventive_evaluation"
+        "oriom.core.functions.layout_power.preventive_energy.aux_layout_power_func.statistical_power_preventive_evaluation"
     )
     def test_wind_branch_builds_one_row_with_energy_and_shutdown(
         self,
@@ -229,14 +229,14 @@ class TestPreventiveEnergyWindTimeseries(unittest.TestCase):
         )
 
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
+        "oriom.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.aux_layout_power_func.timeseries_power_preventive_evaluation"
+        "oriom.core.functions.layout_power.preventive_energy.aux_layout_power_func.timeseries_power_preventive_evaluation"
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.aux_layout_power_func.take_date_inspection_oper_scheduler"
+        "oriom.core.functions.layout_power.preventive_energy.aux_layout_power_func.take_date_inspection_oper_scheduler"
     )
     def test_wind_timeseries_branch_uses_timeseries_results(
         self,
@@ -334,11 +334,11 @@ class TestPreventiveEnergyWave(unittest.TestCase):
         )
 
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
+        "oriom.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.aux_layout_power_func.statistical_power_preventive_evaluation"
+        "oriom.core.functions.layout_power.preventive_energy.aux_layout_power_func.statistical_power_preventive_evaluation"
     )
     def test_wave_branch_builds_one_row(
         self,
@@ -430,11 +430,11 @@ class TestPreventiveEnergyPV(unittest.TestCase):
         )
 
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
+        "oriom.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.aux_layout_power_func.statistical_power_preventive_evaluation"
+        "oriom.core.functions.layout_power.preventive_energy.aux_layout_power_func.statistical_power_preventive_evaluation"
     )
     def test_pv_branch_calls_statistical_power_eval_with_degradation(
         self,
@@ -499,7 +499,7 @@ class TestPreventiveEnergyMissingInspection(unittest.TestCase):
     """
 
     @patch(
-        "logistic_tools.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
+        "oriom.core.functions.layout_power.preventive_energy.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     def test_missing_inspection_definition_raises_value_error(self, _mock_convert):

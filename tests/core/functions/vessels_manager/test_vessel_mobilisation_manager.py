@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 from datetime import datetime, timedelta
 
-from logistic_tools.core.functions.vessels_manager.vessel_mobilisation_manager import (
+from oriom.core.functions.vessels_manager.vessel_mobilisation_manager import (
     create_yearly_mobilisation_mother_vessel,
     reduce_redundant_mobilisations_inspection,
 )
@@ -13,8 +13,8 @@ from logistic_tools.core.functions.vessels_manager.vessel_mobilisation_manager i
 
 class TestCreateYearlyMobilisationMotherVessel(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.vessels_manager.vessel_mobilisation_manager.create_mobilisation")
-    @patch("logistic_tools.core.functions.vessels_manager.vessel_mobilisation_manager.get_first_failure")
+    @patch("oriom.core.functions.vessels_manager.vessel_mobilisation_manager.create_mobilisation")
+    @patch("oriom.core.functions.vessels_manager.vessel_mobilisation_manager.get_first_failure")
     def test_create_yearly_mobilisation_single_year(
         self, mock_get_first_failure, mock_create_mobilisation
     ):
@@ -72,7 +72,7 @@ class TestCreateYearlyMobilisationMotherVessel(unittest.TestCase):
 
 class TestReduceRedundantMobilisationsInspection(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.vessels_manager.vessel_mobilisation_manager.safe_copy_df")
+    @patch("oriom.core.functions.vessels_manager.vessel_mobilisation_manager.safe_copy_df")
     def test_reduce_redundant_same_month(self, mock_safe_copy):
         """
         If two inspections occur in the same month for the same vessel,
@@ -114,7 +114,7 @@ class TestReduceRedundantMobilisationsInspection(unittest.TestCase):
         self.assertEqual(len(remaining_mobi), 1)
 
 
-    @patch("logistic_tools.core.functions.vessels_manager.vessel_mobilisation_manager.safe_copy_df")
+    @patch("oriom.core.functions.vessels_manager.vessel_mobilisation_manager.safe_copy_df")
     def test_reduce_redundant_no_reduction_if_single_inspection(self, mock_safe_copy):
         """
         If there is only one inspection in a period, no mobilisation is removed.
@@ -144,7 +144,7 @@ class TestReduceRedundantMobilisationsInspection(unittest.TestCase):
         # No mobilisation should be removed
         self.assertEqual(len(out), len(df))
 
-    @patch("logistic_tools.core.functions.vessels_manager.vessel_mobilisation_manager.safe_copy_df")
+    @patch("oriom.core.functions.vessels_manager.vessel_mobilisation_manager.safe_copy_df")
     def test_reduce_redundant_vessel_with_zero_mobilisation_time(self, mock_safe_copy):
         """
         If vessel.mobilisation_time == 0, mobilisations must not be removed.

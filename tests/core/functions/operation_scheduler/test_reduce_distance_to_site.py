@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from logistic_tools.core.functions.operation_scheduler.reduce_distance_to_site import (
+from oriom.core.functions.operation_scheduler.reduce_distance_to_site import (
     modify_distance_to_site,
     modify_distance,
 )
@@ -53,7 +53,7 @@ class TestModifyDistanceToSite(unittest.TestCase):
 
         vessel = MagicMock()
         vessel.speed_transit = 20  # m/s
-    
+
         duration = modify_distance_to_site(operation, vessel, KM_DISTANCE=5)
 
         # Activity 1 must be updated
@@ -105,7 +105,7 @@ class TestModifyDistance(unittest.TestCase):
         op.vessel2.mother_vessel = False
         return op
 
-    @patch("logistic_tools.core.functions.operation_scheduler.reduce_distance_to_site.modify_distance_to_site")
+    @patch("oriom.core.functions.operation_scheduler.reduce_distance_to_site.modify_distance_to_site")
     def test_case1_reduced_distance(self, m_calc):
         """
         Case 1: vessel1 is in the reduced-distance list
@@ -153,7 +153,7 @@ class TestModifyDistance(unittest.TestCase):
         expected = 18.0 / op.vessel1.speed_transit / 3.6
         self.assertAlmostEqual(out, expected, places=6)
 
-    @patch("logistic_tools.core.functions.operation_scheduler.reduce_distance_to_site.modify_distance_to_site")
+    @patch("oriom.core.functions.operation_scheduler.reduce_distance_to_site.modify_distance_to_site")
     def test_case2_mother_vessel(self, m_calc):
         """
         Case 2:
@@ -180,7 +180,7 @@ class TestModifyDistance(unittest.TestCase):
         )
         self.assertEqual(out, 123.45)
 
-    @patch("logistic_tools.core.functions.operation_scheduler.reduce_distance_to_site.modify_distance_to_site")
+    @patch("oriom.core.functions.operation_scheduler.reduce_distance_to_site.modify_distance_to_site")
     def test_reduced_distance_overridden_by_mother_vessel(self, m_calc):
         """
         If both conditions apply:

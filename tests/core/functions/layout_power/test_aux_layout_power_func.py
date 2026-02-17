@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
-from logistic_tools.core.functions.layout_power import aux_layout_power_func
+from oriom.core.functions.layout_power import aux_layout_power_func
 
 
 class TestStatisticalPowerPreventiveEvaluation(unittest.TestCase):
@@ -194,7 +194,7 @@ class TestChooseLoc(unittest.TestCase):
     def setUp(self):
         self.date = datetime(2025, 1, 1)
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.random.choice")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
     def test_choose_node_non_pv_avoids_failed_nodes(self, m_choice):
         """
         For node-level failures, choose_loc must not select nodes in list_failed.
@@ -219,7 +219,7 @@ class TestChooseLoc(unittest.TestCase):
         self.assertEqual(loc, 2)
         self.assertNotIn(loc, failed)
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.random.choice")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
     def test_choose_node_pv_uses_component_level_power(self, m_choice):
         """
         For PV and levels 'device'/'string', level is replaced by component_level_power.
@@ -242,7 +242,7 @@ class TestChooseLoc(unittest.TestCase):
         self.assertEqual(loc, 10)
         self.assertEqual(G.nodes[loc]["level"], "string")
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.random.choice")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
     def test_choose_edge_visible_only(self, m_choice):
         """
         For edge levels, only edges with visible=True are eligible.
@@ -320,8 +320,8 @@ class TestChooseLoc(unittest.TestCase):
                 tech="WIND",
             )
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.random.choice")
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.logging.error")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.logging.error")
     def test_all_nodes_failed_logs_error_and_selects_any(self, m_log_error, m_choice):
         """
         If all nodes at a given level are failed, an error is logged and one of them is still selected.
@@ -346,8 +346,8 @@ class TestChooseLoc(unittest.TestCase):
         m_log_error.assert_called_once()
         self.assertIn("all device has failed", m_log_error.call_args[0][0])
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.random.choice")
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.logging.error")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.logging.error")
     def test_all_edges_failed_logs_error_and_selects_any(self, m_log_error, m_choice):
         """
         If all candidate edges are failed, an error is logged and one of them is still selected.
@@ -422,7 +422,7 @@ class TestFixPercentageMarkersDates(unittest.TestCase):
 
 class TestStringLocation(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.random.choice")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
     def test_returns_string_not_in_failed_set(self, m_choice):
         failed_strings = {0, 1}
         string_inverter = {0, 1, 2, 3}
@@ -437,8 +437,8 @@ class TestStringLocation(unittest.TestCase):
         self.assertEqual(k, 2)
         self.assertNotIn(k, failed_strings)
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.random.choice")
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.logging.warning")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.logging.warning")
     def test_when_all_failed_logs_warning_and_still_returns_choice(self, m_log_warning, m_choice):
         """
         If all strings are failed for the inverter, a warning is logged and
@@ -611,8 +611,8 @@ class TestCreateListDate(unittest.TestCase):
 
 class TestTakeDateInspectionOperScheduler(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.get_inspections_date")
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.approximate_hourly_data")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.get_inspections_date")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.approximate_hourly_data")
     def test_take_date_inspection_oper_scheduler_basic(self, m_approx, m_get_dates):
         """
         Ensure approximate_hourly_data is applied to each trigger and that
@@ -649,7 +649,7 @@ class TestTakeDateInspectionOperScheduler(unittest.TestCase):
 
 class TestTimeseriesPowerPreventiveEvaluation(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.create_list_date")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.create_list_date")
     def test_simple_case_single_interval_uses_main_factor(self, m_create_list_date):
         """
         Simple case: a single inspection, a single interval.
@@ -701,7 +701,7 @@ class TestTimeseriesPowerPreventiveEvaluation(unittest.TestCase):
         self.assertAlmostEqual(energy_list[0], expected_energy, places=7)
         self.assertAlmostEqual(shutdown_list[0], expected_hours, places=7)
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.create_list_date")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.create_list_date")
     def test_no_overlap_returns_zero(self, m_create_list_date):
         """
         If there is no overlap between inspection intervals and weather timeseries,
@@ -805,7 +805,7 @@ class TestTakePowerLevelInspections(unittest.TestCase):
 
 class TestTakeMonthInspection(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.layout_power.aux_layout_power_func.pd.date_range")
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.pd.date_range")
     def test_no_months_range_falls_back_to_start_month(self, m_date_range):
         """
         If date_range returns an empty index, the function must fall back to the

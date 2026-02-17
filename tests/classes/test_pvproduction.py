@@ -2,14 +2,14 @@ import unittest
 import os
 from copy import deepcopy
 
-from logistic_tools.classes.PVProduction import PVProduction
+from oriom.classes.PVProduction import PVProduction
 
 
 class TestPVProduction(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.yaml_file = os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'pv.yaml')
-        
+
     def test_init1(self):
         pv = PVProduction(
             number_devices=100,
@@ -32,7 +32,7 @@ class TestPVProduction(unittest.TestCase):
         self.assertEqual(pv.number_inverters, 2)
         self.assertEqual(pv.degradation_rate, 0)
         self.assertEqual(pv.number_mv_transformers, None)
-    
+
     def test_init2(self):
         pv = PVProduction(
             number_devices=100,
@@ -47,7 +47,7 @@ class TestPVProduction(unittest.TestCase):
             number_inverters=2,
             number_mv_transformers=1,
             number_substations=1,
-            degradation_rate=0.05,        
+            degradation_rate=0.05,
         )
         self.assertIsInstance(pv.number_devices, int)
         self.assertEqual(pv.number_devices, 100)
@@ -111,7 +111,7 @@ class TestPVProduction(unittest.TestCase):
         self.assertEqual(pv.degradation_rate, 1)
         self.assertEqual(pv.number_mv_transformers, None)
 
-        
+
 
 if __name__ == '__main__':
 

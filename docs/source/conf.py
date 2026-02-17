@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath('../../src'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [ 
+extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
@@ -38,7 +38,7 @@ extensions = [
 ]
 
 add_module_names = False                 # Show short names without module prefixes
-modindex_common_prefix = ["logistic_tools."]  # Trim common module prefix in modindex
+modindex_common_prefix = ["oriom."]  # Trim common module prefix in modindex
 autosummary_generate = True              # Auto-generate summary stub pages
 autosummary_generate_overwrite = True         # Overwrite old stubs with new template
 
@@ -95,9 +95,9 @@ def setup(app):
 def modify_name_rst():
     for dirpath, dirnames, filenames in os.walk("_api/"):
         for filename in filenames:
-            if filename.endswith(".rst"):  
+            if filename.endswith(".rst"):
                 filepath = os.path.join(dirpath, filename)
-                
+
                 with open(filepath, "r", encoding="utf-8") as f:
                     lines = f.readlines()
 

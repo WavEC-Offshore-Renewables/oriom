@@ -7,7 +7,7 @@ from datetime import datetime
 import pandas as pd
 import networkx as nx
 
-from logistic_tools.core.functions.layout_power import corrective_energy
+from oriom.core.functions.layout_power import corrective_energy
 
 
 DUMMY_OPERATIONS_STATS = [object()]
@@ -19,7 +19,7 @@ class TestEnergyCalculation(unittest.TestCase):
     """
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.approximate_hourly_data",
+        "oriom.core.functions.layout_power.corrective_energy.approximate_hourly_data",
         side_effect=lambda dt: dt,  # identity: do not change the timestamp
     )
     def test_energy_calculation_sums_between_rows_and_repeats_last(self, _mock_approx):
@@ -56,7 +56,7 @@ class TestEnergyCalculation(unittest.TestCase):
         self.assertEqual(energy_list, [40.0, 40.0])
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.approximate_hourly_data",
+        "oriom.core.functions.layout_power.corrective_energy.approximate_hourly_data",
         side_effect=lambda dt: dt,  # identity
     )
     def test_energy_calculation_multiple_intervals(self, _mock_approx):
@@ -171,7 +171,7 @@ class TestCorrectiveLayoutBasicChecks(unittest.TestCase):
         self.assertTrue(df_pv.empty)
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.return_percentage"
+        "oriom.core.functions.layout_power.corrective_energy.return_percentage"
     )
     def test_log_events_filter_excludes_inspections_and_mobilisations(
         self, mock_return_percentage
@@ -259,7 +259,7 @@ class TestCorrectiveLayoutWind(unittest.TestCase):
         self.G_wind.add_node(1)
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.return_percentage"
+        "oriom.core.functions.layout_power.corrective_energy.return_percentage"
     )
     def test_wind_statistic_energy_uses_monthly_power_and_percentage(
         self, mock_return_percentage
@@ -307,11 +307,11 @@ class TestCorrectiveLayoutWind(unittest.TestCase):
         )
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.approximate_hourly_data",
+        "oriom.core.functions.layout_power.corrective_energy.approximate_hourly_data",
         side_effect=lambda dt: dt,  # identity to simplify
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.return_percentage"
+        "oriom.core.functions.layout_power.corrective_energy.return_percentage"
     )
     def test_wind_non_statistic_energy_uses_metocean_timeseries(
         self, mock_return_percentage, _mock_approx
@@ -405,11 +405,11 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
         )
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.approximate_hourly_data",
+        "oriom.core.functions.layout_power.corrective_energy.approximate_hourly_data",
         side_effect=lambda dt: dt,  # identity to simplify
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.return_percentage"
+        "oriom.core.functions.layout_power.corrective_energy.return_percentage"
     )
     def test_wave_non_statistic_energy_uses_metocean_timeseries(
         self, mock_return_percentage, _mock_approx
@@ -460,7 +460,7 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
         )
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.return_percentage"
+        "oriom.core.functions.layout_power.corrective_energy.return_percentage"
     )
     def test_wave_statistic_energy_uses_monthly_power(self, mock_return_percentage):
         """
@@ -502,7 +502,7 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
             df_wave_out["Power_loss_kW"].tolist(), [200.0, 1000.0]
         )
 
-    
+
 class TestCorrectiveLayoutPV(unittest.TestCase):
     """
     Tests for PV branch inside corrective_layout.
@@ -521,13 +521,13 @@ class TestCorrectiveLayoutPV(unittest.TestCase):
         self.G_pv.add_node(1)
 
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.calculate_energy_loss_pv"
+        "oriom.core.functions.layout_power.corrective_energy.calculate_energy_loss_pv"
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.aux_functions.convert_stringtime"
+        "oriom.core.functions.layout_power.corrective_energy.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.functions.layout_power.corrective_energy.return_percentage"
+        "oriom.core.functions.layout_power.corrective_energy.return_percentage"
     )
     def test_pv_branch_calls_calculate_energy_loss_and_sets_power_loss(
         self,

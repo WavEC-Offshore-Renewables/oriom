@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pandas as pd
 
-import logistic_tools.core.functions.graphs.report_graphs as report_graphs_module
+import oriom.core.functions.graphs.report_graphs as report_graphs_module
 
 
 class TestReportGraphs(unittest.TestCase):

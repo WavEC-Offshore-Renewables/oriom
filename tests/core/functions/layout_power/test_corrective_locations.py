@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from logistic_tools.core.functions.layout_power import corrective_location as logs_mod
+from oriom.core.functions.layout_power import corrective_location as logs_mod
 
 
 # ------------------------------------------------------------------

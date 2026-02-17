@@ -5,7 +5,7 @@ from unittest.mock import patch
 from datetime import datetime, timedelta
 import pandas as pd
 
-from logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_immediate import merge_operation
+from oriom.core.functions.log_merge_corrective_functions.merge_corrective_immediate import merge_operation
 
 
 # Minimal COLS matching the structure expected when building merged rows
@@ -72,7 +72,7 @@ class TestMergeOperationSingleOp(unittest.TestCase):
     """Tests for merge_operation when there is only one operation in the day."""
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
         "df_vessel_merge_use"
     )
     def test_single_operation_no_merge(self, mock_vessel_use):
@@ -142,16 +142,16 @@ class TestMergeOperationMultipleOps(unittest.TestCase):
     """Tests for merge_operation when multiple operations can be merged."""
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
         "df_vessel_merge_use"
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
         "create_data",
         side_effect=lambda df, col, current: current + timedelta(hours=1),
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_immediate."
         "approximate_hourly_data",
         side_effect=lambda dt: dt,
     )

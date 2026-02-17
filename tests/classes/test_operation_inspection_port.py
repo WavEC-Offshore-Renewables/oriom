@@ -6,7 +6,7 @@ from unittest.mock import patch
 from ruamel.yaml import YAML
 
 # Adjust this import if your package structure is different
-from logistic_tools.classes.Operations.InspectionPort import InspectionPort
+from oriom.classes.Operations.InspectionPort import InspectionPort
 
 
 class FakeTowOp:
@@ -468,7 +468,7 @@ class TestInspectionPort(unittest.TestCase):
     # ------------------------------------------------------------------ #
     # define_level
     # ------------------------------------------------------------------ #
-    @patch("logistic_tools.classes.Operations.InspectionPort.find_highest_power_node")
+    @patch("oriom.classes.Operations.InspectionPort.find_highest_power_node")
     def test_define_level_for_known_technology(self, mock_find):
         """define_level must use tech_finder and find_highest_power_node to set level."""
         mock_find.return_value = "node_X"
@@ -482,7 +482,7 @@ class TestInspectionPort(unittest.TestCase):
         mock_find.assert_called_once_with("graph_wind")
         self.assertEqual(op.level, "node_X")
 
-    @patch("logistic_tools.classes.Operations.InspectionPort.find_highest_power_node")
+    @patch("oriom.classes.Operations.InspectionPort.find_highest_power_node")
     def test_define_level_for_oce_common_event(self, mock_find):
         """
         When tech_finder returns None (e.g. oce prefix), define_level should

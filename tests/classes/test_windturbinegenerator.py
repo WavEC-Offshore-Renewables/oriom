@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from logistic_tools.classes.WindTurbineGenerator import WindTurbineGenerator
+from oriom.classes.WindTurbineGenerator import WindTurbineGenerator
 
 
 class TestWindTurbineGenerator(unittest.TestCase):
@@ -154,7 +154,7 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 self.assertEqual(wtg.number_exportcables, 1)
                 self.assertEqual(wtg.wtg_layout, 1)
                 self.assertEqual(wtg.moorings, 3)
-        
+
         def test_yaml(self):
                 wtg = WindTurbineGenerator.get_wtg_from_yaml(self.yaml_file)
                 self.assertIsInstance(wtg.number_devices, int)

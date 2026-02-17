@@ -1,5 +1,5 @@
 import unittest
-from logistic_tools.classes.FindElementClass import Find_Element
+from oriom.classes.FindElementClass import Find_Element
 
 
 # --- Dummies --------------------------------------------------------------

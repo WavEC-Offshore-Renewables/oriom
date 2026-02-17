@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from logistic_tools.core.timeseries_analysis.montecarlo import f_montecarlo
+from oriom.core.timeseries_analysis.montecarlo import f_montecarlo
 
 
 class MonteCarloTestCase(unittest.TestCase):

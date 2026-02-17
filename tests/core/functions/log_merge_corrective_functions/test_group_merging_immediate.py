@@ -3,7 +3,7 @@
 import unittest
 import os
 from unittest.mock import patch
-from logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate import mergeble_operation
+from oriom.core.functions.log_merge_corrective_functions.group_merging_immediate import mergeble_operation
 from pprint import pprint
 
 class TestMergebleOperation(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestMergebleOperation(unittest.TestCase):
         cls.result_dir_r = os.path.join(os.getcwd(), 'tmp')
         cls.OLC_LIST = ['hs', 'cs', 'ws', 'ws_hub', 'tp', 'light']
 
-    @patch('logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv')
+    @patch('oriom.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv')
     def test_case_1_basic_structure(self, mock_save_file_csv):
         # Original simple case (Op1, Op2 in same group with different durations)
         oper_dict = {
@@ -25,11 +25,11 @@ class TestMergebleOperation(unittest.TestCase):
         self.assertEqual(result["Vessel1"]["Group 1"]["Op2"]["Rank"], 1)
         self.assertEqual(result["Vessel1"]["Group 1"]["Op1"]["Rank"], 2)
         self.assertEqual(result["Vessel2"]["Group 1"]["Op3"]["Rank"], 1)
-        
+
 
         mock_save_file_csv.assert_called_once()
 
-    @patch('logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv')
+    @patch('oriom.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv')
     def test_case_2_custom_grouping(self, mock_save_file_csv):
         # New set with different OLC values to create separate groups
         oper_dict = {
@@ -48,7 +48,7 @@ class TestMergebleOperation(unittest.TestCase):
         self.assertEqual(group["OpB"]["Rank"], 1)
         mock_save_file_csv.assert_called_once()
 
-    @patch('logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv')
+    @patch('oriom.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv')
     def test_case_3_large_example(self, mock_save_file_csv):
         # Complex case with 25 operations from user
         oper_dict = {
@@ -194,7 +194,7 @@ class TestMergebleOperationBasicGrouping(unittest.TestCase):
     """
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
+        "oriom.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
     )
     def test_same_vessel_same_olc_ranked_by_duration(self, mock_save):
         """
@@ -251,7 +251,7 @@ class TestMergebleOperationBasicGrouping(unittest.TestCase):
         mock_save.assert_called_once()
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
+        "oriom.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
     )
     def test_same_vessel_different_olc_more_restrictive_first(self, mock_save):
         """
@@ -301,7 +301,7 @@ class TestMergebleOperationBasicGrouping(unittest.TestCase):
         mock_save.assert_called_once()
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
+        "oriom.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
     )
     def test_mixed_olc_creates_separate_groups(self, mock_save):
         """
@@ -351,7 +351,7 @@ class TestMergebleOperationBasicGrouping(unittest.TestCase):
         mock_save.assert_called_once()
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
+        "oriom.core.functions.log_merge_corrective_functions.group_merging_immediate.save_file_csv"
     )
     def test_different_vessels_are_separated(self, mock_save):
         """

@@ -2,7 +2,7 @@
 import unittest
 from datetime import datetime, timedelta
 
-from logistic_tools.core.functions.operation_scheduler.shift_functions import (
+from oriom.core.functions.operation_scheduler.shift_functions import (
     operation_consecutive,
     operation_consecutive_simultaneously,
     last_oper,

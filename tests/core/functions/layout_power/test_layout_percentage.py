@@ -7,7 +7,7 @@ from datetime import datetime
 import pandas as pd
 import networkx as nx
 
-from logistic_tools.core.functions.layout_power import layout_percentage
+from oriom.core.functions.layout_power import layout_percentage
 
 
 # ------------------------------------------------------------------
@@ -95,15 +95,15 @@ class TestReturnPercentageNonPV(unittest.TestCase):
         self.G.add_node(0, level="SHORE", power=0)
         self.G.add_node(1, level="device", power=10.0)
 
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
            side_effect=lambda df: df)
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
            side_effect=lambda df, df_extra: pd.concat([df, df_extra], ignore_index=True))
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
            return_value="device")
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.logs_corrective_locations")
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.shut")
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.fix")
+    @patch("oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations")
+    @patch("oriom.core.functions.layout_power.layout_percentage.shut")
+    @patch("oriom.core.functions.layout_power.layout_percentage.fix")
     def test_non_pv_shut_and_fix_update_percentages(
         self,
         mock_fix,
@@ -194,13 +194,13 @@ class TestReturnPercentageNonPV(unittest.TestCase):
         self.assertEqual(perc_list[0], 50.0)
         self.assertEqual(perc_list[1], 100.0)
 
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
            side_effect=lambda df: df)
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
            side_effect=lambda df, df_extra: pd.concat([df, df_extra], ignore_index=True))
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
            return_value="device")
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.logs_corrective_locations")
+    @patch("oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations")
     def test_unknown_shut_fix_raises_value_error(
         self,
         mock_logs_corr,
@@ -268,16 +268,16 @@ class TestReturnPercentagePV(unittest.TestCase):
         self.G_pv.add_node(0, level="SHORE", power=0)
         self.G_pv.add_node(1, level="inverter", power=10.0)
 
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
            side_effect=lambda df: df)
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
            side_effect=lambda df, df_extra: pd.concat([df, df_extra], ignore_index=True))
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
            return_value="inverter")
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.aux_layout_power_func.string_location",
+    @patch("oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.string_location",
            side_effect=lambda failed_strings, string_inverter: sorted(list(string_inverter - failed_strings))[0])
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.logs_corrective_locations")
-    @patch("logistic_tools.core.functions.layout_power.layout_percentage.shut")
+    @patch("oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations")
+    @patch("oriom.core.functions.layout_power.layout_percentage.shut")
     def test_pv_second_device_failure_triggers_rename_when_max_reached(
         self,
         mock_shut,

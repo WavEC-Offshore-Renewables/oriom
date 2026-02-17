@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective import (
+from oriom.core.functions.logs_timeseries.create_logs_events_corrective import (
     create_logs_corrective_file,
 )
 
@@ -122,7 +122,7 @@ class DummyFinder:
 class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
 
     # 1) Failure beyond cutoff — no output
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
     def test_failure_beyond_cutoff(self, mock_fail_to_log):
         mock_fail_to_log.return_value = pd.DataFrame(columns=["d_trigger"])  # minimal
         cutoff = datetime(2025, 1, 1)
@@ -135,9 +135,9 @@ class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
         self.assertTrue(out.empty)
 
     # 2) Vessel mobilisation influencing leadtime
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
     def test_mobilisation_effect(self, MockImmediate, mock_fail_to_log, mock_create_data):
         # create_data: ritorna semplicemente la data di partenza (ci basta per il test)
         mock_create_data.side_effect = lambda df_slice, col, start: start
@@ -193,9 +193,9 @@ class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
         self.assertEqual(out.iloc[0]["d_end_leadtime"], sched.iloc[3]["datetime"])
 
     # 3) Preferred-month deferred maintenance
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionDeferred")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionDeferred")
     def test_preferred_month_deferred(self, MockDeferred, mock_fail_to_log, mock_create_data):
         # create_data: ritorna semplicemente la data di partenza
         mock_create_data.side_effect = lambda df_slice, col, start: start
@@ -251,9 +251,9 @@ class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
         self.assertGreaterEqual(len(out), 1)
 
     # 4) Test with vessel_2 present
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
     def test_vessel2_fields(self, MockImmediate, mock_fail_to_log, mock_create_data):
         mock_create_data.side_effect = lambda df_slice, col, start: start
         mock_fail_to_log.return_value = pd.DataFrame(columns=LOG_COLS)
@@ -307,9 +307,9 @@ class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
         self.assertEqual(out.iloc[0]["vessel_2"], "B")
 
     # 5) Multiple failures
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
     def test_multiple_failures(self, MockImmediate, mock_fail_to_log, mock_create_data):
         mock_create_data.side_effect = lambda df_slice, col, start: start
         mock_fail_to_log.return_value = pd.DataFrame(columns=LOG_COLS)
@@ -372,7 +372,7 @@ class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
         self.assertEqual(len(ops_only), 2)
 
     # 6) Trigger operation missing
-    @patch("logistic_tools.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df", return_value=pd.DataFrame(columns=["d_trigger"]))
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df", return_value=pd.DataFrame(columns=["d_trigger"]))
     def test_missing_operation_trigger(self, mock_fail):
         base = datetime(2025,1,1)
         dates_failures = pd.DataFrame([{ "datetime": base, "id":"FX.0","maintenance_strategy":"immediately","operation_triggered":"missing_op" }])

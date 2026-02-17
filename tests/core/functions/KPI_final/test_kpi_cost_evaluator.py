@@ -6,8 +6,8 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 # ---- CHANGE THESE IMPORTS if your real paths differ ----
-from logistic_tools.core.functions.kpi_final import kpi_aux
-from logistic_tools.core.functions.kpi_final.kpi_cost_evaluator import (  # <-- sostituisci con il path reale del file testato
+from oriom.core.functions.kpi_final import kpi_aux
+from oriom.core.functions.kpi_final.kpi_cost_evaluator import (  # <-- sostituisci con il path reale del file testato
     inspection_data,
     values_from_log_file,
     find_time_log_events_insp,
@@ -39,7 +39,7 @@ class DummyFailure():
 class DummyFindFailure():
     def __init__(self, failures):
         self.failures_dict_id = {f.id: f for f in failures}
-    
+
     def find_failure_from_id(self, fail_id):
         f = self.failures_dict_id.get(fail_id)
         if f:
@@ -185,7 +185,7 @@ class TestValuesFromLogFile(unittest.TestCase):
 # ---------- Tests for find_time_log_events_insp ----------
 
 class TestFindTimeLogEventsInsp(unittest.TestCase):
-    @patch("logistic_tools.core.functions.kpi_final.kpi_cost_evaluator.approximate_hourly_data", side_effect=lambda x: x)
+    @patch("oriom.core.functions.kpi_final.kpi_cost_evaluator.approximate_hourly_data", side_effect=lambda x: x)
     def test_site_inspection_flow(self, mock_approx):
         """
         Single site inspection:
@@ -255,7 +255,7 @@ class TestFindTimeLogEventsInsp(unittest.TestCase):
         self.assertTrue(c_tech >= 0)
         self.assertTrue(c_rov >= 0)
 
-    @patch("logistic_tools.core.functions.kpi_final.kpi_cost_evaluator.approximate_hourly_data", side_effect=lambda x: x)
+    @patch("oriom.core.functions.kpi_final.kpi_cost_evaluator.approximate_hourly_data", side_effect=lambda x: x)
     def test_port_inspection_flow(self, mock_approx):
         """
         Single port inspection:
@@ -356,7 +356,7 @@ class TestFindTimeLogEventsInsp(unittest.TestCase):
 # ---------- Tests for calculate_event_cost ----------
 
 class TestCalculateEventCosts(unittest.TestCase):
-    @patch("logistic_tools.core.functions.kpi_final.kpi_cost_evaluator.values_from_log_file",
+    @patch("oriom.core.functions.kpi_final.kpi_cost_evaluator.values_from_log_file",
            return_value=(5.0, 2.0, 3.0, 100, 50))
     def test_without_insp_params(self, mock_values):
         """

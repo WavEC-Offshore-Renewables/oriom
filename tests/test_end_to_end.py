@@ -8,21 +8,21 @@ import importlib.util
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from logistic_tools.inputs.Configuration import ConfigRun
-import logistic_tools.main as main_module
+from oriom.inputs.Configuration import ConfigRun
+import oriom.main as main_module
 
 warnings.simplefilter("ignore")
 pd.options.mode.chained_assignment = None  # Disable SettingWithCopyWarning
 
 try:
     check_files_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.check_files"
+        "oriom.core.functions.private.check_files"
     )
 except ModuleNotFoundError:
     check_files_spec = None
 
 class TestMainEndToEnd(unittest.TestCase):
-    """End-to-end regression test for logistic_tools.main."""
+    """End-to-end regression test for oriom.main."""
 
     @staticmethod
     def _repo_root() -> Path:
@@ -146,7 +146,7 @@ class TestMainEndToEnd(unittest.TestCase):
 
         with patch.object(main_module.Inputs, "__init__", new=patched_inputs_init):
             with patch(
-                "logistic_tools.core.functions.layout_power.aux_layout_power_func.choose_loc",
+                "oriom.core.functions.layout_power.aux_layout_power_func.choose_loc",
                 side_effect=choose_loc_side_effect,
             ):
                 dirs = main_module.run(config=config)

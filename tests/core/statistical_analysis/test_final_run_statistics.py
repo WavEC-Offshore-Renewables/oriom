@@ -11,7 +11,7 @@ import numpy as np
 from openpyxl import load_workbook
 from unittest.mock import patch, MagicMock
 
-from logistic_tools.core.statistical_analysis.final_run_statistics import (
+from oriom.core.statistical_analysis.final_run_statistics import (
     return_statistics_runs,
 )
 
@@ -220,7 +220,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
         mobilisation_add = {"vA": 20.0}
 
         # Patch external side-effects: plots, CSVs, KPI_Insight
-        module_path = "logistic_tools.core.statistical_analysis.final_run_statistics"
+        module_path = "oriom.core.statistical_analysis.final_run_statistics"
         with patch(f"{module_path}.aux_functions.save_file_csv") as m_save_csv, \
              patch(f"{module_path}.final_economic_graphs") as m_econ_graphs, \
              patch(f"{module_path}.report_graphs") as m_report_graphs, \
@@ -319,7 +319,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
         fuel_add = {"vA": 5.0}
         mobilisation_add = {"vA": 5.0}
 
-        module_path = "logistic_tools.core.statistical_analysis.final_run_statistics"
+        module_path = "oriom.core.statistical_analysis.final_run_statistics"
         with patch(f"{module_path}.aux_functions.save_file_csv") as m_save_csv, \
              patch(f"{module_path}.final_economic_graphs") as m_econ_graphs, \
              patch(f"{module_path}.report_graphs") as m_report_graphs, \

@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
-from logistic_tools.core.functions.layout_power import layout_power as ea
+from oriom.core.functions.layout_power import layout_power as ea
 
 
 class TestFixValues(unittest.TestCase):
@@ -195,8 +195,8 @@ class TestEnergyAvailabilityWindIntegration(unittest.TestCase):
     Simplified integration test for energy_availability, wind branch.
     """
 
-    @patch("logistic_tools.core.functions.layout_power.layout_power.preventive_energy")
-    @patch("logistic_tools.core.functions.layout_power.layout_power.corrective_layout")
+    @patch("oriom.core.functions.layout_power.layout_power.preventive_energy")
+    @patch("oriom.core.functions.layout_power.layout_power.corrective_layout")
     def test_energy_availability_wind_single_year(
         self, mock_corrective_layout, mock_preventive_energy
     ):
@@ -316,8 +316,8 @@ class TestEnergyAvailabilityPVErrors(unittest.TestCase):
     Test of associated error at power_pv_df without degradation_rate.
     """
 
-    @patch("logistic_tools.core.functions.layout_power.layout_power.preventive_energy")
-    @patch("logistic_tools.core.functions.layout_power.layout_power.corrective_layout")
+    @patch("oriom.core.functions.layout_power.layout_power.preventive_energy")
+    @patch("oriom.core.functions.layout_power.layout_power.corrective_layout")
     def test_pv_power_without_degradation_raises_value_error(
         self, mock_corrective_layout, mock_preventive_energy
     ):

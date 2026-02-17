@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from logistic_tools.classes.Inputs import Inputs
+from oriom.classes.Inputs import Inputs
 
 
 def skipIfNotLocal():

@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use("Agg")  # headless
 import networkx as nx
 
-from logistic_tools.classes.Layouts.Layout_Auxiliary import Layout_Aux
+from oriom.classes.Layouts.Layout_Auxiliary import Layout_Aux
 
 
 class TestLayoutAuxAddSubstationAndShore(unittest.TestCase):

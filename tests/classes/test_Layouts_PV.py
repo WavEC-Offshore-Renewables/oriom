@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 import networkx as nx
 
-from logistic_tools.classes.Layouts.Layouts_PV import Layout_PV
+from oriom.classes.Layouts.Layouts_PV import Layout_PV
 
 
 def count_nodes_by_level(G: nx.DiGraph, level: str) -> int:
@@ -50,7 +50,7 @@ class TestCheckInputPV(unittest.TestCase):
                                    n_substations=1, n_mvtransformers=3)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 class TestLayout1PV(unittest.TestCase):
     def setUp(self):
         self.pv = Layout_PV()
@@ -84,7 +84,7 @@ class TestLayout1PV(unittest.TestCase):
         self.assertIn("array_cable", edge_levels)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 class TestLayout3PV(unittest.TestCase):
     def setUp(self):
         self.pv = Layout_PV()
@@ -119,7 +119,7 @@ class TestLayout3PV(unittest.TestCase):
         self.assertEqual(count_nodes_by_level(G, "device"), 6 * 2)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 class TestLayout2PV(unittest.TestCase):
     def setUp(self):
         self.pv = Layout_PV()
@@ -156,7 +156,7 @@ class TestLayout2PV(unittest.TestCase):
             )
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 class TestDispatcher(unittest.TestCase):
     def setUp(self):
         self.pv = Layout_PV()

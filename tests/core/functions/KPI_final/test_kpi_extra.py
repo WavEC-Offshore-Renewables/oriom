@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pandas as pd
 from datetime import datetime
 
-from logistic_tools.core.functions.kpi_final.kpi_extra import data_ctv_long_term_strategy
+from oriom.core.functions.kpi_final.kpi_extra import data_ctv_long_term_strategy
 
 
 # ------------------------------------------------------------------
@@ -133,7 +133,7 @@ class TestDataCtvLongTermStrategy(unittest.TestCase):
         FakeVesselDayCounter.created_instances = []
 
         with patch(
-            "logistic_tools.core.functions.kpi_final.kpi_extra.VesselDayCounter",
+            "oriom.core.functions.kpi_final.kpi_extra.VesselDayCounter",
             new=FakeVesselDayCounter,
         ):
             out = data_ctv_long_term_strategy(
@@ -190,7 +190,7 @@ class TestDataCtvLongTermStrategy(unittest.TestCase):
         log_events_merged = self._make_log_events_merged()
 
         with patch(
-            "logistic_tools.core.functions.kpi_final.kpi_extra.VesselDayCounter",
+            "oriom.core.functions.kpi_final.kpi_extra.VesselDayCounter",
             new=FakeVesselDayCounter,
         ):
             out = data_ctv_long_term_strategy(

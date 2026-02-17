@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries.InspectionSiteOrganizer import (
+from oriom.core.functions.logs_timeseries.InspectionSiteOrganizer import (
     InspectionSiteCreation,
 )
 
@@ -32,7 +32,7 @@ class TestInspectionSiteCreation(unittest.TestCase):
     """Unit tests for InspectionSiteCreation."""
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.InspectionSiteOrganizer."
+        "oriom.core.functions.logs_timeseries.InspectionSiteOrganizer."
         "logs_timeseries_func.inspection_statistic_duration"
     )
     def test_preventive_site_inspection_simple(self, mock_stat_dur):
@@ -85,7 +85,7 @@ class TestInspectionSiteCreation(unittest.TestCase):
         self.assertEqual(mother_campaign, {})
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.InspectionSiteOrganizer."
+        "oriom.core.functions.logs_timeseries.InspectionSiteOrganizer."
         "logs_timeseries_func.inspection_statistic_duration",
         return_value=4.0,
     )
@@ -144,11 +144,11 @@ class TestInspectionSiteCreation(unittest.TestCase):
         self.assertEqual(mother_campaign["MOTH1"][2025][(6, 10)], d_end_device)
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.InspectionSiteOrganizer."
+        "oriom.core.functions.logs_timeseries.InspectionSiteOrganizer."
         "approximate_hourly_data"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.InspectionSiteOrganizer."
+        "oriom.core.functions.logs_timeseries.InspectionSiteOrganizer."
         "logs_timeseries_func.inspection_statistic_duration",
         return_value=2.0,
     )

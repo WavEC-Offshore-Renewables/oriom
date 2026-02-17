@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from unittest.mock import patch  # <-- manca nel tuo file
 
-from logistic_tools.inputs.Input_manager import (
+from oriom.inputs.Input_manager import (
     Input_Files,
     extract_input_from_excel,
     handle_overwrite_previous,
@@ -60,7 +60,7 @@ class TestExtractInputFromExcelOverwriteAndEdge(unittest.TestCase):
         # Torna fuori prima di distruggere la TemporaryDirectory (evita lock su Windows)
         os.chdir(self.old_cwd)
 
-    @patch("logistic_tools.inputs.Input_manager.excel_to_yaml")
+    @patch("oriom.inputs.Input_manager.excel_to_yaml")
     def test_local_excel_overwrites_existing_yaml(self, m_excel_to_yaml):
         target_yaml = os.path.join(self.dirs.base_dir, "inputs_gen.yaml")
         with open(target_yaml, "w", encoding="utf-8") as f:
@@ -111,8 +111,8 @@ class TestExtractInputFromExcelOverwriteAndEdge(unittest.TestCase):
         with open(os.path.join(self.dirs.base_dir, "a.yaml"), "r", encoding="utf-8") as f:
             self.assertEqual(f.read(), "SRC_A")
 
-    @patch("logistic_tools.inputs.Input_manager.msoffice365_sharepoint.download_file")
-    @patch("logistic_tools.inputs.Input_manager.excel_to_yaml")
+    @patch("oriom.inputs.Input_manager.msoffice365_sharepoint.download_file")
+    @patch("oriom.inputs.Input_manager.excel_to_yaml")
     def test_sharepoint_branch_downloads_and_converts(self, m_excel_to_yaml, m_download):
         extract_input_from_excel(
             dirs=self.dirs,

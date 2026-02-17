@@ -4,9 +4,9 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from logistic_tools.core.functions.logs_timeseries.failures import failures_event
-from logistic_tools.classes.Failure import Failure
-from logistic_tools.classes.Scenario import Scenario
+from oriom.core.functions.logs_timeseries.failures import failures_event
+from oriom.classes.Failure import Failure
+from oriom.classes.Scenario import Scenario
 
 
 class TestFailures(unittest.TestCase):
@@ -157,15 +157,15 @@ class TestFailuresEventUnit(unittest.TestCase):
         old_df = pd.DataFrame(
             [
                 {
-                    "datetime": datetime(2025, 1, 2, 0, 0), 
-                    "id": "comp2", 
+                    "datetime": datetime(2025, 1, 2, 0, 0),
+                    "id": "comp2",
                     "maintenance_strategy": "specific month",
                     "operation_triggered": "op_c2",
                     "preferred_month": 5
                 },
                 {
-                    "datetime": datetime(2025, 1, 1, 0, 0), 
-                    "id": "comp1", 
+                    "datetime": datetime(2025, 1, 1, 0, 0),
+                    "id": "comp1",
                     "maintenance_strategy": "immediately",
                     "operation_triggered": "op_c1",
                     "preferred_month": np.nan
@@ -272,15 +272,15 @@ class TestFailuresEventUnit(unittest.TestCase):
         old_df = pd.DataFrame(
             [
                 {
-                    "datetime": datetime(2025, 1, 2, 0, 0), 
-                    "id": "comp2", 
+                    "datetime": datetime(2025, 1, 2, 0, 0),
+                    "id": "comp2",
                     "maintenance_strategy": "specific month",
                     "operation_triggered": "op_c2",
                     "preferred_month": 5
                 },
                 {
-                    "datetime": datetime(2025, 1, 1, 0, 0), 
-                    "id": "comp1", 
+                    "datetime": datetime(2025, 1, 1, 0, 0),
+                    "id": "comp1",
                     "maintenance_strategy": "immediately",
                     "operation_triggered": "op_c1",
                     "preferred_month": np.nan
@@ -307,8 +307,8 @@ class TestFailuresEventUnit(unittest.TestCase):
 
     def test_bath_tub_changes_distribution(self):
         """
-        With the same fail_rate and n_element, but bath_tub True/False, 
-        the distribution of failure years must be different 
+        With the same fail_rate and n_element, but bath_tub True/False,
+        the distribution of failure years must be different
         (different probabilities for start/end years).
         """
         scenarios = [DummyScenario([1.0 / 12.0] * 12)]

@@ -7,7 +7,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries import logs_preventive_aux
+from oriom.core.functions.logs_timeseries import logs_preventive_aux
 
 
 class DummyInspClass:

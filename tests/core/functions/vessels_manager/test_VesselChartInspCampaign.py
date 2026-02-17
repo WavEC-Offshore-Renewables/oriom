@@ -7,7 +7,7 @@ import pandas.testing as pdt
 from datetime import datetime, timedelta
 from types import SimpleNamespace
 
-from logistic_tools.core.functions.vessels_manager.VesselChartInspCampaign import Stat_chart_inspection_campaign
+from oriom.core.functions.vessels_manager.VesselChartInspCampaign import Stat_chart_inspection_campaign
 
 
 
@@ -157,7 +157,7 @@ def expected_dicts_from_inspections(inspections):
 
 class TestStatChartInspectionCampaignEndToEnd(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.vessels_manager.VesselChartInspCampaign.log_event_convert_stringtime")
+    @patch("oriom.core.functions.vessels_manager.VesselChartInspCampaign.log_event_convert_stringtime")
     def test_dicts_and_create_stat_chart(self, mock_convert):
         # Patch converter to parse day-first strings used in input
         def _convert(df):
@@ -261,7 +261,7 @@ class TestStatChartInspectionCampaign(unittest.TestCase):
         self.assertEqual(self.obj.id_month_to_group[("inspB", 5)], (5, 10))
 
     @patch(
-        "logistic_tools.core.functions.vessels_manager.VesselChartInspCampaign.log_event_convert_stringtime",
+        "oriom.core.functions.vessels_manager.VesselChartInspCampaign.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     def test_create_stat_chart_inspection_campaign_simple_group(self, _m_convert):
@@ -312,7 +312,7 @@ class TestStatChartInspectionCampaign(unittest.TestCase):
         self.assertTrue(
             pd.api.types.is_datetime64_any_dtype(df_out["d_end_stat_chart"]),
         )
-        
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -3,7 +3,7 @@
 import unittest
 from datetime import datetime
 
-from logistic_tools.utils.read_dataframe_value import (
+from oriom.utils.read_dataframe_value import (
     get_first_failure,
     compute_rov_cost,
     take_id_operation,

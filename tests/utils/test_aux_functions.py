@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pandas as pd
 
-from logistic_tools.utils.aux_functions import (
+from oriom.utils.aux_functions import (
     update_dict,
     save_file_csv,
     safe_getattr,

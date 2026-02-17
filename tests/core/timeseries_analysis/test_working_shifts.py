@@ -1,11 +1,11 @@
 import unittest
 import os
-from logistic_tools.classes.Operations.InspectionSite import InspectionSite
-from logistic_tools.classes.Vessel import Vessel
+from oriom.classes.Operations.InspectionSite import InspectionSite
+from oriom.classes.Vessel import Vessel
 
-from logistic_tools.classes.DefineOperationTechs import Define_operation
+from oriom.classes.DefineOperationTechs import Define_operation
 
-from logistic_tools.core.timeseries_analysis.working_shifts import working_shifts
+from oriom.core.timeseries_analysis.working_shifts import working_shifts
 
 
 file_vessels=os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'vessels.yaml')
@@ -145,9 +145,9 @@ class TestWorkingShifts(unittest.TestCase):
                 transit_between_devices=0.5,
                 operation_to_group_with=operation_4.to_group_with
         )
-  
+
     def test_case_1(self):
-        
+
         self.assertEqual(self.work_shifts_1['number_shifts_main'], 1)
         self.assertEqual(self.work_shifts_1['number_shifts_last'], 1)
         self.assertEqual(self.work_shifts_1['duration_shift_main'], 11.0)

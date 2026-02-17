@@ -3,8 +3,8 @@ documentation_build:
 	.\venv\Scripts\activate
 # Delete previous build
 	del /Q .\docs\build\html
-# Get logistic_tools docstrings
-	sphinx-apidoc -f -e -o docs/source/_api ./src/logistic_tools src/logistic_tools/main.py
+# Get oriom docstrings
+	sphinx-apidoc -f -e -o docs/source/_api ./src/oriom src/oriom/main.py
 # Create HTML documentation
 	sphinx-build -b html docs/source/ docs/build/html
 
@@ -23,6 +23,6 @@ test:
 # Enter src package
 	cd src
 # Run the tests
-	coverage run --source=logistic_tools -m pytest -s
+	coverage run --source=oriom -m pytest -s
 # Show the reports
 	coverage report

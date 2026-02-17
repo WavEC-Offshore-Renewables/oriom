@@ -43,10 +43,10 @@ Different feature consent to:
 -  Reutilize vessels or recall vessel that have do not complete the operations inside the contracting chart time (not available in open source mode)
 ====================================================================================================================================================
 
--  Consider joint operations for different operations to optimize the O&M plan when possible 
+-  Consider joint operations for different operations to optimize the O&M plan when possible
 ============================================================================================
 
--  Intermediate results analysis 
+-  Intermediate results analysis
 ================================
 
 
@@ -73,8 +73,8 @@ Tool flowchart
    :caption: Index
    :titlesonly:
 
-   Classes package <_api/logistic_tools.classes>
-   Core package <_api/logistic_tools.core>
-   Inputs package <_api/logistic_tools.inputs>
-   Utils package <_api/logistic_tools.utils>
-   Main module <_api/logistic_tools.main>
+   Classes package <_api/oriom.classes>
+   Core package <_api/oriom.core>
+   Inputs package <_api/oriom.inputs>
+   Utils package <_api/oriom.utils>
+   Main module <_api/oriom.main>

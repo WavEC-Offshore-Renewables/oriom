@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from unittest import skip
 
-from logistic_tools.classes.Vessel import Vessel
+from oriom.classes.Vessel import Vessel
 
 
 class TestVessel(unittest.TestCase):

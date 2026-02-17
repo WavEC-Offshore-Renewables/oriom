@@ -5,11 +5,11 @@ import types
 import networkx as nx
 from copy import deepcopy
 
-from logistic_tools.utils.aux_operation import level_component_check, operation_check_identities, define_activities
-from logistic_tools.classes.DefineOperationTechs import Define_operation
-from logistic_tools.classes.Operations.CorrectiveMajor import CorrectiveMajor
-from logistic_tools.classes.Operations.OperationTow import OperationTow
-from logistic_tools.classes.Vessel import Vessel
+from oriom.utils.aux_operation import level_component_check, operation_check_identities, define_activities
+from oriom.classes.DefineOperationTechs import Define_operation
+from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.classes.Operations.OperationTow import OperationTow
+from oriom.classes.Vessel import Vessel
 
 # ---------------------------
 # Helpers / fakes for tests
@@ -92,7 +92,7 @@ class TestLevelComponentCheck(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             operation_check_identities(ops)
-        
+
         self.assertIn("Duplicate operation id found", str(context.exception))
 
 class TestOperation(unittest.TestCase):

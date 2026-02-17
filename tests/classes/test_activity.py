@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from logistic_tools.classes.Activity import Activity
+from oriom.classes.Activity import Activity
 
 
 class TestActivity(unittest.TestCase):
