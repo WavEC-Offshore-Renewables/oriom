@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
-from logistic_tools.core.functions.operation_scheduler.define_shift_operation import (
+from oriom.core.functions.operation_scheduler.define_shift_operation import (
     copy_row_wait_start,
     define_shift_operation_values,
 )
@@ -178,7 +178,7 @@ class TestLightConstrainWorkability(unittest.TestCase):
 
 
 class TestDefineShiftOperationValues(unittest.TestCase):
-    @patch("logistic_tools.core.functions.operation_scheduler.define_shift_operation.save_file_csv")
+    @patch("oriom.core.functions.operation_scheduler.define_shift_operation.save_file_csv")
     def test_all_workability_true_branch(self, m_save):
         """
         Simple case: df_workability all True.

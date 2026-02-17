@@ -7,7 +7,7 @@ import numpy as np
 from datetime import datetime, timedelta
 
 
-from logistic_tools.core.functions.kpi_final.kpi_aux import (
+from oriom.core.functions.kpi_final.kpi_aux import (
     calculate_cost,
     count_day,
     safe_get_tech_tot,
@@ -215,7 +215,7 @@ class TestDefineFuelCost(unittest.TestCase):
 
 class TestTechRovCost(unittest.TestCase):
 
-    @patch("logistic_tools.utils.read_dataframe_value.compute_rov_cost")
+    @patch("oriom.utils.read_dataframe_value.compute_rov_cost")
     def test_tech_rov_cost_mixed_sources_and_shifts(self, mock_compute_rov):
         """
         - ROV cost comes from compute_rov_cost(row['id'], row['n_vessel_1'], rov_dict_cost)

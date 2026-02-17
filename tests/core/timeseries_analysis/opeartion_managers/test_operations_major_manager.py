@@ -9,14 +9,14 @@ from unittest.mock import patch, MagicMock
 import pandas as pd
 import importlib.util
 
-from logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager import (
+from oriom.core.timeseries_analysis.operation_managers.operations_major_manager import (
     operation_major_manager,
 )
 
 # --- check module check_files is present---
 try:
     check_files_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.check_files"
+        "oriom.core.functions.private.check_files"
     )
 except ModuleNotFoundError:
     check_files_spec = None
@@ -72,31 +72,31 @@ class TestOperationMajorManager(unittest.TestCase):
     # ---------- 1) Short-circuit when schedule file already exists ----------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
     )
     def test_existing_schedule_short_circuits(
         self,
@@ -153,31 +153,31 @@ class TestOperationMajorManager(unittest.TestCase):
     # ---------- 2) Full path: new schedule, not recycled ----------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
     )
     def test_create_schedule_when_not_existing_and_not_recycled(
         self,
@@ -302,31 +302,31 @@ class TestOperationMajorManager(unittest.TestCase):
     # ---------- 3) Recycled schedule: skip define_operation_values ----------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_recycled_schedule_skips_define_operation_values(
         self,
@@ -386,31 +386,31 @@ class TestOperationMajorManager(unittest.TestCase):
     # ---------- 3-bis) Recycled schedule: skip define_operation_values if no check_file is present ----------
     @skip_if_check_files_present
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.check_files"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.check_files"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_recycled_schedule_skips_define_operation_values_bis(
         self,
@@ -471,31 +471,31 @@ class TestOperationMajorManager(unittest.TestCase):
     # ---------- 4) InterruptedError from define_operation_values is swallowed ----------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
     )
     def test_interrupted_error_is_caught_and_not_re_raised(
         self,
@@ -553,31 +553,31 @@ class TestOperationMajorManager(unittest.TestCase):
 # ---------- 4-bis) InterruptedError from define_operation_values is swallowed if check file do not exist----------
     @skip_if_check_files_present
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_major_manager.check_files"
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.check_files"
     )
     def test_interrupted_error_is_caught_and_not_re_raised_bis(
         self,

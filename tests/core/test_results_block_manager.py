@@ -9,13 +9,13 @@ import importlib.util
 
 import pandas as pd
 
-import logistic_tools.core.results_block_manager as results_block_module
+import oriom.core.results_block_manager as results_block_module
 
 
 # --- check module check_files is present---
 try:
     KPI_Insight_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.KPI_Insight"
+        "oriom.core.functions.private.KPI_Insight"
     )
 except ModuleNotFoundError:
     KPI_Insight_spec = None
@@ -233,19 +233,19 @@ class TestResultsBlock(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as tmpdir,
-            patch("logistic_tools.core.results_block_manager.pd.read_csv") as mock_read_csv,
-            patch("logistic_tools.core.results_block_manager.aux_functions") as mock_aux,
-            patch("logistic_tools.core.results_block_manager.failures_event") as mock_failures_event,
-            patch("logistic_tools.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
-            patch("logistic_tools.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
-            patch("logistic_tools.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
+            patch("oriom.core.results_block_manager.pd.read_csv") as mock_read_csv,
+            patch("oriom.core.results_block_manager.aux_functions") as mock_aux,
+            patch("oriom.core.results_block_manager.failures_event") as mock_failures_event,
+            patch("oriom.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
+            patch("oriom.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
+            patch("oriom.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
             patch(
-                "logistic_tools.core.results_block_manager.vessel_mobilisation_manager"
+                "oriom.core.results_block_manager.vessel_mobilisation_manager"
             ) as mock_vessel_mob_mgr,
-            patch("logistic_tools.core.results_block_manager.VesselMobilisationScheduler") as mock_vessel_sched,
-            patch("logistic_tools.core.results_block_manager.energy_availability") as mock_energy_av,
-            patch("logistic_tools.core.results_block_manager.report_graphs") as mock_report_graphs,
-            patch("logistic_tools.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
+            patch("oriom.core.results_block_manager.VesselMobilisationScheduler") as mock_vessel_sched,
+            patch("oriom.core.results_block_manager.energy_availability") as mock_energy_av,
+            patch("oriom.core.results_block_manager.report_graphs") as mock_report_graphs,
+            patch("oriom.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
         ):
             result_dir_r = tmpdir
             r = 1
@@ -384,18 +384,18 @@ class TestResultsBlock(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as tmpdir,
-            patch("logistic_tools.core.results_block_manager.pd.read_csv") as mock_read_csv,
-            patch("logistic_tools.core.results_block_manager.aux_functions") as mock_aux,
-            patch("logistic_tools.core.results_block_manager.failures_event") as mock_failures_event,
-            patch("logistic_tools.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
-            patch("logistic_tools.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
-            patch("logistic_tools.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
+            patch("oriom.core.results_block_manager.pd.read_csv") as mock_read_csv,
+            patch("oriom.core.results_block_manager.aux_functions") as mock_aux,
+            patch("oriom.core.results_block_manager.failures_event") as mock_failures_event,
+            patch("oriom.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
+            patch("oriom.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
+            patch("oriom.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
             patch(
-                "logistic_tools.core.results_block_manager.vessel_mobilisation_manager"
+                "oriom.core.results_block_manager.vessel_mobilisation_manager"
             ) as mock_vessel_mob_mgr,
-            patch("logistic_tools.core.results_block_manager.energy_availability") as mock_energy_av,
-            patch("logistic_tools.core.results_block_manager.report_graphs") as mock_report_graphs,
-            patch("logistic_tools.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
+            patch("oriom.core.results_block_manager.energy_availability") as mock_energy_av,
+            patch("oriom.core.results_block_manager.report_graphs") as mock_report_graphs,
+            patch("oriom.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
         ):
             result_dir_r = tmpdir
             r = 1
@@ -485,18 +485,18 @@ class TestResultsBlock(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as tmpdir,
-            patch("logistic_tools.core.results_block_manager.pd.read_csv") as mock_read_csv,
-            patch("logistic_tools.core.results_block_manager.aux_functions") as mock_aux,
-            patch("logistic_tools.core.results_block_manager.failures_event") as mock_failures_event,
-            patch("logistic_tools.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
-            patch("logistic_tools.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
-            patch("logistic_tools.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
+            patch("oriom.core.results_block_manager.pd.read_csv") as mock_read_csv,
+            patch("oriom.core.results_block_manager.aux_functions") as mock_aux,
+            patch("oriom.core.results_block_manager.failures_event") as mock_failures_event,
+            patch("oriom.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
+            patch("oriom.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
+            patch("oriom.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
             patch(
-                "logistic_tools.core.results_block_manager.vessel_mobilisation_manager"
+                "oriom.core.results_block_manager.vessel_mobilisation_manager"
             ) as mock_vessel_mob_mgr,
-            patch("logistic_tools.core.results_block_manager.energy_availability") as mock_energy_av,
-            patch("logistic_tools.core.results_block_manager.report_graphs") as mock_report_graphs,
-            patch("logistic_tools.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
+            patch("oriom.core.results_block_manager.energy_availability") as mock_energy_av,
+            patch("oriom.core.results_block_manager.report_graphs") as mock_report_graphs,
+            patch("oriom.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
         ):
             result_dir_r = tmpdir
             r = 1
@@ -598,19 +598,19 @@ class TestResultsBlock(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as tmpdir,
-            patch("logistic_tools.core.results_block_manager.pd.read_csv") as mock_read_csv,
-            patch("logistic_tools.core.results_block_manager.aux_functions") as mock_aux,
-            patch("logistic_tools.core.results_block_manager.failures_event") as mock_failures_event,
-            patch("logistic_tools.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
-            patch("logistic_tools.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
-            patch("logistic_tools.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
+            patch("oriom.core.results_block_manager.pd.read_csv") as mock_read_csv,
+            patch("oriom.core.results_block_manager.aux_functions") as mock_aux,
+            patch("oriom.core.results_block_manager.failures_event") as mock_failures_event,
+            patch("oriom.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
+            patch("oriom.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
+            patch("oriom.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
             patch(
-                "logistic_tools.core.results_block_manager.vessel_mobilisation_manager"
+                "oriom.core.results_block_manager.vessel_mobilisation_manager"
             ) as mock_vessel_mob_mgr,
-            patch("logistic_tools.core.results_block_manager.VesselMobilisationScheduler") as mock_vessel_sched,
-            patch("logistic_tools.core.results_block_manager.energy_availability") as mock_energy_av,
-            patch("logistic_tools.core.results_block_manager.report_graphs") as mock_report_graphs,
-            patch("logistic_tools.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
+            patch("oriom.core.results_block_manager.VesselMobilisationScheduler") as mock_vessel_sched,
+            patch("oriom.core.results_block_manager.energy_availability") as mock_energy_av,
+            patch("oriom.core.results_block_manager.report_graphs") as mock_report_graphs,
+            patch("oriom.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
         ):
             result_dir_r = tmpdir
             r = 1
@@ -712,11 +712,11 @@ class TestResultsBlock(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as tmpdir,
-            patch("logistic_tools.core.results_block_manager.pd.read_csv") as mock_read_csv,
-            patch("logistic_tools.core.results_block_manager.aux_functions") as mock_aux,
-            patch("logistic_tools.core.results_block_manager.failures_event") as mock_failures_event,
-            patch("logistic_tools.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
-            patch("logistic_tools.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
+            patch("oriom.core.results_block_manager.pd.read_csv") as mock_read_csv,
+            patch("oriom.core.results_block_manager.aux_functions") as mock_aux,
+            patch("oriom.core.results_block_manager.failures_event") as mock_failures_event,
+            patch("oriom.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
+            patch("oriom.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
         ):
             result_dir_r = tmpdir
             r = 1
@@ -788,18 +788,18 @@ class TestResultsBlock(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as tmpdir,
-            patch("logistic_tools.core.results_block_manager.pd.read_csv") as mock_read_csv,
-            patch("logistic_tools.core.results_block_manager.aux_functions") as mock_aux,
-            patch("logistic_tools.core.results_block_manager.failures_event") as mock_failures_event,
-            patch("logistic_tools.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
-            patch("logistic_tools.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
-            patch("logistic_tools.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
+            patch("oriom.core.results_block_manager.pd.read_csv") as mock_read_csv,
+            patch("oriom.core.results_block_manager.aux_functions") as mock_aux,
+            patch("oriom.core.results_block_manager.failures_event") as mock_failures_event,
+            patch("oriom.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_ts,
+            patch("oriom.core.results_block_manager.create_logs_merge") as mock_create_logs_merge,
+            patch("oriom.core.results_block_manager.VesselDayCounter") as mock_vessel_day_counter,
             patch(
-                "logistic_tools.core.results_block_manager.vessel_mobilisation_manager"
+                "oriom.core.results_block_manager.vessel_mobilisation_manager"
             ) as mock_vessel_mob_mgr,
-            patch("logistic_tools.core.results_block_manager.energy_availability") as mock_energy_av,
-            patch("logistic_tools.core.results_block_manager.report_graphs") as mock_report_graphs,
-            patch("logistic_tools.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
+            patch("oriom.core.results_block_manager.energy_availability") as mock_energy_av,
+            patch("oriom.core.results_block_manager.report_graphs") as mock_report_graphs,
+            patch("oriom.core.results_block_manager.kpi_final_total_cost") as mock_kpi_final,
         ):
             result_dir_r = tmpdir
             r = 1

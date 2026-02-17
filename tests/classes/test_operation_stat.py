@@ -4,16 +4,16 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import timedelta
 
-from logistic_tools.classes.Operations.InspectionSite import InspectionSite
-from logistic_tools.classes.Operations.InspectionPort import InspectionPort
-from logistic_tools.classes.Operations.CorrectiveMajor import CorrectiveMajor 
-from logistic_tools.classes.Operations.OperationTow import OperationTow
-from logistic_tools.classes.OperationsStat.InspectionSiteStat import InspectionSiteStat
-from logistic_tools.classes.OperationsStat.InspectionPortStat import InspectionPortStat
-from logistic_tools.classes.OperationsStat.CorrectiveStat import CorrectiveStat
-from logistic_tools.classes.OperationsStat.OperationTowStat import OperationsTowStat
-from logistic_tools.classes.Vessel import Vessel
-from logistic_tools.classes.DefineOperationTechs import Define_operation
+from oriom.classes.Operations.InspectionSite import InspectionSite
+from oriom.classes.Operations.InspectionPort import InspectionPort
+from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor 
+from oriom.classes.Operations.OperationTow import OperationTow
+from oriom.classes.OperationsStat.InspectionSiteStat import InspectionSiteStat
+from oriom.classes.OperationsStat.InspectionPortStat import InspectionPortStat
+from oriom.classes.OperationsStat.CorrectiveStat import CorrectiveStat
+from oriom.classes.OperationsStat.OperationTowStat import OperationsTowStat
+from oriom.classes.Vessel import Vessel
+from oriom.classes.DefineOperationTechs import Define_operation
 
 
 

@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 import pandas as pd
 import networkx as nx
 
-from logistic_tools.core.functions.layout_power import layout_energy_manager as lem
+from oriom.core.functions.layout_power import layout_energy_manager as lem
 
 
 class TestShutWindWave(unittest.TestCase):
@@ -135,8 +135,8 @@ class TestShutPV(unittest.TestCase):
         self.assertEqual(G_out.nodes[10]["power"], 6.0)
         self.assertEqual(power_farm, 6.0)
 
-    @patch("logistic_tools.core.functions.layout_power.layout_energy_manager.string_location")
-    @patch("logistic_tools.core.functions.layout_power.layout_energy_manager.random.choice")
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.string_location")
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.random.choice")
     def test_shut_pv_cable_xx_reassigns_to_inverter_and_closes_string(
         self, mock_choice, mock_string_location
     ):
@@ -298,7 +298,7 @@ class TestReassignLoc(unittest.TestCase):
     Test for reassign_loc: Loc reassignment and DataFrame update.
     """
 
-    @patch("logistic_tools.core.functions.layout_power.layout_energy_manager.choose_loc")
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.choose_loc")
     def test_reassign_loc_updates_failure_and_operation_rows(self, mock_choose_loc):
         """
         reassign_loc must:

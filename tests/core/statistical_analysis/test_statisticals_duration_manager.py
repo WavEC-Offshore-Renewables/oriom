@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 from types import SimpleNamespace
 import pandas as pd
 
-from logistic_tools.core.statistical_analysis.statisticals_duration_manager import statistical_duration_manager
+from oriom.core.statistical_analysis.statisticals_duration_manager import statistical_duration_manager
 
 
 def make_operation(op_id, name):
@@ -14,8 +14,8 @@ def make_operation(op_id, name):
 
 
 class TestStatisticalDurationManager(unittest.TestCase):
-    @patch("logistic_tools.core.statistical_analysis.statisticals_duration_manager.aux_functions.save_file_csv")
-    @patch("logistic_tools.core.statistical_analysis.statisticals_duration_manager.operation_stats")
+    @patch("oriom.core.statistical_analysis.statisticals_duration_manager.aux_functions.save_file_csv")
+    @patch("oriom.core.statistical_analysis.statisticals_duration_manager.operation_stats")
     def test_basic_statistical_duration_manager(self, mock_operation_stats, mock_save_csv):
         """
         Test that statistical_duration_manager:
@@ -54,8 +54,8 @@ class TestStatisticalDurationManager(unittest.TestCase):
         # Check that percentile_max is set correctly
         self.assertEqual(inputs_stats.percentile_max, {"value": 90, "units": None})
 
-    @patch("logistic_tools.core.statistical_analysis.statisticals_duration_manager.aux_functions.save_file_csv")
-    @patch("logistic_tools.core.statistical_analysis.statisticals_duration_manager.operation_stats", side_effect=FileNotFoundError)
+    @patch("oriom.core.statistical_analysis.statisticals_duration_manager.aux_functions.save_file_csv")
+    @patch("oriom.core.statistical_analysis.statisticals_duration_manager.operation_stats", side_effect=FileNotFoundError)
     def test_file_not_found_warning(self, mock_operation_stats, mock_save_csv):
         """
         Test that if operation_stats raises FileNotFoundError, a warning is logged

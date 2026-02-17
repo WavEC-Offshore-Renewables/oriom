@@ -9,7 +9,7 @@ import importlib.util
 
 import pandas as pd
 
-from logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager import (
+from oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager import (
     creation_data_working_shift_port,
     operation_inspect_port_manager,
 )
@@ -17,7 +17,7 @@ from logistic_tools.core.timeseries_analysis.operation_managers.operations_inspe
 # --- check module check_files is present---
 try:
     check_files_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.check_files"
+        "oriom.core.functions.private.check_files"
     )
 except ModuleNotFoundError:
     check_files_spec = None
@@ -115,12 +115,12 @@ class TestOperationInspectPortManager(unittest.TestCase):
         self.df_metocean = pd.DataFrame({"hs": [1.0, 1.2]}, index=pd.date_range("2020-01-01", periods=2, freq="H"))
 
     @skip_if_no_check_files
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.define_shift_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml_each_attribute")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.define_shift_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml_each_attribute")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.check_files.reuse_file_exist")
     def test_skip_operation_if_schedule_already_exists(
         self,
         m_reuse_file,
@@ -158,13 +158,13 @@ class TestOperationInspectPortManager(unittest.TestCase):
         self.assertIsNone(op.ts_data)
 
     @skip_if_no_check_files
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.OperationTimeSeriesData.create_timeseries_data")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.define_shift_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml_each_attribute")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.define_shift_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml_each_attribute")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.check_files.reuse_file_exist")
     def test_create_schedule_and_tsdata_when_not_existing(
         self,
         m_reuse_file,
@@ -283,13 +283,13 @@ class TestOperationInspectPortManager(unittest.TestCase):
 
 
     @skip_if_check_files_present
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.OperationTimeSeriesData.create_timeseries_data")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.define_shift_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml_each_attribute")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.check_files")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.define_shift_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.yaml_manager.update_yaml_each_attribute")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager.check_files")
     def test_create_schedule_and_tsdata_when_not_existing_bis(
         self,
         m_reuse_file,

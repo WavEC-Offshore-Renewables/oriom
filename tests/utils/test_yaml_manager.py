@@ -6,8 +6,8 @@ import tempfile
 
 from ruamel.yaml import YAML
 
-from logistic_tools.utils import yaml_manager
-from logistic_tools.utils.aux_functions import update_dict
+from oriom.utils import yaml_manager
+from oriom.utils.aux_functions import update_dict
 
 
 class DummyInputs:

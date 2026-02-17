@@ -8,11 +8,11 @@ from unittest.mock import patch
 import pandas as pd
 from ruamel.yaml import YAML
 
-import logistic_tools.inputs.excel_to_yaml as excel_to_yaml_module
+import oriom.inputs.excel_to_yaml as excel_to_yaml_module
 
 
 class TestExcelToYaml(unittest.TestCase):
-    @patch("logistic_tools.inputs.excel_to_yaml.pd.read_excel")
+    @patch("oriom.inputs.excel_to_yaml.pd.read_excel")
     def test_excel_to_yaml_creates_inputs_gen_yaml_from_gen_inputs_sheet(
         self, mock_read_excel
     ):
@@ -102,8 +102,8 @@ class TestExcelToYaml(unittest.TestCase):
     # ------------------------------------------------------------------
     # Extended Test: cover all sheet and file YAML
     # ------------------------------------------------------------------
-    @patch("logistic_tools.inputs.excel_to_yaml.platform.system", return_value="Linux")
-    @patch("logistic_tools.inputs.excel_to_yaml.pd.read_excel")
+    @patch("oriom.inputs.excel_to_yaml.platform.system", return_value="Linux")
+    @patch("oriom.inputs.excel_to_yaml.pd.read_excel")
     def test_excel_to_yaml_creates_all_yaml_files_from_multiple_sheets(
         self, mock_read_excel, mock_platform_system
     ):

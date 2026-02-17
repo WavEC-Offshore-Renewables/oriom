@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 
-from logistic_tools.core.functions.operation_scheduler.define_shift import output_working_shifts, merge_shift_deferred
+from oriom.core.functions.operation_scheduler.define_shift import output_working_shifts, merge_shift_deferred
 
 
 class TestOutputWorkingShiftsGolden(unittest.TestCase):

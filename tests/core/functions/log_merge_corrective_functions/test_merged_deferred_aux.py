@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
-from logistic_tools.core.functions.log_merge_corrective_functions import merged_deferred_aux
+from oriom.core.functions.log_merge_corrective_functions import merged_deferred_aux
 
 
 class DummyVessel:
@@ -204,7 +204,7 @@ class TestFindStartTime(unittest.TestCase):
     """Tests for find_start_time."""
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions."
+        "oriom.core.functions.log_merge_corrective_functions."
         "merged_deferred_aux.approximate_hourly_data",
         side_effect=lambda dt: dt,
     )
@@ -241,7 +241,7 @@ class TestFindStartTime(unittest.TestCase):
         self.assertEqual(new_date, sched.at[2, "datetime"])
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions."
+        "oriom.core.functions.log_merge_corrective_functions."
         "merged_deferred_aux.approximate_hourly_data",
         side_effect=lambda dt: dt,
     )

@@ -16,7 +16,7 @@ with (here / "README.md").open(encoding="utf-8") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="logistic-tools",
+    name="oriom",
     version="0.1.0",
     python_requires=">=3.9,<3.11",
     packages=setuptools.find_packages(where="src"),

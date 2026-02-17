@@ -5,10 +5,10 @@ import numpy as np
 from copy import deepcopy
 
 # Import classes
-from logistic_tools.classes.Metocean import Metocean
+from oriom.classes.Metocean import Metocean
 
 # Import functions
-from logistic_tools.core.timeseries_analysis.timestep_power import add_power_columns
+from oriom.core.timeseries_analysis.timestep_power import add_power_columns
 
 
 

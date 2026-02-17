@@ -9,14 +9,14 @@ import importlib.util
 
 import pandas as pd
 
-from logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager import (
+from oriom.core.timeseries_analysis.operation_managers.operations_tow_manager import (
     operation_tow_manager,
 )
 
 # --- check module check_files is present---
 try:
     check_files_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.check_files"
+        "oriom.core.functions.private.check_files"
     )
 except ModuleNotFoundError:
     check_files_spec = None
@@ -63,14 +63,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 1) Short-circuit when reuse_file_exist is True ----------------
     @skip_if_no_check_files
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_reuse_file_exist_short_circuits(
         self,
         m_create_ts,
@@ -119,14 +119,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 2) Happy path: everything runs, ts_data is set ----------------
     @skip_if_no_check_files
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_happy_path_calls_all_and_sets_ts_data(
         self,
         m_create_ts,
@@ -231,14 +231,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 3) Empty timesteps still calls define_operation_values ----------------
     @skip_if_no_check_files
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_empty_timesteps_still_runs_define_operation_values(
         self,
         m_create_ts,
@@ -299,14 +299,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 4) InterruptedError with specific message is swallowed ----------------
     @skip_if_no_check_files
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_interrupted_error_with_specific_message_is_swallowed(
         self,
         m_create_ts,
@@ -359,14 +359,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 5) InterruptedError with different message is re-raised ----------------
     @skip_if_no_check_files
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files.reuse_file_exist")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_interrupted_error_with_other_message_is_reraised(
         self,
         m_create_ts,
@@ -417,14 +417,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 2-bis) Happy path: everything runs, ts_data is set ----------------
     @skip_if_check_files_present
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_happy_path_calls_all_and_sets_ts_data_bis(
         self,
         m_create_ts,
@@ -524,14 +524,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 3-bis) Empty timesteps still calls define_operation_values ----------------
     @skip_if_check_files_present
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_empty_timesteps_still_runs_define_operation_values_bis(
         self,
         m_create_ts,
@@ -593,14 +593,14 @@ class TestOperationTowManager(unittest.TestCase):
 
     # ---------------- 4-bis) InterruptedError with specific message is swallowed ----------------
     @skip_if_check_files_present
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_interrupted_error_with_specific_message_is_swallowed_bis(
         self,
         m_create_ts,
@@ -655,14 +655,14 @@ class TestOperationTowManager(unittest.TestCase):
     # ---------------- 5_bis) InterruptedError with different message is re-raised ----------------
     @skip_if_check_files_present
 
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
-    @patch("logistic_tools.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.tqdm")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.check_files")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.workability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.startability")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.recycle_major_other_oper_scheduler")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.get_meaningful_timesteps")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.define_operation_values")
+    @patch("oriom.core.timeseries_analysis.operation_managers.operations_tow_manager.OperationTimeSeriesData.create_timeseries_data")
     def test_interrupted_error_with_other_message_is_reraised_bis(
         self,
         m_create_ts,

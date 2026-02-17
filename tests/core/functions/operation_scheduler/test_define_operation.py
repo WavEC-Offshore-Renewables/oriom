@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 import pandas as pd
 import numpy as np
 
-from logistic_tools.core.functions.operation_scheduler.define_operation import define_operation_values
+from oriom.core.functions.operation_scheduler.define_operation import define_operation_values
 
 
 def make_activity(name, duration, location, wtg_sd=False, wec_sd=False, pv_sd=False):
@@ -37,8 +37,8 @@ class TestDefineOperationValues(unittest.TestCase):
         self.out_dir = os.path.join(self.tmp_ctx.name, "schedule.csv")
 
     # ---------- Happy path: no waiting, 3 activities (<=3 forces MAX_WAIT=0) ----------
-    @patch("logistic_tools.core.functions.operation_scheduler.define_operation.save_file_csv")
-    @patch("logistic_tools.core.functions.operation_scheduler.define_operation.tqdm")
+    @patch("oriom.core.functions.operation_scheduler.define_operation.save_file_csv")
+    @patch("oriom.core.functions.operation_scheduler.define_operation.tqdm")
     def test_happy_path_no_wait_three_activities(self, m_tqdm, m_save):
         # Progress bar mock
         m_tqdm.return_value = MagicMock(total=10, update=lambda *a, **k: None, close=lambda: None)
@@ -91,7 +91,7 @@ class TestDefineOperationValues(unittest.TestCase):
         self.assertAlmostEqual(row0["dur_shutdown_pv"], 0.0, places=3)
 
     # ---------- Wait-at-start scenario: first activity is most restrictive ----------
-    @patch("logistic_tools.core.functions.operation_scheduler.define_operation.tqdm")
+    @patch("oriom.core.functions.operation_scheduler.define_operation.tqdm")
     def test_WoW_Watsite(self, m_tqdm):
         m_tqdm.return_value = MagicMock(total=50, update=lambda *a, **k: None, close=lambda: None)
 
@@ -182,7 +182,7 @@ class TestDefineOperationValues(unittest.TestCase):
         self.assertEqual(df.loc[10:14, "wait_start"].astype(int).tolist(), [5, 4, 3, 2, 1])
 
     # ---------- Impossible scenario: raise InterruptedError ----------
-    @patch("logistic_tools.core.functions.operation_scheduler.define_operation.tqdm")
+    @patch("oriom.core.functions.operation_scheduler.define_operation.tqdm")
     def test_impossible_operation_raises(self, m_tqdm):
         m_tqdm.return_value = MagicMock(total=10, update=lambda *a, **k: None, close=lambda: None)
 
@@ -209,7 +209,7 @@ class TestDefineOperationValues(unittest.TestCase):
             )
 
     # ---------- NEW: invalid activity location should raise AssertionError ----------
-    @patch("logistic_tools.core.functions.operation_scheduler.define_operation.tqdm")
+    @patch("oriom.core.functions.operation_scheduler.define_operation.tqdm")
     def test_invalid_activity_location_raises(self, m_tqdm):
         """
         If an activity has an unrecognized location, the function must raise AssertionError.
@@ -239,7 +239,7 @@ class TestDefineOperationValues(unittest.TestCase):
             )
 
     # ---------- NEW: MAX_WAIT forced to 0 for <=3 activities ----------
-    @patch("logistic_tools.core.functions.operation_scheduler.define_operation.tqdm")
+    @patch("oriom.core.functions.operation_scheduler.define_operation.tqdm")
     def test_max_wait_forced_zero_for_three_activities(self, m_tqdm):
         """
         For operations with <=3 activities, the function forces MAX_WAIT = 0.

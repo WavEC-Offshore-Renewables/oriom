@@ -1,7 +1,7 @@
 # tests/test_layout_aux.py
 import unittest
 
-from logistic_tools.classes.Layouts.Layouts_Managers import LayoutManager
+from oriom.classes.Layouts.Layouts_Managers import LayoutManager
 
 
 def test_layout_manager_all():

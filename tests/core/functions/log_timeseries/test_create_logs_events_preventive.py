@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive import (
+from oriom.core.functions.logs_timeseries.create_logs_events_preventive import (
     create_logs_preventive,
 )
 
@@ -88,11 +88,11 @@ class TestCreateLogsPreventive(unittest.TestCase):
         self.assertListEqual(list(result.columns), self.COLS)
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "logs_timeseries_func.create_mobilisation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "define_dates_inspection.define_dates"
     )
     def test_site_inspection_with_mobilisation_creates_inspection_and_mob_rows(
@@ -147,11 +147,11 @@ class TestCreateLogsPreventive(unittest.TestCase):
         self.assertIn("mobilisation", events)
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "logs_timeseries_func.create_mobilisation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "define_dates_inspection.define_dates"
     )
     def test_site_inspection_without_mobilisation_does_not_call_create_mobilisation(
@@ -192,11 +192,11 @@ class TestCreateLogsPreventive(unittest.TestCase):
         self.assertEqual(result.iloc[0]["event"], "inspection_site")
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "logs_timeseries_func.create_mobilisation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "define_dates_inspection.define_dates"
     )
     def test_port_inspection_sets_vessel_1_from_insp_class_and_adds_mobilisation(
@@ -253,11 +253,11 @@ class TestCreateLogsPreventive(unittest.TestCase):
         self.assertEqual(len(mob_rows), 1)
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "logs_timeseries_func.create_mobilisation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_events_preventive."
+        "oriom.core.functions.logs_timeseries.create_logs_events_preventive."
         "define_dates_inspection.define_dates"
     )
     def test_port_inspection_without_mobilisation_time_skips_mobilisation(

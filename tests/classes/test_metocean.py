@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 import pandas as pd
 
-from logistic_tools.classes.Metocean import Metocean
+from oriom.classes.Metocean import Metocean
 
 
 class stat_inputs():

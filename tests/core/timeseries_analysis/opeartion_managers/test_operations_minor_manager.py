@@ -9,14 +9,14 @@ import importlib.util
 
 import pandas as pd
 
-from logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager import (
+from oriom.core.timeseries_analysis.operation_managers.operations_minor_manager import (
     opeartion_minor_manager,
 )
 
 # --- check module check_files is present---
 try:
     check_files_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.check_files"
+        "oriom.core.functions.private.check_files"
     )
 except ModuleNotFoundError:
     check_files_spec = None
@@ -97,37 +97,37 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 1) Reuse existing schedule: reuse_file_exist returns True --------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_reuse_existing_schedule_short_circuits(
         self,
@@ -188,37 +188,37 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 2) Happy path: single shift, device_shutdown False --------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_happy_path_single_shift_no_shutdown(
         self,
@@ -336,37 +336,37 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 3) Device shutdown True, type-specific assignment (ofw/opv/owc) --------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_shutdown_type_branches_ofw_opv_owc(
         self,
@@ -453,19 +453,19 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 4) RuntimeError when more than one shift is required --------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     def test_runtime_error_when_more_than_one_shift(
         self,
@@ -506,37 +506,37 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 5) InterruptedError with specific message is swallowed --------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files.reuse_file_exist"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_interrupted_error_is_caught(
         self,
@@ -592,37 +592,37 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 2-bis) Happy path: single shift, device_shutdown False --------
     @skip_if_check_files_present
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_happy_path_single_shift_no_shutdown_bis(
         self,
@@ -741,37 +741,37 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 3 -bis) Device shutdown True, type-specific assignment (ofw/opv/owc) --------
     @skip_if_check_files_present
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_shutdown_type_branches_ofw_opv_owc_bis(
         self,
@@ -859,19 +859,19 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 4 -bis) RuntimeError when more than one shift is required --------
     @skip_if_check_files_present
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     def test_runtime_error_when_more_than_one_shift_bis(
         self,
@@ -913,37 +913,37 @@ class TestInspectMinorManager(unittest.TestCase):
     # -------- 5-bis) InterruptedError with specific message is swallowed --------
     @skip_if_check_files_present
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.check_files"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.recycle_other_oper_scheduler"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.aux_functions.convert_stringtime"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_minor_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     def test_interrupted_error_is_caught_bis(
         self,

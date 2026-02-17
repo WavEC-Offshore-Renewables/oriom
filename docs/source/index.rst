@@ -73,8 +73,8 @@ Tool flowchart
    :caption: Index
    :titlesonly:
 
-   Classes package <_api/logistic_tools.classes>
-   Core package <_api/logistic_tools.core>
-   Inputs package <_api/logistic_tools.inputs>
-   Utils package <_api/logistic_tools.utils>
-   Main module <_api/logistic_tools.main>
+   Classes package <_api/oriom.classes>
+   Core package <_api/oriom.core>
+   Inputs package <_api/oriom.inputs>
+   Utils package <_api/oriom.utils>
+   Main module <_api/oriom.main>

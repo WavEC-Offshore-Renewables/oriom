@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 import networkx as nx
 
-from logistic_tools.classes.Layouts.Layouts_Wave import Layout_Wave
+from oriom.classes.Layouts.Layouts_Wave import Layout_Wave
 
 
 def count_nodes_by_level(G: nx.DiGraph, level: str) -> int:
@@ -33,7 +33,7 @@ class TestCheckInputWave(unittest.TestCase):
             self.w.check_input_wave(n_wec=10, n_strings=3)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout1Wave(unittest.TestCase):
@@ -64,7 +64,7 @@ class TestLayout1Wave(unittest.TestCase):
         self.assertIsNotNone(sub_n)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout2Wave(unittest.TestCase):
@@ -87,7 +87,7 @@ class TestLayout2Wave(unittest.TestCase):
         self.assertGreaterEqual(levels.count("redundant_cable"), 2)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout3Wave(unittest.TestCase):
@@ -105,7 +105,7 @@ class TestLayout3Wave(unittest.TestCase):
         self.assertEqual(levels.count("exp_cable_dummy"), 2)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout4Wave(unittest.TestCase):
@@ -128,7 +128,7 @@ class TestLayout4Wave(unittest.TestCase):
         self.assertIn("array_cable", levels)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout5Wave(unittest.TestCase):
@@ -140,7 +140,7 @@ class TestLayout5Wave(unittest.TestCase):
         self.assertIsInstance(G, nx.DiGraph)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestDispatcher(unittest.TestCase):

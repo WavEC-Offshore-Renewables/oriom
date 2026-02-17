@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import timedelta
 from types import SimpleNamespace
 
-from logistic_tools.core.functions.kpi_final.kpi_final_costs import kpi_final_total_cost
+from oriom.core.functions.kpi_final.kpi_final_costs import kpi_final_total_cost
 
 
 # ------------------------------------------------------------------
@@ -117,10 +117,10 @@ class TestKpiFinalTotalCost(unittest.TestCase):
     # TEST 1 — baseline (fixed annual costs row)
     # ------------------------------------------------------------------
 
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.VesselDayCounter")
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.create_lifetime_cost", side_effect=lambda df: df)
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.kpi_cost_vessel_internal")
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.aux_functions.log_event_convert_stringtime", side_effect=lambda df: df)
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.VesselDayCounter")
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.create_lifetime_cost", side_effect=lambda df: df)
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.kpi_cost_vessel_internal")
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.aux_functions.log_event_convert_stringtime", side_effect=lambda df: df)
     def test_no_mother_no_ctv(
         self,
         mock_log_convert,
@@ -168,10 +168,10 @@ class TestKpiFinalTotalCost(unittest.TestCase):
     # TEST 2 — empty year (no events => yearly direct_costs = 0)
     # ------------------------------------------------------------------
 
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.VesselDayCounter")
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.create_lifetime_cost", side_effect=lambda df: df)
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.kpi_cost_vessel_internal")
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.aux_functions.log_event_convert_stringtime", side_effect=lambda df: df)
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.VesselDayCounter")
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.create_lifetime_cost", side_effect=lambda df: df)
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.kpi_cost_vessel_internal")
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.aux_functions.log_event_convert_stringtime", side_effect=lambda df: df)
     def test_empty_year_zero_costs(
         self,
         mock_log_convert,
@@ -211,10 +211,10 @@ class TestKpiFinalTotalCost(unittest.TestCase):
     # TEST 3 — total row (sum lifetime_direct_costs)
     # ------------------------------------------------------------------
 
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.VesselDayCounter")
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.create_lifetime_cost", side_effect=lambda df: df)
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.kpi_cost_vessel_internal")
-    @patch("logistic_tools.core.functions.kpi_final.kpi_final_costs.aux_functions.log_event_convert_stringtime", side_effect=lambda df: df)
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.VesselDayCounter")
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.create_lifetime_cost", side_effect=lambda df: df)
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.kpi_cost_vessel_internal")
+    @patch("oriom.core.functions.kpi_final.kpi_final_costs.aux_functions.log_event_convert_stringtime", side_effect=lambda df: df)
     def test_total_row(
         self,
         mock_log_convert,

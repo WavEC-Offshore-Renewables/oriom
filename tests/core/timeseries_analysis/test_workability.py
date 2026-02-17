@@ -8,10 +8,10 @@ import itertools
 import pandas as pd
 import numpy as np
 
-from logistic_tools.classes.Metocean import Metocean
-from logistic_tools.classes.Activity import Activity
+from oriom.classes.Metocean import Metocean
+from oriom.classes.Activity import Activity
 
-from logistic_tools.core.timeseries_analysis.workability import workability, workability_tow
+from oriom.core.timeseries_analysis.workability import workability, workability_tow
 
 
 class TestWorkability(unittest.TestCase):
@@ -281,7 +281,7 @@ class TestWorkabilityTow(unittest.TestCase):
         }
         return operation, df_site, metocean_tow
 
-    @patch("logistic_tools.core.timeseries_analysis.workability.workability")
+    @patch("oriom.core.timeseries_analysis.workability.workability")
     def test_towing_and_series_basic(self, mock_workability):
         """
         Base case towing:
@@ -340,8 +340,8 @@ class TestWorkabilityTow(unittest.TestCase):
         )
         pd.testing.assert_series_equal(df_work["act_tow"], expected_tow)
 
-    @patch("logistic_tools.core.timeseries_analysis.workability.workability")
-    @patch("logistic_tools.core.timeseries_analysis.workability.logging.warning")
+    @patch("oriom.core.timeseries_analysis.workability.workability")
+    @patch("oriom.core.timeseries_analysis.workability.logging.warning")
 
     def test_towing_missing_column_falls_back_to_site_series(self, m_log_warning, mock_workability):
         """
@@ -387,8 +387,8 @@ class TestWorkabilityTow(unittest.TestCase):
         pd.testing.assert_series_equal(df_work["act_tow"], df0["act_tow"])
         self.assertIn("missing in metocean data point", m_log_warning.call_args[0][0])
 
-    @patch("logistic_tools.core.timeseries_analysis.workability.workability")
-    @patch("logistic_tools.core.timeseries_analysis.workability.logging.warning")
+    @patch("oriom.core.timeseries_analysis.workability.workability")
+    @patch("oriom.core.timeseries_analysis.workability.logging.warning")
     def test_towing_index_mismatch_falls_back_to_site_series(self, m_log_warning, mock_workability):
         """
         If a df_works[i] has an incompatible index, and_series_on_ref should

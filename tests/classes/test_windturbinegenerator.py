@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from logistic_tools.classes.WindTurbineGenerator import WindTurbineGenerator
+from oriom.classes.WindTurbineGenerator import WindTurbineGenerator
 
 
 class TestWindTurbineGenerator(unittest.TestCase):

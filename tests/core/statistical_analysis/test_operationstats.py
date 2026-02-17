@@ -2,7 +2,7 @@ import unittest
 import pandas as pd
 import os
 
-from logistic_tools.core.statistical_analysis.operation_stats import *
+from oriom.core.statistical_analysis.operation_stats import *
 
 
 class Testaoperation_stat(unittest.TestCase):

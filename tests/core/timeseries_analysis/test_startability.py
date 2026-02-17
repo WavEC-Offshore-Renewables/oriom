@@ -4,10 +4,10 @@ import pandas as pd
 from copy import deepcopy
 
 # Import classes
-from logistic_tools.classes.Activity import Activity
+from oriom.classes.Activity import Activity
 
 # Import functions
-from logistic_tools.core.timeseries_analysis.startability import startability
+from oriom.core.timeseries_analysis.startability import startability
 
 
 class TestStartability(unittest.TestCase):

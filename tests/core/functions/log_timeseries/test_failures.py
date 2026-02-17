@@ -4,9 +4,9 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from logistic_tools.core.functions.logs_timeseries.failures import failures_event
-from logistic_tools.classes.Failure import Failure
-from logistic_tools.classes.Scenario import Scenario
+from oriom.core.functions.logs_timeseries.failures import failures_event
+from oriom.classes.Failure import Failure
+from oriom.classes.Scenario import Scenario
 
 
 class TestFailures(unittest.TestCase):

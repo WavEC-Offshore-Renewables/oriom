@@ -2,10 +2,10 @@ import unittest
 import pandas as pd
 import os
 
-from logistic_tools.classes.Power import Curve, Matrix
-from logistic_tools.classes.Metocean import Metocean
-from logistic_tools.core.timeseries_analysis.timestep_power import add_power_columns
-from logistic_tools.core.statistical_analysis.power_stats import average_pwind, average_pwave
+from oriom.classes.Power import Curve, Matrix
+from oriom.classes.Metocean import Metocean
+from oriom.core.timeseries_analysis.timestep_power import add_power_columns
+from oriom.core.statistical_analysis.power_stats import average_pwind, average_pwave
 
 class Testapower_stat(unittest.TestCase):
     @classmethod

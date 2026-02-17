@@ -3,7 +3,7 @@ import unittest
 import pandas as pd
 from unittest.mock import MagicMock, patch
 
-from logistic_tools.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation import tow_deferred_mobi
+from oriom.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation import tow_deferred_mobi
 
 
 # --------------------------------------------
@@ -40,7 +40,7 @@ class TestEmptyData(unittest.TestCase):
 # ============================================
 class TestSingleVesselMobi(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation.create_mobilisation")
+    @patch("oriom.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation.create_mobilisation")
     def test_single_event_creates_mobilisation(self, mock_create_mobi):
         COLS = ["id", "vessel_1",  "n_vessel_1", "d_trigger", "d_end_wait_start", "comments"]
 
@@ -80,7 +80,7 @@ class TestSingleVesselMobi(unittest.TestCase):
 # ============================================
 class TestManyVesselMobi(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation.create_mobilisation")
+    @patch("oriom.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation.create_mobilisation")
     def test_multiple_events_same_month(self, mock_create_mobi):
         COLS = ["id", "vessel_1", "n_vessel_1", "d_trigger", "d_end_wait_start", "comments"]
 
@@ -148,7 +148,7 @@ class TestVesselZeroMobi(unittest.TestCase):
 # ============================================
 class TestOrderOfEvents(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation.create_mobilisation")
+    @patch("oriom.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation.create_mobilisation")
     def test_first_event_is_used(self, mock_create_mobi):
         COLS = ["id", "vessel_1", "n_vessel_1", "d_trigger", "d_end_wait_start", "comments"]
 

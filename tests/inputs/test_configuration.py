@@ -4,7 +4,7 @@ import unittest
 import tempfile
 from datetime import datetime
 
-from logistic_tools.inputs.Configuration import ConfigRun, ProjectDirs
+from oriom.inputs.Configuration import ConfigRun, ProjectDirs
 
 
 class DummyLogger:

@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 import pandas as pd
 
-from logistic_tools.core.functions.log_merge_corrective_functions import merge_corrective_deferred
+from oriom.core.functions.log_merge_corrective_functions import merge_corrective_deferred
 
 
 class DummyTsData:
@@ -82,15 +82,15 @@ class TestMergeDeferredOperationsTow(unittest.TestCase):
     """Tests for the special 'tow' vessel branch (rows are simply copied)."""
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
         side_effect=lambda df, vessels, percentile: df,
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data"
     )
     def test_tow_branch_copies_rows_verbatim(
         self, mock_approx, mock_merge_shift, mock_stat_chart
@@ -138,12 +138,12 @@ class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
     """Tests for a minimal one-operation deferred merging case."""
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
         side_effect=lambda df, vessels, percentile: df,
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.vessel_reuse",
         side_effect=lambda vessel_n, n_vessel_used, day_start_idx_previous, day_start_idx_next, vessel_busy: (
             vessel_n,
@@ -152,14 +152,14 @@ class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
         ),
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data",
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data",
         side_effect=lambda dt: dt,
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.aux_functions.take_attribute"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.aux_functions.take_attribute"
     )
     def test_single_deferred_operation_creates_one_merged_row(
         self,
@@ -286,12 +286,12 @@ class TestMergeDeferredOperationsMultipleOps(unittest.TestCase):
     """Tests for deferred merging when more than one failure of the same operation is present."""
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
         side_effect=lambda df, vessels, percentile: df,
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.vessel_reuse",
         side_effect=lambda vessel_n, n_vessel_used, day_start_idx_previous, day_start_idx_next, vessel_busy: (
             vessel_n,
@@ -300,14 +300,14 @@ class TestMergeDeferredOperationsMultipleOps(unittest.TestCase):
         ),
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data",
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data",
         side_effect=lambda dt: dt,
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.aux_functions.take_attribute"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.aux_functions.take_attribute"
     )
     def test_multiple_deferred_operations_are_grouped_in_one_shift(
         self,
@@ -442,12 +442,12 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
     """Tests when multiple deferred failures are split across two shifts (partial merge)."""
 
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
         side_effect=lambda df, vessels, percentile: df,
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.vessel_reuse",
         side_effect=lambda vessel_n, n_vessel_used, day_start_idx_previous, day_start_idx_next, vessel_busy: (
             vessel_n,
@@ -456,18 +456,18 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
         ),
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.find_start_time"
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data",
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data",
         side_effect=lambda dt: dt,
     )
     @patch(
-        "logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective_deferred.aux_functions.take_attribute"
+        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.aux_functions.take_attribute"
     )
     def test_multiple_failures_split_into_two_shifts(
         self,

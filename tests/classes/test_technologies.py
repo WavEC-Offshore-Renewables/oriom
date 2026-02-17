@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from unittest.mock import patch, MagicMock
 
 # Import from the real runtime module (per your stack traces)
-from logistic_tools.classes.Technologies import (
+from oriom.classes.Technologies import (
     TechnologyBuilder,
     PowerTechResult,
     TechFarm,
@@ -27,10 +27,10 @@ class TestTechnologyBuilder(unittest.TestCase):
         self.pv_file = os.path.join(self.run_dir, "pv.yaml")
 
     # ---------- create_technologies: reuse branch ----------
-    @patch("logistic_tools.classes.Technologies.WindTurbineGenerator")
-    @patch("logistic_tools.classes.Technologies.WaveEnergyConverter")
-    @patch("logistic_tools.classes.Technologies.PVProduction")
-    @patch("logistic_tools.classes.Technologies.check_file_exists")
+    @patch("oriom.classes.Technologies.WindTurbineGenerator")
+    @patch("oriom.classes.Technologies.WaveEnergyConverter")
+    @patch("oriom.classes.Technologies.PVProduction")
+    @patch("oriom.classes.Technologies.check_file_exists")
     def test_create_technologies_reuse_when_yaml_already_in_run_dir(
         self, m_check_exists, m_pv, m_wec, m_wtg
     ):
@@ -59,10 +59,10 @@ class TestTechnologyBuilder(unittest.TestCase):
         self.assertIs(pv, pv_inst)
 
     # ---------- create_technologies: build branch ----------
-    @patch("logistic_tools.classes.Technologies.WindTurbineGenerator")
-    @patch("logistic_tools.classes.Technologies.WaveEnergyConverter")
-    @patch("logistic_tools.classes.Technologies.PVProduction")
-    @patch("logistic_tools.classes.Technologies.check_file_exists")
+    @patch("oriom.classes.Technologies.WindTurbineGenerator")
+    @patch("oriom.classes.Technologies.WaveEnergyConverter")
+    @patch("oriom.classes.Technologies.PVProduction")
+    @patch("oriom.classes.Technologies.check_file_exists")
     def test_create_technologies_build_when_yaml_not_in_run_dir(
         self, m_check_exists, m_pv, m_wec, m_wtg
     ):
@@ -96,10 +96,10 @@ class TestTechnologyBuilder(unittest.TestCase):
         self.assertIs(pv, pv_inst)
 
     # ---------- create_technologies: raises when none has number_devices ----------
-    @patch("logistic_tools.classes.Technologies.WindTurbineGenerator")
-    @patch("logistic_tools.classes.Technologies.WaveEnergyConverter")
-    @patch("logistic_tools.classes.Technologies.PVProduction")
-    @patch("logistic_tools.classes.Technologies.check_file_exists")
+    @patch("oriom.classes.Technologies.WindTurbineGenerator")
+    @patch("oriom.classes.Technologies.WaveEnergyConverter")
+    @patch("oriom.classes.Technologies.PVProduction")
+    @patch("oriom.classes.Technologies.check_file_exists")
     def test_create_technologies_raises_if_no_number_devices_anywhere(
         self, m_check_exists, m_pv, m_wec, m_wtg
     ):
@@ -117,10 +117,10 @@ class TestTechnologyBuilder(unittest.TestCase):
             )
 
     # ---------- build_power_technologies: all present ----------
-    @patch("logistic_tools.classes.Technologies.PowerCurve")
-    @patch("logistic_tools.classes.Technologies.PowerMatrix")
-    @patch("logistic_tools.classes.Technologies.PVProduction")
-    @patch("logistic_tools.classes.Technologies.save_file_csv")
+    @patch("oriom.classes.Technologies.PowerCurve")
+    @patch("oriom.classes.Technologies.PowerMatrix")
+    @patch("oriom.classes.Technologies.PVProduction")
+    @patch("oriom.classes.Technologies.save_file_csv")
     def test_build_power_technologies_all_present(
         self, m_save_csv, m_pv_prod, m_power_matrix, m_power_curve
     ):
@@ -176,10 +176,10 @@ class TestTechnologyBuilder(unittest.TestCase):
         self.assertEqual(result.pv_max_failure_module, 5)
 
     # ---------- build_power_technologies: missing branches -> None ----------
-    @patch("logistic_tools.classes.Technologies.PowerCurve")
-    @patch("logistic_tools.classes.Technologies.PowerMatrix")
-    @patch("logistic_tools.classes.Technologies.PVProduction")
-    @patch("logistic_tools.classes.Technologies.save_file_csv")
+    @patch("oriom.classes.Technologies.PowerCurve")
+    @patch("oriom.classes.Technologies.PowerMatrix")
+    @patch("oriom.classes.Technologies.PVProduction")
+    @patch("oriom.classes.Technologies.save_file_csv")
     def test_build_power_technologies_missing_each_branch_sets_none(
         self, m_save_csv, m_pv_prod, m_power_matrix, m_power_curve
     ):

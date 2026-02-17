@@ -21,5 +21,5 @@ jobs:
 
       - name: Run tests with pytest + coverage (min 80%)
         run: |
-          python -m coverage run --source=logistic_tools -m pytest -q
+          python -m coverage run --source=oriom -m pytest -q
           python -m coverage report --fail-under=80

@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 import networkx as nx
 
-from logistic_tools.classes.Layouts.Layouts_Wind import Layout_Wind
+from oriom.classes.Layouts.Layouts_Wind import Layout_Wind
 
 
 # --------- helpers ---------
@@ -38,7 +38,7 @@ class TestCheckInputWind(unittest.TestCase):
 
 
 # Patch draw operations to avoid IO and GUI during tests
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout1Wind(unittest.TestCase):
@@ -66,7 +66,7 @@ class TestLayout1Wind(unittest.TestCase):
         self.assertIn("array_cable", edge_levels(G))
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout2Wind(unittest.TestCase):
@@ -92,7 +92,7 @@ class TestLayout2Wind(unittest.TestCase):
         self.assertIsNotNone(shore_n)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout3Wind(unittest.TestCase):
@@ -111,7 +111,7 @@ class TestLayout3Wind(unittest.TestCase):
         self.assertEqual(levels.count("exp_cable_dummy"), 2)
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout4Wind(unittest.TestCase):
@@ -141,7 +141,7 @@ class TestLayout4Wind(unittest.TestCase):
             )
 
 
-@patch("logistic_tools.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestDispatcher(unittest.TestCase):

@@ -4,7 +4,7 @@ import unittest
 import pandas as pd
 from unittest.mock import MagicMock
 
-from logistic_tools.core.functions.log_merge_corrective_functions import merge_corrective
+from oriom.core.functions.log_merge_corrective_functions import merge_corrective
 
 
 class TestCreateLogsMerge(unittest.TestCase):
@@ -56,23 +56,23 @@ class TestCreateLogsMerge(unittest.TestCase):
         # Mock external functions called by merge_corrective
         # This avoids needing the real complex system
         self.patcher1 = unittest.mock.patch(
-            'logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective.creation_oper_vessel_dict',
+            'oriom.core.functions.log_merge_corrective_functions.merge_corrective.creation_oper_vessel_dict',
             return_value=None
         )
         self.patcher2 = unittest.mock.patch(
-            'logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective.merge_deferred_operations',
+            'oriom.core.functions.log_merge_corrective_functions.merge_corrective.merge_deferred_operations',
             return_value=pd.DataFrame()
         )
         self.patcher3 = unittest.mock.patch(
-            'logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective.merge_operation',
+            'oriom.core.functions.log_merge_corrective_functions.merge_corrective.merge_operation',
             return_value=pd.DataFrame()
         )
         self.patcher4 = unittest.mock.patch(
-            'logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective.mergeble_operation',
+            'oriom.core.functions.log_merge_corrective_functions.merge_corrective.mergeble_operation',
             return_value={}
         )
         self.patcher5 = unittest.mock.patch(
-            'logistic_tools.core.functions.log_merge_corrective_functions.merge_corrective.tow_deferred_mobi',
+            'oriom.core.functions.log_merge_corrective_functions.merge_corrective.tow_deferred_mobi',
             return_value=pd.DataFrame()
         )
 

@@ -5,7 +5,7 @@ from unittest.mock import patch
 from datetime import datetime, timedelta
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer import InspectionPortCreation
+from oriom.core.functions.logs_timeseries.InspectionPortOrganizer import InspectionPortCreation
 
 # ----------------- Helpers -----------------
 
@@ -36,8 +36,8 @@ class DummyInspection:
 
 class TestInspectionPortCreation(unittest.TestCase):
 
-    @patch("logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.date_ranges_overlap")
-    @patch("logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.take_op_schedule_tow")
+    @patch("oriom.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.date_ranges_overlap")
+    @patch("oriom.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.take_op_schedule_tow")
     def test_happy_path_and_shutdown_accumulation(self, mock_take_tow, mock_overlap):
         """
         One device, no overlaps. Checks:
@@ -113,8 +113,8 @@ class TestInspectionPortCreation(unittest.TestCase):
         self.assertEqual(valid_datetimes[0], d0)
         self.assertEqual(duration_shutdown_month[6], 5)
 
-    @patch("logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.date_ranges_overlap")
-    @patch("logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.take_op_schedule_tow")
+    @patch("oriom.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.date_ranges_overlap")
+    @patch("oriom.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.take_op_schedule_tow")
     def test_missing_schedule_row_aborts_operation(self, mock_take_tow, mock_overlap):
         """
         If tow_inspection_schedule cannot find the matching 'datetime' row, it returns (None, None),
@@ -175,8 +175,8 @@ class TestInspectionPortCreation(unittest.TestCase):
         self.assertEqual(duration_shutdown_month[6], 0)
 
 
-    @patch("logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.date_ranges_overlap")
-    @patch("logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.take_op_schedule_tow")
+    @patch("oriom.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.date_ranges_overlap")
+    @patch("oriom.core.functions.logs_timeseries.InspectionPortOrganizer.logs_preventive_aux.take_op_schedule_tow")
     def test_four_devices_two_at_port_with_shutdown_accumulation(self, mock_take_tow, mock_overlap):
         """
         4 devices, capacity of 2 devices at port (n_device_at_port=2, n_vessel_1=2).
@@ -302,7 +302,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer import (
+from oriom.core.functions.logs_timeseries.InspectionPortOrganizer import (
     InspectionPortCreation,
 )
 
@@ -395,7 +395,7 @@ class TestInspectionPortCreation(unittest.TestCase):
     # ------------------------------------------------------------------ #
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer."
+        "oriom.core.functions.logs_timeseries.InspectionPortOrganizer."
         "logs_preventive_aux.date_ranges_overlap",
         return_value=False,
     )
@@ -430,7 +430,7 @@ class TestInspectionPortCreation(unittest.TestCase):
         mock_overlap.assert_called()
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.InspectionPortOrganizer."
+        "oriom.core.functions.logs_timeseries.InspectionPortOrganizer."
         "logs_preventive_aux.date_ranges_overlap"
     )
     def test_overlap_shift_tow_with_reschedule(self, mock_overlap):

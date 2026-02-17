@@ -5,7 +5,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from logistic_tools.core.functions.layout_power import pv_power_calculation
+from oriom.core.functions.layout_power import pv_power_calculation
 
 
 class TestCalculateEnergyLossPVBasic(unittest.TestCase):

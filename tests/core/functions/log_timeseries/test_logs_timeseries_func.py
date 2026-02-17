@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries import logs_timeseries_func
+from oriom.core.functions.logs_timeseries import logs_timeseries_func
 
 
 # ---------------------- Dummy helpers per i test ---------------------- #

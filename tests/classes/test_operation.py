@@ -5,14 +5,14 @@ from copy import deepcopy
 from ruamel.yaml import YAML
 import tempfile
 
-from logistic_tools.classes.Operations.InspectionSite import InspectionSite
-from logistic_tools.classes.Operations.InspectionPort import InspectionPort
-from logistic_tools.classes.Operations.CorrectiveMajor import CorrectiveMajor
-from logistic_tools.classes.Operations.CorrectiveMinor import CorrectiveMinor
-from logistic_tools.classes.Operations.OperationTow import OperationTow
-from logistic_tools.classes.DefineOperationTechs import Define_operation
-from logistic_tools.classes.Vessel import Vessel
-from logistic_tools.classes.RovDrone import RovDrone
+from oriom.classes.Operations.InspectionSite import InspectionSite
+from oriom.classes.Operations.InspectionPort import InspectionPort
+from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.classes.Operations.CorrectiveMinor import CorrectiveMinor
+from oriom.classes.Operations.OperationTow import OperationTow
+from oriom.classes.DefineOperationTechs import Define_operation
+from oriom.classes.Vessel import Vessel
+from oriom.classes.RovDrone import RovDrone
 
 
 class TestOperation(unittest.TestCase):

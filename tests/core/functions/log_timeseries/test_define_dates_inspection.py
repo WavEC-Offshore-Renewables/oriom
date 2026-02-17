@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
 import pandas as pd
 
-import logistic_tools.core.functions.logs_timeseries.define_dates_inspection as define_dates
+import oriom.core.functions.logs_timeseries.define_dates_inspection as define_dates
 
 
 class DummyInspClass:
@@ -72,7 +72,7 @@ class TestDefineDatesBasic(unittest.TestCase):
         ]
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
     )
     def test_returns_empty_when_no_days(self, m_safe_getattr):
         """
@@ -127,24 +127,24 @@ class TestDefineDatesPortInspection(unittest.TestCase):
         ]
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.aux_functions.save_file_csv"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.aux_functions.save_file_csv"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.aux_functions.log_event_convert_stringtime",
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.aux_functions.log_event_convert_stringtime",
         side_effect=lambda df: df,
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.logs_timeseries_func.create_stat_chart_inspection_port",
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.logs_timeseries_func.create_stat_chart_inspection_port",
         side_effect=lambda df, p: df,
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.logs_preventive_aux.start_date_inspection"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.logs_preventive_aux.start_date_inspection"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.InspectionPortCreation"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.InspectionPortCreation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
     )
     def test_port_inspection_updates_shutdown_dict_and_towing_log(
         self,
@@ -287,17 +287,17 @@ class TestDefineDatesSiteInspection(unittest.TestCase):
         ]
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.logs_timeseries_func.create_stat_chart_inspection_port",
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.logs_timeseries_func.create_stat_chart_inspection_port",
         side_effect=lambda df, p: df,
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.logs_preventive_aux.start_date_inspection"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.logs_preventive_aux.start_date_inspection"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.InspectionSiteCreation"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.InspectionSiteCreation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
     )
     def test_site_inspection_basic(
         self,
@@ -384,17 +384,17 @@ class TestDefineDatesSiteInspection(unittest.TestCase):
         self.assertTrue(df["n_vessel_2"].isna().all())
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.logs_timeseries_func.create_stat_chart_inspection_port",
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.logs_timeseries_func.create_stat_chart_inspection_port",
         side_effect=lambda df, p: df,
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.logs_preventive_aux.start_date_inspection"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.logs_preventive_aux.start_date_inspection"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.InspectionSiteCreation"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.InspectionSiteCreation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
+        "oriom.core.functions.logs_timeseries.define_dates_inspection.aux_functions.safe_getattr"
     )
     def test_site_inspection_uses_n_vessel_last_when_days_main_zero(
         self,

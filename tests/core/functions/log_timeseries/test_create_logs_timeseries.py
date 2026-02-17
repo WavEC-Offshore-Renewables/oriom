@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pandas as pd
 
-from logistic_tools.core.functions.logs_timeseries.create_logs_timeseries import (
+from oriom.core.functions.logs_timeseries.create_logs_timeseries import (
     create_logs_timeseries_file,
 )
 
@@ -72,19 +72,19 @@ class TestCreateLogsTimeseriesFile(unittest.TestCase):
         }
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".logs_timeseries_func.shutdown_evaluation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".Stat_chart_inspection_campaign"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".create_logs_events_preventive.create_logs_preventive"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".create_logs_events_corrective.create_logs_corrective_file"
     )
     def test_flow_calls_subfunctions_and_filters_by_cutoff(
@@ -193,19 +193,19 @@ class TestCreateLogsTimeseriesFile(unittest.TestCase):
         pd.testing.assert_frame_equal(result, expected_filtered_sorted)
 
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".logs_timeseries_func.shutdown_evaluation"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".Stat_chart_inspection_campaign"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".create_logs_events_preventive.create_logs_preventive"
     )
     @patch(
-        "logistic_tools.core.functions.logs_timeseries.create_logs_timeseries"
+        "oriom.core.functions.logs_timeseries.create_logs_timeseries"
         ".create_logs_events_corrective.create_logs_corrective_file"
     )
     def test_vessel_to_merge_is_passed_through_when_provided(

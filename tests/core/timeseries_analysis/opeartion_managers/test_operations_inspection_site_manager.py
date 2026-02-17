@@ -9,14 +9,14 @@ import importlib.util
 
 import pandas as pd
 
-from logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import (
+from oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import (
     inspect_site_manager,
 )
 
 # --- check module check_files is present---
 try:
     check_files_spec = importlib.util.find_spec(
-        "logistic_tools.core.functions.private.check_files"
+        "oriom.core.functions.private.check_files"
     )
 except ModuleNotFoundError:
     check_files_spec = None
@@ -111,13 +111,13 @@ class TestInspectSiteManager(unittest.TestCase):
     # ---------- 1) Existing schedule: path should short-circuit ----------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.check_files.reuse_file_exist"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.check_files.reuse_file_exist"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.recycle_other_oper_scheduler"
     )
     def test_skip_when_schedule_already_exists(
         self, m_recycle, m_reuse_file, m_tqdm
@@ -139,15 +139,15 @@ class TestInspectSiteManager(unittest.TestCase):
         m_reuse_file.return_value = True
 
         with patch(
-            "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.workability"
+            "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.workability"
         ) as m_workability, patch(
-            "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.working_shifts"
+            "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.working_shifts"
         ) as m_working_shifts, patch(
-            "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.define_shift_operation_values"
+            "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.define_shift_operation_values"
         ) as m_define_shift, patch(
-            "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml_each_attribute"
+            "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml_each_attribute"
         ) as m_update_each, patch(
-            "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml"
+            "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml"
         ) as m_update_yaml:
             inspect_site_manager(
                 operation_dir=self.operation_dir,
@@ -174,34 +174,34 @@ class TestInspectSiteManager(unittest.TestCase):
     # ---------- 2) Full path: new schedule is created ----------
     @skip_if_no_check_files
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.check_files.reuse_file_exist"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.check_files.reuse_file_exist"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.recycle_other_oper_scheduler"
     )
     def test_create_schedule_when_not_existing(
         self,
@@ -352,34 +352,34 @@ class TestInspectSiteManager(unittest.TestCase):
 # ---------- 2-bis) Full path: new schedule is created ----------
     @skip_if_check_files_present
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.tqdm"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.tqdm"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.OperationTimeSeriesData.create_timeseries_data"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.OperationTimeSeriesData.create_timeseries_data"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.define_shift_operation_values"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.define_shift_operation_values"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.workability"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.workability"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml_each_attribute"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.yaml_manager.update_yaml_each_attribute"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.working_shifts"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.working_shifts"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.modify_distance"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.modify_distance"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.check_files"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.check_files"
     )
     @patch(
-        "logistic_tools.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.recycle_other_oper_scheduler"
+        "oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager.recycle_other_oper_scheduler"
     )
     def test_create_schedule_when_not_existing_bis(
         self,

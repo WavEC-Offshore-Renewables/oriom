@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-from logistic_tools.core.functions.vessels_manager.vessels_merge_day import (
+from oriom.core.functions.vessels_manager.vessels_merge_day import (
     number_vessels_func_with_oper,
     vessel_day_func,
     df_vessel_merge_use,
