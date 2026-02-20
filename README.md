@@ -11,7 +11,7 @@ ORIOM supports scenario-based simulation of:
 - **Port logistics**, mobilisation, and demobilisation assumptions
 - **Cost build-up** and aggregated project KPIs
 
-ORIOM has been developed and used over multiple years in WavEC R&D projects and consulting activities and is published primarily to improve **transparency, peer review, and reproducibility** of analyses.
+ORIOM has been developed and used over multiple years in WavEC R&D projects and consulting activities and is published primarily to improve **transparency, peer review, and reproducibility** of published analyses.
 
 ## Contents
 - [Citation](#citation)
@@ -48,12 +48,12 @@ If you are unsure whether a planned use competes, contact us: **oriom@wavec.org*
 ### Examples of use
 
 Examples of uses that are typically compatible (non-competing):
-- Academic research (MSc/PhD work, publications)
+- Academic research (MSc/PhD work, open-access publications)
 - Teaching and internal training
 - Internal evaluation, benchmarking, or decision support within an organisation, where results are not offered as a competing external service/product
 
 Examples of uses that are typically competing and therefore **not permitted without a separate agreement**:
-- Providing third-party consulting, planning, optimisation, or design verification services based on ORIOM as a substitute for WavEC’s services
+- Providing third-party consulting, planning, optimisation, or design verification services based on ORIOM
 - Packaging ORIOM into a product/SaaS offering offered to third parties in a competing market
 
 **This section is non-binding guidance. The `LICENCE` file governs.**
