@@ -2,7 +2,7 @@
 
 ![PyPI - Python Version](https://img.shields.io/badge/python-3.9%20%7C%203.10-blue)
 [![PolyForm-Shield 1.0.0](https://img.shields.io/badge/Licence-PolyForm--Shield%201.0.0-green)](https://polyformproject.org/licences/shield/1.0.0/)
-[![codecov](https://codecov.io/gh/<USERNAME>/<REPO>/branch/main/graph/badge.svg)](https://codecov.io/gh/<USERNAME>/<REPO>)
+[![codecov](https://codecov.io/gh/WavEC-Offshore-Renewables/oriom/branch/master/graph/badge.svg)](https://codecov.io/gh/WavEC-Offshore-Renewables/oriom)
 
 ORIOM (Offshore Renewables Installation and O&M) is an open-code Python-based modelling tool developed by **WavEC Offshore Renewables** to simulate and assess **installation** and **operations & maintenance (O&M)** logistics and costs for offshore renewable energy projects, including (but not limited to) **fixed-bottom offshore wind, floating wind, wave energy, and floating solar**.
 
