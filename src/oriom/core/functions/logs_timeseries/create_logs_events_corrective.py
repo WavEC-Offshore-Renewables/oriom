@@ -6,8 +6,9 @@ from datetime import timedelta, datetime
 import pandas as pd
 
 from oriom.utils.aux_functions import safe_getattr
+from oriom.utils.read_dataframe_value import approximate_hourly_data
 from oriom.core.functions.logs_timeseries import logs_timeseries_func
-from oriom.core.functions.logs_timeseries.BaseCorrection import CorrectionImmediate, CorrectionDeferred, CorrectionTowPort, CorrectionTowSite
+from oriom.core.functions.logs_timeseries.BaseCorrection import CorrectionTowPort, CorrectionTowSite
 
 
 def _map_failure_indices(failure_df: pd.DataFrame, oper_sched: pd.DataFrame) -> pd.Series:
@@ -124,7 +125,7 @@ def create_logs_corrective_file(
         CUTOFF_DATE (datetime): last date of possible creation for log corrective on last month
         dates_failures (:obj:`pd.DataFrame`): Log of all the events (failure,
             operation, inspection_port, inspection_site).
-        operation_log_file_stats (:obj:`list`): List of objects :class:`OperationsCorrectiveStat`.
+        operation_log_file_stats (:obj:`list`): List of objects :class:`OperationsCorrectiveStat` with max percentile.
         time_fail_op_immediately (:obj:`float`): Time between failure and
             immediate operations.
         vessel_to_merge (list): List of vessel that op can be merged when is possible to merge operations
@@ -162,6 +163,8 @@ def create_logs_corrective_file(
             tow_op_flag = True
             tow_op_port = find_element_class.find_operation(getattr(oper, 'op_tow_port'))
             tow_op_site = find_element_class.find_operation(getattr(oper, 'op_tow_site'))
+            add_op_tow_port = getattr(tow_op_port, 'addition_op_tow', None)
+            add_op_tow_site = getattr(tow_op_site, 'addition_op_tow', None)
             tow_op_port_stat = find_element_class.find_operation_stats_pmax(tow_op_port.id)
             tow_op_site_stat = find_element_class.find_operation_stats_pmax(tow_op_site.id)
             tow_port_op_oper_sched = safe_getattr(tow_op_port, ['ts_data','oper_sched'])
@@ -188,6 +191,8 @@ def create_logs_corrective_file(
         ### FOR EACH FAILURE ###
         for _, row in failure_filter.iterrows():
             row_tow_port = None
+            row_add_op_tow_port = None
+            row_add_op_tow_site = None
             row_tow_site = None
             row_dates = pd.DataFrame(columns=COLS)
             failure = find_element_class.find_failure_from_id(row['id'].split('.')[0])
@@ -202,8 +207,34 @@ def create_logs_corrective_file(
             # TOWING PORT CREATION
             #------------------------
             if tow_op_flag:
-                vessel, ves_2, mob_time = _take_vessel_data(find_element_class = find_element_class, op = tow_op_port)
+                if add_op_tow_port:
+                    oper_stat_op_tow = find_element_class.find_operation_stats_pmax(oper_stat_op_tow.id)
+                    vessel, ves_2, mob_time = _take_vessel_data(find_element_class = find_element_class, op = add_op_tow_port)
+                    row_add_op_tow_port, row_mob_line_op_tow_port = create_operation_site(
+                        failure_ = {'failure': failure, 'date_failure': date_failure},
+                        vessel_ = {'vessel': vessel, 'vessel_to_merge': vessel_to_merge},
+                        vessels_ = {'vessel1_id': vessel1_id, 'ves_1': ves_1, 'vessel2_id': vessel2_id, 'ves_2': ves_2},
+                        oper_ = {'oper': add_op_tow_port, 'oper_stat': oper_stat, 'oper_sched': oper_sched},
+                        mobilisation = {'mob_time': mob_time, 'lead_mob_time': lead_mob_time},
+                        df = {'df': 'row': row}
+                        index = {'fail_index': fail_index, 'last_valid_idx': last_valid_idx},
+                        CONST = {'COLS': COLS, 'CUTOFF_DATE', CUTOFF_DATE}
+                    )
+                    
+                    if not row_add_op_tow_port:
+                        continue
+                    if row_mob_line_op_tow_port is not None:
+                        if row_mob_line is None:
+                            row_mob_line = row_mob_line_op_tow_port
+                        else:
+                            row_mob_line = pd.concat([
+                                row_mob_line,
+                                row_mob_line_op_tow_port
+                            ], ignore_index=True)
+                        fail_index = row_add_op_tow_port
+                        
 
+                vessel, ves_2, mob_time = _take_vessel_data(find_element_class = find_element_class, op = tow_op_port)
                 towing_port = CorrectionTowPort(
                     date_failure = date_failure,
                     vessel = vessel,
@@ -291,110 +322,85 @@ def create_logs_corrective_file(
             # OPERATION CREATION
             #------------------------
             if operation_trig is not None:
-                # Find the start of the vessel use
-                if failure.maintenance_strategy == 'immediately':
-                    immediate_correction = CorrectionImmediate(
-                        date_failure = date_failure,
-                        vessel = vessel,
-                        oper = oper,
-                        time_fail_op_immediately = time_fail_op_immediately,
-                        tow_op = tow_op_flag
-                    )
-                    # No mobilisation for operations with vessel to merge as considered in merge_funct
-                    if mob_time != 0 and vessel.type not in vessel_to_merge:            # NOTE Mobilisation of merging vessel is considered in create_logs_merge
-                        row_mob_line = immediate_correction.mobilitate_vessel(log_events = log_events, row = row)
-                    # Row at operation schedule with idx at 5 AM
-                    immediate_correction.add_hours_for_noon_shift(
-                        fail_index = fail_index,
-                        lead_mob_time = lead_mob_time,
-                        oper_sched = oper_sched,
-                    )
-                    date_op = immediate_correction.date_op
-                    idx_end_leadtime = immediate_correction.idx_end_leadtime
-
-                elif failure.maintenance_strategy == 'specific month':
-                    deferred_correction = CorrectionDeferred(
-                        date_failure = date_failure,
-                        vessel = vessel,
-                        oper = oper,
-                        preferred_month = failure.preferred_month,
-                        tow_op = tow_op_flag
-                    )
-
-                    # Evaluate end of leadtime date
-                    if not tow_op_flag:
-                        deferred_correction.leadtime_evaluation(lead_mob_time = lead_mob_time)
+                row_dates, row_mob_line_op = create_operation_site(
+                    failure_ = {'failure': failure, 'date_failure': date_failure},
+                    vessel_ = {'vessel': vessel, 'vessel_to_merge': vessel_to_merge},
+                    vessels_ = {'vessel1_id': vessel1_id, 'ves_1': ves_1, 'vessel2_id': vessel2_id, 'ves_2': ves_2},
+                    oper_ = {'oper': oper, 'oper_stat': oper_stat, 'oper_sched': oper_sched},
+                    mobilisation = {'mob_time': mob_time, 'lead_mob_time': lead_mob_time},
+                    df = {'df': 'row': row}
+                    index = {'fail_index': fail_index, 'last_valid_idx': last_valid_idx},
+                    CONST = {'COLS': COLS, 'CUTOFF_DATE', CUTOFF_DATE}
+                )
+                
+                if not row_dates:
+                    continue
+                if not tow_op_flag:
+                    date_end_wait_start = row_dates['date_end_wait_start']
+                if row_mob_line_op is not None:
+                    if row_mob_line is None:
+                        row_mob_line = row_mob_line_op
                     else:
-                        deferred_correction.add_leadtime_tow(
-                            lead_mob_time = lead_mob_time,
-                        )
-
-                    index_found = deferred_correction.check_leadtime_index(oper_sched = oper_sched, CUTOFF_DATE = CUTOFF_DATE)
-                    if not index_found:
-                        continue
-                    date_op = deferred_correction.date_op
-                    idx_end_leadtime = deferred_correction.idx_end_leadtime
-                else:
-                    raise KeyError(f'Maintenance strategy not found: {failure.maintenance_strategy}')
+                        row_mob_line = pd.concat([
+                            row_mob_line,
+                            row_mob_line_op
+                        ], ignore_index=True)
             else:
                 logging.error(f"LogDates: Operation trigger not found for failure {row['id']}")
                 raise KeyError
-
-            df_filtered_start = _check_index_row_validity(
-                idx_end_leadtime = idx_end_leadtime,
-                last_valid_idx= last_valid_idx,
-                row = row,
-                oper_sched = oper_sched
-            )
-
-            if df_filtered_start.empty:
-                continue
-
-            dates_op = compute_operation_datetimes(df_filtered_start, oper_stat)
-
-            if not tow_op_flag:
-                date_end_wait_start = dates_op['date_end_wait_start']
-
-            row_dates = pd.DataFrame([[
-                date_op,
-                dates_op['date_end_leadtime'],
-                dates_op['date_end_wait_start'],
-                dates_op['date_end_dur_net_port'],
-                dates_op['date_end_transit_ts'],
-                dates_op['date_end_wait_site'],
-                dates_op['date_end_dur_net_site'],
-                dates_op['date_end_transit_tp'],
-                dates_op['date_end'],
-                dates_op['date_end_stat_chart'],
-                'operation',
-                oper.id,
-                vessel1_id,
-                ves_1,
-                vessel2_id,
-                ves_2,
-                'oper_' + row['id']
-            ]],columns=COLS)
 
             #------------------------
             # TOWING SITE CREATION
             #------------------------
             if tow_op_flag:
+                #------------------------
+                # ADDITIONAL OPERATION TO TOWING SITE
+                if add_op_tow_site:
+                    oper_stat_op_site = find_element_class.find_operation_stats_pmax(add_op_tow_site.id)
+                    vessel, ves_2, mob_time = _take_vessel_data(find_element_class = find_element_class, op = add_op_tow_site)
+                    op_sched_add_tow_site = safe_getattr(add_op_tow_site, ['ts_data','oper_sched'])
+                    row_add_op_tow_site, row_mob_line_op_tow_site = create_operation_site(
+                        failure_ = {'failure': failure, 'date_failure': date_failure},
+                        vessel_ = {'vessel': vessel, 'vessel_to_merge': vessel_to_merge},
+                        vessels_ = {'vessel1_id': vessel.id, 'ves_1': add_op_tow_site.vessel1_qt, 'vessel2_id': add_op_tow_site.vessel2_id, 'ves_2': ves_2},
+                        oper_ = {'oper': add_op_tow_site, 'oper_stat': oper_stat_op_site, 'oper_sched': op_sched_add_tow_site},
+                        mobilisation = {'mob_time': mob_time, 'lead_mob_time': lead_mob_time},
+                        df = {'df': 'row': row}
+                        index = {'fail_index': fail_index, 'last_valid_idx': safe_getattr(add_op_tow_site, ['ts_data','last_valid_index'])},
+                        CONST = {'COLS': COLS, 'CUTOFF_DATE', CUTOFF_DATE}
+                    )
+                    
+                    if not row_add_op_tow_site:
+                        continue
+                    if row_mob_line_op_tow_site is not None:
+                        if row_mob_line is None:
+                            row_mob_line = row_mob_line_op_tow_site
+                        else:
+                            row_mob_line = pd.concat([
+                                row_mob_line,
+                                row_mob_line_op_tow_site
+                            ], ignore_index=True)
+                        # Update the fail_index
+                        fail_index = op_sched_add_tow_site.loc[approximate_hourly_data(row_add_op_tow_site['d_end'])]
+                        
+                #------------------------
+                ### TOWING TO SITE
                 vessel_tow_site, ves_2, mob_time = _take_vessel_data(find_element_class = find_element_class, op = tow_op_site)
 
                 towing_site = CorrectionTowSite(
                     date_failure = date_failure,
                     vessel = vessel_tow_site,
                     oper = tow_op_site,
-                    date_start = dates_op['date_end']
+                    date_start = row_dates['d_end']
                 )
 
                 if not towing_port.tow_deferred and mob_time != 0:
                     if row_mob_line is None:
-                        row_mob_line = towing_site.mobilitate_vessel(log_events=log_events, row=row, date_start=dates_op['date_end'])
+                        row_mob_line = towing_site.mobilitate_vessel(log_events=log_events, row=row, date_start=row_dates['d_end'])
                     else:
                         row_mob_line = pd.concat([
                             row_mob_line,
-                            towing_site.mobilitate_vessel(log_events=log_events, row=row, date_start=dates_op['date_end'] - timedelta(hours = mob_time))
+                            towing_site.mobilitate_vessel(log_events=log_events, row=row, date_start=row_dates['d_end'] - timedelta(hours = mob_time))
                         ], ignore_index=True)
 
                 index_found = towing_site.check_leadtime_index(oper_sched = tow_site_oper_sched, CUTOFF_DATE = CUTOFF_DATE)
@@ -402,7 +408,7 @@ def create_logs_corrective_file(
                     continue
 
                 # Create row_tow with data
-                date_op = dates_op['date_end'] - timedelta(hours = mob_time)
+                date_op = row_dates['d_end'] - timedelta(hours = mob_time)
 
                 df_filtered_start_tow = _check_index_row_validity(
                     idx_end_leadtime = towing_site.idx_end_leadtime,
@@ -414,10 +420,10 @@ def create_logs_corrective_file(
                 if df_filtered_start_tow.empty:
                     continue
 
-                dates_tow_site = compute_operation_datetimes(df_filtered_start_tow, tow_op_port_stat)
+                dates_tow_site = compute_operation_datetimes(df_filtered_start_tow, tow_op_site_stat)
 
                 row_tow_site = pd.DataFrame([[
-                    dates_op['date_end'],
+                    row_dates['d_end'],
                     dates_tow_site['date_end_leadtime'],
                     dates_tow_site['date_end_wait_start'],
                     dates_tow_site['date_end_dur_net_port'],

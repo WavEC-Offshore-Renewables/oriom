@@ -85,12 +85,12 @@ class TestMainEndToEnd(unittest.TestCase):
         excel_dir = repo_root / "tests" / "test_files" / "test_end_to_end"
 
         if check_files_spec:
-            expected_result0_dir = excel_dir / "private" / "result_0"
-            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "private")
+            expected_result0_dir = excel_dir / "result_private" / "result_0"
+            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "result_private")
         else:
-            expected_result0_dir = excel_dir / "public" / "result_0"
+            expected_result0_dir = excel_dir / "result_public" / "result_0"
             # This is the value you want to inject into inputs.general.failureevent_file["value"]
-            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "public")
+            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "result_public")
 
         self.assertTrue(excel_dir.exists(), f"Excel directory not found: {excel_dir}")
         self.assertTrue((excel_dir / "form_test.xlsx").exists(), "Missing form_test.xlsx")
@@ -154,10 +154,6 @@ class TestMainEndToEnd(unittest.TestCase):
         # Compare CSVs in result_0
         actual_result0_dir = Path(dirs.result_dir) / "result_0"
         self.assertTrue(actual_result0_dir.exists(), f"Actual result_0 directory not found: {actual_result0_dir}")
-
-        print(expected_result0_dir)
-        print(expected_result0_dir)
-        print(expected_result0_dir)
 
         self._assert_csv_dirs_equal(expected_dir=expected_result0_dir, actual_dir=actual_result0_dir)
 

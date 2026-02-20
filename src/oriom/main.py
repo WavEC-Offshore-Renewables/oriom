@@ -193,6 +193,15 @@ def run(config: ConfigRun | None = None):
         graph_dir=dirs.graph_dir,
     )
 
+    logging.info('--------------------\FAILURES\t--------------------')
+    # Define failure events
+    failures = Failure.get_failures_from_yaml(
+            file_path = files.failures_file
+    )
+    # Variate failure rate for sensitivity analysis
+    for failure in failures:
+        if getattr(failure, "fail_variation", False):
+            failure.fail_rate *= inputs.stats.failure_ratio_sensitivity["value"]
 
     logging.info('--------------------\tINPUTS - OPERATIONS\t--------------------')
     vessels = {}
@@ -229,9 +238,11 @@ def run(config: ConfigRun | None = None):
 
     total_operations = operations_tow + operations_inspect_site + operations_inspect_port + operations_corr_major + operations_corr_minor
 
-    # Define deferred months of operation if presents
     for operation in (operations_corr_major + operations_corr_minor):
+        # Define deferred months of operation if presents
         operation.define_months_operations()
+        # Define failure class in Operation attributes
+        aux_operation.get_failures(operation, failures)
 
     # Create and prepare a run folder for each operation
     for operation in total_operations:
@@ -272,6 +283,10 @@ def run(config: ConfigRun | None = None):
     for operation in operations_corr_minor:
         if operation.duration_net >= inputs.tseries.shift_duration["value"]:
             raise ValueError("OperMinor: Duration too long, define the operation as a major", operation.id)
+
+    for operation in operations_tow:
+        if getattr(operation, "addition_op_tow", None):
+            operation.define_previous_op_tow(operations_corr_major)
 
     # Populate Major Corrective ant Tow Operations Operations with activities
     for operation in (operations_corr_major + operations_tow):
@@ -326,18 +341,8 @@ def run(config: ConfigRun | None = None):
             out_dir=os.path.join(os.getcwd(), dirs.run_dir)
     )
 
-    # Define failure events
-    failures = Failure.get_failures_from_yaml(
-            file_path = files.failures_file
-    )
-
     # Check if all the levels defined are associated to a component in the graph
     aux_operation.level_component_check(Gs = G_layouts, operations = failures, failure = True)
-
-    # Variate failure rate for sensitivity analysis
-    for failure in failures:
-        if getattr(failure, "fail_variation", False):
-            failure.fail_rate *= inputs.stats.failure_ratio_sensitivity["value"]
 
     # Define scenario for failure event
     inputs.tseries.scenario = Scenario.get_scenarios_from_yaml(
@@ -349,12 +354,6 @@ def run(config: ConfigRun | None = None):
             data_panda=metocean.df_timeseries,
             ts_percent_dec=inputs.tseries.montecarlo_percent["value"]
     )
-
-    # Define failure class in Operation attributes
-    for operation in operations_corr_major:
-        CorrectiveMajor.get_failures(operation, failures)
-    for operation in operations_corr_minor:
-        CorrectiveMinor.get_failures(operation, failures)
 
 
     ### --- OPERATION ANALYSES PER TIMESTEP --- ###

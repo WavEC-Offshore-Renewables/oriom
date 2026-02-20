@@ -34,6 +34,8 @@ class OperationTow():
             ``1`` if not defined.
         other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
+        addition_op_tow (:obj: CorrectiveMajor): Major operation object to conduct
+            before or after the towing operation. Its value is ``None`` if not defided
         activities (:obj:`list`): List of
             :class:`~oriom.classes.Activity.Activity` preformed during
             the logistic operation.
@@ -60,6 +62,7 @@ class OperationTow():
             vessel1_qt: int=1,
             vessel2_id: str=None,
             vessel2_qt: int=None,
+            addition_op_tow: str,
             other_costs: float=0
     ):
         """Initializes :class:`OperationTow` with various attributes and optional parameters.
@@ -72,6 +75,8 @@ class OperationTow():
             vessel1_id (:obj:`str`): The ID of the main vessel.
             tech_cost (:obj:`float`,*optional*): The daily cost of each technician[€/day].
                 Defaults to ``0``.
+            addition_op_tow (:obj:`str`, *optional*): Major_operation.id object to conduct
+                before the towing opeartion. Default to ``None``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
             vessel1_qt (:obj:`int`): Number of main vessel.
@@ -91,6 +96,7 @@ class OperationTow():
         self.vessel1_qt = 1
         self.vessel2_qt = None
         self.other_costs = 0
+        self.addition_op_tow = None
 
         self.activities = None
         self.vessel1 = None
@@ -111,9 +117,11 @@ class OperationTow():
             self.vessel1_qt = int(vessel1_qt)
         if other_costs is not None:
             self.other_costs = float(other_costs)
+        if addition_op_tow is not None:
+            self.addition_op_tow = str(addition_op_tow).lower()
 
         self._check_attributes()
-
+        
 
     def _check_attributes(self):
         """
@@ -173,7 +181,8 @@ class OperationTow():
                 'vessel2_id',
                 'vessel1_qt',
                 'vessel2_qt',
-                'other_costs'
+                'other_costs',
+                'addition_op_tow'
         ]
 
         operations_list = []
@@ -204,12 +213,29 @@ class OperationTow():
                     vessel1_qt=operation["vessel1_qt"],
                     vessel2_id=operation["vessel2_id"],
                     vessel2_qt=operation["vessel2_qt"],
+                    addition_op_tow=operation["addition_op_tow"],
                     other_costs=operation["other_costs"]
                 )
             )
 
         logging.info('OperationTow: operations defined based on file "%s"' % file_path)
         return operations_list
+
+
+    def define_previous_op_tow(
+            self,
+            operations_corr_major: list
+    ):
+        """Assign an operation if a previous operation is required with towing operation"""
+
+        op_found = False
+        for op in operations_corr_major:
+            if op.id == self.addition_op_tow:
+                self.addition_op_tow = op
+                break
+        if not op_found:
+            raise ValueError(f"OperationTow: addition_op_tow {self.addition_op_tow} not found in CorrectiveMajor")
+
 
     def to_yaml(
             self,
@@ -246,6 +272,7 @@ class OperationTow():
                 "vessel1": vessel1,
                 "vessel2": vessel2,
                 "other_costs": self.other_costs,
+                "addition_op_tow": self.addition_op_tow,
                 "activities": activities
         }, f)
         f.close()
