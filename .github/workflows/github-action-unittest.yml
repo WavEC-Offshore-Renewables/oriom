@@ -23,3 +23,7 @@ jobs:
         run: |
           python -m coverage run --source=oriom -m pytest -q
           python -m coverage report --fail-under=80
+          python -m coverage xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4

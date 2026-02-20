@@ -7,7 +7,7 @@ from copy import deepcopy
 
 
 def f_montecarlo(data_panda: pd.DataFrame, ts_percent_dec: float) -> tuple:
-    """Consider different years first.
+    """Select randomly the timestemp to analyse selecting a fixed % for each months.
 
     Args:
         data_panda (:obj:`pd.DataFrame`): Table with metocean data.
