@@ -62,7 +62,7 @@ class OperationTow():
             vessel1_qt: int=1,
             vessel2_id: str=None,
             vessel2_qt: int=None,
-            addition_op_tow: str,
+            addition_op_tow: str = None,
             other_costs: float=0
     ):
         """Initializes :class:`OperationTow` with various attributes and optional parameters.
@@ -232,6 +232,7 @@ class OperationTow():
         for op in operations_corr_major:
             if op.id == self.addition_op_tow:
                 self.addition_op_tow = op
+                op_found = True
                 break
         if not op_found:
             raise ValueError(f"OperationTow: addition_op_tow {self.addition_op_tow} not found in CorrectiveMajor")
@@ -272,7 +273,7 @@ class OperationTow():
                 "vessel1": vessel1,
                 "vessel2": vessel2,
                 "other_costs": self.other_costs,
-                "addition_op_tow": self.addition_op_tow,
+                "addition_op_tow": getattr(self.addition_op_tow, 'id', None),
                 "activities": activities
         }, f)
         f.close()

@@ -473,6 +473,6 @@ class CorrectiveMinor():
                 "other_costs": self.other_costs,
                 "rov_drone": rov_drone,
                 "double_shift": self.double_shift,
-                "failures": self.failures
+                "failures": [failure.id for failure in getattr(self, 'failures', []) or []]
         }, f)
         f.close()

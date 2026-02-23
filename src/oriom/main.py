@@ -80,9 +80,9 @@ DEFAULT_CONFIG  = ConfigRun(
     ENERGY_STATISTICAL_CALCULATION=False,
     PROJECT_NAME="TEST_TO_USE",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\<USER>\<GITHUB_REPOSITORIES>\oriom\tests\test_files\test_end_to_end",
+    EXCEL_FILE_PATH=r"C:\Users\rmeda\Richi documents\Projects\ORIOM\files",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_v8_test.xlsx",
+    FORM_NAME="form_test_op_add.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

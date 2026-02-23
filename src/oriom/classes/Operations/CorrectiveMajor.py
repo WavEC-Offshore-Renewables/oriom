@@ -392,6 +392,6 @@ class CorrectiveMajor():
                 "port_costs": self.port_costs,
                 "activities": activities,
                 "rov_drone": rov_drone,
-                # "failures": failures,
+                "failures": [failure.id for failure in getattr(self, 'failures', []) or []]
         }, f)
         f.close()
