@@ -85,12 +85,16 @@ class TestMainEndToEnd(unittest.TestCase):
         excel_dir = repo_root / "tests" / "test_files" / "test_end_to_end"
 
         if check_files_spec:
-            expected_result0_dir = excel_dir / "private" / "result_0"
-            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "private")
+            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
+            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
+            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
+            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
+            expected_result0_dir = excel_dir / "repo_private" / "result_0"
+            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "repo_public")
         else:
-            expected_result0_dir = excel_dir / "public" / "result_0"
+            expected_result0_dir = excel_dir / "repo_public" / "result_0"
             # This is the value you want to inject into inputs.general.failureevent_file["value"]
-            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "public")
+            repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "repo_public")
 
         self.assertTrue(excel_dir.exists(), f"Excel directory not found: {excel_dir}")
         self.assertTrue((excel_dir / "form_test.xlsx").exists(), "Missing form_test.xlsx")

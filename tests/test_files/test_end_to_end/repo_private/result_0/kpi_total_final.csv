@@ -1,0 +1,8 @@
+vessel_id,vessel type,n_chart_days,av_vessel_costs,tot_vessel_costs,av_mobilization_costs,tot_mobilization_costs,av_technicians_costs,tot_technicians_costs,av_part_costs,tot_part_costs,av_rov_costs,tot_rov_costs,av_other_costs,tot_other_costs,average_direct_costs,lifetime_direct_costs
+v002,multicat,155,3000.9,465139.66,1000.0,5000.0,154.84,24000.0,64.52,10000.0,0.0,0,1.29,200.0,3376.3900000000003,504339.66
+v001,ctv,714,1599.5,1142041.52,0.0,0.0,51.82,37000.0,29.69,21200.0,96.47,68880.0,0.0,0.0,1829.3,1269121.52
+oper_port,port oper,1,0.0,0.0,0.0,0.0,1050.0,1050.0,7000.0,7000.0,0.0,0,1000.0,1000.0,10100.0,9050.0
+port,0,0,0,0,0,0,0,0,0,0,0,0,5000.0,10000.0,5000.0,10000.0
+technician,0,0,0,0,0,0,0,0,0,0,0,0,50000.0,100000.0,50000.0,100000.0
+insurance,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0.0,0.0
+total,,,,1607181.18,,5000.0,,62050.0,,38200.0,,68880.0,,111200.0,,1892511.18

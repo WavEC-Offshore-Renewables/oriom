@@ -1,0 +1,4 @@
+Vessel,Group,Operation,Rank,Duration,OLC
+v001,Group 1,ofw_op003,1,6.0,"1.0, 100, 100, 100, 100, 1.0"
+v001,Group 1,ofw_op001,2,8.0,"1.0, 100, 100, 10.0, 100, 1.0"
+v001,Group 1,ofw_op002,3,8.0,"1.0, 100, 100, 10.0, 100, 1.0"
