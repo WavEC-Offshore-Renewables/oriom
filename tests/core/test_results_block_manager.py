@@ -458,8 +458,8 @@ class TestResultsBlock(unittest.TestCase):
     # ------------------------------------------------------------------
     def test_results_block_passes_none_for_pv_parameters_when_no_pv_devices(self):
         """
-        Se pv_number_devices è None, n_strings_per_inv, n_modules_per_strings e
-        max_failure_module devono essere passati a energy_availability come None.
+        If pv_number_devices is None, n_strings_per_inv, n_modules_per_strings, and
+        max_failure_module must be passed to energy_availability as None.
         """
         (
             inputs,
@@ -565,9 +565,9 @@ class TestResultsBlock(unittest.TestCase):
     # ------------------------------------------------------------------
     def test_results_block_uses_vessel_mobilisation_scheduler_when_statistical_chart_true(self):
         """
-        Se Config.STATISTICAL_CHART è True, deve:
-        - istanziare VesselMobilisationScheduler e chiamare charts_manager
-        - istanziare VesselDayCounter due volte.
+        If Config.STATISTICAL_CHART is True, it must:
+        - instantiate VesselMobilizationScheduler and call charts_manager
+        - instantiate VesselDayCounter twice.
         """
         (
             inputs,
@@ -686,8 +686,8 @@ class TestResultsBlock(unittest.TestCase):
     # ------------------------------------------------------------------
     def test_results_block_raises_if_log_events_empty(self):
         """
-        Se create_logs_timeseries_file restituisce un DataFrame vuoto,
-        results_block deve sollevare un'eccezione e NON chiamare kpi_final_total_cost.
+        If create_logs_timeseries_file returns an empty DataFrame,
+        results_block should raise an exception and NOT call kpi_final_total_cost.
         """
         (
             inputs,
@@ -757,7 +757,7 @@ class TestResultsBlock(unittest.TestCase):
     # ------------------------------------------------------------------
     def test_results_block_does_not_call_distribution_failures_when_dates_failures_empty(self):
         """
-        Se il DataFrame dates_failures è vuoto, distribution_failures non deve essere chiamata.
+        If the DataFrame dates failures is empty, distribution failures should not be called.
         """
         (
             inputs,
