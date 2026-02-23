@@ -122,7 +122,16 @@ def return_percentage(
     LEVELS_NO_POWER = {data.get("level") for _, data in G.nodes(data=True)}
     LEVELS_NO_POWER.discard(COMPONENT_LEVEL_POWER)
 
+    # Create list of operations id to consider for shut down or fix strategy
     op_corr_excl_tow = [op.id for op in operations_corrective_stat if not getattr(op.op_class, "tow_to_port", None)]
+    op_corr_port = [op for op in operations_corrective_stat if getattr(op.op_class, "tow_to_port", None)]
+    op_corr_tow_ids = {
+            op.op_class.op_tow_port for op in op_corr_port
+        }.union({
+            op.op_class.op_tow_site for op in op_corr_port
+    })
+    op_corr_tow_ids.discard(None)
+
     events_total = []
     percentage = []
 
@@ -148,7 +157,8 @@ def return_percentage(
                     op_corr_excl_tow,
                     shut_attribute,
                     find_element_class,
-                    dict_locations
+                    dict_locations,
+                    op_corr_tow_ids
             )
 
             for row in rows:

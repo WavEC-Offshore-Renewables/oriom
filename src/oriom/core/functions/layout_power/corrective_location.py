@@ -20,6 +20,7 @@ def logs_corrective_locations(
     shut_attribute: str,
     find_element_class,
     dict_locations: dict,
+    op_corr_tow: list
 ) -> tuple[list, dict]:
     """
     Generate time-ordered abstract corrective events WITHOUT deciding location.
@@ -28,6 +29,7 @@ def logs_corrective_locations(
     Args:
         r (:obj:`pd.Series`): Row of the Log_event (failure, operation, inspection_port, inspection_site).
         op_corr_excluding_tow (:obj:`list`): list of string representig object.id :class:`OperationsMinor`+`OperationsMajor`.
+        op_corr_tow (:obj:`list`): list of string representig object.id :class:`OperationsTow`.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         dict_locations (dict): Dictionary with key the failure id and value the location assigned.
@@ -108,32 +110,54 @@ def logs_corrective_locations(
         shutdown_hours = getattr(operation, shut_attribute)
         month = r['d_end_transit_ts'].month
 
-        # optional shutdown before repair
-        if shutdown_hours.get(str(month), 0) != 0:
+        fail_op = operation.op_class.failures  or []
+
+        # Shut operations
+        # only for operations that are not additional operation to tow or that are additional op removals
+        if (
+            not any(f.id in op_corr_tow for f in fail_op)
+            or
+            any(
+                f.id in op_corr_tow and "remov" in f.name.lower()
+                for f in fail_op
+            )
+        ):
+            # optional shutdown before repair
+            if shutdown_hours.get(str(month), 0) != 0:
+                events.append({
+                    "date": r['d_end_transit_ts'],
+                    "event": "operation",
+                    "id": r['id'],
+                    "comments": r['comments'],
+                    "name": operation.op_class.name,
+                    "failure_id": fail,
+                    "shutdown": True,
+                    "shut_fix": "shut",
+                    "loc": None,
+                })
+        
+        # fix or final state
+        # only for operations that are not additional operation to tow or that are additional op redeploy
+
+        if (
+            not any(f.id in op_corr_tow for f in fail_op)
+            or
+            any(
+                f.id in op_corr_tow and "deplo" in f.name.lower()
+                for f in fail_op
+            )
+        ):
             events.append({
-                "date": r['d_end_transit_ts'],
+                "date": r['d_end_transit_tp'],
                 "event": "operation",
                 "id": r['id'],
                 "comments": r['comments'],
                 "name": operation.op_class.name,
                 "failure_id": fail,
                 "shutdown": True,
-                "shut_fix": "shut",
+                "shut_fix": shut_fix,
                 "loc": None,
             })
-
-        # fix or final state
-        events.append({
-            "date": r['d_end_transit_tp'],
-            "event": "operation",
-            "id": r['id'],
-            "comments": r['comments'],
-            "name": operation.op_class.name,
-            "failure_id": fail,
-            "shutdown": True,
-            "shut_fix": shut_fix,
-            "loc": None,
-        })
 
     return events, dict_locations
 

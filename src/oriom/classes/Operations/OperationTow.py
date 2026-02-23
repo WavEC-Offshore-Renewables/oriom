@@ -234,6 +234,8 @@ class OperationTow():
                 self.addition_op_tow = op
                 op_found = True
                 break
+        # save tow.id in additional operation failures
+        op.failures = [self]
         if not op_found:
             raise ValueError(f"OperationTow: addition_op_tow {self.addition_op_tow} not found in CorrectiveMajor")
 

@@ -86,9 +86,6 @@ class TestMainEndToEnd(unittest.TestCase):
 
         if check_files_spec:
             print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
-            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
-            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
-            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
             expected_result0_dir = excel_dir / "repo_private" / "result_0"
             repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "repo_public")
         else:
