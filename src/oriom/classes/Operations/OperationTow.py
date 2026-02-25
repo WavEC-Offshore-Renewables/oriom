@@ -46,7 +46,9 @@ class OperationTow():
             defided.
         ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
-        tow_operation (:obj:`bool`): Define if is a towing opreation. Default to ``True``
+        tow_operation (:obj:`bool`): Define if is a towing opreation. Default to ``True``.
+        string_disconnection (:obj:`bool`): Define if is a string disconnection is required
+            during towing opreation. Default to ``False``.
 
 
     Note:
@@ -63,6 +65,7 @@ class OperationTow():
             vessel2_id: str=None,
             vessel2_qt: int=None,
             addition_op_tow: str = None,
+            string_disconnection: bool = None,
             other_costs: float=0
     ):
         """Initializes :class:`OperationTow` with various attributes and optional parameters.
@@ -104,6 +107,7 @@ class OperationTow():
 
         self.ts_data = None
         self.tow_operation = True
+        self.string_disconnection = False
 
         if tech_cost is not None and tech_cost !=0:
             self.tech_cost = float(tech_cost)
@@ -119,6 +123,8 @@ class OperationTow():
             self.other_costs = float(other_costs)
         if addition_op_tow is not None:
             self.addition_op_tow = str(addition_op_tow).lower()
+        if string_disconnection is not None:
+            self.string_disconnection = bool(string_disconnection)
 
         self._check_attributes()
         
@@ -182,7 +188,8 @@ class OperationTow():
                 'vessel1_qt',
                 'vessel2_qt',
                 'other_costs',
-                'addition_op_tow'
+                'addition_op_tow',
+                'string_disconnection'
         ]
 
         operations_list = []
@@ -214,6 +221,7 @@ class OperationTow():
                     vessel2_id=operation["vessel2_id"],
                     vessel2_qt=operation["vessel2_qt"],
                     addition_op_tow=operation["addition_op_tow"],
+                    string_disconnection=operation["string_disconnection"],
                     other_costs=operation["other_costs"]
                 )
             )
@@ -276,6 +284,7 @@ class OperationTow():
                 "vessel2": vessel2,
                 "other_costs": self.other_costs,
                 "addition_op_tow": getattr(self.addition_op_tow, 'id', None),
+                "string_disconnection": self.string_disconnection,
                 "activities": activities
         }, f)
         f.close()

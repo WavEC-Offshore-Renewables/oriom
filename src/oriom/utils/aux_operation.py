@@ -74,6 +74,8 @@ def operation_check_identities(total_operations: list):
         logging.error(e_)
         raise ValueError(e_)
 
+    
+
 
 def define_activities(
         operation: object,

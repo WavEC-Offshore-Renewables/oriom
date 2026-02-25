@@ -1349,6 +1349,7 @@ def excel_to_yaml(
                     "vessel1_qt": row['vessel1_qt'],
                     "vessel2_qt": row['vessel2_qt'],
                     "addition_op_tow": row['additional_previous_op_tow'],
+                    "string_disconnection": row['string_disconnection'],
                     "other_costs": row['other_costs']
             })
 

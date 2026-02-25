@@ -55,8 +55,7 @@ def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None):
     date_end_dur_net_site = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_site', date_end_wait_site)
     date_end_transit_tp = logs_timeseries_func.create_data(df_filtered_start, 'transit_to_port', date_end_dur_net_site)
     date_end_stat_chart = date_end_leadtime + timedelta(hours=oper_stat.dur_total_dict[str(date_end_leadtime.month)])
-    date_end = date_end_transit_tp if add_op_end is None else add_op_end
-
+    date_end = date_end_transit_tp
     dur_tot_tow = df_filtered_start['dur_total']
 
     return {

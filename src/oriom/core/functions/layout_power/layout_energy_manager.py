@@ -34,7 +34,10 @@ def shut(
     device_shutted_string_level: dict = None,
     list_failed: set = (),
     string_inverter: set = (),
-    event: str = ''
+    event: str = '',
+    op_add_tow: dict = {},
+    op_corr_tow: dict = {},
+    r_id = ''
 ):
 
     """
@@ -65,6 +68,12 @@ def shut(
         list_failed (:obj:`set`, *optional*): set of already failed component.
         string_inverter (:obj:`set`, *optional*): Set of string for the inverter
         event (:obj:`str`, *optional*): Type of event
+        op_add_tow (:obj:`dict`, *optional*): Dictionary with operation id as key and boolean as value to identify 
+            if the operation is an addition op tow
+        op_corr_tow (:obj:`dict`, *optional*): Dictionary with operation id as key and dictionary as value to identify 
+            if the operation is a correlated op tow and if it requires the shutdown of the downstream string
+        r_id (:obj:`str`, *optional*): id of the row of the operation analyzed, used to check if the operation 
+            is an addition op tow or if it is a correlated op tow
 
     Returns:
         G graph and percentage farm available.
@@ -94,7 +103,9 @@ def shut(
             if livello in levels_component_no_power or event == 'tow':
                 manage_string_tow_operation(G = G, loc = loc, action = False)
             # Disconnect if farm electr layout cannot sustain a tow without shutdown downstream string a is conducted a towing operation
-            if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
+            if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False) and not op_corr_tow.get(r_id, {}).get('addition_op_tow', False):
+                manage_string_tow_operation(G = G, loc = loc, action = False)
+            if op_add_tow.get(r_id, False) and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
                 manage_string_tow_operation(G = G, loc = loc, action = False)
 
 
@@ -141,7 +152,9 @@ def shut(
 
     # Manage case in which device already shut down but require a tow and farm electr layout lead to shutdown downstream string a is conducted a towing operation
     else:
-        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
+        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False) and not getattr(op_corr_tow.get(r_id), 'addition_op_tow', False):
+            manage_string_tow_operation(G = G, loc = loc, action = False)
+        if op_add_tow.get(r_id, False) and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
             manage_string_tow_operation(G = G, loc = loc, action = False)
 
     #Returning the percentage available
@@ -169,7 +182,10 @@ def fix(
     tech: str,
     names_tech: str,
     n_pv_per_string: int = None,
-    event: str = ''
+    event: str = '',
+    op_add_tow: dict = {},
+    op_corr_tow: dict = {},
+    r_id = ''
 ):
     """
     It restore the power production due to the fixing of the component failed
@@ -187,6 +203,12 @@ def fix(
         names_tech (:obj:`str`): level of the component analyzed
         n_pv_per_string (:obj:`str`): number of pv modules per string
         event (:obj:`str`, *optional*): Type of event
+        op_add_tow (:obj:`dict`, *optional*): Dictionary with operation id as key and boolean as value to identify 
+            if the operation is an addition op tow
+        op_corr_tow (:obj:`dict`, *optional*): Dictionary with operation id as key and dictionary as value to identify 
+            if the operation is a correlated op tow and if it requires the shutdown of the downstream string
+        r_id (:obj:`str`, *optional*): id of the row of the operation analyzed, used to check if the operation 
+            is an addition op tow or if it is a correlated op tow
 
     Returns:
         G graph and percentage farm available.
@@ -218,7 +240,9 @@ def fix(
         if livello in levels_component_no_power or event == 'tow':
             manage_string_tow_operation(G = G, loc = loc, action = True)
         # Reconnect the string if the towing operation did shutdown the downstream string
-        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
+        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False) and not getattr(op_corr_tow.get(r_id), 'addition_op_tow', False):
+            manage_string_tow_operation(G = G, loc = loc, action = True)
+        if op_add_tow.get(r_id, False) and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
             manage_string_tow_operation(G = G, loc = loc, action = True)
 
     n_list = []
