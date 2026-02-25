@@ -1,9 +1,0 @@
-datetime,id,maintenance_strategy,operation_triggered,preferred_month
-03-02-10 15:00,ofw_fail_3,immediately,ofw_op002,
-17-06-10 6:00,ofw_fail_2,immediately,ofw_op001,
-05-06-11 23:00,ofw_fail_1,specific month,ofw_op001,5
-24-09-11 2:00,ofw_fail_4,immediately,ofw_op003,
-07-10-11 16:00,ofw_fail_1,specific month,ofw_op001,5
-04-11-11 7:00,ofw_fail_1,specific month,ofw_op001,5
-07-12-11 17:00,ofw_fail_3,immediately,ofw_op002,
-27-12-11 7:00,ofw_fail_5,immediately,ofw_op004,

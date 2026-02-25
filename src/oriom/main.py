@@ -65,7 +65,6 @@ except ImportError:
 warnings.simplefilter('ignore')
 
 
-
 ### ---------- INPUTS ---------- ###
 ### Parameters hard coded to define ###
 DEFAULT_CONFIG  = ConfigRun(
@@ -78,11 +77,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="TEST_TO_USE",
+    PROJECT_NAME="TEST",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\rmeda\Richi documents\Projects\ORIOM\files",
+    EXCEL_FILE_PATH=r"C:\Users\<Users>\<Path>\ORIOM\files",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_test_op_add.xlsx",
+    FORM_NAME="file_name.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

@@ -10,7 +10,6 @@ from oriom.classes.DefineOperationTechs import Define_operation
 
 
 # ----------------- Helpers & Dummies -----------------
-
 class DummyOperation:
     """Minimal operation object holding vessel IDs and target attributes."""
     def __init__(self, vessel1_id=None, vessel2_id=None, rov_drone=None, id_="op_001"):

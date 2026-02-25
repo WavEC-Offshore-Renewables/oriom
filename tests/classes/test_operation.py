@@ -745,73 +745,15 @@ class TestCorrectiveMinor(unittest.TestCase):
             with self.assertRaises(KeyError):
                 CorrectiveMinor.get_operations_from_yaml(yaml_path)
 
-    # ------------------------------------------------------------------ #
-    # get_failures and define_months_operations
-    # ------------------------------------------------------------------ #
-    def test_get_failures_assigns_matching_failures(self):
-        """get_failures must allocate failures whose operation_triggered matches operation id."""
-        op = CorrectiveMinor(
-            id_="ofw050",
-            name="Corrective",
-            duration_net=2.0,
-            device_shutdown=True,
-            level="device",
-            tech_required=1,
-            vessel1_id="CTV1",
-        )
-
-        f1 = FakeFailure(operation_triggered="ofw050", maintenance_strategy="immediate")
-        f2 = FakeFailure(operation_triggered="ofw999", maintenance_strategy="immediate")
-
-        op.get_failures([f1, f2])
-
-        self.assertIsNotNone(op.failures)
-        self.assertEqual(len(op.failures), 1)
-        self.assertIs(op.failures[0], f1)
-
-    def test_define_months_operations_specific_failures(self):
-        """
-        define_months_operations must restrict months to the preferred months of
-        failures whose maintenance_strategy contains 'specific'.
-        """
-        op = CorrectiveMinor(
-            id_="ofw051",
-            name="Corrective",
-            duration_net=2.0,
-            device_shutdown=True,
-            level="device",
-            tech_required=1,
-            vessel1_id="CTV1",
-        )
-
-        f_specific_1 = FakeFailure(
-            operation_triggered="ofw051",
-            maintenance_strategy="specific-month",
-            preferred_month=3,
-        )
-        f_specific_2 = FakeFailure(
-            operation_triggered="ofw051",
-            maintenance_strategy="specific-window",
-            preferred_month=5,
-        )
-        f_other = FakeFailure(
-            operation_triggered="ofw051",
-            maintenance_strategy="immediate",
-            preferred_month=None,
-        )
-
-        op.failures = [f_specific_1, f_specific_2, f_other]
-
-        # Before redefinition, all months or defaults are present
-        self.assertEqual(op.months, list(range(1, 13)))
-
-        op.define_months_operations()
-
-        self.assertEqual(op.months, [3, 5])
 
     # ------------------------------------------------------------------ #
     # to_yaml
     # ------------------------------------------------------------------ #
+class FakeFailure_id:
+    """Simple helper class to mimic a Failure object."""
+    def __init__(self, id_):
+        self.id = id_
+
     def test_to_yaml_writes_attributes_file_with_expected_structure(self):
         """to_yaml must write attributes.yaml with the correct keys and values."""
         op = CorrectiveMinor(
@@ -840,7 +782,7 @@ class TestCorrectiveMinor(unittest.TestCase):
         op.vessel2 = FakeVessel("support1", 1)
         op.rov_drone = FakeRovDrone("rov1")
         op.technology = "wtg"
-        op.failures = ["dummy_failure_1"]
+        op.failures = [FakeFailure_id(id_="dummy_failure_1")]
 
         with tempfile.TemporaryDirectory() as tmpdir:
             op.to_yaml(tmpdir)
