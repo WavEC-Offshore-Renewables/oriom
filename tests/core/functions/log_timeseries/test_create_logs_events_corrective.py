@@ -1,18 +1,16 @@
-# Updated tests/test_create_logs_corrective_file.py
-
-# --- I will insert the existing content and add all new test cases here ---
-
-# tests/test_create_logs_corrective_file.py
+# test_create_logs_corrective.py
 
 import unittest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
+
 import pandas as pd
 
 from oriom.core.functions.logs_timeseries.create_logs_events_corrective import (
     create_logs_corrective_file,
 )
 
+# Keep the same column set used by the production code/tests.
 LOG_COLS = [
     "d_trigger",
     "d_end_leadtime",
@@ -33,57 +31,23 @@ LOG_COLS = [
     "comments",
 ]
 
-# ----------------- Helpers -----------------
 
-# (original helpers retained)
+# -----------------
+# Helpers / dummies
+# -----------------
 
-def make_oper_sched(start_dt, n_rows=10, step_h=1,
-                    wait_start=1, dur_net_port=1, transit_to_site=1,
-                    wait_site=1, dur_net_site=1, transit_to_port=1, wait_port=1):
-    dts = [start_dt + timedelta(hours=i*step_h) for i in range(n_rows)]
-    dur_total = (
-        wait_start + dur_net_port + transit_to_site + wait_site + dur_net_site + transit_to_port + wait_port
-    )
-    return pd.DataFrame({
-        "datetime": dts,
-        "wait_start": [wait_start]*n_rows,
-        "dur_net_port": [dur_net_port]*n_rows,
-        "transit_to_site": [transit_to_site]*n_rows,
-        "wait_site": [wait_site]*n_rows,
-        "dur_net_site": [dur_net_site]*n_rows,
-        "transit_to_port": [transit_to_port]*n_rows,
-        "wait_port": [wait_port]*n_rows,
-        "dur_total": [dur_total]*n_rows,
-    })
+def make_oper_sched(start_dt, n_rows=24, step_h=1):
+    """Create a minimal operation schedule with an hourly 'datetime' column."""
+    dts = [start_dt + timedelta(hours=i * step_h) for i in range(n_rows)]
+    return pd.DataFrame({"datetime": dts})
 
 
 class DummyTS:
-    def __init__(self, oper_sched, last_valid_index):
+    def __init__(self, oper_sched, last_valid_index=None):
         self.oper_sched = oper_sched
+        if last_valid_index is None and oper_sched is not None:
+            last_valid_index = len(oper_sched) - 1
         self.last_valid_index = last_valid_index
-
-
-class DummyOp:
-    def __init__(self, id_, vessel1, vessel2=None, ts_data=None):
-        self.id = id_
-        self.vessel1 = vessel1
-        self.vessel2 = vessel2
-        self.vessel1_id = vessel1.id
-        self.vessel1_qt = 1
-        self.vessel2_id = vessel2.id if vessel2 else None
-        self.vessel2_qt = 1 if vessel2 else None
-        self.ts_data = ts_data
-        self.tow_to_port = False
-        self.op_tow_port = None
-        self.op_tow_site = None
-        self.vessel1_qt = 1
-        self.tow_to_site_dict = {"1": 0}
-
-
-class DummyOperStat:
-    def __init__(self, op_class, dur_total_dict):
-        self.op_class = op_class
-        self.dur_total_dict = dur_total_dict
 
 
 class DummyVessel:
@@ -91,6 +55,46 @@ class DummyVessel:
         self.id = id_
         self.mobilisation_time = mobilisation_time
         self.type = vtype
+
+
+class DummyOp:
+    def __init__(
+        self,
+        id_,
+        vessel1,
+        vessel2=None,
+        ts_data=None,
+        tow_to_port=False,
+        op_tow_port=None,
+        op_tow_site=None,
+        addition_op_tow=None,
+    ):
+        self.id = id_
+        self.vessel1 = vessel1
+        self.vessel2 = vessel2
+
+        self.vessel1_id = vessel1.id
+        self.vessel1_qt = 1
+
+        self.vessel2_id = vessel2.id if vessel2 else None
+        self.vessel2_qt = 1 if vessel2 else None
+
+        self.ts_data = ts_data
+
+        # Towing-related flags/refs
+        self.tow_to_port = tow_to_port
+        self.op_tow_port = op_tow_port
+        self.op_tow_site = op_tow_site
+        self.addition_op_tow = addition_op_tow
+
+        # Present in your original dummy; keep for compatibility.
+        self.tow_to_site_dict = {"1": 0}
+
+
+class DummyOperStat:
+    def __init__(self, op_class, dur_total_dict=None):
+        self.op_class = op_class
+        self.dur_total_dict = dur_total_dict or {"1": 1}
 
 
 class DummyFailure:
@@ -101,198 +105,148 @@ class DummyFailure:
 
 
 class DummyFinder:
-    def __init__(self, vessel_map, failure_map, op_stats_pmax_map=None, operations=None):
-        self.vessel_map = vessel_map
-        self.failure_map = failure_map
+    def __init__(
+        self,
+        vessel_map=None,
+        failure_map=None,
+        op_stats_pmax_map=None,
+        operations=None,
+    ):
+        self.vessel_map = vessel_map or {}
+        self.failure_map = failure_map or {}
         self.op_stats_pmax_map = op_stats_pmax_map or {}
         self.operations = operations or {}
 
-    def find_vessel(self, vessel_id): return self.vessel_map[vessel_id]
-    def find_failure_from_id(self, fail_id): return self.failure_map[fail_id]
-    def find_operation_stats_pmax(self, op_id): return self.op_stats_pmax_map[op_id]
-    def find_operation(self, op_id): return self.operations[op_id]
+    def find_vessel(self, vessel_id):
+        return self.vessel_map[vessel_id]
+
+    def find_failure_from_id(self, fail_id):
+        return self.failure_map[fail_id]
+
+    def find_operation_stats_pmax(self, op_id):
+        return self.op_stats_pmax_map[op_id]
+
+    def find_operation(self, op_id):
+        return self.operations[op_id]
 
 
-# ----------------- Original Test Cases (unchanged) -----------------
+def failure_df_to_logevent_df_stub(dates_failures: pd.DataFrame, cols: list) -> pd.DataFrame:
+    """Generate deterministic 'failure' log rows from dates_failures."""
+    rows = []
+    for _, r in dates_failures.iterrows():
+        row = {c: None for c in cols}
+        if "d_trigger" in cols:
+            row["d_trigger"] = r["datetime"]
+        if "event" in cols:
+            row["event"] = "failure"
+        if "id" in cols:
+            row["id"] = r["id"]
+        if "comments" in cols:
+            row["comments"] = f"failure_{r['id']}"
+        rows.append(row)
+    return pd.DataFrame(rows, columns=cols)
 
-# (existing two tests retained exactly as before)
 
-# ----------------- NEW TESTS ADDED BELOW -----------------
+def build_single_operation_row(cols, oper_id, vessel1_id, vessel2_id=None, date_failure=None, lead_h=0):
+    """Build a minimal operation row consistent with LOG_COLS."""
+    date_failure = date_failure or datetime(2025, 1, 1)
+    d_end_leadtime = date_failure + timedelta(hours=lead_h)
+    d_end_wait_start = d_end_leadtime + timedelta(hours=1)
+    d_end = d_end_wait_start + timedelta(hours=1)
 
-class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
+    row = {c: None for c in cols}
+    row.update(
+        {
+            "d_trigger": date_failure,
+            "d_end_leadtime": d_end_leadtime,
+            "d_end_wait_start": d_end_wait_start,
+            "d_end": d_end,
+            "event": "operation",
+            "id": oper_id,
+            "vessel_1": vessel1_id,
+            "n_vessel_1": 1,
+            "vessel_2": vessel2_id,
+            "n_vessel_2": 1 if vessel2_id else None,
+            "comments": "operation_row",
+        }
+    )
+    return pd.DataFrame([row], columns=cols)
 
-    # 1) Failure beyond cutoff — no output
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    def test_failure_beyond_cutoff(self, mock_fail_to_log):
-        mock_fail_to_log.return_value = pd.DataFrame(columns=["d_trigger"])  # minimal
+
+def build_single_mobilisation_row(cols, oper_id, vessel1_id, date_failure=None):
+    """Build a minimal mobilisation row; d_end will be overwritten by the function under test."""
+    date_failure = date_failure or datetime(2025, 1, 1)
+    row = {c: None for c in cols}
+    row.update(
+        {
+            "d_trigger": date_failure,
+            "d_end": date_failure,  # placeholder: should be overwritten by create_logs_corrective_file
+            "event": "mobilisation",
+            "id": oper_id,
+            "vessel_1": vessel1_id,
+            "n_vessel_1": 1,
+            "comments": "mobilisation_row",
+        }
+    )
+    return pd.DataFrame([row], columns=cols)
+
+
+# -----------------
+# Test cases
+# -----------------
+
+class TestCreateLogsCorrectiveFile(unittest.TestCase):
+
+    def test_returns_empty_if_dates_failures_empty(self):
         cutoff = datetime(2025, 1, 1)
-        dates_failures = pd.DataFrame([{ "datetime": cutoff + timedelta(days=10), "id": "F001.0", "maintenance_strategy": "immediately", "operation_triggered": "opA" }])
-        finder = DummyFinder({}, {})
-        out = create_logs_corrective_file(COLS=["d_trigger"], CUTOFF_DATE=cutoff,
-                                          dates_failures=dates_failures,
-                                          operation_log_file_stats=[], time_fail_op_immediately=1,
-                                          vessel_to_merge=[], find_element_class=finder)
-        self.assertTrue(out.empty)
-
-    # 2) Vessel mobilisation influencing leadtime
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
-    def test_mobilisation_effect(self, MockImmediate, mock_fail_to_log, mock_create_data):
-        # create_data: ritorna semplicemente la data di partenza (ci basta per il test)
-        mock_create_data.side_effect = lambda df_slice, col, start: start
-        mock_fail_to_log.return_value = pd.DataFrame(columns=LOG_COLS)
-
-        base = datetime(2025, 1, 1)
-        sched = make_oper_sched(base, n_rows=10)
-        ts = DummyTS(sched, last_valid_index=9)
-
-        # mobilizzazione = 0, ma lead_time del failure = 3 h
-        vessel = DummyVessel("V1", mobilisation_time=0)
-        op = DummyOp("opA", vessel1=vessel, ts_data=ts)
-        stat = DummyOperStat(op, dur_total_dict={"1": 5})
-
-        dates_failures = pd.DataFrame([{
-            "datetime": base,
-            "id": "F1.0",
-            "maintenance_strategy": "immediately",
-            "operation_triggered": op.id.lower(),  # <-- deve coincidere con oper.id.lower()
-        }])
-
-        failure = DummyFailure("immediately", lead_time=3)
-        finder = DummyFinder({"V1": vessel}, {"F1": failure})
-
-        # Stub per CorrectionImmediate
-        class StubImmediate:
-            def __init__(self, date_failure, vessel, oper, time_fail_op_immediately, tow_op):
-                self.date_failure = date_failure
-                self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
-                self.idx_end_leadtime = None
-
-            def mobilitate_vessel(self, log_events, row):
-                return None  # niente mobilizzazione nel test
-
-            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched):
-                # simuliamo idx_end_leadtime = indice failure + lead_mob_time
-                self.idx_end_leadtime = fail_index + lead_mob_time
-
-        MockImmediate.side_effect = StubImmediate
+        finder = DummyFinder()
 
         out = create_logs_corrective_file(
             COLS=LOG_COLS,
-            CUTOFF_DATE=base + timedelta(days=1),
-            dates_failures=dates_failures,
-            operation_log_file_stats=[stat],
+            CUTOFF_DATE=cutoff,
+            dates_failures=pd.DataFrame(),
+            operation_log_file_stats=[],
             time_fail_op_immediately=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
+        self.assertTrue(out.empty)
+        self.assertEqual(list(out.columns), LOG_COLS)
 
-        self.assertEqual(len(out), 1)
-        # idx_end_leadtime = 0 + 3 → riga 3 della schedule
-        self.assertEqual(out.iloc[0]["d_end_leadtime"], sched.iloc[3]["datetime"])
-
-    # 3) Preferred-month deferred maintenance
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionDeferred")
-    def test_preferred_month_deferred(self, MockDeferred, mock_fail_to_log, mock_create_data):
-        # create_data: ritorna semplicemente la data di partenza
-        mock_create_data.side_effect = lambda df_slice, col, start: start
-        mock_fail_to_log.return_value = pd.DataFrame(columns=LOG_COLS)
-
-        base = datetime(2025, 1, 15)
-        sched = make_oper_sched(base, n_rows=10)
-        ts = DummyTS(sched, last_valid_index=9)
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_failure_beyond_cutoff_creates_no_operations(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=1)
 
         vessel = DummyVessel("V1")
-        op = DummyOp("opA", vessel1=vessel, ts_data=ts)
-        stat = DummyOperStat(op, dur_total_dict={"1": 5, "2": 5})
+        oper_sched = make_oper_sched(base)
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(oper_sched))
+        stat = DummyOperStat(op)
 
-        dates_failures = pd.DataFrame([{
-            "datetime": base,
-            "id": "F2.0",
-            "maintenance_strategy": "specific month",  # <--- questa è la stringa che il codice gestisce
-            "operation_triggered": op.id.lower(),
-        }])
-
-        failure = DummyFailure("specific month", lead_time=0, preferred_month=2)
-        finder = DummyFinder({"V1": vessel}, {"F2": failure})
-
-        class StubDeferred:
-            def __init__(self, date_failure, vessel, oper, preferred_month, tow_op):
-                self.date_failure = date_failure
-                self.date_op = date_failure  # per il test basta
-                self.idx_end_leadtime = 0
-
-            def leadtime_evaluation(self, lead_mob_time):
-                # per semplicità teniamo sempre idx=0
-                self.idx_end_leadtime = 0
-
-            def add_leadtime_tow(self, lead_mob_time):
-                self.idx_end_leadtime = 0
-
-            def check_leadtime_index(self, oper_sched, CUTOFF_DATE):
-                return True  # sempre trovata una finestra valida
-
-        MockDeferred.side_effect = StubDeferred
-
-        out = create_logs_corrective_file(
-            COLS=LOG_COLS,
-            CUTOFF_DATE=base + timedelta(days=60),
-            dates_failures=dates_failures,
-            operation_log_file_stats=[stat],
-            time_fail_op_immediately=0,
-            vessel_to_merge=[],
-            find_element_class=finder,
+        # Failure occurs after cutoff => should not create an operation row.
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": cutoff + timedelta(days=10),
+                    "id": "F001.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                }
+            ]
         )
-
-        # basta verificare che venga creata almeno una riga
-        self.assertGreaterEqual(len(out), 1)
-
-    # 4) Test with vessel_2 present
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
-    def test_vessel2_fields(self, MockImmediate, mock_fail_to_log, mock_create_data):
-        mock_create_data.side_effect = lambda df_slice, col, start: start
-        mock_fail_to_log.return_value = pd.DataFrame(columns=LOG_COLS)
-
-        base = datetime(2025, 1, 1)
-        v1 = DummyVessel("A")
-        v2 = DummyVessel("B")
-        op = DummyOp("opAB", v1, vessel2=v2, ts_data=DummyTS(make_oper_sched(base), 5))
-        stat = DummyOperStat(op, {"1": 5})
-
-        dates_failures = pd.DataFrame([{
-            "datetime": base,
-            "id": "FX.0",
-            "maintenance_strategy": "immediately",
-            "operation_triggered": op.id.lower(),  # "opab"
-        }])
 
         finder = DummyFinder(
-            {"A": v1, "B": v2},
-            {"FX": DummyFailure("immediately")}
+            vessel_map={"V1": vessel},
+            failure_map={"F001": DummyFailure("immediately", lead_time=0)},
         )
-
-        class StubImmediate:
-            def __init__(self, date_failure, vessel, oper, time_fail_op_immediately, tow_op):
-                self.date_failure = date_failure
-                self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
-                self.idx_end_leadtime = 0
-
-            def mobilitate_vessel(self, log_events, row):
-                return None
-
-            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched):
-                self.idx_end_leadtime = fail_index
-
-        MockImmediate.side_effect = StubImmediate
 
         out = create_logs_corrective_file(
             COLS=LOG_COLS,
-            CUTOFF_DATE=base + timedelta(days=1),
+            CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
             time_fail_op_immediately=1,
@@ -300,88 +254,695 @@ class TestCreateLogsCorrectiveFileExtended(unittest.TestCase):
             find_element_class=finder,
         )
 
-        self.assertGreaterEqual(len(out), 1)
-        # controlliamo che il campo vessel_2 contenga l'id del secondo vessel
-        self.assertIn("vessel_2", out.columns)
-        self.assertIn("n_vessel_2", out.columns)
-        self.assertEqual(out.iloc[0]["vessel_2"], "B")
+        # We still get the "failure" row coming from failure_df_to_logevent_df,
+        # but we must not create "operation" rows.
+        self.assertEqual((out["event"] == "operation").sum(), 0)
+        mock_create_op.assert_not_called()
 
-    # 5) Multiple failures
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.create_data")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df")
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionImmediate")
-    def test_multiple_failures(self, MockImmediate, mock_fail_to_log, mock_create_data):
-        mock_create_data.side_effect = lambda df_slice, col, start: start
-        mock_fail_to_log.return_value = pd.DataFrame(columns=LOG_COLS)
-
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_never_repair_is_filtered_for_operations_only(self, mock_create_op, _mock_fail_to_log):
         base = datetime(2025, 1, 1)
-        v = DummyVessel("V1")  # mobilisation_time=0
-        op = DummyOp("opM", v, ts_data=DummyTS(make_oper_sched(base), 5))
-        stat = DummyOperStat(op, {"1": 5})
+        cutoff = base + timedelta(days=10)
 
-        dates_failures = pd.DataFrame([
-            {
-                "datetime": base,
-                "id": "F1.0",
-                "maintenance_strategy": "immediately",
-                "operation_triggered": op.id.lower(),  # "opm"
-            },
-            {
-                "datetime": base + timedelta(hours=1),
-                "id": "F2.0",
-                "maintenance_strategy": "immediately",
-                "operation_triggered": op.id.lower(),
-            },
-        ])
+        vessel = DummyVessel("V1")
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(make_oper_sched(base)))
+        stat = DummyOperStat(op)
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "F1.0",
+                    "maintenance_strategy": "never repair",
+                    "operation_triggered": op.id.lower(),
+                },
+                {
+                    "datetime": base + timedelta(hours=1),
+                    "id": "F2.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                },
+            ]
+        )
 
         finder = DummyFinder(
-            {"V1": v},
-            {
-                "F1": DummyFailure("immediately"),
-                "F2": DummyFailure("immediately"),
+            vessel_map={"V1": vessel},
+            failure_map={
+                "F1": DummyFailure("never repair", lead_time=0),
+                "F2": DummyFailure("immediately", lead_time=0),
             },
         )
 
-        class StubImmediate:
-            def __init__(self, date_failure, vessel, oper, time_fail_op_immediately, tow_op):
+        # Return a minimal operation row so we can detect call count.
+        def _stub_create_operation_site(**kwargs):
+            cols = kwargs["CONST"]["COLS"]
+            oper_obj = kwargs["oper_"]["oper"]
+            vessel_obj = kwargs["vessel_"]["vessel"]
+            lead_mob_time = kwargs["mobilisation"]["lead_mob_time"]
+            row_dates = build_single_operation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                date_failure=kwargs["failure_"]["date_failure"],
+                lead_h=int(lead_mob_time),
+            )
+            return row_dates, None
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        out = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        # One operation row only (for the repairable failure).
+        self.assertEqual((out["event"] == "operation").sum(), 1)
+        self.assertEqual(mock_create_op.call_count, 1)
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_lead_mob_time_passed_to_create_operation_site(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        # mobilisation_time=2h, component lead_time=3h => lead_mob_time=max(2,3)=3
+        vessel = DummyVessel("V1", mobilisation_time=2)
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(make_oper_sched(base)))
+        stat = DummyOperStat(op)
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "F1.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"V1": vessel},
+            failure_map={"F1": DummyFailure("immediately", lead_time=3)},
+        )
+
+        captured = {}
+
+        def _stub_create_operation_site(**kwargs):
+            captured["mob_time"] = kwargs["mobilisation"]["mob_time"]
+            captured["lead_mob_time"] = kwargs["mobilisation"]["lead_mob_time"]
+            cols = kwargs["CONST"]["COLS"]
+            oper_obj = kwargs["oper_"]["oper"]
+            vessel_obj = kwargs["vessel_"]["vessel"]
+            row_dates = build_single_operation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                date_failure=kwargs["failure_"]["date_failure"],
+                lead_h=int(kwargs["mobilisation"]["lead_mob_time"]),
+            )
+            return row_dates, None
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        _ = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        self.assertEqual(captured["mob_time"], 2)
+        self.assertEqual(captured["lead_mob_time"], 3)
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_matching_index_is_passed_to_create_operation_site(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        sched = make_oper_sched(base, n_rows=12)
+        vessel = DummyVessel("V1")
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(sched))
+        stat = DummyOperStat(op)
+
+        # Put failure exactly at schedule index 4.
+        failure_dt = sched.iloc[4]["datetime"]
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": failure_dt,
+                    "id": "F1.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"V1": vessel},
+            failure_map={"F1": DummyFailure("immediately", lead_time=0)},
+        )
+
+        captured = {}
+
+        def _stub_create_operation_site(**kwargs):
+            captured["fail_index"] = kwargs["index"]["fail_index"]
+            cols = kwargs["CONST"]["COLS"]
+            oper_obj = kwargs["oper_"]["oper"]
+            vessel_obj = kwargs["vessel_"]["vessel"]
+            row_dates = build_single_operation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                date_failure=kwargs["failure_"]["date_failure"],
+                lead_h=0,
+            )
+            return row_dates, None
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        _ = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        self.assertEqual(captured["fail_index"], 4)
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_vessel2_fields_are_propagated(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        v1 = DummyVessel("A")
+        v2 = DummyVessel("B")
+        op = DummyOp("opAB", vessel1=v1, vessel2=v2, ts_data=DummyTS(make_oper_sched(base)))
+        stat = DummyOperStat(op)
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "FX.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"A": v1, "B": v2},
+            failure_map={"FX": DummyFailure("immediately", lead_time=0)},
+        )
+
+        def _stub_create_operation_site(**kwargs):
+            cols = kwargs["CONST"]["COLS"]
+            oper_obj = kwargs["oper_"]["oper"]
+            vessel_obj = kwargs["vessel_"]["vessel"]
+            vessel2_id = kwargs["vessels_"]["vessel2_id"]
+            lead_mob_time = kwargs["mobilisation"]["lead_mob_time"]
+            row_dates = build_single_operation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                vessel2_id=vessel2_id,
+                date_failure=kwargs["failure_"]["date_failure"],
+                lead_h=int(lead_mob_time),
+            )
+            return row_dates, None
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        out = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        ops = out[out["event"] == "operation"]
+        self.assertEqual(len(ops), 1)
+        self.assertEqual(ops.iloc[0]["vessel_2"], "B")
+        self.assertEqual(ops.iloc[0]["n_vessel_2"], 1)
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_multiple_failures_create_multiple_operations(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        vessel = DummyVessel("V1")
+        op = DummyOp("opM", vessel1=vessel, ts_data=DummyTS(make_oper_sched(base)))
+        stat = DummyOperStat(op)
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "F1.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                },
+                {
+                    "datetime": base + timedelta(hours=1),
+                    "id": "F2.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                },
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"V1": vessel},
+            failure_map={
+                "F1": DummyFailure("immediately", lead_time=0),
+                "F2": DummyFailure("immediately", lead_time=0),
+            },
+        )
+
+        def _stub_create_operation_site(**kwargs):
+            cols = kwargs["CONST"]["COLS"]
+            oper_obj = kwargs["oper_"]["oper"]
+            vessel_obj = kwargs["vessel_"]["vessel"]
+            row_dates = build_single_operation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                date_failure=kwargs["failure_"]["date_failure"],
+                lead_h=0,
+            )
+            return row_dates, None
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        out = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        ops = out[out["event"] == "operation"]
+        self.assertEqual(len(ops), 2)
+        self.assertEqual(mock_create_op.call_count, 2)
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_operation_trigger_mismatch_skips_operations(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        vessel = DummyVessel("V1")
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(make_oper_sched(base)))
+        stat = DummyOperStat(op)
+
+        # operation_triggered does not match op.id.lower() => filtered out.
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "FX.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": "missing_op",
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"V1": vessel},
+            failure_map={"FX": DummyFailure("immediately", lead_time=0)},
+        )
+
+        out = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        self.assertEqual((out["event"] == "operation").sum(), 0)
+        mock_create_op.assert_not_called()
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    def test_missing_oper_sched_raises_filenotfound(self, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        vessel = DummyVessel("V1")
+        # ts_data missing schedule => safe_getattr returns None => FileNotFoundError
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(oper_sched=None, last_valid_index=None))
+        stat = DummyOperStat(op)
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "F1.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"V1": vessel},
+            failure_map={"F1": DummyFailure("immediately", lead_time=0)},
+        )
+
+        with self.assertRaises(FileNotFoundError):
+            create_logs_corrective_file(
+                COLS=LOG_COLS,
+                CUTOFF_DATE=cutoff,
+                dates_failures=dates_failures,
+                operation_log_file_stats=[stat],
+                time_fail_op_immediately=1,
+                vessel_to_merge=[],
+                find_element_class=finder,
+            )
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_mobilisation_row_d_end_is_overwritten_with_end_wait_start(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        vessel = DummyVessel("V1", mobilisation_time=2)
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(make_oper_sched(base)))
+        stat = DummyOperStat(op)
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "F1.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"V1": vessel},
+            failure_map={"F1": DummyFailure("immediately", lead_time=0)},
+        )
+
+        def _stub_create_operation_site(**kwargs):
+            cols = kwargs["CONST"]["COLS"]
+            oper_obj = kwargs["oper_"]["oper"]
+            vessel_obj = kwargs["vessel_"]["vessel"]
+            # Force a known end_wait_start so we can assert overwrite.
+            row_dates = build_single_operation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                date_failure=kwargs["failure_"]["date_failure"],
+                lead_h=0,
+            )
+            row_mob = build_single_mobilisation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                date_failure=kwargs["failure_"]["date_failure"],
+            )
+            return row_dates, row_mob
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        out = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        ops = out[out["event"] == "operation"]
+        mobs = out[out["event"] == "mobilisation"]
+
+        self.assertEqual(len(ops), 1)
+        self.assertEqual(len(mobs), 1)
+
+        expected = ops.iloc[0]["d_end_wait_start"]
+        self.assertEqual(mobs.iloc[0]["d_end"], expected)
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_failure_datetime_not_in_schedule_can_be_skipped(self, mock_create_op, _mock_fail_to_log):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        # Schedule does not include base+999h.
+        sched = make_oper_sched(base, n_rows=10)
+        vessel = DummyVessel("V1")
+        op = DummyOp("opA", vessel1=vessel, ts_data=DummyTS(sched))
+        stat = DummyOperStat(op)
+
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base + timedelta(hours=999),
+                    "id": "F1.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op.id.lower(),
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={"V1": vessel},
+            failure_map={"F1": DummyFailure("immediately", lead_time=0)},
+        )
+
+        # If fail_index is NaN, simulate create_operation_site returning an empty DF => function should continue.
+        def _stub_create_operation_site(**kwargs):
+            fail_index = kwargs["index"]["fail_index"]
+            if pd.isna(fail_index):
+                return pd.DataFrame(columns=kwargs["CONST"]["COLS"]), None
+            raise AssertionError("This branch should not be reached in this test.")
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        out = create_logs_corrective_file(
+            COLS=LOG_COLS,
+            CUTOFF_DATE=cutoff,
+            dates_failures=dates_failures,
+            operation_log_file_stats=[stat],
+            time_fail_op_immediately=1,
+            vessel_to_merge=[],
+            find_element_class=finder,
+        )
+
+        self.assertEqual((out["event"] == "operation").sum(), 0)
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df",
+        side_effect=failure_df_to_logevent_df_stub,
+    )
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.compute_operation_datetimes")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective._check_index_row_validity")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionTowSite")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.CorrectionTowPort")
+    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.create_operation_site")
+    def test_tow_flow_creates_tow_rows(
+        self,
+        mock_create_op,
+        MockTowPort,
+        MockTowSite,
+        mock_check_idx,
+        mock_compute_dates,
+        _mock_fail_to_log,
+    ):
+        base = datetime(2025, 1, 1)
+        cutoff = base + timedelta(days=10)
+
+        # Main operation (tow enabled)
+        v_main = DummyVessel("V_MAIN", mobilisation_time=0)
+        main_sched = make_oper_sched(base, n_rows=24)
+        op_main = DummyOp(
+            "opMain",
+            vessel1=v_main,
+            ts_data=DummyTS(main_sched),
+            tow_to_port=True,
+            op_tow_port="opTowPort",
+            op_tow_site="opTowSite",
+        )
+        stat_main = DummyOperStat(op_main)
+
+        # Tow to port operation
+        v_tow_port = DummyVessel("V_TOW_PORT", mobilisation_time=0)
+        tow_port_sched = make_oper_sched(base, n_rows=24)
+        op_tow_port = DummyOp("opTowPort", vessel1=v_tow_port, ts_data=DummyTS(tow_port_sched))
+
+        # Tow to site operation
+        v_tow_site = DummyVessel("V_TOW_SITE", mobilisation_time=0)
+        tow_site_sched = make_oper_sched(base, n_rows=24)
+        op_tow_site = DummyOp("opTowSite", vessel1=v_tow_site, ts_data=DummyTS(tow_site_sched))
+
+        # Failure triggers main operation
+        dates_failures = pd.DataFrame(
+            [
+                {
+                    "datetime": base,
+                    "id": "F1.0",
+                    "maintenance_strategy": "immediately",
+                    "operation_triggered": op_main.id.lower(),
+                }
+            ]
+        )
+
+        finder = DummyFinder(
+            vessel_map={
+                "V_MAIN": v_main,
+                "V_TOW_PORT": v_tow_port,
+                "V_TOW_SITE": v_tow_site,
+            },
+            failure_map={"F1": DummyFailure("immediately", lead_time=0)},
+            operations={
+                "opTowPort": op_tow_port,
+                "opTowSite": op_tow_site,
+            },
+            op_stats_pmax_map={
+                "opTowPort": MagicMock(),
+                "opTowSite": MagicMock(),
+            },
+        )
+
+        # Stub create_operation_site for the main operation (after tow port).
+        def _stub_create_operation_site(**kwargs):
+            cols = kwargs["CONST"]["COLS"]
+            oper_obj = kwargs["oper_"]["oper"]
+            vessel_obj = kwargs["vessel_"]["vessel"]
+            row_dates = build_single_operation_row(
+                cols=cols,
+                oper_id=oper_obj.id,
+                vessel1_id=vessel_obj.id,
+                date_failure=kwargs["failure_"]["date_failure"],
+                lead_h=0,
+            )
+            # No mobilisation lines for this tow test.
+            return row_dates, None
+
+        mock_create_op.side_effect = _stub_create_operation_site
+
+        # TowPort stub
+        class StubTowPort:
+            def __init__(self, date_failure, vessel, oper, failure, time_fail_op_immediately):
                 self.date_failure = date_failure
                 self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
                 self.idx_end_leadtime = None
+                self.tow_deferred = False
 
             def mobilitate_vessel(self, log_events, row):
                 return None
 
             def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched):
-                # in questo test non ci interessa il leadtime aggiuntivo
-                self.idx_end_leadtime = fail_index
+                self.idx_end_leadtime = int(fail_index)
 
-        MockImmediate.side_effect = StubImmediate
+        MockTowPort.side_effect = StubTowPort
+
+        # TowSite stub
+        class StubTowSite:
+            def __init__(self, date_failure, vessel, oper, date_start):
+                self.date_failure = date_failure
+                self.idx_end_leadtime = 0
+
+            def mobilitate_vessel(self, log_events, row, date_start=None):
+                return None
+
+            def check_leadtime_index(self, oper_sched, CUTOFF_DATE):
+                self.idx_end_leadtime = 0
+                return True
+
+        MockTowSite.side_effect = StubTowSite
+
+        # _check_index_row_validity: always return a non-empty slice
+        mock_check_idx.return_value = pd.DataFrame({"datetime": [base]})
+
+        # compute_operation_datetimes: deterministic timeline
+        def _compute_dates(_df, _stat, _end_add_op):
+            t0 = _df["datetime"].iloc[0]
+            return {
+                "date_end_leadtime": t0 + timedelta(hours=0),
+                "date_end_wait_start": t0 + timedelta(hours=1),
+                "date_end_dur_net_port": t0 + timedelta(hours=2),
+                "date_end_transit_ts": t0 + timedelta(hours=3),
+                "date_end_wait_site": t0 + timedelta(hours=4),
+                "date_end_dur_net_site": t0 + timedelta(hours=5),
+                "date_end_transit_tp": t0 + timedelta(hours=6),
+                "date_end": t0 + timedelta(hours=7),
+                "date_end_stat_chart": t0 + timedelta(hours=7),
+                "dur_total": 1,
+            }
+
+        mock_compute_dates.side_effect = _compute_dates
 
         out = create_logs_corrective_file(
             COLS=LOG_COLS,
-            CUTOFF_DATE=base + timedelta(days=1),
+            CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
-            operation_log_file_stats=[stat],
+            operation_log_file_stats=[stat_main],
             time_fail_op_immediately=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
 
-        # una riga di operazione per ogni failure
-        ops_only = out[out["event"] == "operation"]
-        self.assertEqual(len(ops_only), 2)
+        tow_rows = out[out["event"] == "tow"]
+        self.assertGreaterEqual(len(tow_rows), 2)
 
-    # 6) Trigger operation missing
-    @patch("oriom.core.functions.logs_timeseries.create_logs_events_corrective.logs_timeseries_func.failure_df_to_logevent_df", return_value=pd.DataFrame(columns=["d_trigger"]))
-    def test_missing_operation_trigger(self, mock_fail):
-        base = datetime(2025,1,1)
-        dates_failures = pd.DataFrame([{ "datetime": base, "id":"FX.0","maintenance_strategy":"immediately","operation_triggered":"missing_op" }])
-        finder = DummyFinder({}, {"FX":DummyFailure("immediately")})
-
-        out = create_logs_corrective_file(COLS=["d_trigger"], CUTOFF_DATE=base+timedelta(days=1),
-                                          dates_failures=dates_failures, operation_log_file_stats=[], time_fail_op_immediately=1,
-                                          vessel_to_merge=[], find_element_class=finder)
-        self.assertTrue(out.empty)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

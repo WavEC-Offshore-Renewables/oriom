@@ -186,7 +186,7 @@ class CorrectiveMajor():
         if self.tech_cost < 0:
             raise ValueError('"tech_cost" must not be negative')
         if isinstance(self.months, int) is True and self.months in range(1,13) is False:
-            raise NameError(' "month" must be between 1 and 12')
+            raise NameError('"month" must be between 1 and 12')
         if isinstance(self.months, int) is False and all([month in range(1, 13) for month in self.months]) is False:
             raise NameError('"months" must be between 1 and 12')
         if self.other_costs is not None and self.other_costs < 0:
@@ -194,7 +194,7 @@ class CorrectiveMajor():
         if self.port_costs is not None and self.port_costs < 0:
             raise ValueError('"port_costs" must not be negative')
         if self.tow_to_port and (self.vessel1_id or self.vessel2_id):
-            raise ValueError('"Vessel must not be defined if is a port operation. Leave it empty "vessel1_id" and "vessel2_id"')
+            raise ValueError('Vessel must not be defined if is a port operation. Leave it empty "vessel1_id" and "vessel2_id"')
         if self.vessel1_id is not None:
             if self.vessel1_qt < 1:
                 raise ValueError('"vessel1_qt" must be positive if a "vessel1_id" is defined')
@@ -329,30 +329,6 @@ class CorrectiveMajor():
         return operations_list
 
 
-    def get_failures(
-            self,
-            failures_list: list
-    ):
-        """
-        Loop through a list of failures and allocate to this operation failures that trigger it.
-
-        Args:
-            failures_list (:class:`~oriom.classes.Failure.Failure`): List of
-                :class:`~oriom.classes.Failure.Failure`.
-        Raises:
-            TypeError: if the operation is not corrective.
-        """
-        failures = []
-        for failure in failures_list:
-            if failure.operation_triggered == self.id:
-                failures.append(failure)
-
-        if len(failures) == 0:
-            return
-        else:
-            self.failures = failures
-
-
     def define_months_operations(self):
         """
         Define the months in which corrective operations may take place based on operation failures.
@@ -416,6 +392,6 @@ class CorrectiveMajor():
                 "port_costs": self.port_costs,
                 "activities": activities,
                 "rov_drone": rov_drone,
-                # "failures": failures,
+                "failures": [failure.id for failure in getattr(self, 'failures', []) or []]
         }, f)
         f.close()

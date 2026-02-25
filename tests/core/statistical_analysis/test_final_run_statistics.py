@@ -251,7 +251,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
             self.assertTrue(os.path.isfile(avg_path))
 
             try:
-                from private_moduls import KPI_Insight_
+                from oriom.core.functions.private.KPI_Insight import KPI_Insight
                 # Check KPI insight Excel is created
                 kpi_path = os.path.join(self.save_dir, "KPI_insight.xlsx")
                 self.assertTrue(os.path.isfile(kpi_path))

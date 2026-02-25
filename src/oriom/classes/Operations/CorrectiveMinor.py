@@ -403,30 +403,6 @@ class CorrectiveMinor():
         return operations_list
 
 
-    def get_failures(
-            self,
-            failures_list: list
-    ):
-        """
-        Loop through a list of failures and allocate to this operation failures that trigger it.
-
-        Args:
-            failures_list (:obj:`list`): List of
-                :class:`~oriom.classes.Failure.Failure`.
-        Raises:
-            TypeError: if the operation is not corrective.
-        """
-        failures = []
-        for failure in failures_list:
-            if failure.operation_triggered == self.id:
-                failures.append(failure)
-
-        if len(failures) == 0:
-            return
-        else:
-            self.failures = failures
-
-
     def define_months_operations(self):
         """
         Define the months in which corrective operations may take place based on operation failures.
@@ -497,6 +473,6 @@ class CorrectiveMinor():
                 "other_costs": self.other_costs,
                 "rov_drone": rov_drone,
                 "double_shift": self.double_shift,
-                "failures": self.failures
+                "failures": [failure.id for failure in getattr(self, 'failures', []) or []]
         }, f)
         f.close()

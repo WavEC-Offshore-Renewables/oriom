@@ -86,9 +86,6 @@ class TestMainEndToEnd(unittest.TestCase):
 
         if check_files_spec:
             print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
-            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
-            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
-            print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
             expected_result0_dir = excel_dir / "repo_private" / "result_0"
             repo_root_failure_dir = os.path.join(repo_root, "tests", "test_files", "test_end_to_end", "repo_public")
         else:
@@ -158,10 +155,6 @@ class TestMainEndToEnd(unittest.TestCase):
         # Compare CSVs in result_0
         actual_result0_dir = Path(dirs.result_dir) / "result_0"
         self.assertTrue(actual_result0_dir.exists(), f"Actual result_0 directory not found: {actual_result0_dir}")
-
-        print(expected_result0_dir)
-        print(expected_result0_dir)
-        print(expected_result0_dir)
 
         self._assert_csv_dirs_equal(expected_dir=expected_result0_dir, actual_dir=actual_result0_dir)
 

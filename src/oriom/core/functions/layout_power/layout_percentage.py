@@ -6,7 +6,7 @@ from datetime import datetime
 import numpy as np
 
 from oriom.core.functions.layout_power import aux_layout_power_func
-from oriom.core.functions.layout_power.corrective_location import logs_corrective_locations
+from oriom.core.functions.layout_power.corrective_location import logs_corrective_locations, choose_spec_loc_string
 from oriom.core.functions.layout_power.layout_energy_manager import shut, fix
 
 
@@ -25,7 +25,7 @@ def return_percentage(
     n_lifetime: int,
     n_devices: int,
     tech: str,
-    find_element_class,
+    find_element_class: object,
     n_strings_per_inv: int = None,
     n_pv_per_string: int = None,
     max_failure_module: int = None
@@ -122,7 +122,10 @@ def return_percentage(
     LEVELS_NO_POWER = {data.get("level") for _, data in G.nodes(data=True)}
     LEVELS_NO_POWER.discard(COMPONENT_LEVEL_POWER)
 
+    # Create list of operations id to consider for shut down or fix strategy
     op_corr_excl_tow = [op.id for op in operations_corrective_stat if not getattr(op.op_class, "tow_to_port", None)]
+    op_corr_tow = {}
+    op_add_tow = {}
     events_total = []
     percentage = []
 
@@ -131,6 +134,17 @@ def return_percentage(
     device_shutted_string_level = {}
     device_string_level = {}
     dict_locations = {}
+
+    for op in operations_corrective_stat:
+        if getattr(op.op_class, "tow_to_port", None) or getattr(op.op_class, "op_tow_site", None):
+            tow_port_op = getattr(op.op_class, "op_tow_port", None)
+            tow_site_op = getattr(op.op_class, "op_tow_site", None)
+
+            for op_tow in [tow_port_op, tow_site_op]:
+                found_op = find_element_class.find_operation(op_tow)
+                op_corr_tow[found_op.id] = found_op
+                if found_op.addition_op_tow:
+                    op_add_tow[found_op.addition_op_tow.id] = found_op.string_disconnection
 
     if tech == 'PV':
         string_inverter = set(range(1, n_strings_per_inv + 1))
@@ -148,7 +162,9 @@ def return_percentage(
                     op_corr_excl_tow,
                     shut_attribute,
                     find_element_class,
-                    dict_locations
+                    dict_locations,
+                    op_corr_tow,
+                    op_add_tow
             )
 
             for row in rows:
@@ -167,7 +183,7 @@ def return_percentage(
             shutdown = r["shutdown"]
             shut_fix = r["shut_fix"]
             failure_id = r["failure_id"]
-
+            r_id = r["id"]
 
             if r["loc"] is None:
                 # failure location
@@ -223,9 +239,10 @@ def return_percentage(
                         device_failed.add(loc)
                         close_device = True
 
-
                 # Shutdown the component if is a failure that requires it or the op require shutdown and was not already shutted
-                if loc not in device_shutted or event == 'tow':
+                if loc not in device_shutted or event == 'tow' or r_id in op_add_tow.keys():
+                    if op_add_tow.get(r_id, False):
+                        loc = choose_spec_loc_string(G,loc)
                     G, power_farm = shut(
                         loc,
                         shutdown if loc not in device_shutted else False, # Manage case device failed but need tow and create string disconn
@@ -239,7 +256,10 @@ def return_percentage(
                         device_shutted_string_level,
                         list_failed = device_shutted,
                         string_inverter = string_inverter,
-                        event = event
+                        event = event,
+                        op_corr_tow = op_corr_tow,
+                        op_add_tow = op_add_tow,
+                        r_id = r_id
                     )
 
                     perc = power_farm / n_devices * 100
@@ -250,6 +270,8 @@ def return_percentage(
 
             # Store the fix of the device and evaluate the power of the farm
             elif shut_fix == 'fix':
+                if op_add_tow.get(r_id, False):
+                    loc = choose_spec_loc_string(G,loc)
                 G, power_farm = fix(
                     loc,
                     G,
@@ -258,7 +280,10 @@ def return_percentage(
                     tech,
                     name,
                     n_pv_per_string,
-                    event = event
+                    event = event,
+                    op_corr_tow = op_corr_tow,
+                    op_add_tow = op_add_tow,
+                    r_id = r_id
                 )
                 device_failed.discard(loc)
                 device_shutted.discard(loc)

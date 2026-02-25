@@ -74,6 +74,8 @@ def operation_check_identities(total_operations: list):
         logging.error(e_)
         raise ValueError(e_)
 
+    
+
 
 def define_activities(
         operation: object,
@@ -228,3 +230,29 @@ def recycle_activities(operation: object, dir: str, file_name: str, tow_op: bool
             file_csv=os.path.join(dir, file_name + '.csv')
     )
     logging.info(f'{operation_type}: operation {operation.id} activities recycled from {os.path.join(dir, file_name)}.')
+
+
+def get_failures(
+        operation: object,
+        failures_list: list
+):
+    """
+    Loop through a list of failures and allocate to the operation the failures that trigger it.
+
+    Args:
+        operation (:obj: object) Object of CorrectiveMajor or CorrectiveMinor
+        failures_list (:class:`~oriom.classes.Failure.Failure`): List of
+            :class:`~oriom.classes.Failure.Failure`.
+    Raises:
+        TypeError: if the operation is not corrective.
+    """
+
+    failures = []
+    for failure in failures_list:
+        if failure.operation_triggered == operation.id:
+            failures.append(failure)
+
+    if len(failures) == 0:
+        return
+    else:
+        operation.failures = failures

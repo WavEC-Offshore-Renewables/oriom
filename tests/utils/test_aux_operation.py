@@ -5,15 +5,24 @@ import types
 import networkx as nx
 from copy import deepcopy
 
-from oriom.utils.aux_operation import level_component_check, operation_check_identities, define_activities
+from oriom.utils.aux_operation import level_component_check, operation_check_identities, define_activities, get_failures
 from oriom.classes.DefineOperationTechs import Define_operation
 from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.classes.Operations.CorrectiveMinor import CorrectiveMinor
 from oriom.classes.Operations.OperationTow import OperationTow
 from oriom.classes.Vessel import Vessel
 
 # ---------------------------
 # Helpers / fakes for tests
 # ---------------------------
+
+class FakeFailure:
+    """Simple helper class to mimic a Failure object."""
+    def __init__(self, operation_triggered, maintenance_strategy, preferred_month=None):
+        self.operation_triggered = operation_triggered
+        self.maintenance_strategy = maintenance_strategy
+        self.preferred_month = preferred_month
+
 
 def make_graph_with_levels(node_lvls=(), edge_lvls=()):
     G = nx.DiGraph()
@@ -137,6 +146,69 @@ class TestOperation(unittest.TestCase):
 
         self.vessels = {ves.id: ves for ves in vessels_obj}
 
+    def test_define_months_operations_specific_failures(self):
+        """
+        define_months_operations must restrict months to the preferred months of
+        failures whose maintenance_strategy contains 'specific'.
+        """
+        op = CorrectiveMinor(
+            id_="ofw051",
+            name="Corrective",
+            duration_net=2.0,
+            device_shutdown=True,
+            level="device",
+            tech_required=1,
+            vessel1_id="CTV1",
+        )
+
+        f_specific_1 = FakeFailure(
+            operation_triggered="ofw051",
+            maintenance_strategy="specific-month",
+            preferred_month=3,
+        )
+        f_specific_2 = FakeFailure(
+            operation_triggered="ofw051",
+            maintenance_strategy="specific-window",
+            preferred_month=5,
+        )
+        f_other = FakeFailure(
+            operation_triggered="ofw051",
+            maintenance_strategy="immediate",
+            preferred_month=None,
+        )
+
+        op.failures = [f_specific_1, f_specific_2, f_other]
+
+        # Before redefinition, all months or defaults are present
+        self.assertEqual(op.months, list(range(1, 13)))
+
+        op.define_months_operations()
+
+        self.assertEqual(op.months, [3, 5])
+
+
+    def test_get_failures_assigns_matching_failures(self):
+        """get_failures must allocate failures whose operation_triggered matches operation id."""
+        op = CorrectiveMinor(
+            id_="ofw050",
+            name="Corrective",
+            duration_net=2.0,
+            device_shutdown=True,
+            level="device",
+            tech_required=1,
+            vessel1_id="CTV1",
+        )
+
+        f1 = FakeFailure(operation_triggered="ofw050", maintenance_strategy="immediate")
+        f2 = FakeFailure(operation_triggered="ofw999", maintenance_strategy="immediate")
+
+        get_failures(operation=op, failures_list=[f1, f2])
+
+        self.assertIsNotNone(op.failures)
+        self.assertEqual(len(op.failures), 1)
+        self.assertIs(op.failures[0], f1)
+
+
 
     def test_define_activities(self):
         op_corr = deepcopy(self.op_corr)
@@ -182,6 +254,6 @@ class TestOperation(unittest.TestCase):
                 tow_op = True
         )
 
-
+    
 if __name__ == "__main__":
     unittest.main(verbosity=2)

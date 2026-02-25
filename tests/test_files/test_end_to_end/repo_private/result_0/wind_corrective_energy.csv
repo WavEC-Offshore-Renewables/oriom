@@ -22,7 +22,9 @@ Date,Event,id,Comments,Name,Loc,Shutdown,Shut/Fix,Perc_availability,Power_loss_k
 2010-07-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
 2010-08-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
 2010-08-08 07:00:00,failure,ofw_fail_5.1,immediately,failure 5,4,True,shut,80.0,6184.995
-2010-08-09 07:41:24,tow,ofw_removal_tow,tow_ofw_fail_5.1,ofw_removal_tow,4,True,shut,40.0,2371060.185
+2010-08-09 06:10:12,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,shut,0.0,11816.7
+2010-08-09 12:20:24,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,fix,80.0,33595.005
+2010-08-10 06:41:24,tow,ofw_removal_tow,tow_ofw_fail_5.1,ofw_removal_tow,4,True,shut,80.0,754395.05
 2010-08-16 10:23:24,tow,ofw_redeploy_tow,tow_ofw_fail_5.1,ofw_redeploy_tow,4,False,fix,100.0,0.0
 2010-08-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
 2010-09-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0

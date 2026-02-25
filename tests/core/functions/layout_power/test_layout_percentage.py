@@ -119,7 +119,7 @@ class TestReturnPercentageNonPV(unittest.TestCase):
         - operation -> fix -> 100% availability
         """
         # logs_corrective_locations returns dict-based events (as in real implementation)
-        def fake_logs_corrective_locations(r, op_corr_excluding_tow, shut_attribute, find_element_class, dict_locations):
+        def fake_logs_corrective_locations(r, op_corr_excluding_tow, shut_attribute, find_element_class, dict_locations, op_corr_tow={}, op_add_tow={}):
             if r["id"] == "ofw.001" and r["event"] == "failure":
                 return (
                     [
@@ -211,7 +211,8 @@ class TestReturnPercentageNonPV(unittest.TestCase):
         """
         If events include an unknown shut_fix value, return_percentage raises ValueError.
         """
-        def fake_logs_corrective_locations(r, op_corr_excluding_tow, shut_attribute, find_element_class, dict_locations):
+        def fake_logs_corrective_locations(r, op_corr_excluding_tow, shut_attribute, find_element_class, dict_locations, op_corr_tow={}, op_add_tow={}):
+
             return (
                 [
                     {
@@ -294,7 +295,7 @@ class TestReturnPercentagePV(unittest.TestCase):
           - availability values are produced
           - code path for PV update_string_PV_shutdown is exercised (via string_location patch)
         """
-        def fake_logs_corrective_locations(r, op_corr_excluding_tow, shut_attribute, find_element_class, dict_locations):
+        def fake_logs_corrective_locations(r, op_corr_excluding_tow, shut_attribute, find_element_class, dict_locations, op_corr_tow={}, op_add_tow={}):
             return (
                 [
                     {
