@@ -49,10 +49,17 @@ from oriom.core.statistical_analysis.final_run_statistics import return_statisti
 from oriom.core.results_block_manager import results_block
 from oriom import test
 
-print()
-test.test()
-time.sleep(3)
-print()
+#from oriom.core.functions.private import charging_bars
+
+# print()
+# test.test()
+# time.sleep(3)
+# print()
+
+# charging_bars.charge_6(duration=3, phrase="Boosting energy transitions...", bar_width = 40, color ="blue")
+# charging_bars.charge_6(duration=3, phrase="Reducing CO2 emissions...", bar_width = 40, color = "yellow")
+# charging_bars.charge_6(duration=3, phrase="Sharing technological knowledge...", bar_width = 40, color = "red")
+# charging_bars.charge_6(duration=3, phrase="Initialising ORIOM...", bar_width = 40, color = "#87CEEB")
 
 try:
     from oriom.core.functions.private import check_files
@@ -63,7 +70,10 @@ except ImportError:
     logging.warning(e_)
 
 warnings.simplefilter('ignore')
-
+logging.basicConfig(
+    level=logging.ERROR,       # Mostra solo ERROR e CRITICAL
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 ### ---------- INPUTS ---------- ###
 ### Parameters hard coded to define ###
@@ -79,9 +89,9 @@ DEFAULT_CONFIG  = ConfigRun(
     ENERGY_STATISTICAL_CALCULATION=False,
     PROJECT_NAME="TEST",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\<Users>\<Path>\ORIOM\files",
+    EXCEL_FILE_PATH=r"C:\Users\rmeda\Richi documents\Projects\ORIOM\files",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="file_name.xlsx",
+    FORM_NAME="form_test_video.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

@@ -410,11 +410,14 @@ class Layout_Wind():
             :width: 800px
             :alt: esempio
 
-            LAYOUT 6 STAR LAYOUT: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=3, n_turbines=15
-
-
+            LAYOUT 6 STAR LAYOUT: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=5, n_turbines=15
 
         Layout with 1 Substation, 1 Array Cable, hubs and string of 1 turbine connected to  connector
+
+        Args:
+            n_string_to_connector (int): Number of string that are connect to the same connector (hub).
+                Default value to ´´1´´
+            n_strings (int): Number of strings in the layout. Is equal to n_turbines
         """
 
         G = nx.DiGraph()
@@ -507,7 +510,7 @@ class Layout_Wind():
             h=1
             l += 1
 
-        Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_6",)
+        Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_6", show_plot = True)
         return G
 
 
@@ -542,7 +545,7 @@ class Layout_Wind():
             return self.layout5_wind(n_turbines=n_turbines, n_strings=n_strings, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         elif n_layout == 6:
             if n_turbines % n_string_to_connector:
-                raise ValueError("Layout 5: n_turbines must be divisible by n_strings or n_string_to_connector manually")
+                raise ValueError("Layout 6: n_turbines must be divisible by n_string_to_connector manually")
             return self.layout6_wind(n_turbines=n_turbines, n_strings=n_turbines, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
 
         else:
@@ -568,6 +571,3 @@ if __name__ == "__main__":
         tow_string_shutdown = True,
         show_plot=True
     )
-
-    print(choose_spec_loc_string(G,9))
-

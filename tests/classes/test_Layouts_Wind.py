@@ -140,6 +140,38 @@ class TestLayout4Wind(unittest.TestCase):
                 n_turbines=9, n_strings=3, substation_node=1, string_list=[2, 3, 3], tow_string_shutdown = True, show_plot=False
             )
 
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("matplotlib.pyplot.show")
+@patch("matplotlib.pyplot.savefig")
+class TestLayout5Wind(unittest.TestCase):
+    def setUp(self):
+        self.w = Layout_Wind()
+
+    def test_list_valid_5(self, _sf, _sh, _draw):
+        # Custom non-uniform split: 10 turbines into 3 strings [3,3,4]
+        G = self.w.layout5_wind(
+            n_turbines=12, n_strings=4, substation_node=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=False
+        )
+        self.assertEqual(count_nodes_by_level(G, "device"), 12)
+        self.assertEqual(count_nodes_by_level(G, "hub"), 2)
+        self.assertIn("dyn_cable-sub", edge_levels(G))
+
+
+@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("matplotlib.pyplot.show")
+@patch("matplotlib.pyplot.savefig")
+class TestLayout6Wind(unittest.TestCase):
+    def setUp(self):
+        self.w = Layout_Wind()
+
+    def test_list_valid_6(self, _sf, _sh, _draw):
+        # Custom non-uniform split: 10 turbines into 3 strings [3,3,4]
+        G_ = self.w.layout6_wind(
+            n_turbines=15, n_strings=15, substation_node=1, n_string_to_connector = 5, tow_string_shutdown = True, show_plot=False
+        )
+        self.assertEqual(count_nodes_by_level(G_, 'device'), 15)
+        self.assertEqual(count_nodes_by_level(G_, "hub"), 3)
+        self.assertIn("dyn_cable-sub", edge_levels(G_))
 
 @patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
@@ -176,6 +208,19 @@ class TestDispatcher(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.w.layout_wind(n_layout=99, n_turbines=6, n_strings=3, show_plot=False)
 
+    def test_dispatch_invalid_layout_5_raises(self, _sf, _sh, _draw):
+        # Sum of sizes does not match total turbines -> ValueError
+        with self.assertRaises(ValueError):
+            self.w.layout_wind(
+                n_layout = 5, n_turbines=12, n_strings=5, n_substations=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=True
+            )
+
+    def test_dispatch_invalid_layout_6_raises(self, _sf, _sh, _draw):
+        # Sum of sizes does not match total turbines -> ValueError
+        with self.assertRaises(ValueError):
+            self.w.layout_wind(
+                n_layout = 6, n_turbines=15, n_strings=2, n_substations=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=True
+            )
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
