@@ -6,6 +6,20 @@ import logging
 from oriom.core.functions.layout_power.aux_layout_power_func import choose_loc
 from oriom.core.functions.layout_power.aux_layout_power_func import string_location
 
+
+def check_previous_fix(G, op_add_tow, r):
+    id_r = r.get('id', None)
+    failure_id_r = r.get('failure_id', None)
+    key = f"{id_r}_tow" if id_r is not None else None
+
+    previous_fix = op_add_tow.get(key) if key is not None else None
+    if previous_fix and failure_id_r in previous_fix:
+        manage_string_tow_operation(G = G, loc = previous_fix[failure_id_r], action = True)
+        del op_add_tow[key][failure_id_r]
+        if not op_add_tow[key]:
+            del op_add_tow[key]
+
+
 def manage_string_tow_operation(
     G: nx.DiGraph,
     loc: int,
@@ -99,13 +113,9 @@ def shut(
             elif tech == 'wind' or tech == 'wave':
                 G.nodes[loc]['power'] = 0
 
-            # Disconnect the string if the component is not power defined (hub/connector/other)
-            if livello in levels_component_no_power or event == 'tow':
-                manage_string_tow_operation(G = G, loc = loc, action = False)
-            # Disconnect if farm electr layout cannot sustain a tow without shutdown downstream string a is conducted a towing operation
-            if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False) and not op_corr_tow.get(r_id, {}).get('addition_op_tow', False):
-                manage_string_tow_operation(G = G, loc = loc, action = False)
-            if op_add_tow.get(r_id, False) and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
+            # Disconnect the string if the component is not power defined (hub/connector/other) or 
+            # if farm electr layout cannot sustain a tow without shutdown downstream string a is conducted a towing operation
+            if livello in levels_component_no_power or (event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False)):
                 manage_string_tow_operation(G = G, loc = loc, action = False)
 
 
@@ -152,9 +162,9 @@ def shut(
 
     # Manage case in which device already shut down but require a tow and farm electr layout lead to shutdown downstream string a is conducted a towing operation
     else:
-        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False) and not getattr(op_corr_tow.get(r_id), 'addition_op_tow', False):
+        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
             manage_string_tow_operation(G = G, loc = loc, action = False)
-        if op_add_tow.get(r_id, False) and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
+        if op_add_tow.get(r_id, False):
             manage_string_tow_operation(G = G, loc = loc, action = False)
 
     #Returning the percentage available
@@ -185,7 +195,7 @@ def fix(
     event: str = '',
     op_add_tow: dict = {},
     op_corr_tow: dict = {},
-    r_id = ''
+    r = pd.Series()
 ):
     """
     It restore the power production due to the fixing of the component failed
@@ -207,8 +217,7 @@ def fix(
             if the operation is an addition op tow
         op_corr_tow (:obj:`dict`, *optional*): Dictionary with operation id as key and dictionary as value to identify 
             if the operation is a correlated op tow and if it requires the shutdown of the downstream string
-        r_id (:obj:`str`, *optional*): id of the row of the operation analyzed, used to check if the operation 
-            is an addition op tow or if it is a correlated op tow
+        r (:obj:`pd.Series`, *optional*): Series row of the operation analyzed
 
     Returns:
         G graph and percentage farm available.
@@ -217,6 +226,7 @@ def fix(
     if loc == ('x', 'x'):
         pass
     elif isinstance(loc, tuple) is True:
+        check_previous_fix(G, op_add_tow, r)
         if G.edges[loc[0],loc[1]]['visible'] is False:
             G.edges[loc[0],loc[1]]['visible'] = True
         else: pass
@@ -236,14 +246,19 @@ def fix(
             if G.nodes[loc]['level'] == 'device':
                 G.nodes[loc]['power'] = 1
 
-        # Reconnect the string if the component is not power defined (hub/connector/other)
-        if livello in levels_component_no_power or event == 'tow':
-            manage_string_tow_operation(G = G, loc = loc, action = True)
-        # Reconnect the string if the towing operation did shutdown the downstream string
-        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False) and not getattr(op_corr_tow.get(r_id), 'addition_op_tow', False):
-            manage_string_tow_operation(G = G, loc = loc, action = True)
-        if op_add_tow.get(r_id, False) and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
-            manage_string_tow_operation(G = G, loc = loc, action = True)
+        # Reconnect the string if the component is not power defined (hub/connector/other) or there is a reconnecting tow or electrical disconenction
+        if (
+            livello in levels_component_no_power or 
+            (event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False)) or 
+            op_add_tow.get(r.get('id', None), False)
+        ):
+            # If a reconnection operation add is present, do not reconnect yet the device
+            op_add = getattr(op_corr_tow.get(r.get('id', None), False), 'addition_op_tow', False)
+            if event == 'tow' and getattr(op_corr_tow.get(r.get('id', None), False), 'addition_op_tow', False):
+                op_add_tow.setdefault(op_add.id + "_tow", {})[r['failure_id']] = loc
+            else:
+                check_previous_fix(G, op_add_tow, r)
+                manage_string_tow_operation(G = G, loc = loc, action = True)
 
     n_list = []
     for node in G.nodes():

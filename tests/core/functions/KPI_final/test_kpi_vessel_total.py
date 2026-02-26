@@ -187,6 +187,7 @@ class TestKpiCostVesselInternalWithEvents(unittest.TestCase):
         log_events_op_merged_orig = pd.DataFrame({"id": ["opm.1"], "comments": ["c2"]})
         log_events_op_def_merged_orig = pd.DataFrame({"id": ["opd.1"], "comments": ["c3"]})
         log_events_op_merged_oper_orig = pd.DataFrame({"id": ["opo.1"], "comments": ["c4"]})
+        log_events_op_merged_oper_orig = pd.DataFrame({"id": ["opo.4"], "comments": ["p1"]})
         log_events_insp_merged_orig = pd.DataFrame({"id": ["insp.1"], "comments": ["i1"]})
         log_events_mobi_merged_orig = pd.DataFrame({"id": ["mob.1"], "comments": ["m1"], "n_vessel_1": [3]})
         log_events_tow_orig = pd.DataFrame({"id": ["tow.1"], "comments": ["t1"]})
