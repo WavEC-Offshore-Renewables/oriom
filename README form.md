@@ -302,6 +302,13 @@ the devisce at port and stored at port must be present (if not know = 0)
     ofw_redeploy        "id of tow to site operation"
     ```
 
+- Additional Operations: <br>
+    creates an operation required before the tow opearation. Tow op will be conducted only after the end at site of such opearation
+
+- String disconnection: <br>
+    If additional operations is present, shutdown the entire string of the device that is towed for the whole duration of the additional operation
+
+
 <span style="font-size: 20px; font-weight: bold;">ACTIVITIES</span>
 
 - More detailed are the activities and better it is, add more activities as refined as possible for long operations. One is a part of the O&M on which the work can be stopped and taken back in another day (when is decided by MAX HOUR BETWEEN ACTIVITY).

@@ -50,8 +50,16 @@ def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None):
     date_end_dur_net_work_port = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_port', date_end_wait_start)
     date_end_dur_net_port = logs_timeseries_func.create_data(df_filtered_start, 'wait_port', date_end_dur_net_work_port)
     date_end_transit_ts = logs_timeseries_func.create_data(df_filtered_start, 'transit_to_site', date_end_dur_net_port)
-    date_end_wait_site_use = max(date_end_transit_ts, add_op_end) if add_op_end else date_end_transit_ts
-    date_end_wait_site = logs_timeseries_func.create_data(df_filtered_start, 'wait_site', date_end_wait_site_use)
+    date_end_wait_site = logs_timeseries_func.create_data(df_filtered_start, 'wait_site', date_end_transit_ts)
+
+    # Evaluate if other operations delay the schedule if does exist additional op
+    if add_op_end:
+        diff_time = int((add_op_end - date_end_wait_site).total_seconds() / 3600)
+        # If delay is higher than 0 return difference
+        if diff_time > 0:
+            diff_time = int((add_op_end - date_end_wait_site).total_seconds() / 3600)
+            return {'diff_time': diff_time} if float(round(df_filtered_start['wait_start'],2)) == 0 else {'diff_time': diff_time + int(round(df_filtered_start['wait_start'],2))}
+
     date_end_dur_net_site = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_site', date_end_wait_site)
     date_end_transit_tp = logs_timeseries_func.create_data(df_filtered_start, 'transit_to_port', date_end_dur_net_site)
     date_end_stat_chart = date_end_leadtime + timedelta(hours=oper_stat.dur_total_dict[str(date_end_leadtime.month)])
@@ -154,7 +162,19 @@ def create_operation_site(
     if df_filtered_start.empty:
         return None, None
 
-    dates_op = compute_operation_datetimes(df_filtered_start, oper_['oper_stat'])
+    dates_op = compute_operation_datetimes(df_filtered_start, oper_['oper_stat'], failure_.get('end_add_op_time') if failure_.get('end_add_op_time') else None)
+    # if operations is delayed reaggiast the df_filtered_start_tow by the difference time
+    if 'diff_time' in dates_op:
+        df_filtered_start_tow = _check_index_row_validity(
+            idx_end_leadtime = idx_end_leadtime + dates_op['diff_time'],
+            last_valid_idx= index['last_valid_idx'],
+            r = row_['row'],
+            oper_sched = oper_['oper_sched']
+        )
+
+        if df_filtered_start_tow.empty:
+            return None, None
+        dates_op = compute_operation_datetimes(df_filtered_start_tow, oper_['oper_stat'])
 
     row_dates = pd.DataFrame([[
         date_op,

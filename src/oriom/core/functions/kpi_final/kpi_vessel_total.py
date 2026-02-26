@@ -113,6 +113,7 @@ def kpi_cost_vessel_internal(
 
     kpi_om = pd.DataFrame(columns=COLS)
     rov_tech_vessel_count = {}
+    failure_corrected_port = []
 
     op_cost = 0 ## VALUE NOT RETURNED, USEFULL FOR A DEBUG AND CHECK THE INSPECTION vs CORRECTION COST
     insp_cost = 0   ## VALUE NOT RETURNED, USEFULL FOR A DEBUG AND CHECK THE INSPECTION vs CORRECTION COST
@@ -126,6 +127,59 @@ def kpi_cost_vessel_internal(
     log_events_mobi_merged = safe_copy_df(log_events_mobi_merged_orig, ['id', 'comments'])
     log_events_tow = safe_copy_df(log_events_tow_orig, ['id', 'comments'])
     log_events_op_port = safe_copy_df(log_events_op_port_orig, ['id', 'comments'])
+
+        # Cost for port operation with no vessel defined
+    if not log_events_op_port.empty:
+        n_oper_at_port = len(log_events_op_port)
+
+        # Tech and ROV costs
+        tot_tech_cost_port, rov_cost_port = kpi_aux.tech_rov_cost(
+            df = log_events_op_port,
+            rov_dict_cost = rov_cost_dict,
+            duration_shift = duration_shift,
+            oper_dict_tech = tech_per_oper_dict
+        )
+        # Part and Other costs
+        part_cost_port, other_cost_port = part_other_cost(
+            df = log_events_op_port,
+            total_operations = total_operations,
+            find_element_class = find_element_class
+        )
+        
+        # List of failures corrected at port to do not count double part costs
+        failure_corrected_port = (
+            log_events_op_port.loc[
+                log_events_op_port['comments'].str.startswith('oper', na=False),
+                'comments'
+            ]
+            .unique()
+            .tolist()
+        )
+
+        tech_cost_avg_port = averaged_res(tot_tech_cost_port, n_oper_at_port)
+        rov_cost_avg_port = averaged_res(rov_cost_port, n_oper_at_port)
+        part_cost_avg_port = averaged_res(part_cost_port, n_oper_at_port)
+        other_cost_avg_port = averaged_res(other_cost_port, n_oper_at_port)
+
+        kpi = pd.DataFrame([[
+            'oper_port',
+            'port oper',
+            n_oper_at_port,
+            0,
+            0,
+            0,
+            0,
+            round(tech_cost_avg_port, 2),
+            round(tot_tech_cost_port, 2),
+            round(part_cost_avg_port, 2),
+            round(part_cost_port, 2),
+            round(rov_cost_avg_port, 2),
+            round(rov_cost_port, 2),
+            round(other_cost_avg_port, 2),
+            round(other_cost_port, 2),
+        ]], columns=COLS)
+
+        kpi_om = pd.concat([kpi_om, kpi], ignore_index=True)
 
     # cost durations for merged operations by vessels
     for ves in vessels:
@@ -200,6 +254,17 @@ def kpi_cost_vessel_internal(
                 total_operations = total_operations,
                 find_element_class = find_element_class
             )
+            
+            # Reduce the part cost that were already counted in the port operations
+            log_o_cost_reduce = log_o[log_o['comments'].isin(failure_corrected_port)]
+            if not log_o_cost_reduce.empty:
+                part_cost_reduce, _ = part_other_cost(
+                    df = log_o_cost_reduce,
+                    total_operations = total_operations,
+                    find_element_class = find_element_class
+                )
+                part_cost -= part_cost_reduce
+
         else:
             part_cost = 0
             other_cost = 0
@@ -287,50 +352,6 @@ def kpi_cost_vessel_internal(
             round(rov_cost, 2),
             round(other_cost_avg, 2),
             round(other_cost, 2),
-        ]], columns=COLS)
-
-        kpi_om = pd.concat([kpi_om, kpi], ignore_index=True)
-
-
-    # Cost for port operation with no vessel defined
-    if not log_events_op_port.empty:
-        n_oper_at_port = len(log_events_op_port)
-
-        # Tech and ROV costs
-        tot_tech_cost_port, rov_cost_port = kpi_aux.tech_rov_cost(
-            df = log_events_op_port,
-            rov_dict_cost = rov_cost_dict,
-            duration_shift = duration_shift,
-            oper_dict_tech = tech_per_oper_dict
-        )
-        # Part and Other costs
-        part_cost_port, other_cost_port = part_other_cost(
-            df = log_events_op_port,
-            total_operations = total_operations,
-            find_element_class = find_element_class
-        )
-
-        tech_cost_avg_port = averaged_res(tot_tech_cost_port, n_oper_at_port)
-        rov_cost_avg_port = averaged_res(rov_cost_port, n_oper_at_port)
-        part_cost_avg_port = averaged_res(part_cost_port, n_oper_at_port)
-        other_cost_avg_port = averaged_res(other_cost_port, n_oper_at_port)
-
-        kpi = pd.DataFrame([[
-            'oper_port',
-            'port oper',
-            n_oper_at_port,
-            0,
-            0,
-            0,
-            0,
-            round(tech_cost_avg_port, 2),
-            round(tot_tech_cost_port, 2),
-            round(part_cost_avg_port, 2),
-            round(part_cost_port, 2),
-            round(rov_cost_avg_port, 2),
-            round(rov_cost_port, 2),
-            round(other_cost_avg_port, 2),
-            round(other_cost_port, 2),
         ]], columns=COLS)
 
         kpi_om = pd.concat([kpi_om, kpi], ignore_index=True)

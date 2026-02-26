@@ -283,7 +283,7 @@ def return_percentage(
                     event = event,
                     op_corr_tow = op_corr_tow,
                     op_add_tow = op_add_tow,
-                    r_id = r_id
+                    r = r
                 )
                 device_failed.discard(loc)
                 device_shutted.discard(loc)

@@ -913,7 +913,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
         mock_check_idx.return_value = pd.DataFrame({"datetime": [base]})
 
         # compute_operation_datetimes: deterministic timeline
-        def _compute_dates(_df, _stat, _end_add_op):
+        def _compute_dates(_df, _stat, _end_add_op = None):
             t0 = _df["datetime"].iloc[0]
             return {
                 "date_end_leadtime": t0 + timedelta(hours=0),

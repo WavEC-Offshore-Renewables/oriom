@@ -267,7 +267,7 @@ def part_other_cost(
     def get_parts_cost(fail_id):
         failure = find_element_class.find_failure_from_id(fail_id)
         return getattr(failure, 'parts_cost', 0)
-
+    
     # Prepare dataframe of operations
     ops_df = pd.DataFrame([{
         'op_id': getattr(op_stat.op_class if hasattr(op_stat, 'op_class') else op_stat.insp_class, 'id'),
