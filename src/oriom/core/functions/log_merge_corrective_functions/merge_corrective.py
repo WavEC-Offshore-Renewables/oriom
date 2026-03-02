@@ -7,7 +7,7 @@ from oriom.core.functions.log_merge_corrective_functions.group_merging_immediate
 from oriom.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation import tow_deferred_mobi
 
 
-FILTER_EVENT = ['failure', 'inspection_site', 'inspection_port', 'mobilisation']
+FILTER_EVENT = ['failure', 'inspection_site', 'inspection_port', 'mobilisation', 'recommissioning']
 OLC_LIST = ['hs', 'cs', 'ws', 'ws_hub', 'tp', 'light']
 COLS = [
     'd_trigger',

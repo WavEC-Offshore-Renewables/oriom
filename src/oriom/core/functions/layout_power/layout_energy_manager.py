@@ -7,14 +7,17 @@ from oriom.core.functions.layout_power.aux_layout_power_func import choose_loc
 from oriom.core.functions.layout_power.aux_layout_power_func import string_location
 
 
-def check_previous_fix(G, op_add_tow, r):
+def check_previous_fix(G, op_add_tow, r, type_id = 'tow'):
     id_r = r.get('id', None)
     failure_id_r = r.get('failure_id', None)
-    key = f"{id_r}_tow" if id_r is not None else None
+    key = f"{id_r}_{type_id}" if id_r is not None else None
 
     previous_fix = op_add_tow.get(key) if key is not None else None
     if previous_fix and failure_id_r in previous_fix:
-        manage_string_tow_operation(G = G, loc = previous_fix[failure_id_r], action = True)
+        if type_id == 'tow':
+            manage_string_tow_operation(G = G, loc = previous_fix[failure_id_r], action = True)
+        else:
+            G.nodes[previous_fix[failure_id_r]]['power'] = 1
         del op_add_tow[key][failure_id_r]
         if not op_add_tow[key]:
             del op_add_tow[key]
@@ -162,22 +165,11 @@ def shut(
 
     # Manage case in which device already shut down but require a tow and farm electr layout lead to shutdown downstream string a is conducted a towing operation
     else:
-        if event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False):
-            manage_string_tow_operation(G = G, loc = loc, action = False)
-        if op_add_tow.get(r_id, False):
+        if getattr(G, 'graph', {}).get('tow_string_shutdown', False) and (event == 'tow' or op_add_tow.get(r_id, False)):
             manage_string_tow_operation(G = G, loc = loc, action = False)
 
     #Returning the percentage available
-    n_list = []
-    for node in G.nodes():
-        if G.nodes[node]['level'] == component_level_power:  # Consider only power nodes as the power is on the lowest level component
-            for path in nx.all_simple_paths(G, source=node, target=0):
-                edges = list(zip(path[:-1], path[1:]))  # Convert the generator in a list
-                if all(G[u][v].get('visible', False) for u, v in edges):  # Verify the visibility of arch
-                    if node not in n_list:  # Avoid duplicate
-                        n_list.append(node)
-        else:
-            pass
+    n_list = count_nodes_power(G, component_level_power)
 
     power_node = [G.nodes[i]['power'] for i in n_list]
     power_farm = sum(power_node)
@@ -223,53 +215,59 @@ def fix(
         G graph and percentage farm available.
     """
 
-    if loc == ('x', 'x'):
-        pass
-    elif isinstance(loc, tuple) is True:
-        check_previous_fix(G, op_add_tow, r)
-        if G.edges[loc[0],loc[1]]['visible'] is False:
-            G.edges[loc[0],loc[1]]['visible'] = True
-        else: pass
-    elif isinstance(loc, int) is True:
-        livello = G.nodes[loc]['level']
-
-        if tech == 'PV':
-            #restore one PV from string
-            if 'device' in names_tech:
-                G.nodes[loc]['power'] += 1 
-                livello = 'device'
-            #restore one string from inverter
-            elif 'string' in names_tech:
-                G.nodes[loc]['power'] += n_pv_per_string
-                livello = 'string'
-        elif tech == 'wind' or tech == 'wave':
-            if G.nodes[loc]['level'] == 'device':
-                G.nodes[loc]['power'] = 1
-
-        # Reconnect the string if the component is not power defined (hub/connector/other) or there is a reconnecting tow or electrical disconenction
-        if (
-            livello in levels_component_no_power or 
-            (event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False)) or 
-            op_add_tow.get(r.get('id', None), False)
-        ):
-            # If a reconnection operation add is present, do not reconnect yet the device
-            op_add = getattr(op_corr_tow.get(r.get('id', None), False), 'addition_op_tow', False)
-            if event == 'tow' and getattr(op_corr_tow.get(r.get('id', None), False), 'addition_op_tow', False):
-                op_add_tow.setdefault(op_add.id + "_tow", {})[r['failure_id']] = loc
-            else:
-                check_previous_fix(G, op_add_tow, r)
-                manage_string_tow_operation(G = G, loc = loc, action = True)
-
-    n_list = []
-    for node in G.nodes():
-        if G.nodes[node]['level'] == component_level_power:  # Consider only power nodes
-            for path in nx.all_simple_paths(G, source=node, target=0):
-                edges = list(zip(path[:-1], path[1:]))  # Convert the generator in a list
-                if all(G[u][v].get('visible', False) for u, v in edges):  # Verify the visibility of arch
-                    if node not in n_list:  # Avoid duplicate
-                        n_list.append(node)
-        else:
+    if event != 'recommisioning':
+        if loc == ('x', 'x'):
             pass
+        elif isinstance(loc, tuple) is True:
+            check_previous_fix(G, op_add_tow, r)
+            if G.edges[loc[0],loc[1]]['visible'] is False:
+                G.edges[loc[0],loc[1]]['visible'] = True
+            else: pass
+        elif isinstance(loc, int) is True:
+            livello = G.nodes[loc]['level']
+            op_tow_ = op_corr_tow.get(r.get('id', None), False)
+            op_add = getattr(op_tow_, 'addition_op_tow', False)
+
+            if tech == 'PV':
+                #restore one PV from string
+                if 'device' in names_tech:
+                    G.nodes[loc]['power'] += 1 
+                    livello = 'device'
+                #restore one string from inverter
+                elif 'string' in names_tech:
+                    G.nodes[loc]['power'] += n_pv_per_string
+                    livello = 'string'
+            elif tech == 'wind' or tech == 'wave':
+                if G.nodes[loc]['level'] == 'device':
+                    if event != 'tow':
+                        G.nodes[loc]['power'] = 1
+                    else:
+                        if getattr(op_tow_, 'recommisioning_time', 0) == 0:
+                            G.nodes[loc]['power'] = 1
+                        else:
+                            op_add_tow.setdefault(op_add.id + "_recom", {})[r['failure_id']] = loc
+
+
+            # Reconnect the string if the component is not power defined (hub/connector/other) or there is a reconnecting tow or electrical disconenction
+            if (
+                livello in levels_component_no_power or 
+                getattr(G, 'graph', {}).get('tow_string_shutdown', False) and (
+                    event == 'tow' or op_add_tow.get(r.get('id', None), False)
+                )
+            ):
+                # If a reconnection operation add is present, do not reconnect yet the device
+                if event == 'tow' and op_add:
+                    op_add_tow.setdefault(op_add.id + "_tow", {})[r['failure_id']] = loc
+                else:
+                    if getattr(op_tow_, 'recommisioning_time', 0) == 0:
+                        check_previous_fix(G, op_add_tow, r)
+                    manage_string_tow_operation(G = G, loc = loc, action = True)
+    else:
+        check_previous_fix(G, op_add_tow, r, type_id = 'recom')
+        manage_string_tow_operation(G = G, loc = loc, action = True)
+        
+    #Returning the percentage available
+    n_list = count_nodes_power(G, component_level_power)
 
     power_node = [G.nodes[i]['power'] for i in n_list]
     power_farm = sum(power_node)
@@ -320,3 +318,28 @@ def reassign_loc(
     df.at[row_index, 'Loc'] = row['Loc']
 
     return row['Loc']
+
+
+def count_nodes_power(G, component_level_power):
+    """ 
+    Count the nodes with power different from 0 on the lowest level of power component to calculate the percentage of power available
+
+    Args:
+        G (:obj:`nx.DiGraph`): DiGraph.
+        component_level_power (:obj:`str`): level of component with power characteristic
+        
+        Returns:
+        n_list (:obj:`list`): list of node with power different from 0 on the lowest level of power component
+    """
+
+    n_list = []
+    for node in G.nodes():
+        if G.nodes[node]['level'] == component_level_power:  # Consider only power nodes
+            for path in nx.all_simple_paths(G, source=node, target=0):
+                edges = list(zip(path[:-1], path[1:]))  # Convert the generator in a list
+                if all(G[u][v].get('visible', False) for u, v in edges):  # Verify the visibility of arch
+                    if node not in n_list:  # Avoid duplicate
+                        n_list.append(node)
+        else:
+            pass
+    return n_list

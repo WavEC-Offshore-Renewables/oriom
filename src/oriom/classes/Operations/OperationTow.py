@@ -49,6 +49,8 @@ class OperationTow():
         tow_operation (:obj:`bool`): Define if is a towing opreation. Default to ``True``.
         string_disconnection (:obj:`bool`): Define if is a string disconnection is required
             during towing opreation. Default to ``False``.
+        recommisioning_time (:obj:`int`): Define the time required to re-commission a device 
+            after towing operation. Default to ``0``.
 
 
     Note:
@@ -66,6 +68,7 @@ class OperationTow():
             vessel2_qt: int=None,
             addition_op_tow: str = None,
             string_disconnection: bool = None,
+            recommisioning_time: int = None,
             other_costs: float=0
     ):
         """Initializes :class:`OperationTow` with various attributes and optional parameters.
@@ -80,6 +83,10 @@ class OperationTow():
                 Defaults to ``0``.
             addition_op_tow (:obj:`str`, *optional*): Major_operation.id object to conduct
                 before the towing opeartion. Default to ``None``.
+            string_disconnection: Define if is a string disconnection is required
+                during towing opreation. Default to ``False``.
+            recommisioning_time (:obj:`int`): Define the time required to re-commission a device 
+                after towing operation. Default to ``0``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
             vessel1_qt (:obj:`int`): Number of main vessel.
@@ -108,6 +115,7 @@ class OperationTow():
         self.ts_data = None
         self.tow_operation = True
         self.string_disconnection = False
+        self.recommisioning_time = 0
 
         if tech_cost is not None and tech_cost !=0:
             self.tech_cost = float(tech_cost)
@@ -125,6 +133,8 @@ class OperationTow():
             self.addition_op_tow = str(addition_op_tow).lower()
         if string_disconnection is not None:
             self.string_disconnection = bool(string_disconnection)
+        if recommisioning_time is not None:
+            self.recommisioning_time = int(recommisioning_time)
 
         self._check_attributes()
         
@@ -149,7 +159,12 @@ class OperationTow():
         if self.vessel2_id is not None:
             if self.vessel2_qt < 1:
                 raise ValueError('"vessel2_qt" must be positive if a "vessel2_id" is defined')
-
+        if self.addition_op_tow is not None and not self.string_disconnection:
+            raise ValueError('"addition_op_tow" manage string disconnection. Must be None if "string_disconnection" is False')
+        if self.recommisioning_time != 0 and not self.string_disconnection:
+            raise ValueError('"recommisioning_time" manage string disconnection. Must be 0 if "string_disconnection" is False')
+            if self.recommisioning_time < 0:
+                raise ValueError('"recommisioning_time" cannot be negative')
         logging.debug('OperationTow: operation %s attributes within ranges and valid.' % self.id)
 
 
@@ -189,7 +204,8 @@ class OperationTow():
                 'vessel2_qt',
                 'other_costs',
                 'addition_op_tow',
-                'string_disconnection'
+                'string_disconnection',
+                'recommisioning_time'
         ]
 
         operations_list = []
@@ -222,6 +238,7 @@ class OperationTow():
                     vessel2_qt=operation["vessel2_qt"],
                     addition_op_tow=operation["addition_op_tow"],
                     string_disconnection=operation["string_disconnection"],
+                    recommisioning_time=operation["recommisioning_time"],
                     other_costs=operation["other_costs"]
                 )
             )
@@ -285,6 +302,7 @@ class OperationTow():
                 "other_costs": self.other_costs,
                 "addition_op_tow": getattr(self.addition_op_tow, 'id', None),
                 "string_disconnection": self.string_disconnection,
+                "recommisioning_time": self.recommisioning_time,
                 "activities": activities
         }, f)
         f.close()
