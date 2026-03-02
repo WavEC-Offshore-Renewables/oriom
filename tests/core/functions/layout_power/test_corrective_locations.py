@@ -236,7 +236,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
                 "id": "op_corr_001",
                 "comments": 123,  # invalid type
                 "d_end_transit_ts": datetime(2025, 1, 2, 0, 0, 0),
-                "d_end_transit_tp": datetime(2025, 1, 3, 0, 0, 0),
+                "d_end_dur_net_site": datetime(2025, 1, 3, 0, 0, 0),
             }
         )
 
@@ -259,7 +259,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
                 "id": "op_corr_001",
                 "comments": "op:  ofw.999",  # comments[5:] -> "ofw.999"
                 "d_end_transit_ts": datetime(2025, 1, 2, 0, 0, 0),
-                "d_end_transit_tp": datetime(2025, 1, 3, 0, 0, 0),
+                "d_end_dur_net_site": datetime(2025, 1, 3, 0, 0, 0),
             }
         )
 
@@ -292,7 +292,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
                 "id": "op_corr_001",
                 "comments": comments,
                 "d_end_transit_ts": datetime(2025, 1, 5, 0, 0, 0),
-                "d_end_transit_tp": datetime(2025, 1, 6, 0, 0, 0),
+                "d_end_dur_net_site": datetime(2025, 1, 6, 0, 0, 0),
             }
         )
 
@@ -316,7 +316,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
         self.assertEqual(len(events), 1)
         evt = events[0]
 
-        self.assertEqual(evt["date"], event_row["d_end_transit_tp"])
+        self.assertEqual(evt["date"], event_row["d_end_dur_net_site"])
         self.assertEqual(evt["event"], "operation")
         self.assertEqual(evt["id"], event_row["id"])
         self.assertEqual(evt["name"], "OperationName")
@@ -336,7 +336,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
                 "id": "op_corr_002",
                 "comments": comments,
                 "d_end_transit_ts": datetime(2025, 1, 10, 0, 0, 0),
-                "d_end_transit_tp": datetime(2025, 1, 11, 0, 0, 0),
+                "d_end_dur_net_site": datetime(2025, 1, 11, 0, 0, 0),
             }
         )
 
@@ -368,7 +368,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
         self.assertTrue(first_evt["shutdown"])
 
         # Last event: final state at transit_tp (tow_to_port=True => "shut")
-        self.assertEqual(last_evt["date"], event_row["d_end_transit_tp"])
+        self.assertEqual(last_evt["date"], event_row["d_end_dur_net_site"])
         self.assertEqual(last_evt["shut_fix"], "shut")
         self.assertTrue(last_evt["shutdown"])
 
@@ -383,7 +383,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
                 "id": "OperationNameAdd",
                 "comments": comments,
                 "d_end_transit_ts": datetime(2025, 1, 5, 0, 0, 0),
-                "d_end_transit_tp": datetime(2025, 1, 6, 0, 0, 0),
+                "d_end_dur_net_site": datetime(2025, 1, 6, 0, 0, 0),
             }
         )
 
@@ -429,7 +429,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
 
         evt = events[1]
 
-        self.assertEqual(evt["date"], event_row["d_end_transit_tp"])
+        self.assertEqual(evt["date"], event_row["d_end_dur_net_site"])
         self.assertEqual(evt["event"], "operation")
         self.assertEqual(evt["id"], event_row["id"])
         self.assertEqual(evt["name"], "OperationNameAdd")

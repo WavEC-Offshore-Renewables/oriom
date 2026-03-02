@@ -308,6 +308,9 @@ the devisce at port and stored at port must be present (if not know = 0)
 - String disconnection: <br>
     If additional operations is present, shutdown the entire string of the device that is towed for the whole duration of the additional operation
 
+- Recommissioning: <br>
+    If additional operations is present that shutdown the entire string of the device a recommissioning period can be added. This must be int value and represent the hours of recommision to consider. In Additional Operations activity add recommissioning activity AFTER the TRANSIT to port!
+
 
 <span style="font-size: 20px; font-weight: bold;">ACTIVITIES</span>
 

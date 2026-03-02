@@ -206,12 +206,12 @@ def results_block(
 
         try:
             G_wave_copy = G_layouts["G_wave"].copy()
-        except:
+        except AttributeError:
             G_wave_copy = None
 
         try:
             G_pv_copy = G_layouts["G_pv"].copy()
-        except:
+        except AttributeError:
             G_pv_copy = None
 
         if (
@@ -257,6 +257,9 @@ def results_block(
             ENERGY_STATISTICAL_CALCULATION = Config.ENERGY_STATISTICAL_CALCULATION,
             result_dir_r = result_dir_r
         )
+
+        log_events = log_events[log_events['event'] != 'recommisioning']
+        log_events_merged = log_events_merged[log_events_merged['event'] != 'recommisioning']
 
         combined = {}
         for k in availability_total.keys():

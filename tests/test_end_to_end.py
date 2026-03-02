@@ -116,7 +116,7 @@ class TestMainEndToEnd(unittest.TestCase):
             MOBILISATION_TO_ADD={},
             ENERGY_AVAILABILITY_CALCULATION=True,
             ENERGY_STATISTICAL_CALCULATION=False,
-            PROJECT_NAME="TEST_E2E",
+            PROJECT_NAME="test_E2E",
             BASEFILES_FROM_EXCEL=False,
             EXCEL_FILE_PATH=str(excel_dir),
             SOURCE_PATH_SHAREPOINT="",
