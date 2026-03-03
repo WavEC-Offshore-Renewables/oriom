@@ -106,3 +106,8 @@ files/
 private/
 scripts/
 src_temp/
+
+#Private files
+KPI_Insight.py
+check_files.py
+VesselMobilisationScheduler.py
