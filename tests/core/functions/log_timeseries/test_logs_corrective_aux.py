@@ -120,6 +120,12 @@ class TestCheckIndexRowValidity(unittest.TestCase):
                 "col3": [7.0, 8.0],
                 "col4": [9.0, 10.0],
                 "col5": [11.0, 12.0],
+                "col6": [11.0, 12.0],
+                "col7": [11.0, 12.0],
+                "col8": [11.0, 12.0],
+                "col9": [11.0, 12.0],
+                "col10": [11.0, 12.0],
+                "col11": [11.0, 12.0],
             }
         )
         row = pd.Series({"id": "F2.0"})
