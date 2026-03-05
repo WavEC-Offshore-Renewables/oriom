@@ -137,12 +137,7 @@ def create_operation_site(
         )
 
         # Evaluate end of leadtime date
-        if not row_['tow_op_flag']:
-            deferred_correction.leadtime_evaluation(lead_mob_time = mobilisation['lead_mob_time'])
-        else:
-            deferred_correction.add_leadtime_tow(
-                lead_mob_time = mobilisation['lead_mob_time'],
-            )
+        deferred_correction.leadtime_evaluation(lead_mob_time = mobilisation['lead_mob_time'])
 
         index_found = deferred_correction.check_leadtime_index(oper_sched = oper_['oper_sched'], CUTOFF_DATE = CONST['CUTOFF_DATE'])
         if not index_found:

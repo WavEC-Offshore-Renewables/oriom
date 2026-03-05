@@ -91,7 +91,7 @@ DEFAULT_CONFIG  = ConfigRun(
     BASEFILES_FROM_EXCEL=False,
     EXCEL_FILE_PATH=r"C:\Users\rmeda\Richi documents\Projects\ORIOM\files",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_test_video.xlsx",
+    FORM_NAME="form_CT_string_disconnection.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

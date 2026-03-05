@@ -132,6 +132,7 @@ def create_logs_corrective_file(
             row_tow_site = None
             row_recommisioning = None
             target_time = None
+            deferred_tow = None
             row_dates = pd.DataFrame(columns=COLS)
             failure = find_element_class.find_failure_from_id(row['id'].split('.')[0])
             date_failure = row['datetime']
@@ -144,8 +145,7 @@ def create_logs_corrective_file(
             #------------------------
             # TOWING PORT CREATION
             #------------------------
-            if tow_op_flag:
-                #------------------------
+            if tow_op_flag: #------------------------
                 # ADDITIONAL OP CREATION
                 if add_op_tow_port:
                     oper_stat_op_tow_port = find_element_class.find_operation_stats_pmax(add_op_tow_port.id)
@@ -174,23 +174,41 @@ def create_logs_corrective_file(
                             ], ignore_index=True)
                     end_add_op_time = approximate_hourly_data(row_add_op_tow_port['d_end_dur_net_site'].iloc[0])
                     fail_index = op_sched_add_tow_port.index[op_sched_add_tow_port['datetime'] == end_add_op_time][0]
+                else:
+                    if failure.maintenance_strategy == 'specific month':
+                        deferred_tow = True
+                        deferred_tow_correction = CorrectionDeferred(
+                            date_failure = date_failure,
+                            vessel = vessel,
+                            oper = oper,
+                            preferred_month = failure.preferred_month,
+                        )
+                        deferred_tow_correction.leadtime_evaluation(lead_mob_time = mobilisation['lead_mob_time'])
+                        index_found = deferred_tow_correction.check_leadtime_index(oper_sched = oper_['oper_sched'], CUTOFF_DATE = CONST['CUTOFF_DATE'])
+                
+                if add_op_tow_port:
+                    date_failure_tow = row_add_op_tow_port['d_trigger'][0]
+                elif deferred_tow:
+                    date_failure_tow = deferred_tow_correction.date_op
+                else:
+                    date_failure_tow = date_failure
 
                 vessel, ves_2, mob_time = _take_vessel_data(find_element_class = find_element_class, op = tow_op_port)
                 towing_port = CorrectionTowPort(
-                    date_failure = date_failure,
+                    date_failure = date_failure_tow,
                     vessel = vessel,
                     oper = tow_op_port,
                     failure = failure,
                     time_fail_op_immediately = time_fail_op_immediately
                 )
-
+                
                 # Evaluate differently for deferred and immediate towing
                 if not towing_port.tow_deferred:
                     if mob_time != 0:
                         row_mob_line = towing_port.mobilitate_vessel(log_events = log_events, row = row)
 
                     towing_port.add_hours_for_noon_shift(
-                            fail_index = fail_index,
+                            fail_index = fail_index if not deferred_tow else deferred_tow_correction.idx_end_leadtime,
                             lead_mob_time = mob_time,
                             oper_sched = tow_port_op_oper_sched,
                         )

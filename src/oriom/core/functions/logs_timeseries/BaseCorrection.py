@@ -126,18 +126,16 @@ class CorrectionDeferred(BaseCorrection):
 
         if not self.tow_op:
             self.time_fail_op_immediately = time_fail_op_immediately
-            self.date_op = datetime(
-                year=self.date_failure.year if preferred_month > self.date_failure.month else self.date_failure.year + 1,
-                month=preferred_month,
-                day=1,
-                hour=5,
-                minute=0,
-                second=0
-            )
         else:
             self.time_fail_op_immediately = 0
-            self.date_op = date_failure
-
+        self.date_op = datetime(
+            year=self.date_failure.year if preferred_month > self.date_failure.month else self.date_failure.year + 1,
+            month=preferred_month,
+            day=1,
+            hour=5,
+            minute=0,
+            second=0
+        )
 
     def add_leadtime_tow(self, lead_mob_time: float):
         self.date_end_leadtime = self.date_op + timedelta(hours=lead_mob_time)
