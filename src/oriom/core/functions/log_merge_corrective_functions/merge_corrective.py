@@ -208,8 +208,13 @@ def create_logs_merge(
     # DEFERRED OPERATION
     #------------------
     # Filter log_events by the failure that require deferred intervention (failure extrapolated from 'comments' column)
-    comments_failure_id = log_events['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
-    log_events_def = log_events[comments_failure_id.isin(deferred_failures_correction)]
+    log_event_op = log_events.loc[~log_events['event'].isin(FILTER_EVENT)]
+    if not log_event_op.empty:
+        comments_failure_id = log_event_op['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
+    else:
+        comments_failure_id = pd.DataFrame()
+
+    log_events_def = log_event_op[comments_failure_id.isin(deferred_failures_correction)]
 
     if not log_events_def.empty:
         log_events_merged_def = merge_deferred_operations(

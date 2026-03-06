@@ -157,7 +157,7 @@ def create_logs_corrective_file(
                         vessels_ = {'vessel1_id': vessel.id, 'ves_1': add_op_tow_port.vessel1_qt, 'vessel2_id': add_op_tow_port.vessel2_id, 'ves_2': ves_2},
                         oper_ = {'oper': add_op_tow_port, 'oper_stat': oper_stat_op_tow_port, 'oper_sched': op_sched_add_tow_port},
                         mobilisation = {'mob_time': mob_time, 'lead_mob_time': mob_time},
-                        row_ = {'row': row, 'tow_op_flag': tow_op_flag},
+                        row_ = {'log_events': log_events,'row': row, 'tow_op_flag': tow_op_flag},
                         index = {'fail_index': fail_index, 'last_valid_idx': safe_getattr(add_op_tow_port, ['ts_data','last_valid_index'])},
                         CONST = {'COLS': COLS, 'CUTOFF_DATE': CUTOFF_DATE, 'time_fail_op_immediately': time_fail_op_immediately},
                     )
@@ -300,7 +300,7 @@ def create_logs_corrective_file(
                     vessels_ = {'vessel1_id': vessel1_id, 'ves_1': ves_1, 'vessel2_id': vessel2_id, 'ves_2': ves_2},
                     oper_ = {'oper': oper, 'oper_stat': oper_stat, 'oper_sched': oper_sched},
                     mobilisation = {'mob_time': mob_time, 'lead_mob_time': lead_mob_time},
-                    row_ = {'row': row, 'tow_op_flag': tow_op_flag},
+                    row_ = {'log_events': log_events, 'row': row, 'tow_op_flag': tow_op_flag},
                     index = {'fail_index': fail_index, 'last_valid_idx': last_valid_idx},
                     CONST = {'COLS': COLS, 'CUTOFF_DATE': CUTOFF_DATE, 'time_fail_op_immediately': time_fail_op_immediately},
                 )
@@ -399,7 +399,7 @@ def create_logs_corrective_file(
                         vessels_ = {'vessel1_id': vessel.id, 'ves_1': add_op_tow_site.vessel1_qt, 'vessel2_id': add_op_tow_site.vessel2_id, 'ves_2': ves_2},
                         oper_ = {'oper': add_op_tow_site, 'oper_stat': oper_stat_op_site, 'oper_sched': op_sched_add_tow_site},
                         mobilisation = {'mob_time': mob_time, 'lead_mob_time': mob_time},
-                        row_ = {'row': row, 'tow_op_flag': tow_op_flag},
+                        row_ = {'log_events': log_events, 'row': row, 'tow_op_flag': tow_op_flag},
                         index = {'fail_index': fail_index, 'last_valid_idx': safe_getattr(add_op_tow_site, ['ts_data','last_valid_index'])},
                         CONST = {'COLS': COLS, 'CUTOFF_DATE': CUTOFF_DATE, 'time_fail_op_immediately': time_fail_op_immediately},
                     )
