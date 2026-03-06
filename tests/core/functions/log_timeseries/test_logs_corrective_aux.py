@@ -35,8 +35,10 @@ LOG_COLS = [
 
 
 class DummyOperStat:
-    def __init__(self, dur_total_dict):
+    def __init__(self, dur_total_dict, id_ = None):
         self.dur_total_dict = dur_total_dict
+        if id_:
+            self.id = id_
 
 
 class DummyFailure:
@@ -167,7 +169,7 @@ class TestComputeOperationDatetimes(unittest.TestCase):
 
         mock_create_data.side_effect = fake_create_data
 
-        oper_stat = DummyOperStat(dur_total_dict={"1": 100.0})
+        oper_stat = DummyOperStat(dur_total_dict={"1": 100.0}, id_ = 'OP1')
 
         result = compute_operation_datetimes(sched_row, oper_stat)
 
@@ -347,7 +349,7 @@ class TestCreateOperationSite(unittest.TestCase):
                 self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
                 self.idx_end_leadtime = None
 
-            def mobilitate_vessel(self, log_events, r):
+            def mobilitate_vessel(self, log_events, row):
                 # One simple mobilisation row
                 return pd.DataFrame(
                     [[self.date_failure]],

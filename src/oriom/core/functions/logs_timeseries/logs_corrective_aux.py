@@ -32,7 +32,7 @@ def _check_index_row_validity(
     return df_filtered_start
 
 
-def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None):
+def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None, tow_stat_chart_month = 0):
     """
     Calculate dates of the various phases of an operations.
 
@@ -62,7 +62,15 @@ def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None):
 
     date_end_dur_net_site = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_site', date_end_wait_site)
     date_end_transit_tp = logs_timeseries_func.create_data(df_filtered_start, 'transit_to_port', date_end_dur_net_site)
-    date_end_stat_chart = date_end_leadtime + timedelta(hours=oper_stat.dur_total_dict[str(date_end_leadtime.month)])
+    duration_chart_op = oper_stat.dur_total_dict[str(date_end_leadtime.month)]
+
+    # Double chart duration if is a tow correction operation or is a cable disconnection operation as op is required twice
+    if 'removal_tow' in oper_stat.id and 'redeploy' not in oper_stat.id:
+        duration_chart_op = duration_chart_op*2
+    if 'cable disconnection' in getattr(getattr(oper_stat, 'op_class', None), 'name', '').lower():
+        duration_chart_op = duration_chart_op*2 + tow_stat_chart_month*2
+    date_end_stat_chart = date_end_leadtime + timedelta(hours=duration_chart_op)
+
     date_end = date_end_transit_tp
     dur_tot_tow = df_filtered_start['dur_total']
 
@@ -117,7 +125,7 @@ def create_operation_site(
         )
         # No mobilisation for operations with vessel to merge as considered in merge_funct
         if mobilisation['mob_time'] != 0 and vessel_['vessel'].type not in vessel_['vessel_to_merge']:            # NOTE Mobilisation of merging vessel is considered in create_logs_merge
-            row_mob_line = immediate_correction.mobilitate_vessel(log_events = row_['log_events'], r = row_['row'])
+            row_mob_line = immediate_correction.mobilitate_vessel(log_events = row_['log_events'], row = row_['row'])
         # Row at operation schedule with idx at 5 AM
         immediate_correction.add_hours_for_noon_shift(
             fail_index = index['fail_index'],
@@ -162,7 +170,11 @@ def create_operation_site(
     if df_filtered_start.empty:
         return None, None
 
-    dates_op = compute_operation_datetimes(df_filtered_start, oper_['oper_stat'], failure_.get('end_add_op_time') if failure_.get('end_add_op_time') else None)
+    dates_op = compute_operation_datetimes(
+        df_filtered_start, oper_['oper_stat'], 
+        failure_.get('end_add_op_time') if failure_.get('end_add_op_time') else None,
+        oper_.get('tow_stat_chart_month') if oper_.get('tow_stat_chart_month') else 0
+    )
     # if operations is delayed reaggiast the df_filtered_start_tow by the difference time
     if 'diff_time' in dates_op:
         df_filtered_start_tow = _check_index_row_validity(

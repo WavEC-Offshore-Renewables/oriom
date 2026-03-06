@@ -75,7 +75,6 @@ def create_logs_corrective_file(
     Returns:
         pd.DataFrame: dataframe with all the events of the farm.
     """
-
     log_events = pd.DataFrame(columns=COLS)
     if dates_failures.empty:
         return log_events
@@ -107,6 +106,7 @@ def create_logs_corrective_file(
             tow_site_oper_sched = safe_getattr(tow_op_site, ['ts_data','oper_sched'])
             last_valid_idx_tow_port = safe_getattr(tow_op_port, ['ts_data','last_valid_index'])
             last_valid_idx_tow_site = safe_getattr(tow_op_site, ['ts_data','last_valid_index'])
+            tow_stat_chart = tow_op_port_stat.dur_total_dict
 
         #take operation_schedule file
         oper_sched = safe_getattr(oper, ['ts_data','oper_sched'])
@@ -145,6 +145,7 @@ def create_logs_corrective_file(
             # TOWING PORT CREATION
             #------------------------
             if tow_op_flag:
+                tow_stat_chart_month = tow_stat_chart[str(date_failure.month)]
                 #------------------------
                 # ADDITIONAL OP CREATION
                 if add_op_tow_port:
@@ -155,7 +156,7 @@ def create_logs_corrective_file(
                         failure_ = {'failure': failure, 'date_failure': date_failure},
                         vessel_ = {'vessel': vessel, 'vessel_to_merge': vessel_to_merge},
                         vessels_ = {'vessel1_id': vessel.id, 'ves_1': add_op_tow_port.vessel1_qt, 'vessel2_id': add_op_tow_port.vessel2_id, 'ves_2': ves_2},
-                        oper_ = {'oper': add_op_tow_port, 'oper_stat': oper_stat_op_tow_port, 'oper_sched': op_sched_add_tow_port},
+                        oper_ = {'oper': add_op_tow_port, 'oper_stat': oper_stat_op_tow_port, 'oper_sched': op_sched_add_tow_port, 'tow_stat_chart_month': tow_stat_chart_month},
                         mobilisation = {'mob_time': mob_time, 'lead_mob_time': mob_time},
                         row_ = {'log_events': log_events,'row': row, 'tow_op_flag': tow_op_flag},
                         index = {'fail_index': fail_index, 'last_valid_idx': safe_getattr(add_op_tow_port, ['ts_data','last_valid_index'])},
@@ -187,7 +188,13 @@ def create_logs_corrective_file(
                 # Evaluate differently for deferred and immediate towing
                 if not towing_port.tow_deferred:
                     if mob_time != 0:
-                        row_mob_line = towing_port.mobilitate_vessel(log_events = log_events, row = row)
+                        if row_mob_line is None:
+                            row_mob_line = towing_port.mobilitate_vessel(log_events = log_events, row = row)
+                        else:
+                            row_mob_line = pd.concat([
+                                row_mob_line,
+                                towing_port.mobilitate_vessel(log_events = log_events, row = row)
+                            ], ignore_index=True)
 
                     towing_port.add_hours_for_noon_shift(
                             fail_index = fail_index,
