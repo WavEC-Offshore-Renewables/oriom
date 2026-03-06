@@ -347,7 +347,7 @@ class TestCreateOperationSite(unittest.TestCase):
                 self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
                 self.idx_end_leadtime = None
 
-            def mobilitate_vessel(self, log_events, r):
+            def mobilitate_vessel(self, log_events, row):
                 # One simple mobilisation row
                 return pd.DataFrame(
                     [[self.date_failure]],

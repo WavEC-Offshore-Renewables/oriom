@@ -278,7 +278,7 @@ def return_statistics_runs(
         run_insight = KPI_Insight(N_SIMULATION = n_runs, n_lifetime = n_lifetime)
         cost_insight, vessel_insight = run_insight.kpi_insight(results_dict = results_dict, vessels = vessels, operations_total = operations_total)
 
-        if not vessel_insight.empty:
+        if not vessel_insight.empty and "ctv" in vessel_insight.index:
             final_cost['reuse_ctv'] = vessel_insight.loc["ctv", "reuse %"]
             final_cost['merge_ctv'] = vessel_insight.loc["ctv", "merge %"]
             final_cost['ctv_effective_day_y'] = vessel_insight.loc["ctv", "yearly day effective"]

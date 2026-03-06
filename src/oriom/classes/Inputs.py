@@ -1417,6 +1417,8 @@ class Inputs():
                     'wec': self.electricity_price_wec["value"]
                 }
             else:
+                if not self.electricity_price["value"]:
+                    self.electricity_price["value"] = 0
                 self.electricity_price_dict = {
                     'pv': self.electricity_price["value"],
                     'wt': self.electricity_price["value"],

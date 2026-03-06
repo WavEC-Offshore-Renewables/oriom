@@ -117,7 +117,7 @@ def create_operation_site(
         )
         # No mobilisation for operations with vessel to merge as considered in merge_funct
         if mobilisation['mob_time'] != 0 and vessel_['vessel'].type not in vessel_['vessel_to_merge']:            # NOTE Mobilisation of merging vessel is considered in create_logs_merge
-            row_mob_line = immediate_correction.mobilitate_vessel(log_events = row_['log_events'], r = row_['row'])
+            row_mob_line = immediate_correction.mobilitate_vessel(log_events = row_['log_events'], row = row_['row'])
         # Row at operation schedule with idx at 5 AM
         immediate_correction.add_hours_for_noon_shift(
             fail_index = index['fail_index'],
