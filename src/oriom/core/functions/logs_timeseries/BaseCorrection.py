@@ -69,9 +69,10 @@ class BaseCorrection:
         self.idx_end_leadtime += h_to_add
 
 
-    def leadtime_evaluation(self, lead_mob_time: float):
+    def leadtime_evaluation(self, lead_mob_time: float, date_original = None):
         """Add the leadtime if the deferred date for the correction is lower then any leadtime"""
-        diff = (self.date_op - (self.date_failure + timedelta(hours=self.time_fail_op_immediately))).total_seconds() / 3600
+        date_check = date_original if date_original else self.date_failure
+        diff = (self.date_op - (date_check + timedelta(hours=self.time_fail_op_immediately))).total_seconds() / 3600
         lead_mob_time = max(lead_mob_time - diff, 0)
         self.date_end_leadtime = self.date_op + timedelta(hours=lead_mob_time)
 
@@ -126,18 +127,16 @@ class CorrectionDeferred(BaseCorrection):
 
         if not self.tow_op:
             self.time_fail_op_immediately = time_fail_op_immediately
-            self.date_op = datetime(
-                year=self.date_failure.year if preferred_month > self.date_failure.month else self.date_failure.year + 1,
-                month=preferred_month,
-                day=1,
-                hour=5,
-                minute=0,
-                second=0
-            )
         else:
             self.time_fail_op_immediately = 0
-            self.date_op = date_failure
-
+        self.date_op = datetime(
+            year=self.date_failure.year if preferred_month > self.date_failure.month else self.date_failure.year + 1,
+            month=preferred_month,
+            day=1,
+            hour=5,
+            minute=0,
+            second=0
+        )
 
     def add_leadtime_tow(self, lead_mob_time: float):
         self.date_end_leadtime = self.date_op + timedelta(hours=lead_mob_time)
@@ -151,11 +150,14 @@ class CorrectionTowPort(BaseCorrection):
     """
     CorrectionTowPort class for tow to port.
     """
-    def __init__(self, date_failure, vessel, oper, failure, time_fail_op_immediately=0):
+    def __init__(self, date_failure, vessel, oper, failure, time_fail_op_immediately=0, date_start = None):
         super().__init__(date_failure, vessel, oper, time_fail_op_immediately)
         self.tow_deferred = False
-        if failure.maintenance_strategy == "immediately":
+        if failure.maintenance_strategy == "immediately" or date_start:
             self.date_op = self.date_failure + timedelta(hours=time_fail_op_immediately)
+            if date_start:
+                self.date_op = date_start
+                self.tow_deferred = True
         else:
             # Calculate deferred for tow
             self.tow_deferred = True

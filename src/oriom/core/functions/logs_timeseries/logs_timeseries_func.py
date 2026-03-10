@@ -35,7 +35,10 @@ def create_mobilisation(
     """
 
     if count_fail:
-        id_mobilisation = 'mobi_' + count_fail
+        if isinstance(count_fail, list):
+            id_mobilisation = ['mobi_' + str(x) for x in count_fail]
+        else:
+            id_mobilisation = 'mobi_' + str(count_fail)
     else: id_mobilisation = None
 
     row_values = [
