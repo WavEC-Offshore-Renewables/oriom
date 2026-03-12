@@ -21,6 +21,7 @@ class WindTurbineGenerator():
         pcurve_file (:obj:`str`): WTG power curve file path. Defaults to ``None``.
         moorings (:obj:`int`): Number of mooring systems per WTG. Defaults to ``0``.
         number_strings (:obj:`int`): Number of strings of WTG devices. Defaults to ``1``.
+        n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``1``
         number_substations (:obj:`int`): Number of substations of WTG farm. Defaults to ``1``.
         number_exportcables (:obj:`int`): Number of export cables of WTG farm. Defaults to ``1``.
         wtg_layout (:obj:`int`): Type layout. Defaults to ``1``.
@@ -64,6 +65,7 @@ class WindTurbineGenerator():
             pcurve_file: str=None,
             moorings: int=None,
             number_strings: int=None,
+            n_string_to_connector: int=None,
             number_substations: int=1,
             number_exportcables: int=1,
             n_device_at_port: int=None,
@@ -83,6 +85,7 @@ class WindTurbineGenerator():
             pcurve_file (:obj:`str`): WTG power curve file path. Defaults to ``None``.
             moorings (:obj:`int`): Number of mooring systems per WTG. Defaults to ``0``.
             number_strings (:obj:`int`): Number of strings of WTG devices. Defaults to ``None``.
+            n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``None``.
             wtg_layout (:obj:`int`): Type layout. Defaults to ``1``.
             number_substations (:obj:`int`): Number of substations of WTG farm. Defaults to ``1``.
             number_exportcables (:obj:`int`): Number of export cables of WTG farm. Defaults to ``1``.
@@ -111,6 +114,11 @@ class WindTurbineGenerator():
         else:
             self.number_strings = 1
 
+        if n_string_to_connector != 0 and n_string_to_connector is not None:
+            self.n_string_to_connector = int(n_string_to_connector)
+        else:
+            self.n_string_to_connector = 1
+            
         try:
             self.number_substations = int(number_substations)
         except ValueError:
@@ -230,6 +238,7 @@ class WindTurbineGenerator():
         pcurve_file = None
         moorings = None
         number_strings = None
+        n_string_to_connector = None
         number_substations = None
         number_exportcables = None
         n_device_at_port = None
@@ -349,12 +358,20 @@ class WindTurbineGenerator():
                     _e += 'Check if any of the other inputs have the word "moorings".'
                     logging.error('WindTurbineGenerator: ' + _e)
                     raise FileNotFoundError(_e)
-            if 'strings' in key:
+            if 'strings' in key and 'connector' not in key:
                 if number_strings is None:
                     number_strings = value
                 else:
                     _e = '"number_strings" alredy defined.'
                     _e += 'Check if any of the other inputs have the word "strings".'
+                    logging.error('WindTurbineGenerator: ' + _e)
+                    raise FileNotFoundError(_e)
+            if 'string' in key and 'connector' in key:
+                if n_string_to_connector is None:
+                    n_string_to_connector = value
+                else:
+                    _e = '"n_string_to_connector" alredy defined.'
+                    _e += 'Check if any of the other inputs have the word "n_string_to_connector".'
                     logging.error('WindTurbineGenerator: ' + _e)
                     raise FileNotFoundError(_e)
             if 'substations' in key:
@@ -405,6 +422,7 @@ class WindTurbineGenerator():
                 pcurve_file=pcurve_file,
                 moorings=moorings,
                 number_strings=number_strings,
+                n_string_to_connector = n_string_to_connector,
                 number_substations=number_substations,
                 number_exportcables=number_exportcables,
                 n_device_at_port=n_device_at_port,
@@ -440,6 +458,7 @@ class WindTurbineGenerator():
                 "wtg power curve file": {"value": self.pcurve_file, "units": "-"},
                 "moorings per wtg": {"value": self.moorings, "units": "-"},
                 "wtg number of strings": {"value": self.number_strings, "units": "-"},
+                "wtg n strings to connector": {"value": self.n_string_to_connector, "units": "-"},
                 "wtg number of hub/substations": {"value": self.number_substations, "units": "-"},
                 "wtg number of export cables": {"value": self.number_exportcables, "units": "-"},
                 "wtg number of n device at port": {"value": self.n_device_at_port, "units": "-"},
@@ -466,6 +485,7 @@ class WindTurbineGenerator():
                 "pcurve_file": wtg_yaml["wtg power curve file"]["value"],
                 "moorings": wtg_yaml["moorings per wtg"]["value"],
                 "number_strings": wtg_yaml["wtg number of strings"]["value"],
+                "n_string_to_connector": wtg_yaml["wtg n strings to connector"]["value"],
                 "number_substations": wtg_yaml["wtg number of hub/substations"]["value"],
                 "number_exportcables": wtg_yaml["wtg number of export cables"]["value"],
                 "n_device_at_port": wtg_yaml["wtg number of n device at port"]["value"],

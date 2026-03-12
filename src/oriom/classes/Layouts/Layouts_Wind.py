@@ -562,12 +562,13 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=6,
-        n_turbines=12,
-        n_strings=4,
+        n_layout=5,
+        n_turbines=4,
+        n_strings=1,
         n_substations=1,
-        n_string_to_connector = 2,
         n_exports=1,
         tow_string_shutdown = True,
         show_plot=True
     )
+
+    a = 1

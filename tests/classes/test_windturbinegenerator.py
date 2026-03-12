@@ -24,7 +24,8 @@ class TestWindTurbineGenerator(unittest.TestCase):
                                 'pcurve_wind.csv'
                         ),
                         moorings=3,
-                        number_strings=1
+                        number_strings=1,
+                        n_string_to_connector=1
                 )
                 self.assertIsInstance(wtg.number_devices, int)
                 self.assertEqual(wtg.number_devices, 10)
@@ -164,7 +165,6 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 self.assertIsInstance(wtg.cut_in, float)
                 self.assertEqual(wtg.hub_height, 200.0)
                 self.assertEqual(wtg.moorings, 3)
-
 
 if __name__ == '__main__':
         unittest.main()

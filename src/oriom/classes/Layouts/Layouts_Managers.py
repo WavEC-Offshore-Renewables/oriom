@@ -20,6 +20,7 @@ class LayoutManager:
                 n_strings=wtg.number_strings,
                 n_substations=wtg.number_substations,
                 n_exports=wtg.number_exportcables,
+                n_string_to_connector=wtg.n_string_to_connector,
                 tow_string_shutdown = getattr(wtg, "tow_string_shutdown", True),
                 save_dir=graph_dir,
                 show_plot=False

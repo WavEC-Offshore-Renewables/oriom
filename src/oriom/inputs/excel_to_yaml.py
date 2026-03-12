@@ -518,10 +518,14 @@ def excel_to_yaml(
                 value = int(value)
                 wtg["moorings per wtg"] = {"value": value, "units": None}
 
-            elif 'strings' in name:
+            elif 'strings' in name and not 'connector' in name:
                 value = int(value)
                 wtg["number of strings"] = {"value": value, "units": None}
 
+            elif 'strings' in name and 'connector' in name:
+                value = int(value)
+                wtg["n strings to connector"] = {"value": value, "units": None}
+            
             elif 'substations' in name:
                 value = int(value)
                 wtg["number of substations"] = {"value": value, "units": None}
