@@ -41,8 +41,10 @@ class TowData:
     tow_op_site_port_stat: object
     tow_port_oper_sched: pd.DataFrame
     tow_site_oper_sched: pd.DataFrame
+    tow_site_port_oper_sched: pd.DataFrame
     last_valid_idx_tow_port: int
     last_valid_idx_tow_site: int
+    last_valid_idx_tow_site_port: int
     oper_stat_op_tow_port: object | None = None
     oper_stat_op_site: object | None = None
     op_at_port: object = None
@@ -60,15 +62,6 @@ class TowData:
 
         for op in filter(None, ops):
             oper_dict_tow[op.id] = op
-
-        return {
-            'op_at_port' : self.op_at_port,
-            'tow_to_port' : self.tow_op_port,
-            'tow_to_site' : self.tow_op_site,
-            'tow_site_port' : self.tow_site_port,
-            'add_op_to_remove' : self.add_op_tow_port,
-            'add_op_to_redeploy' : self.add_op_tow_site
-        }
 
 
     @classmethod
