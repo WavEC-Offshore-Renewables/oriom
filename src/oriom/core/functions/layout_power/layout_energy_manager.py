@@ -215,7 +215,7 @@ def fix(
         G graph and percentage farm available.
     """
 
-    if event != 'recommisioning':
+    if event != 'recommissioning':
         if loc == ('x', 'x'):
             pass
         elif isinstance(loc, tuple) is True:
@@ -242,7 +242,7 @@ def fix(
                     if event != 'tow':
                         G.nodes[loc]['power'] = 1
                     else:
-                        if getattr(op_tow_, 'recommisioning_time', 0) == 0:
+                        if getattr(op_tow_, 'recommissioning_time', 0) == 0:
                             G.nodes[loc]['power'] = 1
                         else:
                             op_add_tow.setdefault(op_add.id + "_recom", {})[r['failure_id']] = loc
@@ -259,7 +259,7 @@ def fix(
                 if event == 'tow' and op_add:
                     op_add_tow.setdefault(op_add.id + "_tow", {})[r['failure_id']] = loc
                 else:
-                    if getattr(op_tow_, 'recommisioning_time', 0) == 0:
+                    if getattr(op_tow_, 'recommissioning_time', 0) == 0:
                         check_previous_fix(G, op_add_tow, r)
                     manage_string_tow_operation(G = G, loc = loc, action = True)
     else:

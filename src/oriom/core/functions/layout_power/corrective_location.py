@@ -134,7 +134,7 @@ def logs_corrective_locations(
             })
 
     # ---------- OPERATION (excluding tow) ----------
-    elif r['event'] == 'operation' and r['id'] in op_corr_excluding_tow or r['event'] == 'recommisioning':
+    elif r['event'] == 'operation' and r['id'] in op_corr_excluding_tow or r['event'] == 'recommissioning':
         if not isinstance(r['comments'], str):
             raise TypeError(f"Invalid comments type: {r['comments']}")
 
@@ -154,7 +154,7 @@ def logs_corrective_locations(
         # Shut operations
         shut_case = condition_shut_fix_evaluation(op_corr_tow, fail_op, op_add_tow, r['id'], 'remov')
         if shut_case:
-            if r['event'] != 'recommisioning':
+            if r['event'] != 'recommissioning':
                 # optional shutdown before repair
                 if shutdown_hours.get(str(month), 0) != 0:
                     events.append({
@@ -174,7 +174,7 @@ def logs_corrective_locations(
         if fix_case:
             events.append({
                 "date": r['d_end_dur_net_site'],
-                "event": "operation" if r['event'] != 'recommisioning' else 'recommisioning',
+                "event": "operation" if r['event'] != 'recommissioning' else 'recommissioning',
                 "id": r['id'],
                 "comments": r['comments'],
                 "name": operation.op_class.name,

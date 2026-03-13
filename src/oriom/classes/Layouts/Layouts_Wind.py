@@ -510,7 +510,7 @@ class Layout_Wind():
             h=1
             l += 1
 
-        Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_6", show_plot = True)
+        Layout_Aux.draw_layout(G = G, save_dir = save_dir, show_plot = show_plot, title="Wind_Layout_6")
         return G
 
 
@@ -562,13 +562,12 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=5,
-        n_turbines=4,
+        n_layout=6,
+        n_turbines=5,
         n_strings=1,
         n_substations=1,
         n_exports=1,
+        n_string_to_connector = 5,
         tow_string_shutdown = True,
         show_plot=True
     )
-
-    a = 1
