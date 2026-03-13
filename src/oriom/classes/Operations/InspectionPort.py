@@ -5,6 +5,7 @@ import os
 from ruamel.yaml import YAML
 from distutils.util import strtobool
 
+from oriom.utils.aux_operation import define_tow_operations
 from oriom.core.functions.layout_power.aux_layout_power_func import find_highest_power_node
 
 
@@ -261,7 +262,7 @@ class InspectionPort():
                     raise ValueError(_e)
 
         self._check_attributes()
-        self._define_tow_operations(towing_ops)
+        define_tow_operations(self, towing_ops, 'InspectionPort')
 
 
     def _check_attributes(self):
@@ -334,51 +335,7 @@ class InspectionPort():
             raise ValueError('"n_device_stored_at_port" must not be negative')
 
         logging.debug('InspectionPort: inspection %s attributes within ranges and valid.' % self.id)
-
-
-    def _define_tow_operations(self, towing_ops:list):
-        """
-        Define tow operations based on the given towing operations and the technology identifier.
-
-        Args:
-            towing_ops (:obj:`list`): List of object :class:`OperationTow`.
-        """
-        if 'ofw' in self.id:
-            tech_identifier = 'ofw'
-        elif 'owc' in self.id:
-            tech_identifier = 'owc'
-        elif 'opv' in self.id:
-            tech_identifier = 'opv'
-        else:
-            _e = 'For inspection %s, the technology identifier ' % self.id
-            _e += 'prefix is not recognized.'
-            raise TypeError(_e)
-
-        for op in towing_ops:
-            if tech_identifier in op.id:
-                if 'remov' in op.name.lower() and 'deplo' not in op.name.lower():
-                    self.op_tow_port = op.id
-                elif 'deplo' in op.name.lower() and 'remov' not in op.name.lower():
-                    self.op_tow_site = op.id
-                elif 'deplo' in op.name.lower() and 'remov' in op.name.lower():
-                    self.op_tow_site_port = op.id
-                else:
-                    _e = 'For operation %s, the tow operation ' % self.id
-                    _e += '%s is not recogneized either as a device ' % op.id
-                    _e += '"removal", "redeploy" or "redeploy" and "tow".'
-                    raise TypeError(_e)
-
-        # Check if both operation IDs were defined
-        if self.op_tow_port is None:
-            _e = 'For operation %s, could not define a tow-to-port operation.' % self.id
-            raise NameError('InspectionPort: ' + _e)
-        if self.op_tow_site is None:
-            _e = 'For operation %s, could not define a tow-to-site operation.' % self.id
-            raise NameError('InspectionPort: ' + _e)
-        if self.op_tow_site_port is None:
-            _w = 'For operation %s, could not define a tow-to-site operation.' % self.id
-            logging.warning('InspectionPort: ' + _w)
-
+    
 
     def define_level(self, G_layouts:dict):
         """

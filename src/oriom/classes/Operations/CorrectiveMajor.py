@@ -3,6 +3,8 @@ import logging
 import os
 from ruamel.yaml import YAML
 
+from oriom.utils.aux_operation import define_tow_operations
+
 
 # Import classes
 class CorrectiveMajor():
@@ -27,6 +29,8 @@ class CorrectiveMajor():
         op_tow_port (:obj:`str`): ID of the tow-to-port operation. Its value is
             ``None`` if not defined.
         op_tow_site (:obj:`str`): ID of the tow-to-site operation. Its value is
+            ``None`` if not defined.
+        op_tow_site_port (:obj:`str`): ID of the tow-to-site-port operation. Its value is
             ``None`` if not defined.
         vessel1_id (:obj:`str`): The ID of the main vessel. Its value is
             ``None`` if not defided.
@@ -128,6 +132,7 @@ class CorrectiveMajor():
 
         self.op_tow_port = None
         self.op_tow_site = None
+        self.op_tow_site_port = None
 
         self.failures = None
 
@@ -171,7 +176,7 @@ class CorrectiveMajor():
 
         self._check_attributes()
         if self.tow_to_port:
-            self.define_tow_operations(towing_ops)
+            define_tow_operations(self, towing_ops, 'CorrectiveMajor')
 
 
     def _check_attributes(self):
@@ -202,44 +207,6 @@ class CorrectiveMajor():
             if self.vessel2_qt < 1:
                 raise ValueError('"vessel2_qt" must be positive if a "vessel2_id" is defined')
         logging.debug('CorrectiveMajor: operation %s attributes within ranges and valid.' % self.id)
-
-
-    def define_tow_operations(self, towing_ops):
-        """
-        Define tow operations based on the given towing operations and the technology identifier of the object.
-
-        Args:
-            towing_ops (:obj:`list`): The list of towing operations.
-        """
-        if 'ofw' in self.id:
-            tech_identifier = 'ofw'
-        elif 'owc' in self.id:
-            tech_identifier = 'owc'
-        elif 'opv' in self.id:
-            tech_identifier = 'opv'
-        else:
-            _e = 'For operation %s, the technology identifier ' % self.id
-            _e += 'prefix is not recognized.'
-            raise TypeError(_e)
-
-        for op in towing_ops:
-            if tech_identifier in op.id:
-                if 'remov' in op.name.lower() and 'deplo' not in op.name.lower():
-                    self.op_tow_port = op.id
-                elif 'deplo' in op.name.lower() and 'remov' not in op.name.lower():
-                    self.op_tow_site = op.id
-                else:
-                    _w = 'For operation %s, the tow operation ' % self.id
-                    _w += '%s is negleted.' % op.id
-                    logging.warning('CorrectiveMajor: '+ _w)
-
-        # Check if both operation IDs were defined
-        if self.op_tow_port is None:
-            _e = 'For operation %s, could not define a tow-to-port operation.' % self.id
-            raise NameError('CorrectiveMajor: ' + _e)
-        if self.op_tow_site is None:
-            _e = 'For operation %s, could not define a tow-to-site operation.' % self.id
-            raise NameError('CorrectiveMajor: ' + _e)
 
 
     def get_operations_from_yaml(

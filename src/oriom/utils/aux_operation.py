@@ -256,3 +256,47 @@ def get_failures(
         return
     else:
         operation.failures = failures
+
+
+def define_tow_operations(oper: object, towing_ops:list, op_type: str):
+    """
+    Define tow operations based on the given towing operations and the technology identifier.
+
+    Args:
+        towing_ops (:obj:`list`): List of object :class:`OperationTow`.
+    """
+    if 'ofw' in oper.id:
+        tech_identifier = 'ofw'
+    elif 'owc' in oper.id:
+        tech_identifier = 'owc'
+    elif 'opv' in oper.id:
+        tech_identifier = 'opv'
+    else:
+        _e = 'For inspection %s, the technology identifier ' % op.id
+        _e += 'prefix is not recognized.'
+        raise TypeError(_e)
+
+    for op in towing_ops:
+        if tech_identifier in op.id:
+            if 'remov' in op.name.lower() and 'deplo' not in op.name.lower():
+                oper.op_tow_port = op.id
+            elif 'deplo' in op.name.lower() and 'remov' not in op.name.lower():
+                oper.op_tow_site = op.id
+            elif 'deplo' in op.name.lower() and 'remov' in op.name.lower():
+                oper.op_tow_site_port = op.id
+            else:
+                _e = 'For operation %s, the tow operation ' % oper.id
+                _e += '%s is not recogneized either as a device ' % op.id
+                _e += '"removal", "redeploy" or "redeploy" and "tow".'
+                raise TypeError(_e)
+
+    # Check if both operation IDs were defined
+    if oper.op_tow_port is None:
+        _e = 'For operation %s, could not define a tow-to-port operation.' % oper.id
+        raise NameError('InspectionPort: ' + _e)
+    if oper.op_tow_site is None:
+        _e = 'For operation %s, could not define a tow-to-site operation.' % oper.id
+        raise NameError('InspectionPort: ' + _e)
+    if oper.op_tow_site_port is None:
+        _w = 'For operation %s, could not define a tow-to-site operation.' % oper.id
+        logging.warning(op_type+ ': ' + _w)
