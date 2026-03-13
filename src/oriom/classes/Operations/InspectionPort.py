@@ -142,7 +142,7 @@ class InspectionPort():
             n_device_at_port(:obj:`int`): Number of devices that can be mantained
                 at port simultaneously. Defaults to :obj:`1`
             n_device_stored_at_port(:obj:`int`): Number of devices that can be
-                stored at port when not in maintenance. Defaults to :obj:`0.0`
+                stored at port when not in maintenance. Defaults to :obj:`0`
             days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
             duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
@@ -457,32 +457,6 @@ class InspectionPort():
 
         logging.info('InspectionPort: inspections defined based on file "%s"' % file_path)
         return inspections_list
-
-
-    def define_device_at_port(self, wtg, wec, pv):
-        tech_op = self.id[:3]
-
-        if tech_op == 'ofw':
-            n_device_at_port = wtg.n_device_at_port
-            n_device_stored_at_port = wtg.n_device_stored_at_port
-        elif tech_op == 'owc':
-            n_device_at_port = wec.n_device_at_port
-            n_device_stored_at_port = wec.n_device_stored_at_port
-        elif tech_op == 'opv':
-            n_device_at_port = pv.n_device_at_port
-            n_device_stored_at_port = pv.n_device_stored_at_port
-        else:
-            raise KeyError('The prefix of the operation is not well described. It must be one of ["ofw", "owc", "opv"]')
-
-        if n_device_at_port is None or n_device_at_port == 0:
-            n_device_at_port = 1
-        if n_device_stored_at_port is None:
-            n_device_stored_at_port = 0
-        if n_device_at_port < 0 or n_device_stored_at_port < 0:
-            raise ValueError('The n_device_at_port or n_device_stored_at_port cannot be negative')
-
-        self.n_device_at_port = n_device_at_port
-        self.n_device_stored_at_port = n_device_stored_at_port
 
 
     def assign_shift_attributes(self, data: dict):

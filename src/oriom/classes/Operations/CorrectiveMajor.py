@@ -56,7 +56,10 @@ class CorrectiveMajor():
             defided.
         ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
-
+        n_device_at_port(:obj:`int`): Number of devices that can be mantained
+            at port simultaneously. Defaults to `None`
+        n_device_stored_at_port(:obj:`int`): Number of devices that can be
+                stored at port when not in maintenance. Defaults to `None`
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
     """
@@ -133,6 +136,9 @@ class CorrectiveMajor():
         self.op_tow_port = None
         self.op_tow_site = None
         self.op_tow_site_port = None
+
+        self.n_device_at_port = None
+        self.n_device_stored_at_port = None
 
         self.failures = None
 

@@ -300,3 +300,32 @@ def define_tow_operations(oper: object, towing_ops:list, op_type: str):
     if oper.op_tow_site_port is None:
         _w = 'For operation %s, could not define a tow-to-site operation.' % oper.id
         logging.warning(op_type+ ': ' + _w)
+
+
+def define_device_at_port(oper: object, wtg: object, wec: object, pv: object, inspection: bool):
+    """ Function to associate number of n_device_at_port and n_device_stored_at_port for the op at port"""
+    
+    if inspection or getattr(oper, 'tow_to_port', False):
+        tech_op = oper.id[:3]
+
+        if tech_op == 'ofw':
+            n_device_at_port = wtg.n_device_at_port
+            n_device_stored_at_port = wtg.n_device_stored_at_port
+        elif tech_op == 'owc':
+            n_device_at_port = wec.n_device_at_port
+            n_device_stored_at_port = wec.n_device_stored_at_port
+        elif tech_op == 'opv':
+            n_device_at_port = pv.n_device_at_port
+            n_device_stored_at_port = pv.n_device_stored_at_port
+        else:
+            raise KeyError('The prefix of the operation is not well described. It must be one of ["ofw", "owc", "opv"]')
+
+        if n_device_at_port is None or n_device_at_port == 0:
+            n_device_at_port = 1
+        if n_device_stored_at_port is None:
+            n_device_stored_at_port = 0
+        if n_device_at_port < 0 or n_device_stored_at_port < 0:
+            raise ValueError('The n_device_at_port or n_device_stored_at_port cannot be negative')
+
+        oper.n_device_at_port = n_device_at_port
+        oper.n_device_stored_at_port = n_device_stored_at_port

@@ -214,7 +214,7 @@ def run(config: ConfigRun | None = None):
 
     logging.info('--------------------\tINPUTS - OPERATIONS\t--------------------')
     vessels = {}
-    
+
     # Define ROVs and Drones
     rovs_drones = RovDrone.get_rovdrones_from_yaml(files.rovs_drones_file)
 
@@ -281,8 +281,18 @@ def run(config: ConfigRun | None = None):
             )
 
     # Populate Operations with device at port storage and simultaneus operations
-    for operation in operations_inspect_port:
-        operation.define_device_at_port(wtg=farm_technologies.wtg, wec=farm_technologies.wec, pv=farm_technologies.pv)
+    for operations_list, inspection in zip(
+        (operations_inspect_port, operations_corr_major),
+        (True, False)
+    ):
+        for operation in operations_list:
+            aux_operation.define_device_at_port(
+                oper=operation,
+                wtg=farm_technologies.wtg,
+                wec=farm_technologies.wec,
+                pv=farm_technologies.pv,
+                inspection=inspection
+            )
 
     # Populate the inspection level if not defined previously
     for operation in (operations_inspect_port + operations_inspect_site):
