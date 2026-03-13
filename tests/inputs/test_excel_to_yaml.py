@@ -660,7 +660,7 @@ class TestExcelToYaml(unittest.TestCase):
                 "other_costs": ["UNIT", 0.0],
                 "additional_previous_op_tow": ["UNIT", "NA"],
                 "string_disconnection": ["UNIT", False],
-                "recommisioning_time": ["UNIT", "NA"],
+                "recommissioning_time": ["UNIT", "NA"],
             }
         )
 

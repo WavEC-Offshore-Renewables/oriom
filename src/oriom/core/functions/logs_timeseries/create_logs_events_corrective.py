@@ -122,7 +122,7 @@ def create_logs_corrective_file(
             row_add_op_tow_port = None
             row_add_op_tow_site = None
             row_tow_site = None
-            row_recommisioning = None
+            row_recommissioning = None
             deferred_tow = None
             tow_stat_chart_month = None
             double = False
@@ -133,7 +133,7 @@ def create_logs_corrective_file(
             operation_trig = row['operation_triggered']
             fail_index = row['matching_indices']
             op_chart_month = oper_stat.dur_total_dict[str(date_failure.month)]
-
+            date_failure_tow = None
 
             ves_1 = oper.vessel1_qt
             component_lead_time = failure.lead_time
@@ -206,7 +206,7 @@ def create_logs_corrective_file(
 
                 vessel, ves_2, mob_time = _take_vessel_data(find_element_class = find_element_class, op = tow_data.tow_op_port)
                 towing_port = CorrectionTowPort(
-                    date_failure = date_failure_tow,
+                    date_failure = date_failure_tow if date_failure_tow else date_failure,
                     vessel = vessel,
                     oper = tow_data.tow_op_port,
                     failure = failure,
@@ -228,12 +228,12 @@ def create_logs_corrective_file(
                     towing_port.add_hours_for_noon_shift(
                             fail_index = fail_index if not deferred_tow else deferred_tow_correction.idx_end_leadtime,
                             lead_mob_time = mob_time,
-                            oper_sched = tow_data.tow_port_op_oper_sched,
+                            oper_sched = tow_data.tow_port_oper_sched,
                         )
                 else:
                     # mobilisation in deferred_merged
                     towing_port.leadtime_evaluation(lead_mob_time = mob_time, date_original = row_add_op_tow_port['d_trigger'][0])
-                    index_found = towing_port.check_leadtime_index(oper_sched = tow_data.tow_port_op_oper_sched, CUTOFF_DATE = CUTOFF_DATE)
+                    index_found = towing_port.check_leadtime_index(oper_sched = tow_data.tow_port_oper_sched, CUTOFF_DATE = CUTOFF_DATE)
                     if not index_found:
                         continue
 
@@ -244,7 +244,7 @@ def create_logs_corrective_file(
                     idx_end_leadtime = towing_port.idx_end_leadtime,
                     last_valid_idx= tow_data.last_valid_idx_tow_port,
                     r = row,
-                    oper_sched = tow_data.tow_port_op_oper_sched
+                    oper_sched = tow_data.tow_port_oper_sched
                 )
 
                 if df_filtered_start_tow.empty:
@@ -266,7 +266,7 @@ def create_logs_corrective_file(
                         idx_end_leadtime = towing_port.idx_end_leadtime + dates_tow_port['diff_time'],
                         last_valid_idx= tow_data.last_valid_idx_tow_port,
                         r = row,
-                        oper_sched = tow_data.tow_port_op_oper_sched
+                        oper_sched = tow_data.tow_port_oper_sched
                     )
 
                     if df_filtered_start_tow.empty:
@@ -463,17 +463,17 @@ def create_logs_corrective_file(
                                 row_mob_line,
                                 row_mob_line_op_tow_site
                             ], ignore_index=True)
-                    # Create row for recommisioning
-                    if getattr(tow_data.tow_op_site, 'recommisioning_time', None):
-                        row_recommisioning = row_add_op_tow_site.copy()
-                        row_recommisioning['event'] = 'recommisioning'
-                        row_recommisioning[["vessel_1", "n_vessel_1", "vessel_2", "n_vessel_2"]] = None                        
-                        modified_date = row_add_op_tow_site['d_end_dur_net_site'] + timedelta(hours=tow_data.tow_op_site.recommisioning_time)                  
+                    # Create row for recommissioning
+                    if getattr(tow_data.tow_op_site, 'recommissioning_time', None):
+                        row_recommissioning = row_add_op_tow_site.copy()
+                        row_recommissioning['event'] = 'recommissioning'
+                        row_recommissioning[["vessel_1", "n_vessel_1", "vessel_2", "n_vessel_2"]] = None                        
+                        modified_date = row_add_op_tow_site['d_end_dur_net_site'] + timedelta(hours=tow_data.tow_op_site.recommissioning_time)                  
                         for ev in ['d_end_dur_net_site', 'd_end_transit_tp', 'd_end']:
-                            row_recommisioning[ev] = modified_date
+                            row_recommissioning[ev] = modified_date
 
             ### CONCAT TO THE LOG_EVENTS
-            for rows_df in [row_tow_port, row_tow_site, row_add_op_tow_port, row_add_op_tow_site, row_recommisioning]:
+            for rows_df in [row_tow_port, row_tow_site, row_add_op_tow_port, row_add_op_tow_site, row_recommissioning]:
                 if rows_df is not None:
                     row_dates = pd.concat([row_dates, rows_df], axis=0, ignore_index=True)
             if row_mob_line is not None:

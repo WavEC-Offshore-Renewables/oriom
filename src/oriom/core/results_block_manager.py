@@ -141,7 +141,7 @@ def results_block(
 
     except (TypeError, FileNotFoundError) as e_:
         log_events_merged = create_logs_merge(
-            log_events = log_events,
+            log_events_original = log_events,
             failures = failures,
             operation_log_file_stats = operations_tow_stats['pmax'] + operations_corrective_stats['pmax'],
             result_dir_r=result_dir_r,
@@ -258,8 +258,8 @@ def results_block(
             result_dir_r = result_dir_r
         )
 
-        log_events = log_events[log_events['event'] != 'recommisioning']
-        log_events_merged = log_events_merged[log_events_merged['event'] != 'recommisioning']
+        log_events = log_events[log_events['event'] != 'recommissioning']
+        log_events_merged = log_events_merged[log_events_merged['event'] != 'recommissioning']
 
         combined = {}
         for k in availability_total.keys():
