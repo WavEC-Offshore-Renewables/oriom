@@ -99,7 +99,7 @@ class OperationTow():
         self.id = str(id_).lower()
         self.name = str(name)
         self.tech_required = int(tech_required)
-        self.vessel1_id = str(vessel1_id)
+        self.vessel1_id = str(vessel1_id).lower()
 
         self.tech_cost = 0
         self.vessel2_id = None

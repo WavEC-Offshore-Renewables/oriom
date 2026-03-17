@@ -20,6 +20,7 @@ class OperationTimeSeriesData:
         dur_net_port (:obj:`float`): Total net duration of the operation at port
         transit_tp (:obj:`float`): Total transit duration to port
         transit_ts (:obj:`float`): Total transit duration to site
+        last_valid_index (:obj:`int`): Last index valid to conduct op of oper_sched
 
     Note:
         When the class is initialized, :func:`_extract_from_sched` is run.
