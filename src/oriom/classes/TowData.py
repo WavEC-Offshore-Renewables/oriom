@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import pandas as pd
 
 from oriom.utils.aux_functions import safe_getattr
@@ -29,6 +29,8 @@ class TowData:
         oper_stat_op_tow_port: Statistics for the additional port tow operation (if present).
         oper_stat_op_site: Statistics for the additional site tow operation (if present).
         op_at_port: Operation executed at port.
+        dict_tow_oper_sched: Dictionary containing oper_sched for towing operations.
+        dict_tow_oper_last_idx: Dictionary containing last_valid_index for towing operations.
     """
 
     tow_op_port: object
@@ -49,8 +51,26 @@ class TowData:
     oper_stat_op_site: object | None = None
     op_at_port: object = None
 
+    # Dictionaries to hold schedules and last indices
+    dict_tow_oper_sched: dict = field(init=False)
+    dict_tow_oper_last_idx: dict = field(init=False)
+
+    def __post_init__(self):
+        """Initialize dictionaries after instance is created"""
+        self.dict_tow_oper_sched = {
+            self.tow_op_port.id: self.tow_port_oper_sched,
+            self.tow_op_site.id: self.tow_site_oper_sched,
+            self.tow_site_port.id: self.tow_site_port_oper_sched,
+        }
+        self.dict_tow_oper_last_idx = {
+            self.tow_op_port.id: self.last_valid_idx_tow_port,
+            self.tow_op_site.id: self.last_valid_idx_tow_site,
+            self.tow_site_port.id: self.last_valid_idx_tow_site_port,
+        }
+
+
     def id_dict_oper(self, oper_dict_tow: dict, op_at_port: object):
-        """Populate a dictionary with obj.id: obj """
+        """Populate a dictionary with obj.id: obj"""
         self.op_at_port = op_at_port
         ops = (
             self.op_at_port,
@@ -76,7 +96,6 @@ class TowData:
         Returns:
             TowData: Aggregated tow operation data.
         """
-
         tow_op_port = finder.find_operation(getattr(oper, 'op_tow_port'))
         tow_op_site = finder.find_operation(getattr(oper, 'op_tow_site'))
         tow_site_port = finder.find_operation(getattr(oper, 'op_tow_site_port'))
@@ -86,7 +105,7 @@ class TowData:
 
         tow_op_port_stat = finder.find_operation_stats_pmax(tow_op_port.id)
         tow_op_site_stat = finder.find_operation_stats_pmax(tow_op_site.id)
-        tow_op_site_port_stat = finder.find_operation_stats_pmax(tow_op_site.id)
+        tow_op_site_port_stat = finder.find_operation_stats_pmax(tow_site_port.id)
 
         tow_port_oper_sched = safe_getattr(tow_op_port, ['ts_data', 'oper_sched'])
         tow_site_oper_sched = safe_getattr(tow_op_site, ['ts_data', 'oper_sched'])

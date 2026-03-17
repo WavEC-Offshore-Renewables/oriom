@@ -177,28 +177,29 @@ def creation_oper_vessel_dict(
         failures: list,
         find_element_class: object,
         oper_per_vessel: dict,
-        deferred_failures_correction:list
+        deferred_failures_correction: list,
+        deferred_failures_correction_tow: list,
+        failures_correction_tow:list
 ):
     """ Create list of failures and dict vess: deferred_op"""
     for failure in failures:
-        if failure.maintenance_strategy == 'specific month':
-            oper = find_element_class.find_operation(failure.operation_triggered)
-            deferred_failures_correction.append(failure.id)
-            # Avoid to take for towing opeartion as there are no failure connected
-            if 'tow' not in oper.id:
-                # If site operation take the vessel
-                if not getattr(oper, "tow_to_port", None):
-                    if oper.vessel1_id in oper_per_vessel:
-                        oper_per_vessel[oper.vessel1_id].append(oper.id)
-                    else:
-                        oper_per_vessel[oper.vessel1_id] = [oper.id]
-                # If port opeartion create tow key instead of vessel.id
-                else:
-                    if 'tow' in oper_per_vessel:
-                        oper_per_vessel['tow'].append(oper.id)
-                    else:
-                        oper_per_vessel['tow'] = [oper.id]
-
+        oper = find_element_class.find_operation(failure.operation_triggered)
+        tow_op = getattr(oper, 'tow_to_port', False)
+        if not tow_op:
+            if failure.maintenance_strategy == 'specific month':
+                    deferred_failures_correction.append(failure.id)
+                    # Avoid to take for towing operation as there are no failure connected
+                    if not getattr(oper, 'tow_operation',False):
+                        # If site operation take the vessel
+                        if oper.vessel1_id in oper_per_vessel:
+                            oper_per_vessel[oper.vessel1_id].append(oper.id)
+                        else:
+                            oper_per_vessel[oper.vessel1_id] = [oper.id]
+        else:
+            if failure.maintenance_strategy == 'specific month':
+                deferred_failures_correction_tow.append(failure.id)
+            else:
+                failures_correction_tow.append(failure.id)
 
 
 if __name__ == '__main__':
