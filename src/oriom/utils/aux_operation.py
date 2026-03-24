@@ -263,8 +263,11 @@ def define_tow_operations(oper: object, towing_ops:list, op_type: str):
     Define tow operations based on the given towing operations and the technology identifier.
 
     Args:
+        oper (:obj: `object`): Operation Object of class `CorrectiveMajor` or `InspectionPort`
         towing_ops (:obj:`list`): List of object :class:`OperationTow`.
+        op_type (:obj:`str`): Type of class `CorrectiveMajor` or `InspectionPort`
     """
+    
     if 'ofw' in oper.id:
         tech_identifier = 'ofw'
     elif 'owc' in oper.id:
@@ -272,7 +275,7 @@ def define_tow_operations(oper: object, towing_ops:list, op_type: str):
     elif 'opv' in oper.id:
         tech_identifier = 'opv'
     else:
-        _e = 'For inspection %s, the technology identifier ' % op.id
+        _e = 'For inspection %s, the technology identifier ' % oper.id
         _e += 'prefix is not recognized.'
         raise TypeError(_e)
 

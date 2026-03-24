@@ -303,13 +303,14 @@ the devisce at port and stored at port must be present (if not know = 0)
     ```
 
 - Additional Operations: <br>
-    creates an operation required before the tow opearation. Tow op will be conducted only after the end at site of such opearation
+    creates an operation required before the tow opearation (if removal) or after (if redeploy) to disconnect full string
+    Require String disconnection == True
 
 - String disconnection: <br>
     If additional operations is present, shutdown the entire string of the device that is towed for the whole duration of the additional operation
 
 - Recommissioning: <br>
-    If additional operations is present that shutdown the entire string of the device a recommissioning period can be added. This must be int value and represent the hours of recommision to consider. In Additional Operations activity add recommissioning activity AFTER the TRANSIT to port!
+    If additional operations is present that shutdown the entire string of the device a recommissioning period can be added. This must be int value and represent the hours of recommision to consider. In Additional Operations activity add recommissioning activity AFTER the TRANSIT to port as LOCATION == port
 
 
 <span style="font-size: 20px; font-weight: bold;">ACTIVITIES</span>

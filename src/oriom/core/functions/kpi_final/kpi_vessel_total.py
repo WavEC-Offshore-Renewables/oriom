@@ -128,7 +128,7 @@ def kpi_cost_vessel_internal(
     log_events_tow = safe_copy_df(log_events_tow_orig, ['id', 'comments'])
     log_events_op_port = safe_copy_df(log_events_op_port_orig, ['id', 'comments'])
 
-        # Cost for port operation with no vessel defined
+    # Cost for port operation with no vessel defined
     if not log_events_op_port.empty:
         n_oper_at_port = len(log_events_op_port)
 

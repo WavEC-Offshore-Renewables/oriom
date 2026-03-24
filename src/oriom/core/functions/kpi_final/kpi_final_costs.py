@@ -42,6 +42,7 @@ def kpi_final_total_cost(
             operation, inspection_port, inspection_site).
         vessels (:obj:`list`): List of objects :class:`Vessel`
         inputs (object): object of class `Inputs` that contains all the input data from input file,
+        vessel_day_counter (: object): Object of ``VesselDayCount`` for ,
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         operations_corrective_stat (:obj:`list`): List of obejcts :class:`OperationsCorrectiveStat`.
