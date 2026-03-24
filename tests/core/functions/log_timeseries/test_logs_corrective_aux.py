@@ -35,8 +35,9 @@ LOG_COLS = [
 
 
 class DummyOperStat:
-    def __init__(self, dur_total_dict, id_ = None):
+    def __init__(self, dur_total_dict, oper = None, id_ = None):
         self.dur_total_dict = dur_total_dict
+        self.op_class = oper
         if id_:
             self.id = id_
 
@@ -168,8 +169,8 @@ class TestComputeOperationDatetimes(unittest.TestCase):
             return start + timedelta(hours=float(row[col_name]))
 
         mock_create_data.side_effect = fake_create_data
-
-        oper_stat = DummyOperStat(dur_total_dict={"1": 100.0}, id_ = 'OP1')
+        op1 = DummyOperation(op_id = 'OP1')
+        oper_stat = DummyOperStat(dur_total_dict={"1": 100.0}, oper = op1, id_ = 'OP1')
 
         result = compute_operation_datetimes(sched_row, oper_stat)
 

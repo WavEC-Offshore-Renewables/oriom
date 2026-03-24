@@ -21,6 +21,7 @@ class OperationTimeSeriesData:
         transit_tp (:obj:`float`): Total transit duration to port
         transit_ts (:obj:`float`): Total transit duration to site
         last_valid_index (:obj:`int`): Last index valid to conduct op of oper_sched
+        act_port_order (:obj:`bool`): Bool to specify if port operation is before or after site operation
 
     Note:
         When the class is initialized, :func:`_extract_from_sched` is run.
@@ -28,11 +29,12 @@ class OperationTimeSeriesData:
 
     def __init__(self, operation, id: str, oper_sched: pd.DataFrame, startability: pd.DataFrame = pd.DataFrame()):
         self.operation = operation
-        self.id = id
+        self.id = operation.id
         self.oper_sched = oper_sched
         if not startability.empty:
             self.startability = startability
 
+        self.act_port_end = False
         self.dur_net_site = None
         self.dur_net_port = 0
         self.transit_tp = None
@@ -45,6 +47,17 @@ class OperationTimeSeriesData:
         self._extract_from_sched()  # automatic call to the function
 
         self.dur_total = self.transit_ts + self.transit_tp + self.dur_net_port + self.dur_net_site
+        self._activity_order()
+
+
+    def _activity_order(self):
+        """ Create dict activities_order and flag for port operation if before or after site operation"""
+        if hasattr(self.operation, 'activities'):
+            for idx, act in enumerate(self.operation.activities):
+                act_prev_loc = self.operation.activities[idx - 1].location.lower() if idx != 0 else act.location.lower()
+                if act.location.lower() == 'port':
+                    if act_prev_loc == 'transit':
+                        self.act_port_end = True
 
 
     def _extract_from_sched(self):

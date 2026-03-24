@@ -252,14 +252,17 @@ def shutdown_evaluation(
     op_shutdown = {}
     # Find if the operations/inspections have a shutdown and map them in a dict
     for op in operation_log_file_stats + inspections_site_stat + inspections_port_stat:
-        try:
-            op_shutdown[op.id] = (
-                any(op.wtg_shutdown_dict.values()) or
-                any(op.pv_shutdown_dict.values()) or
-                any(op.wec_shutdown_dict.values())
-            )
-        except AttributeError:
-            op_shutdown[op.id] = op.shutdown_dict
+        if getattr(op, 'tow_operation',False):
+            op_shutdown[op.id]
+        else:
+            try:
+                op_shutdown[op.id] = (
+                    any(op.wtg_shutdown_dict.values()) or
+                    any(op.pv_shutdown_dict.values()) or
+                    any(op.wec_shutdown_dict.values())
+                )
+            except AttributeError:
+                op_shutdown[op.id] = op.shutdown_dict
 
     op_shutdown = {op: v for op, v in op_shutdown.items() if v}
     # Overwrite the shutdown column in log_events

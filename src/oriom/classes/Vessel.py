@@ -375,10 +375,6 @@ class Vessel():
             raise ValueError('"n_vessels" must be greater or equal to 1')
         if self.crew_berths < 0:
             raise ValueError('"crew_berths" must not be negative')
-        if self.mobilisation_time != 0 and self.mobilisation_cost == 0:
-            raise ValueError('"mobilisation_time" defined and "mobilisation_cost" not defined')
-        if self.mobilisation_cost != 0 and self.mobilisation_time == 0:
-            raise ValueError('"mobilisation_cost" defined and "mobilisation_time" not defined')
         if self.mobilisation_cost < 0:
             raise ValueError('"mobilisation_cost" must not be negative')
         if self.power is not None and self.power <= 0:

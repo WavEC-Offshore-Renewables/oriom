@@ -6,9 +6,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
-from oriom.core.functions.logs_timeseries.create_logs_events_corrective import (
-    create_logs_corrective_file,
-)
+from oriom.core.functions.logs_timeseries import create_logs_events_corrective 
 
 # Keep the same column set used by the production code/tests.
 LOG_COLS = [
@@ -51,10 +49,11 @@ class DummyTS:
 
 
 class DummyVessel:
-    def __init__(self, id_, mobilisation_time=0, vtype="workboat"):
+    def __init__(self, id_, mobilisation_time=0, vtype="workboat", vessel_n=None):
         self.id = id_
         self.mobilisation_time = mobilisation_time
         self.type = vtype
+        self.vessel_n = vessel_n
 
 
 class DummyOp:
@@ -63,10 +62,13 @@ class DummyOp:
         id_,
         vessel1,
         vessel2=None,
+        vessel2_id=None,
+        vessel2_qt=None,
         ts_data=None,
         tow_to_port=False,
         op_tow_port=None,
         op_tow_site=None,
+        op_tow_site_port=None,
         addition_op_tow=None,
     ):
         self.id = id_
@@ -77,7 +79,15 @@ class DummyOp:
         self.vessel1_qt = 1
 
         self.vessel2_id = vessel2.id if vessel2 else None
-        self.vessel2_qt = 1 if vessel2 else None
+        if vessel2:
+            if getattr(vessel2, 'vessel_n', False):
+                vessel_n = vessel2.vessel_n
+            else:
+                vessel_n = 1
+        else:
+            vessel_n = None
+        
+        self.vessel2_qt = vessel_n
 
         self.ts_data = ts_data
 
@@ -86,6 +96,7 @@ class DummyOp:
         self.op_tow_port = op_tow_port
         self.op_tow_site = op_tow_site
         self.addition_op_tow = addition_op_tow
+        self.op_tow_site_port = op_tow_site_port
 
         # Present in your original dummy; keep for compatibility.
         self.tow_to_site_dict = {"1": 0}
@@ -180,7 +191,7 @@ def build_single_mobilisation_row(cols, oper_id, vessel1_id, date_failure=None):
     row.update(
         {
             "d_trigger": date_failure,
-            "d_end": date_failure,  # placeholder: should be overwritten by create_logs_corrective_file
+            "d_end": date_failure,  # placeholder: should be overwritten by create_logs_events_corrective.create_logs_corrective_file
             "event": "mobilisation",
             "id": oper_id,
             "vessel_1": vessel1_id,
@@ -201,7 +212,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
         cutoff = datetime(2025, 1, 1)
         finder = DummyFinder()
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=pd.DataFrame(),
@@ -244,7 +255,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             failure_map={"F001": DummyFailure("immediately", lead_time=0)},
         )
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -314,7 +325,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         mock_create_op.side_effect = _stub_create_operation_site
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -377,7 +388,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         mock_create_op.side_effect = _stub_create_operation_site
 
-        _ = create_logs_corrective_file(
+        _ = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -441,7 +452,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         mock_create_op.side_effect = _stub_create_operation_site
 
-        _ = create_logs_corrective_file(
+        _ = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -501,7 +512,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         mock_create_op.side_effect = _stub_create_operation_site
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -569,7 +580,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         mock_create_op.side_effect = _stub_create_operation_site
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -613,7 +624,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             failure_map={"FX": DummyFailure("immediately", lead_time=0)},
         )
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -656,7 +667,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
         )
 
         with self.assertRaises(FileNotFoundError):
-            create_logs_corrective_file(
+            create_logs_events_corrective.create_logs_corrective_file(
                 COLS=LOG_COLS,
                 CUTOFF_DATE=cutoff,
                 dates_failures=dates_failures,
@@ -717,7 +728,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         mock_create_op.side_effect = _stub_create_operation_site
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -776,7 +787,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         mock_create_op.side_effect = _stub_create_operation_site
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -819,6 +830,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             tow_to_port=True,
             op_tow_port="opTowPort",
             op_tow_site="opTowSite",
+            op_tow_site_port="opTowSitePort",
         )
         stat_main = DummyOperStat(op_main)
 
@@ -831,6 +843,10 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
         v_tow_site = DummyVessel("V_TOW_SITE", mobilisation_time=0)
         tow_site_sched = make_oper_sched(base, n_rows=24)
         op_tow_site = DummyOp("opTowSite", vessel1=v_tow_site, ts_data=DummyTS(tow_site_sched))
+
+        v_tow_site_port = DummyVessel("V_TOW_SITE_PORT", mobilisation_time=0)
+        tow_site_port_sched = make_oper_sched(base, n_rows=24)
+        op_tow_site_port = DummyOp("opTowSitePort", vessel1=v_tow_site_port, ts_data=DummyTS(tow_site_port_sched))
 
         # Failure triggers main operation
         dates_failures = pd.DataFrame(
@@ -849,15 +865,18 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
                 "V_MAIN": v_main,
                 "V_TOW_PORT": v_tow_port,
                 "V_TOW_SITE": v_tow_site,
+                "V_TOW_SITE_PORT": v_tow_site_port
             },
             failure_map={"F1": DummyFailure("immediately", lead_time=0)},
             operations={
                 "opTowPort": op_tow_port,
                 "opTowSite": op_tow_site,
+                "opTowSitePort": op_tow_site_port
             },
             op_stats_pmax_map={
                 "opTowPort": MagicMock(),
                 "opTowSite": MagicMock(),
+                "opTowSitePort": MagicMock(),
             },
         )
 
@@ -869,7 +888,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             row_dates = build_single_operation_row(
                 cols=cols,
                 oper_id=oper_obj.id,
-                vessel1_id=vessel_obj.id,
+                vessel1_id='v001',
                 date_failure=kwargs["failure_"]["date_failure"],
                 lead_h=0,
             )
@@ -880,11 +899,12 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         # TowPort stub
         class StubTowPort:
-            def __init__(self, date_failure, vessel, oper, failure, time_fail_op_immediately):
+            def __init__(self, date_failure, vessel, oper, failure, time_fail_op_immediately, date_start):
                 self.date_failure = date_failure
                 self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
                 self.idx_end_leadtime = None
                 self.tow_deferred = False
+                self.date_start = date_failure + timedelta(hours=time_fail_op_immediately)
 
             def mobilitate_vessel(self, log_events, row):
                 return None
@@ -913,8 +933,16 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
         mock_check_idx.return_value = pd.DataFrame({"datetime": [base]})
 
         # compute_operation_datetimes: deterministic timeline
-        def _compute_dates(_df, _stat, _end_add_op = None):
-            t0 = _df["datetime"].iloc[0]
+        def _compute_dates(
+            df_filtered_start = None,
+            oper_stat = None,
+            tow_stat_chart_month = None,
+            double = None,
+            add_op_end = None,
+
+        ):
+
+            t0 = df_filtered_start["datetime"].iloc[0]
             return {
                 "date_end_leadtime": t0 + timedelta(hours=0),
                 "date_end_wait_start": t0 + timedelta(hours=1),
@@ -928,9 +956,18 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
                 "dur_total": 1,
             }
 
+        oper_sched = pd.DataFrame({
+            "datetime": [
+                pd.Timestamp("2025-06-01 00:00:00"),
+                pd.Timestamp("2025-06-01 00:00:00"),
+                pd.Timestamp("2025-06-01 00:00:00"),
+                pd.Timestamp("2025-06-01 00:00:00")
+            ]
+        })
+
         mock_compute_dates.side_effect = _compute_dates
 
-        out = create_logs_corrective_file(
+        out = create_logs_events_corrective.create_logs_corrective_file(
             COLS=LOG_COLS,
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
@@ -943,6 +980,97 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
         tow_rows = out[out["event"] == "tow"]
         self.assertGreaterEqual(len(tow_rows), 2)
 
+
+class TestMapFailureIndices(unittest.TestCase):
+
+    def test_map_failure_indices_basic(self):
+        oper_sched = pd.DataFrame({
+            "datetime": [
+                pd.Timestamp("2025-06-01 00:00:00"),
+                pd.Timestamp("2025-06-01 01:00:00"),
+                pd.Timestamp("2025-06-01 02:00:00"),
+            ]
+        })
+
+        failure_df = pd.DataFrame({
+            "datetime": [
+                pd.Timestamp("2025-06-01 01:00:00"),
+                pd.Timestamp("2025-06-01 02:00:00"),
+            ]
+        })
+
+        result = create_logs_events_corrective._map_failure_indices(failure_df, oper_sched)
+
+        expected = pd.Series([1, 2], name="datetime")
+        pd.testing.assert_series_equal(result.reset_index(drop=True), expected)
+
+    def test_map_failure_indices_with_missing_datetime(self):
+        oper_sched = pd.DataFrame({
+            "datetime": [
+                pd.Timestamp("2025-06-01 00:00:00"),
+                pd.Timestamp("2025-06-01 01:00:00"),
+            ]
+        })
+
+        failure_df = pd.DataFrame({
+            "datetime": [
+                pd.Timestamp("2025-06-01 01:00:00"),
+                pd.Timestamp("2025-06-01 03:00:00"),  # non presente
+            ]
+        })
+
+        result = create_logs_events_corrective._map_failure_indices(failure_df, oper_sched)
+
+        self.assertEqual(result.iloc[0], 1)
+        self.assertTrue(pd.isna(result.iloc[1]))
+
+
+class TestTakeVesselData(unittest.TestCase):
+
+    def test_take_vessel_data_basic(self):
+        vessel = DummyVessel(id_='v001', mobilisation_time=2.3)
+        vessel2 = DummyVessel(id_='v002', mobilisation_time=2.3, vessel_n = 5)
+        op = DummyOp(
+            id_ = 'op1',
+            tow_to_port=None,
+            vessel1=vessel,
+            vessel2=vessel2,
+        )
+
+        v1, v2, mob_time = create_logs_events_corrective._take_vessel_data(op)
+
+        self.assertIs(v1, vessel)
+        self.assertEqual(v2, 5)
+        self.assertEqual(mob_time, 3)  # ceil(2.3)
+
+    def test_take_vessel_data_tow_to_port(self):
+        vessel = DummyVessel(id_='v001', mobilisation_time=2.3)
+        op = DummyOp(
+            id_ = 'op1',
+            tow_to_port=True,
+            vessel1=vessel
+        )
+
+        v1, v2, mob_time = create_logs_events_corrective._take_vessel_data(op)
+
+        self.assertIsNone(v1)
+        self.assertIsNone(v2)
+        self.assertEqual(mob_time, 0)
+
+    def test_take_vessel_data_no_vessel2(self):
+        vessel = DummyVessel(id_='v001', mobilisation_time=1.2)
+        op = DummyOp(
+            id_ = 'op1',
+            tow_to_port=None,
+            vessel1=vessel,
+            vessel2_id=None
+        )
+
+        v1, v2, mob_time = create_logs_events_corrective._take_vessel_data(op)
+
+        self.assertIs(v1, vessel)
+        self.assertIsNone(v2)
+        self.assertEqual(mob_time, 2)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

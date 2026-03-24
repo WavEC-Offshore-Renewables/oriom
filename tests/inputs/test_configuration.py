@@ -50,6 +50,7 @@ class TestConfigRun(unittest.TestCase):
             "workability.csv",
             "startability.csv",
             "operation_schedule.csv",
+            'towing_inspection_log.csv'
         ):
             self.assertIn(fname, cfg.OPERATION_FILES)
 

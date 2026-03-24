@@ -294,7 +294,13 @@ def part_other_cost(
 
     # Total cost calculation
     part_cost = merged['parts_cost'].sum()
-    other_cost = merged['other_costs'].sum() + (merged['port_costs'] * (merged['d_end'] - merged['d_end_leadtime']).dt.days).sum()
+    other_cost = (
+        merged['other_costs'].sum()
+        + (merged['port_costs']* (
+                merged['d_end']
+                - merged['d_end_leadtime'].fillna(merged['d_trigger'])
+            ).dt.days).sum()
+    )
 
     return part_cost, other_cost
 

@@ -404,7 +404,8 @@ class TestPartOtherCostAndZeros(unittest.TestCase):
         df = pd.DataFrame({
             "id": ["OP1", "OP2", "OP3"],
             "d_end": [dt(48), dt(25), dt(10)],
-            "d_end_leadtime": [dt(24), dt(20), dt(5)],
+            "d_end_leadtime": [dt(24), None, dt(5)],
+            "d_trigger": [dt(24), dt(20), dt(5)],
             "event": ["operation", "operation", "operation"],
             "comments": ['oper_a1.1', 'oper_a2.1', 'oper_a3.1']
         })

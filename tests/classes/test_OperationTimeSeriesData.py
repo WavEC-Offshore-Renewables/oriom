@@ -15,6 +15,16 @@ class DummyOp:
     def __init__(self, id_="ofw_001"):
         self.id = id_
 
+class Activities:
+    def __init__(self, id_, location):
+        self.id = id_
+        self.location = location
+
+class DummyMajorOP:
+    def __init__(self, id_="ofw_001", activities = []):
+        self.id = id_
+        self.activities = activities
+
 
 def make_sched_df(cols=None, rows=None):
     """
@@ -191,6 +201,26 @@ class TestOperationTimeSeriesData_CreateTimeseries(unittest.TestCase):
                 operation=self.op, file_name_dir=123, op_dir=self.base, save=None
             )
 
+class TestOperationTimeSeriesData_ActivityOrder(unittest.TestCase):
+    
+    def test_check_activity_order(self):
+        act_001 = Activities("act_001", location = 'transit')
+        act_002 = Activities("act_002", location = 'site')
+        act_003 = Activities("act_003", location = 'transit')
+        act_004 = Activities("act_004", location = 'port')
+        op_maj = DummyMajorOP("ofw_123", [act_001, act_002, act_003, act_004])
+        df = pd.DataFrame({
+            "ts": [pd.Timestamp("2025-06-01 08:00:00")],
+            "dur_net_site": [2.0],
+            "transit_to_port": [1.0],
+            "transit_to_site": [1.0],
+            "dur_net_port": [0.0],
+        })
+        obj = OperationTimeSeriesData(operation=op_maj, id=op_maj.id, oper_sched=df, startability=pd.DataFrame())
+
+        obj._activity_order()
+
+        self.assertEqual(obj.act_port_end, True)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

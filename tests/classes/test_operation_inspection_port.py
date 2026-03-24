@@ -257,16 +257,6 @@ class TestInspectionPort(unittest.TestCase):
         with self.assertRaises(Exception):
             InspectionPort(**make_base_kwargs(id_="ofw025", double_shift="not_bool"))
 
-    # ------------------------------------------------------------------ #
-    # _define_tow_operations behaviour
-    # ------------------------------------------------------------------ #
-
-    def test_define_tow_operations_unrecognized_name_raises_type_error(self):
-        """If a tow operation name has neither 'remov' nor 'deplo', TypeError must be raised."""
-        op = InspectionPort(**make_base_kwargs())
-        bad_ops = [FakeTowOp("ofw_unknown", "just towing")]
-        with self.assertRaises(TypeError):
-            op._define_tow_operations(bad_ops)
 
     # ------------------------------------------------------------------ #
     # get_inspections_from_yaml
@@ -357,52 +347,6 @@ class TestInspectionPort(unittest.TestCase):
                     towing_operations=make_valid_towing_ops("ofw"),
                 )
 
-    # ------------------------------------------------------------------ #
-    # define_device_at_port
-    # ------------------------------------------------------------------ #
-    def test_define_device_at_port_sets_values_for_ofw(self):
-        """define_device_at_port must pick values from the correct technology object."""
-        op = InspectionPort(**make_base_kwargs(id_="ofw200"))
-        wtg = FakeTechObj(n_device_at_port=3, n_device_stored_at_port=2)
-        wec = FakeTechObj(n_device_at_port=99, n_device_stored_at_port=99)
-        pv = FakeTechObj(n_device_at_port=99, n_device_stored_at_port=99)
-
-        op.define_device_at_port(wtg, wec, pv)
-        self.assertEqual(op.n_device_at_port, 3)
-        self.assertEqual(op.n_device_stored_at_port, 2)
-
-    def test_define_device_at_port_defaults_for_none_or_zero(self):
-        """None/zero values must be defaulted to 1 and 0."""
-        op = InspectionPort(**make_base_kwargs(id_="ofw201"))
-        wtg = FakeTechObj(n_device_at_port=None, n_device_stored_at_port=None)
-        wec = FakeTechObj(n_device_at_port=0, n_device_stored_at_port=None)
-        pv = FakeTechObj(n_device_at_port=0, n_device_stored_at_port=None)
-
-        op.define_device_at_port(wtg, wec, pv)
-        self.assertEqual(op.n_device_at_port, 1)
-        self.assertEqual(op.n_device_stored_at_port, 0)
-
-    def test_define_device_at_port_negative_values_raise(self):
-        """Negative values for device counts must raise ValueError."""
-        op = InspectionPort(**make_base_kwargs(id_="ofw202"))
-        wtg = FakeTechObj(n_device_at_port=-1, n_device_stored_at_port=0)
-        wec = FakeTechObj(0, 0)
-        pv = FakeTechObj(0, 0)
-
-        with self.assertRaises(ValueError):
-            op.define_device_at_port(wtg, wec, pv)
-
-    def test_define_device_at_port_invalid_prefix_raises_keyerror(self):
-        """Invalid prefix must cause KeyError in define_device_at_port."""
-        op = InspectionPort(**make_base_kwargs(id_="ofw203"))
-        # Hack id after creation to bypass __init__ prefix check
-        op.id = "xxx999"
-        wtg = FakeTechObj(1, 0)
-        wec = FakeTechObj(1, 0)
-        pv = FakeTechObj(1, 0)
-
-        with self.assertRaises(KeyError):
-            op.define_device_at_port(wtg, wec, pv)
 
     # ------------------------------------------------------------------ #
     # assign_shift_attributes

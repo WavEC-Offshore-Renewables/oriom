@@ -2,6 +2,7 @@ import pandas as pd
 import logging
 from datetime import timedelta, datetime
 
+from oriom.utils.aux_functions import save_file_csv, safe_getattr
 from oriom.core.functions.logs_timeseries.BaseCorrection import CorrectionImmediate, CorrectionDeferred
 from oriom.core.functions.logs_timeseries import logs_timeseries_func
 
@@ -47,9 +48,12 @@ def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None, t
         dict: Dict with all dates.
     """
     date_end_leadtime = df_filtered_start.iat[0]
-
     date_end_wait_start = logs_timeseries_func.create_data(df_filtered_start, 'wait_start', date_end_leadtime)
-    date_end_dur_net_work_port = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_port', date_end_wait_start)
+    act_port_end = safe_getattr(oper_stat.op_class, ['ts_data', 'act_port_end'], False)
+    if not act_port_end:
+        date_end_dur_net_work_port = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_port', date_end_wait_start)
+    else:
+        date_end_dur_net_work_port = date_end_wait_start
     date_end_dur_net_port = logs_timeseries_func.create_data(df_filtered_start, 'wait_port', date_end_dur_net_work_port)
     date_end_transit_ts = logs_timeseries_func.create_data(df_filtered_start, 'transit_to_site', date_end_dur_net_port)
     date_end_wait_site = logs_timeseries_func.create_data(df_filtered_start, 'wait_site', date_end_transit_ts)
@@ -65,6 +69,10 @@ def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None, t
     date_end_dur_net_site = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_site', date_end_wait_site)
     date_end_transit_tp = logs_timeseries_func.create_data(df_filtered_start, 'transit_to_port', date_end_dur_net_site)
     duration_chart_op = oper_stat.dur_total_dict[str(date_end_leadtime.month)]
+    if act_port_end:
+        date_end = logs_timeseries_func.create_data(df_filtered_start, 'dur_net_port', date_end_transit_tp)
+    else:
+        date_end = date_end_transit_tp
 
     # Add stat Chart duration if has a previous operation (tow remove with add op or cable connection after wor redeploy)
     if tow_stat_chart_month:
@@ -78,7 +86,6 @@ def compute_operation_datetimes(df_filtered_start, oper_stat, add_op_end=None, t
                 duration_chart_op *=2
 
     date_end_stat_chart = date_end_leadtime + timedelta(hours=duration_chart_op)
-    date_end = date_end_transit_tp
     dur_tot_tow = df_filtered_start['dur_total']
 
     return {
@@ -225,3 +232,22 @@ def create_operation_site(
     ]],columns=CONST['COLS'])
 
     return row_dates, row_mob_line
+
+
+def manage_def_to_log_events(
+        log_events: pd.DataFrame, 
+        log_def_tow: pd.DataFrame,
+        list_idx_remove: list,
+        result_dir_r: str
+    ):
+
+    """Overwrite def_op_tow with the correct one evaluated in merged_corrective"""
+
+    log_events = log_events.drop(index=list_idx_remove, errors='ignore')
+    if not log_def_tow.empty:
+        log_events = pd.concat([log_events, log_def_tow], ignore_index=False)
+    log_events = log_events.sort_values(by='d_trigger', ascending=True)
+
+    save_file_csv(log_events, result_dir_r, 'log_events.csv')
+
+    return log_events
