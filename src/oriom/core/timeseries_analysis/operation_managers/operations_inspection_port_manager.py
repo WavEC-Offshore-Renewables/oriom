@@ -98,8 +98,19 @@ def operation_inspect_port_manager(
                 operation = operation,
                 shift_op = True
             )
+            logging.info(f'file {file_name_schedule} reused, {operation.id}')
+
 
             if file_exist:
+                file_name_schedule = 'towing_inspection_log.csv'
+                file_exist = check_files.reuse_file_exist(
+                    op_dir = op_dir,
+                    file_name_schedule = file_name_schedule,
+                    operation = operation,
+                    shift_op = True,
+                    tow_log_op = True
+                )
+                logging.info(f'file {file_name_schedule} reused {operation.id}')
                 continue
 
         df_workability = workability(

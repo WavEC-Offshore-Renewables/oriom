@@ -84,7 +84,8 @@ class ConfigRun:
             'activities.csv',
             'workability.csv',
             'startability.csv',
-            'operation_schedule.csv'
+            'operation_schedule.csv',
+            'towing_inspection_log.csv'
         ]
 
 

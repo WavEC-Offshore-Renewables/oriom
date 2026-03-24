@@ -67,7 +67,7 @@ def operation_tow_manager(
             if file_exist:
                 continue
 
-        transit_duration = modify_distance(
+        _ = modify_distance(
             Config = Config,
             operation = operation,
             default_distance = inputs_tseries.distance["value"]
