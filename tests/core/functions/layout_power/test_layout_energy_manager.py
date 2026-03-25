@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch, Mock
 import pandas as pd
-import networkx as nx
+import networkx as nx 
 
 from oriom.core.functions.layout_power import layout_energy_manager as lem
 
@@ -359,6 +359,134 @@ class TestReassignLoc(unittest.TestCase):
         self.assertEqual(df.loc[1, "Loc"], 99)
         # choose_loc must have been called once
         mock_choose_loc.assert_called_once()
+
+
+class TestEnergyFunctions(unittest.TestCase):
+
+    # ---------------------------
+    # TEST count_nodes_power
+    # ---------------------------
+    def test_count_nodes_power_visible_path(self):
+        G = nx.DiGraph()
+
+        # structure: 1 -> 2 -> 0
+        G.add_edge(1, 2, visible=True)
+        G.add_edge(2, 0, visible=True)
+
+        G.nodes[1]['level'] = 'device'
+        G.nodes[2]['level'] = 'other'
+        G.nodes[0]['level'] = 'root'
+
+        result = lem.count_nodes_power(G, 'device')
+
+        self.assertEqual(result, [1])
+
+    def test_count_nodes_power_invisible_edge(self):
+        G = nx.DiGraph()
+
+        G.add_edge(1, 2, visible=False)
+        G.add_edge(2, 0, visible=True)
+
+        G.nodes[1]['level'] = 'device'
+        G.nodes[2]['level'] = 'other'
+        G.nodes[0]['level'] = 'root'
+
+        result = lem.count_nodes_power(G, 'device')
+
+        self.assertEqual(result, [])  # path not valid
+
+    def test_count_nodes_power_wrong_level(self):
+        G = nx.DiGraph()
+
+        G.add_edge(1, 0, visible=True)
+
+        G.nodes[1]['level'] = 'not_device'
+        G.nodes[0]['level'] = 'root'
+
+        result = lem.count_nodes_power(G, 'device')
+
+        self.assertEqual(result, [])
+
+
+    # ---------------------------
+    # TEST manage_string_tow_operation
+    # ---------------------------
+    def test_manage_string_tow_operation_tuple(self):
+        G = nx.DiGraph()
+        G.add_edge(1, 2, visible=False)
+
+        lem.manage_string_tow_operation(G, (1, 2), True)
+
+        self.assertTrue(G.edges[1, 2]['visible'])
+
+    def test_manage_string_tow_operation_node(self):
+        G = nx.DiGraph()
+
+        # 3 -> 1 (smallest neighbor = 1)
+        G.add_edge(3, 1, visible=False)
+
+        lem.manage_string_tow_operation(G, 3, True)
+
+        self.assertTrue(G.edges[3, 1]['visible'])
+
+    def test_manage_string_tow_operation_no_neighbors(self):
+        G = nx.DiGraph()
+        G.add_node(5)
+
+        # should not crash
+        lem.manage_string_tow_operation(G, 5, True)
+
+
+    # ---------------------------
+    # TEST check_previous_fix
+    # ---------------------------
+    def test_check_previous_fix_tow(self):
+        G = nx.DiGraph()
+        G.add_edge(1, 2, visible=False)
+
+        op_add_tow = {
+            "10_tow": {
+                "f1": (1, 2)
+            }
+        }
+
+        r = {'id': 10, 'failure_id': 'f1'}
+
+        lem.check_previous_fix(G, op_add_tow, r, type_id='tow')
+
+        # edge must be visibile
+        self.assertTrue(G.edges[1, 2]['visible'])
+        self.assertNotIn("10_tow", op_add_tow)
+
+    def test_check_previous_fix_non_tow(self):
+        G = nx.DiGraph()
+        G.add_node(5, power=0)
+
+        op_add_tow = {
+            "20_other": {
+                "f2": 5
+            }
+        }
+
+        r = {'id': 20, 'failure_id': 'f2'}
+
+        lem.check_previous_fix(G, op_add_tow, r, type_id='other')
+
+        # power restored
+        self.assertEqual(G.nodes[5]['power'], 1)
+        self.assertNotIn("20_other", op_add_tow)
+
+    def test_check_previous_fix_no_match(self):
+        G = nx.DiGraph()
+
+        op_add_tow = {}
+        r = {'id': 1, 'failure_id': 'x'}
+
+        # should not crash
+        lem.check_previous_fix(G, op_add_tow, r, type_id='tow')
+
+        self.assertEqual(op_add_tow, {})
+
 
 
 if __name__ == "__main__":

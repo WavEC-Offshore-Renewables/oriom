@@ -3,8 +3,7 @@ import pandas as pd
 import random
 import logging
 
-from oriom.core.functions.layout_power.aux_layout_power_func import choose_loc
-from oriom.core.functions.layout_power.aux_layout_power_func import string_location
+from oriom.core.functions.layout_power.aux_layout_power_func import choose_loc, string_location
 
 
 def check_previous_fix(G, op_add_tow, r, type_id = 'tow'):
@@ -34,9 +33,16 @@ def manage_string_tow_operation(
         loc (:obj:`int or tuple`): location of the failure
         action (:obj:`boolean`): define the action for the visibility of the node
     """
-    for u, v in G.edges(loc):
-        G[u][v]['visible'] = action
-
+    if isinstance(loc, tuple):
+        G.edges[loc[0],loc[1]]['visible'] = action
+    else:
+        neighbors = set(G.successors(loc)) | set(G.predecessors(loc))
+        if neighbors:
+            smallest = min(neighbors)
+            if G.has_edge(loc, smallest):
+                G.edges[loc, smallest]['visible'] = action
+            elif G.has_edge(smallest, loc):
+                G.edges[smallest, loc]['visible'] = action
 
 def shut(
     loc: int,

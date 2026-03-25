@@ -8,6 +8,22 @@ import networkx as nx
 
 from oriom.core.functions.layout_power import layout_power as ea
 
+class DummyPower():
+    def __init__(self, pv_dev, max_fail_mode):
+        self.pv_number_devices = pv_dev
+        self.pv_max_failure_module = max_fail_mode
+
+class DummyPV:
+    def __init__(self, n_strings, n_inv):
+        self.number_strings = n_strings
+        self.number_inverters = n_inv
+
+class DummyFarm():
+    def __init__(self, dummy_pv, dummy_power):
+        self.pv = dummy_pv
+        self.power = dummy_power
+        
+
 
 class TestFixValues(unittest.TestCase):
     def test_fix_values_clamps_above_100_and_below_0_1(self):
@@ -367,6 +383,59 @@ class TestEnergyAvailabilityPVErrors(unittest.TestCase):
                 G_wave=None,
                 G_pv=None,
             )
+
+
+class TestConfigEnergyAvailability(unittest.TestCase):
+    """Test to the configuration of energy availability"""
+
+    def test_config_energy_availability(self):
+        # Arrange
+        G_lay = {name_G: nx.DiGraph() for name_G in ['G_wind', 'G_wave', 'G_pv']}
+
+        pv = DummyPV(10, 2)
+        power = DummyPower(100, 5)
+        farm_tech = DummyFarm(pv, power)
+
+        # Act
+        result = ea.config_energy_availability(
+            G_layouts=G_lay,
+            farm_technologies=farm_tech
+        )
+
+        # Assert graph
+        self.assertIsNotNone(result['G_wind_copy'])
+        self.assertIsNotNone(result['G_wave_copy'])
+        self.assertIsNotNone(result['G_pv_copy'])
+
+        self.assertIsInstance(result['G_wind_copy'], nx.DiGraph)
+        self.assertIsInstance(result['G_wave_copy'], nx.DiGraph)
+        self.assertIsInstance(result['G_pv_copy'], nx.DiGraph)
+        self.assertIsNot(result['G_wind_copy'], G_lay['G_wind'])
+        self.assertIsNot(result['G_wave_copy'], G_lay['G_wave'])
+        self.assertIsNot(result['G_pv_copy'], G_lay['G_pv'])
+
+        # Assert PV
+        expected_modules_per_string = 100 / (10 * 2)
+        self.assertEqual(result['n_modules_per_strings'], expected_modules_per_string)
+        self.assertEqual(result['n_strings_per_inv'], 10)
+        self.assertEqual(result['max_failure_module'], 5)
+
+    def test_config_energy_availability_no_pv(self):
+        G_lay = {'G_wind': nx.DiGraph(), 'G_wave': nx.DiGraph(), 'G_pv': nx.DiGraph()}
+
+        pv = DummyPV(0, 0)
+        power = DummyPower(None, None)
+        farm_tech = DummyFarm(pv, power)
+
+        result = ea.config_energy_availability(
+            G_layouts=G_lay,
+            farm_technologies=farm_tech
+        )
+
+        self.assertIsNone(result['n_modules_per_strings'])
+        self.assertIsNone(result['n_strings_per_inv'])
+        self.assertIsNone(result['max_failure_module'])
+
 
 
 if __name__ == "__main__":

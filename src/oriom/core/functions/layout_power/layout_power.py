@@ -10,6 +10,49 @@ from oriom.core.functions.layout_power.preventive_energy import preventive_energ
 LIST_MONTHS = list(range(1,13))
 
 
+def config_energy_availability(G_layouts: dict, farm_technologies: object):
+    try:
+        G_wind_copy = G_layouts["G_wind"].copy()
+    except AttributeError:
+        G_wind_copy = None
+
+    try:
+        G_wave_copy = G_layouts["G_wave"].copy()
+    except AttributeError:
+        G_wave_copy = None
+
+    try:
+        G_pv_copy = G_layouts["G_pv"].copy()
+    except AttributeError:
+        G_pv_copy = None
+
+    if (
+        farm_technologies.power.pv_number_devices is not None
+        and farm_technologies.pv.number_strings > 0
+        and farm_technologies.pv.number_inverters > 0
+    ):
+        n_modules_per_strings = (
+                farm_technologies.power.pv_number_devices/
+                (farm_technologies.pv.number_strings*farm_technologies.pv.number_inverters)
+            )
+        n_strings_per_inv = farm_technologies.pv.number_strings
+        max_failure_module = farm_technologies.power.pv_max_failure_module
+
+    else:
+        n_strings_per_inv = None
+        n_modules_per_strings = None
+        max_failure_module = None
+    
+    return {
+        'G_wind_copy': G_wind_copy,
+        'G_wave_copy': G_wave_copy,
+        'G_pv_copy': G_pv_copy,
+        'n_modules_per_strings': n_modules_per_strings,
+        'n_strings_per_inv': n_strings_per_inv,
+        'max_failure_module': max_failure_module
+    }
+
+
 def fix_values(
         df_fixing: pd.DataFrame,
         column_name: str
