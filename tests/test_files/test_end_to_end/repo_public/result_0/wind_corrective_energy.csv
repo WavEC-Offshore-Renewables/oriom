@@ -24,10 +24,11 @@ Date,Event,id,Comments,Name,Loc,Shutdown,Shut/Fix,Perc_availability,Power_loss_k
 2010-08-08 07:00:00,failure,ofw_fail_5.1,immediately,failure 5,4,True,shut,80.0,6184.995
 2010-08-09 06:10:12,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,shut,0.0,11816.7
 2010-08-09 12:10:12,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,fix,80.0,33595.005
-2010-08-10 06:41:24,tow,ofw_removal_tow,tow_ofw_fail_5.1,ofw_removal_tow,4,True,shut,40.0,2263185.15
-2010-08-16 10:23:24,tow,ofw_redeploy_tow,tow_ofw_fail_5.1,ofw_redeploy_tow,4,False,fix,40.0,257460.01499999996
-2010-08-17 06:10:12,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,shut,0.0,7083.35
-2010-08-17 12:10:12,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,fix,100.0,0.0
+2010-08-10 06:41:24,tow,ofw_removal_tow,tow_ofw_fail_5.1,ofw_removal_tow,4,True,shut,40.0,193594.98
+2010-08-11 10:23:24,tow,ofw_redeploy_tow,tow_ofw_fail_5.1,ofw_redeploy_tow,4,False,fix,40.0,1764300.0449999997
+2010-08-15 06:10:12,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,shut,0.0,62791.725000000006
+2010-08-15 12:10:12,operation,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,fix,80.0,90651.695
+2010-08-16 12:10:12,recommissioning,ofw_op005,oper_ofw_fail_5.1,Medium repair,4,True,fix,100.0,0.0
 2010-08-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
 2010-09-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
 2010-09-30 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
