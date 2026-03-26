@@ -142,8 +142,7 @@ def create_logs_corrective_file(
             #------------------------
             # TOWING PORT CREATION
             #------------------------
-            if tow_op_flag:
-                #------------------------
+            if tow_op_flag: #------------------------
                 # ADDITIONAL OP CREATION
                 if oper.tow_data.add_op_tow_port:
                     tow_stat_chart_month = oper.tow_data.tow_op_port_stat.dur_total_dict[str(date_failure.month)]
