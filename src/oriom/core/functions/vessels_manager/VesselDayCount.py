@@ -74,11 +74,11 @@ class VesselDayCounter():
                 return df
 
             # Find idx of each campaign for max d_end and min d_end
-            idx_max = df.loc[mask].groupby('d_end_stat_chart')['d_end'].idxmax()
-            idx_min = df.loc[mask].groupby('d_end_stat_chart')['d_end'].idxmin()
+            idx_max = df.loc[mask].groupby(['vessel_1', 'd_end_stat_chart'])['d_end'].idxmax()
+            idx_min = df.loc[mask].groupby(['vessel_1', 'd_end_stat_chart'])['d_end'].idxmin()
 
             # col to update from idx_min into idx_max
-            cols_to_update = df.columns[:3]
+            cols_to_update = ['d_trigger', 'd_end_leadtime', 'd_end_wait_start']
 
             # take value of idx_min and reindex into the destination index
             src = df.loc[idx_min.values, cols_to_update].copy()
@@ -143,16 +143,17 @@ class VesselDayCounter():
 
         # Reorder firstly the inspection then by dates
         self.log_event_day["_is_insp"] = (self.log_event_day["event"].str.lower().str.startswith("insp", na=False))
+        self.log_event_day["_deferred"] = self.log_event_day["event"].str.lower().str.contains("defer", na=False)
         self.log_event_day = self.log_event_day.sort_values(
-            by=["_is_insp", "d_trigger"],
-            ascending=[False, True]
-        ).drop(columns="_is_insp")
+            by=["_is_insp", "_deferred", "d_trigger"],
+            ascending=[False, False, True]
+        ).drop(columns=["_is_insp","_deferred"])
 
         for idx, row in self.log_event_day.iterrows():
             event = row["event"]
 
-            # Do not count if reuse a ST vessel when create the ultimate vessels_calendar
             if not ST:
+                # Do not count if reuse a ST vessel when create the ultimate vessels_calendar
                 n_vessel_1 = "n_vessel_1_effective"
                 if row["d_end_stat_chart"] == 'reuse_vessel':
                     continue

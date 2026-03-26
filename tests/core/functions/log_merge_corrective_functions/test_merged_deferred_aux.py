@@ -58,28 +58,32 @@ class TestCreateStatChartCampaignOperation(unittest.TestCase):
 
         # Row 1: Jan campaign for V1, duration 10 days
         d1_start = datetime(2025, 1, 1, 0, 0, 0)
+        d1_leadtime = datetime(2025, 1, 1, 0, 0, 0)
         d1_end = datetime(2025, 1, 11, 0, 0, 0)
 
         # Row 2: Feb campaign for V1, duration 5 days
         d2_start = datetime(2025, 2, 1, 0, 0, 0)
+        d2_leadtime = datetime(2025, 2, 1, 0, 0, 0)
         d2_end = datetime(2025, 2, 6, 0, 0, 0)
 
         # Row 3: non-deferred event for V1 (should not be touched)
         d3_start = datetime(2025, 1, 5, 0, 0, 0)
+        d3_leadtime = datetime(2025, 1, 5, 0, 0, 0)
         d3_end = datetime(2025, 1, 6, 0, 0, 0)
 
         # Row 4: deferred merged for another vessel V2 (should be handled separately)
         d4_start = datetime(2025, 1, 3, 0, 0, 0)
+        d4_leadtime = datetime(2025, 1, 3, 0, 0, 0)
         d4_end = datetime(2025, 1, 8, 0, 0, 0)
 
         df = pd.DataFrame(
             [
-                [d1_start, d1_end, "operation_deferred_merged", "V1", None],
-                [d2_start, d2_end, "operation_deferred_merged", "V1", None],
-                [d3_start, d3_end, "operation", "V1", None],
-                [d4_start, d4_end, "operation_deferred_merged", "V2", None],
+                [d1_start, d1_leadtime, d1_end, "operation_deferred_merged", "V1", None],
+                [d2_start, d2_leadtime, d2_end, "operation_deferred_merged", "V1", None],
+                [d3_start, d3_leadtime, d3_end, "mobilisation_merged", "V1", None],
+                [d4_start, d4_leadtime, d4_end, "operation_deferred_merged", "V2", None],
             ],
-            columns=["d_trigger", "d_end", "event", "vessel_1", "d_end_stat_chart"],
+            columns=["d_trigger", "d_end_leadtime", "d_end", "event", "vessel_1", "d_end_stat_chart"],
         )
 
         result = merged_deferred_aux.create_stat_chart_campaign_operation(
@@ -112,10 +116,11 @@ class TestCreateStatChartCampaignOperation(unittest.TestCase):
         v1 = DummyVessel("V1")
         d_start = datetime(2025, 3, 1, 0, 0, 0)
         d_end = datetime(2025, 3, 6, 0, 0, 0)  # duration 5 days
+        d_end_leadtime = datetime(2025, 3, 1, 0, 0, 0)  # duration 2 days
 
         df = pd.DataFrame(
-            [[d_start, d_end, "operation_deferred_merged", "V1", None]],
-            columns=["d_trigger", "d_end", "event", "vessel_1", "d_end_stat_chart"],
+            [[d_start, d_end_leadtime, d_end, "operation_deferred_merged", "V1", None]],
+            columns=["d_trigger", "d_end_leadtime", "d_end", "event", "vessel_1", "d_end_stat_chart"],
         )
 
         # Using percentile=90 should behave like 0.9 in this simple 1-row case
@@ -304,36 +309,112 @@ class TestCreationOperVesselDict(unittest.TestCase):
         f2 = DummyFailure(fid="fail2", maintenance_strategy="specific month", operation_triggered="opTow")
         f3 = DummyFailure(fid="fail3", maintenance_strategy="other", operation_triggered="opA")  # ignored
         f4 = DummyFailure(fid="fail4", maintenance_strategy="specific month", operation_triggered="tow_special")
+        f5 = DummyFailure(fid="fail5", maintenance_strategy="immediate", operation_triggered="opTow")
 
-        failures = [f1, f2, f3, f4]
+        failures = [f1, f2, f3, f4, f5]
 
         oper_per_vessel = {}
         deferred_failures_correction = []
+        deferred_failures_correction_tow = []
+        failures_correction_tow = []
 
         merged_deferred_aux.creation_oper_vessel_dict(
             failures=failures,
             find_element_class=finder,
             oper_per_vessel=oper_per_vessel,
             deferred_failures_correction=deferred_failures_correction,
+            deferred_failures_correction_tow = deferred_failures_correction_tow,
+            failures_correction_tow = failures_correction_tow
         )
 
         # Check failures list
         self.assertCountEqual(
             deferred_failures_correction,
-            ["fail1", "fail2", "fail4"],
+            ["fail1", "fail4"],
+        )
+        self.assertCountEqual(
+            deferred_failures_correction_tow,
+            ["fail2"],
+        )
+        self.assertCountEqual(
+            failures_correction_tow,
+            ["fail5"],
         )
 
         # Check oper_per_vessel structure
         self.assertIn("V1", oper_per_vessel)
-        self.assertIn("tow", oper_per_vessel)
 
         self.assertEqual(oper_per_vessel["V1"], ["opA"])
         # tow bucket contains only port operation (via name)
-        self.assertCountEqual(
-            oper_per_vessel["tow"],
-            ["opTow"],
+
+
+# ------------------------ manage_recommissioning ------------------------------
+
+class TestManageRecommissioning(unittest.TestCase):
+
+    def test_removes_recommissioning_and_keeps_others(self):
+        df = pd.DataFrame(
+            {
+                "event": ["operation", "recommissioning", "operation"],
+                "d_end": [1, 2, 3],
+                "d_end_dur_net_site": [10, 20, 30],
+                "d_end_transit_tp": [100, 200, 300],
+            }
         )
 
+        # Substitute=False → just remove recommissioning
+        result = merged_deferred_aux.manage_recommissioning(df.copy(), substitute=False)
+        self.assertNotIn("recommissioning", result["event"].values)
+        self.assertEqual(len(result), 2)
+
+    def test_substitute_updates_columns(self):
+        df = pd.DataFrame(
+            {
+                "event": ["operation", "recommissioning", "operation"],
+                "d_end": [1, 99, 3],
+                "d_end_dur_net_site": [10, 99, 30],
+                "d_end_transit_tp": [100, 99, 300],
+            }
+        )
+
+        result = merged_deferred_aux.manage_recommissioning(df.copy(), substitute=True)
+        # Only the recomm row values were copied → removed in final
+        self.assertNotIn("recommissioning", result["event"].values)
+        # Columns remain unchanged for others
+        self.assertEqual(result.iloc[0]["d_end"], 1)
+        self.assertEqual(result.iloc[1]["d_end"], 3)
+
+
+# ------------------------ manage_chart ----------------------------------------
+
+class TestManageChart(unittest.TestCase):
+
+    def test_event_name_and_stat_chart(self):
+        v1 = DummyVessel("V1")
+        base = datetime(2025, 1, 1)
+
+        df = pd.DataFrame(
+            {
+                "event": ["operation", "mobilisation_merged"],
+                "d_trigger": [base, base + timedelta(days=1)],
+                "d_end_leadtime": [base + timedelta(hours=2), base + timedelta(hours=3)],
+                "year_month": [1, 1],
+                "vessel_1": ["V1", "V1"],
+            }
+        )
+
+        # Patch create_stat_chart_campaign_operation to just pass through
+        with patch(
+            "oriom.core.functions.log_merge_corrective_functions.merged_deferred_aux.create_stat_chart_campaign_operation",
+            side_effect=lambda df, vessels, percentile: df,
+        ) as mock_stat_chart:
+
+            result = merged_deferred_aux.manage_chart(df.copy(), vessels=[v1], percentile=0.9)
+            # mobilisation_merged should keep name
+            self.assertIn("mobilisation_merged", result["event"].values)
+            # other events renamed
+            self.assertIn("operation_deferred_merged", result["event"].values)
+            mock_stat_chart.assert_called_once()
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

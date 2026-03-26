@@ -67,6 +67,11 @@ class TowData:
             self.tow_op_site.id: self.last_valid_idx_tow_site,
             self.tow_site_port.id: self.last_valid_idx_tow_site_port,
         }
+        self.dict_oper_stat = {
+            self.tow_op_port.id: self.tow_op_port_stat,
+            self.tow_op_site.id: self.tow_op_site_stat,
+            self.tow_site_port.id: self.tow_op_site_port_stat,
+        }
 
 
     def id_dict_oper(self, oper_dict_tow: dict, op_at_port: object):

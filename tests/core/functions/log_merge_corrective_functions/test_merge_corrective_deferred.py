@@ -16,22 +16,32 @@ class DummyTsData:
         self.dur_net_port = dur_net_port
         self.transit_ts = transit_ts
         self.transit_tp = transit_tp
+        self.oper_sched = pd.DataFrame({
+            'datetime': [datetime(2025, 1, 1, 0, 0, 0), datetime(2025, 1, 2, 0, 0, 0)],
+            'wait_start': [24,0],
+            'wait_port': [0,0]
+        })
 
 
 class DummyOperStat:
     """Minimal object with dur_total_dict for deferred operation statistics."""
-    def __init__(self, dur_total_dict=None):
+    def __init__(self, dur_total_dict=None, op=None):
         # dur_total_dict is a dict with month (as string) → hours
         self.dur_total_dict = dur_total_dict or {"1": 2.0}
+        if op:
+            self.op_class=op
 
 
 class DummyOperation:
     """Minimal operation object returned by aux_functions.take_attribute."""
-    def __init__(self, op_id="opv001"):
+    def __init__(self, op_id="opv001", vessel2_id:str='v001'):
         self.id = op_id
         self.ts_data = DummyTsData()
         self.tech_required = 2
         self.rov_drone = False
+        self.vessel2_id = vessel2_id
+        self.vessel2 = DummyVessel()
+        self.vessel2_qt = 1
 
 
 class DummyVessel:
@@ -46,11 +56,15 @@ class DummyVessel:
 
 class DummyFinder:
     """Minimal Find_element_class-like object with only find_vessel implemented."""
-    def __init__(self, vessel):
+    def __init__(self, vessel, op_stat = None):
         self._vessel = vessel
+        self._op_stat = op_stat
 
     def find_vessel(self, vessel_id):
         return self._vessel
+    
+    def find_operation_stats(self, op_stat_id):
+        return self._op_stat
 
 
 # Common COLS used to build the merged dataframe
@@ -76,62 +90,6 @@ COLS_MERGED = [
     "St-1",                # 18
     "St-2",                # 19
 ]
-
-
-class TestMergeDeferredOperationsTow(unittest.TestCase):
-    """Tests for the special 'tow' vessel branch (rows are simply copied)."""
-
-    @patch(
-        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
-        "merged_deferred_aux.create_stat_chart_campaign_operation",
-        side_effect=lambda df, vessels, percentile: df,
-    )
-    @patch(
-        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.merge_shift_deferred"
-    )
-    @patch(
-        "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred.approximate_hourly_data"
-    )
-    def test_tow_branch_copies_rows_verbatim(
-        self, mock_approx, mock_merge_shift, mock_stat_chart
-    ):
-        """
-        When vessel_id == 'tow', rows for those operations must be copied directly
-        (no merging logic, no merge_shift_deferred calls).
-        """
-        base_time = datetime(2025, 1, 1, 0, 0, 0)
-        log_events_def = pd.DataFrame(
-            {
-                "d_trigger": [base_time, base_time + timedelta(days=1)],
-                "id": ["tow_op", "tow_op"],
-                "comments": ["c1", "c2"],
-                "d_end_wait_start": [base_time, base_time + timedelta(days=1)],
-                "d_end_transit_tp": [base_time, base_time + timedelta(days=1)],
-                "shutdown": True
-            }
-        )
-
-        mock_approx.side_effect = lambda dt: dt  # identity, but should not be used for tow
-
-        result = merge_corrective_deferred.merge_deferred_operations(
-            log_events_def=log_events_def,
-            vessels=[],
-            time_between_devices={},
-            oper_per_vessel={"tow": ["tow_op"]},
-            time_fail_op_immediately=0.0,
-            percentile=0.9,
-            COLS=log_events_def.columns.tolist(),  # tow branch uses original columns
-            find_element_class=DummyFinder(DummyVessel()),
-            duration_shift=8.0,
-        )
-
-        # tow branch should NOT call merge_shift_deferred
-        mock_merge_shift.assert_not_called()
-
-        # rows are copied (apart from internal 'year_month' handling)
-        self.assertEqual(len(result), 2)
-        self.assertListEqual(result["id"].tolist(), ["tow_op", "tow_op"])
-        self.assertListEqual(result["comments"].tolist(), ["c1", "c2"])
 
 
 class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
@@ -581,7 +539,8 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
         )
 
         vessel = DummyVessel(vid="V1", n_vessels=1, mobilisation_time=0.0)
-        finder = DummyFinder(vessel)
+        op_stat = DummyOperStat(15)
+        finder = DummyFinder(vessel, op_stat)
 
         result = merge_corrective_deferred.merge_deferred_operations(
             log_events_def=log_events_def,

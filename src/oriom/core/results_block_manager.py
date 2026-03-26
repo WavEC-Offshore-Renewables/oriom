@@ -8,10 +8,11 @@ from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.vessels_manager import vessel_mobilisation_manager
 from oriom.core.functions.graphs import report_graphs
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective import create_logs_merge
-from oriom.core.functions.layout_power.layout_power import energy_availability
+from oriom.core.functions.layout_power.layout_power import energy_availability, config_energy_availability
 from oriom.core.functions.kpi_final.kpi_final_costs import kpi_final_total_cost
 from oriom.core.functions.logs_timeseries.failures import failures_event
 from oriom.core.functions.logs_timeseries.create_logs_timeseries import create_logs_timeseries_file
+from oriom.core.functions.logs_timeseries.logs_corrective_aux import manage_def_to_log_events
 try:
     from oriom.core.functions.private.VesselMobilisationScheduler import VesselMobilisationScheduler
 except ImportError:
@@ -86,8 +87,8 @@ def results_block(
         logging.info('Uploading Failure file from previous run %d folder', r)
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 
-    except (TypeError, FileNotFoundError) as e_:
-        logging.info('Creating a failure scenario for run %d', r)
+    except (TypeError, FileNotFoundError):
+        logging.info(f'Creating a failure scenario for run {r}')
         dates_failures = failures_event(
             s = inputs.tseries.failure_scenario["value"],
             scenarios = inputs.tseries.scenario,
@@ -138,9 +139,12 @@ def results_block(
         log_events_merged = pd.read_csv(log_events_dir_merged, sep=',')
         logging.info('Uploading Log events merged file from previous folder')
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
+        # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
+        vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+        log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
 
     except (TypeError, FileNotFoundError) as e_:
-        log_events_merged = create_logs_merge(
+        log_events_merged, index_overwrite_log_ev, df_port_operation_def_log = create_logs_merge(
             log_events_original = log_events,
             failures = failures,
             operation_log_file_stats = operations_tow_stats['pmax'] + operations_corrective_stats['pmax'],
@@ -153,6 +157,14 @@ def results_block(
             time_fail_op_immediately = Config.TIME_FAIL_OP_IMMEDIATELY,
             duration_shift = inputs.tseries.shift_duration["value"],
         )
+
+        if index_overwrite_log_ev:
+            log_events = manage_def_to_log_events(
+                log_events = log_events,
+                log_def_tow = df_port_operation_def_log,
+                list_idx_remove = index_overwrite_log_ev,
+                result_dir_r = result_dir_r
+            )
 
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
         vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
@@ -199,37 +211,7 @@ def results_block(
     os.makedirs(graph_dir_r)
 
     if Config.ENERGY_AVAILABILITY_CALCULATION:
-        try:
-            G_wind_copy = G_layouts["G_wind"].copy()
-        except AttributeError:
-            G_wind_copy = None
-
-        try:
-            G_wave_copy = G_layouts["G_wave"].copy()
-        except AttributeError:
-            G_wave_copy = None
-
-        try:
-            G_pv_copy = G_layouts["G_pv"].copy()
-        except AttributeError:
-            G_pv_copy = None
-
-        if (
-            farm_technologies.power.pv_number_devices is not None
-            and farm_technologies.pv.number_strings > 0
-            and farm_technologies.pv.number_inverters > 0
-        ):
-            n_modules_per_strings = (
-                    farm_technologies.power.pv_number_devices/
-                    (farm_technologies.pv.number_strings*farm_technologies.pv.number_inverters)
-                )
-            n_strings_per_inv = farm_technologies.pv.number_strings
-            max_failure_module = farm_technologies.power.pv_max_failure_module
-
-        else:
-            n_strings_per_inv = None
-            n_modules_per_strings = None
-            max_failure_module = None
+        energy_config = config_energy_availability(G_layouts, farm_technologies)
 
         availability_total = energy_availability(
             log_events_energy = log_events,
@@ -247,12 +229,12 @@ def results_block(
             n_device_wtg = farm_technologies.power.wtg_number_devices,
             n_device_wec = farm_technologies.power.wec_number_devices,
             n_device_pv = farm_technologies.power.pv_number_devices,
-            G_wind = G_wind_copy,
-            G_wave = G_wave_copy,
-            G_pv = G_pv_copy,
-            n_strings_per_inv = n_strings_per_inv,
-            n_modules_per_strings = n_modules_per_strings,
-            max_failure_module = max_failure_module,
+            G_wind = energy_config['G_wind_copy'],
+            G_wave = energy_config['G_wave_copy'],
+            G_pv = energy_config['G_pv_copy'],
+            n_strings_per_inv = energy_config['n_strings_per_inv'],
+            n_modules_per_strings = energy_config['n_modules_per_strings'],
+            max_failure_module = energy_config['max_failure_module'],
             metocean_timeseries = metocean_timeseries,
             ENERGY_STATISTICAL_CALCULATION = Config.ENERGY_STATISTICAL_CALCULATION,
             result_dir_r = result_dir_r

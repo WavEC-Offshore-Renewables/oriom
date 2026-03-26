@@ -6,12 +6,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 
-from oriom.core.functions.logs_timeseries.logs_corrective_aux import (
-    _check_index_row_validity,
-    compute_operation_datetimes,
-    create_operation_site,
-)
-
+from oriom.core.functions.logs_timeseries import logs_corrective_aux
 
 LOG_COLS = [
     "d_trigger",
@@ -77,7 +72,7 @@ class TestCheckIndexRowValidity(unittest.TestCase):
         )
         row = pd.Series({"id": "F1.0"})
 
-        result = _check_index_row_validity(
+        result = logs_corrective_aux._check_index_row_validity(
             idx_end_leadtime=5,
             last_valid_idx=2,
             r=row,
@@ -100,7 +95,7 @@ class TestCheckIndexRowValidity(unittest.TestCase):
         )
         row = pd.Series({"id": "F1.0"})
 
-        result = _check_index_row_validity(
+        result = logs_corrective_aux._check_index_row_validity(
             idx_end_leadtime=1,
             last_valid_idx=2,
             r=row,
@@ -134,7 +129,7 @@ class TestCheckIndexRowValidity(unittest.TestCase):
         row = pd.Series({"id": "F2.0"})
 
         with self.assertRaises(ValueError):
-            _check_index_row_validity(
+            logs_corrective_aux._check_index_row_validity(
                 idx_end_leadtime=0,
                 last_valid_idx=1,
                 r=row,
@@ -172,7 +167,7 @@ class TestComputeOperationDatetimes(unittest.TestCase):
         op1 = DummyOperation(op_id = 'OP1')
         oper_stat = DummyOperStat(dur_total_dict={"1": 100.0}, oper = op1, id_ = 'OP1')
 
-        result = compute_operation_datetimes(sched_row, oper_stat)
+        result = logs_corrective_aux.compute_operation_datetimes(sched_row, oper_stat)
 
         # date_end_leadtime is the original datetime
         self.assertEqual(result["date_end_leadtime"], base_dt)
@@ -232,7 +227,7 @@ class TestComputeOperationDatetimes(unittest.TestCase):
         # Additional operation ends 5 hours after date_end_wait_site
         add_op_end = date_end_wait_site + timedelta(hours=5)
 
-        result = compute_operation_datetimes(
+        result = logs_corrective_aux.compute_operation_datetimes(
             sched_row, oper_stat, add_op_end=add_op_end
         )
 
@@ -284,7 +279,7 @@ class TestComputeOperationDatetimes(unittest.TestCase):
         )
 
         add_op_end = date_end_wait_site + timedelta(hours=5)
-        result = compute_operation_datetimes(
+        result = logs_corrective_aux.compute_operation_datetimes(
             sched_row, oper_stat, add_op_end=add_op_end
         )
 
@@ -364,7 +359,7 @@ class TestCreateOperationSite(unittest.TestCase):
 
         MockImmediate.side_effect = StubImmediate
 
-        # _check_index_row_validity returns a schedule row as a Series
+        # logs_corrective_aux._check_index_row_validity returns a schedule row as a Series
         mock_check_validity.return_value = pd.Series(
             {
                 "datetime": base_dt,
@@ -379,7 +374,7 @@ class TestCreateOperationSite(unittest.TestCase):
             }
         )
 
-        # compute_operation_datetimes returns a fixed set of dates
+        # logs_corrective_aux.compute_operation_datetimes returns a fixed set of dates
         mock_compute_dates.return_value = {
             "date_end_leadtime": base_dt,
             "date_end_wait_start": base_dt + timedelta(hours=1),
@@ -393,7 +388,7 @@ class TestCreateOperationSite(unittest.TestCase):
             "dur_total": 2.0,
         }
 
-        row_dates, row_mob_line = create_operation_site(
+        row_dates, row_mob_line = logs_corrective_aux.create_operation_site(
             failure_=failure_dict,
             vessel_=vessel_dict,
             vessels_=vessels_dict,
@@ -509,7 +504,7 @@ class TestCreateOperationSite(unittest.TestCase):
             "dur_total": 1.0,
         }
 
-        row_dates, row_mob_line = create_operation_site(
+        row_dates, row_mob_line = logs_corrective_aux.create_operation_site(
             failure_=failure_dict,
             vessel_=vessel_dict,
             vessels_=vessels_dict,
@@ -583,7 +578,7 @@ class TestCreateOperationSite(unittest.TestCase):
 
         MockDeferred.side_effect = StubDeferred
 
-        row_dates, row_mob_line = create_operation_site(
+        row_dates, row_mob_line = logs_corrective_aux.create_operation_site(
             failure_=failure_dict,
             vessel_=vessel_dict,
             vessels_=vessels_dict,
@@ -635,13 +630,13 @@ class TestCreateOperationSite(unittest.TestCase):
         }
 
         with self.assertRaises(KeyError):
-            create_operation_site(
+            logs_corrective_aux.create_operation_site(
                 failure_=failure_dict,
                 vessel_=vessel_dict,
                 vessels_=vessels_dict,
                 oper_=oper_dict,
                 mobilisation=mobilisation_dict,
-                row_=row_dict,
+                row_=row_dict, 
                 index=index_dict,
                 CONST=const_dict,
             )
@@ -659,8 +654,8 @@ class TestCreateOperationSite(unittest.TestCase):
         self, MockImmediate, mock_check_validity, mock_compute_dates
     ):
         """
-        When compute_operation_datetimes returns a diff_time key, the function must
-        call _check_index_row_validity and compute_operation_datetimes a second time.
+        When logs_corrective_aux.compute_operation_datetimes returns a diff_time key, the function must
+        call logs_corrective_aux._check_index_row_validity and logs_corrective_aux.compute_operation_datetimes a second time.
         """
         base_dt = datetime(2025, 1, 1, 0, 0)
 
@@ -748,7 +743,7 @@ class TestCreateOperationSite(unittest.TestCase):
             },
         ]
 
-        row_dates, row_mob_line = create_operation_site(
+        row_dates, row_mob_line = logs_corrective_aux.create_operation_site(
             failure_=failure_dict,
             vessel_=vessel_dict,
             vessels_=vessels_dict,
@@ -759,12 +754,127 @@ class TestCreateOperationSite(unittest.TestCase):
             CONST=const_dict,
         )
 
-        # compute_operation_datetimes is called twice due to diff_time
+        # logs_corrective_aux.compute_operation_datetimes is called twice due to diff_time
         self.assertEqual(mock_compute_dates.call_count, 2)
         self.assertIsInstance(row_dates, pd.DataFrame)
         self.assertEqual(len(row_dates), 1)
         self.assertEqual(row_dates.iloc[0]["event"], "operation")
 
+
+class TestManageDefToLogEvents(unittest.TestCase):
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.logs_corrective_aux.save_file_csv"
+    )
+    def test_remove_indices_and_sort(self, mock_save):
+        """Rows in list_idx_remove are dropped and the result is sorted by d_trigger."""
+
+        df = pd.DataFrame({
+            "d_trigger": [3, 1, 2],
+            "event": ["a", "b", "c"]
+        }, index=[0, 1, 2])
+
+        log_def_tow = pd.DataFrame()  # empty
+        list_idx_remove = [0]  # remove row with d_trigger = 3
+
+        result = logs_corrective_aux.manage_def_to_log_events(
+            log_events=df,
+            log_def_tow=log_def_tow,
+            list_idx_remove=list_idx_remove,
+            result_dir_r="dummy_path"
+        )
+
+        # row removed
+        self.assertEqual(len(result), 2)
+
+        # sorted by d_trigger
+        self.assertListEqual(list(result["d_trigger"]), [1, 2])
+
+        # save called
+        mock_save.assert_called_once()
+
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.logs_corrective_aux.save_file_csv"
+    )
+    def test_concat_with_log_def_tow(self, mock_save):
+        """log_def_tow is concatenated when not empty."""
+
+        df = pd.DataFrame({
+            "d_trigger": [1, 3],
+            "event": ["a", "b"]
+        }, index=[0, 1])
+
+        log_def_tow = pd.DataFrame({
+            "d_trigger": [2],
+            "event": ["tow"]
+        }, index=[5])  # different index
+
+        result = logs_corrective_aux.manage_def_to_log_events(
+            log_events=df,
+            log_def_tow=log_def_tow,
+            list_idx_remove=[],
+            result_dir_r="dummy_path"
+        )
+
+        # 3 rows after concat
+        self.assertEqual(len(result), 3)
+
+        # sorted correctly
+        self.assertListEqual(list(result["d_trigger"]), [1, 2, 3])
+
+        mock_save.assert_called_once()
+
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.logs_corrective_aux.save_file_csv"
+    )
+    def test_ignore_missing_indices(self, mock_save):
+        """Non-existing indices in list_idx_remove must not raise errors."""
+
+        df = pd.DataFrame({
+            "d_trigger": [1, 2],
+            "event": ["a", "b"]
+        }, index=[0, 1])
+
+        # index 99 does not exist
+        result = logs_corrective_aux.manage_def_to_log_events(
+            log_events=df,
+            log_def_tow=pd.DataFrame(),
+            list_idx_remove=[99],
+            result_dir_r="dummy_path"
+        )
+
+        # nothing removed
+        self.assertEqual(len(result), 2)
+
+        mock_save.assert_called_once()
+
+
+    @patch(
+        "oriom.core.functions.logs_timeseries.logs_corrective_aux.save_file_csv"
+    )
+    def test_empty_log_events(self, mock_save):
+        """Function should work even if log_events is empty."""
+
+        df = pd.DataFrame(columns=["d_trigger", "event"])
+
+        log_def_tow = pd.DataFrame({
+            "d_trigger": [1],
+            "event": ["tow"]
+        })
+
+        result = logs_corrective_aux.manage_def_to_log_events(
+            log_events=df,
+            log_def_tow=log_def_tow,
+            list_idx_remove=[],
+            result_dir_r="dummy_path"
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result.iloc[0]["event"], "tow")
+
+        mock_save.assert_called_once()
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

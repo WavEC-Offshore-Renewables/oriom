@@ -7,10 +7,24 @@ import numpy as np
 from oriom.utils.read_dataframe_value import approximate_hourly_data
 
 
+def manage_recommissioning(log_events_tow: pd.DataFrame, substitute = False):
+    """ Manage recommissioning event modifying the date of operation end and removing recomm row"""
+    if substitute:
+        values_overwrite = ['d_end_dur_net_site', 'd_end_transit_tp', 'd_end']
+
+        # look for recommissiong event
+        recom = log_events_tow[log_events_tow['event'] == 'recommissioning']
+        if not recom.empty:
+            for col in values_overwrite:
+                log_events_tow.loc[recom.index, col] = recom[col]
+
+    return log_events_tow[log_events_tow['event'] != 'recommissioning']
+
+
 def create_stat_chart_campaign_operation(
         df:pd.DataFrame,
         vessels: list,
-        percentile: float = 0.9
+        percentile: float = 0.9,
     )->pd.DataFrame:
 
     """
@@ -22,6 +36,7 @@ def create_stat_chart_campaign_operation(
         df (:obj:`pd.DataFrame`): Dataframe of log_events_merged
         vessels (list): list of class `~oriom.classes.Vessel.Vessel`
         percentile (:obj:`float`): percentile value to calculate the statistic
+        month_year_calculate (:obj:`bool`): boolean to evaluate
 
     Returns:
         pd.DataFrame: dataframe with all the failures.
@@ -31,7 +46,7 @@ def create_stat_chart_campaign_operation(
         percentile = percentile / 100
 
     # Filter the df for deferred_merged_operation
-    df_deferred = deepcopy(df[df['event'] == 'operation_deferred_merged'])
+    df_deferred = deepcopy(df[df['event'] != 'mobilisation_merged'])
 
     # Extract month for grouping
     df_deferred['year'] = df_deferred['d_trigger'].dt.year
@@ -40,10 +55,11 @@ def create_stat_chart_campaign_operation(
     # iterate for vessel used
     for vessel in vessels:
         df_deferred_vessel = df_deferred[df_deferred['vessel_1'] == vessel.id]
-
+        if df_deferred_vessel.empty:
+            continue
         # Regroup by year and month, evaluate start and end of deferred op for each month, year
         grouped = df_deferred_vessel.groupby(['year', 'month']).agg(
-            min_trigger=('d_trigger', 'min'),
+            min_trigger=('d_end_leadtime', 'min'),
             max_end=('d_end', 'max')
         ).reset_index()
 
@@ -56,7 +72,7 @@ def create_stat_chart_campaign_operation(
         month_percentiles_dict = {int(row['month']): int(np.ceil(row['duration_days'])) for _, row in month_percentiles.iterrows()}
 
         # Add the monthly percentiles to the d_trigger only for the deferred operations
-        mask = (df['event'] == 'operation_deferred_merged') & (df['vessel_1'] == vessel.id)
+        mask = (df['event'] != 'mobilisation_merged') & (df['vessel_1'] == vessel.id)
 
         stat_end_dict = {
             (row['year'], row['month']): row['min_trigger'] + timedelta(
@@ -73,6 +89,33 @@ def create_stat_chart_campaign_operation(
 
     return df
 
+
+def manage_chart(df: pd.DataFrame, vessels: list, percentile: float = 0.9):
+
+    """ Manage d_trigger, event and chart_vessel of the deferred tow merged"""
+
+    # Modify event name
+    df['event'] = np.where(
+        df['event'] != 'mobilisation_merged',
+        'operation_deferred_merged',  # valore se condizione True
+        df['event']                   # valore se condizione False (lascia invariato)
+    )
+
+    # Uniform d_trigger and d_end_leadtime
+    df[['d_trigger', 'd_end_leadtime']] = (
+        df.groupby('year_month')[['d_trigger', 'd_end_leadtime']]
+        .transform('min')
+    )
+    
+    # Manage deferred chart for campaign tow
+    df = df.drop(columns=['year_month'])
+    df = create_stat_chart_campaign_operation(
+        df = df,
+        vessels = vessels,
+        percentile = percentile
+    )
+        
+    return df
 
 
 def vessel_reuse(
@@ -179,7 +222,7 @@ def creation_oper_vessel_dict(
         oper_per_vessel: dict,
         deferred_failures_correction: list,
         deferred_failures_correction_tow: list,
-        failures_correction_tow:list
+        failures_correction_tow: list
 ):
     """ Create list of failures and dict vess: deferred_op"""
     for failure in failures:

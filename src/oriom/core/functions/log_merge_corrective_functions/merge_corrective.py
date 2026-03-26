@@ -1,13 +1,15 @@
 import pandas as pd
+from copy import deepcopy
 
-from oriom.core.functions.log_merge_corrective_functions.merged_deferred_aux import creation_oper_vessel_dict
+from oriom.classes.TowData import TowData
+from oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer import OperationDeferredPortCreation
+from oriom.core.functions.log_merge_corrective_functions import merged_deferred_aux
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred import merge_deferred_operations
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective_immediate import merge_operation
 from oriom.core.functions.log_merge_corrective_functions.group_merging_immediate import mergeble_operation
-from oriom.core.functions.log_merge_corrective_functions.tow_deferred_mobilisation import tow_deferred_mobi
 
 
-FILTER_EVENT = ['failure', 'inspection_site', 'inspection_port', 'mobilisation', 'recommissioning']
+FILTER_EVENT = ['failure', 'inspection_site', 'inspection_port', 'mobilisation']
 OLC_LIST = ['hs', 'cs', 'ws', 'ws_hub', 'tp', 'light']
 COLS = [
     'd_trigger',
@@ -32,8 +34,30 @@ COLS = [
     'ST_contract_2',
 ]
 
+
+def filter_tow_op(log_events: pd.DataFrame, comments_failure_id_tow: pd.Series, list_fail: list, recom: bool = False):
+    """ Filter log_events file related to the towing operation"""
+    if list_fail:
+        comments_tow = set(comments_failure_id_tow[comments_failure_id_tow.isin(list_fail)])
+        pattern_tow = "|".join(comments_tow)
+        l_events_tow = log_events[log_events["comments"].str.contains(pattern_tow, case=False, na=False)]
+        return l_events_tow, comments_tow
+    else:
+        return pd.DataFrame(), []
+
+
+def comment_filtering(log_event_op):
+    """ Extrapolate comments for failures"""
+    if not log_event_op.empty:
+        comments_failure_id = log_event_op['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
+    else:
+        comments_failure_id = pd.DataFrame()
+
+    return comments_failure_id
+
+
 def create_logs_merge(
-    log_events: pd.DataFrame,
+    log_events_original: pd.DataFrame,
     failures: list,
     operation_log_file_stats: list,
     result_dir_r: str,
@@ -64,7 +88,7 @@ def create_logs_merge(
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         time_between_devices (:obj:`dict`): Dictionary of time between devices for the various tech
         percentile (:obj:`float`, *optional*): Percentile value to calculate the statistic for inspection_port. Default to 0.9
-        vessel_to_merge (:obj;`list`): list of vessel that are considered for the merge
+        vessel_to_merge (:obj;`list`): list of vessel that are considered for the immediate merge
         time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
         duration_shift (:obj:`float`): Maximum hours of working shift.
 
@@ -143,11 +167,11 @@ def create_logs_merge(
         tech_cost = getattr(oper, 'tech_cost', None)
 
         oper_dict[op] = {
-        'vess_1': getattr(oper, 'vessel1_id', None),
-        'vess_2': getattr(oper, 'vessel2_id', None),
-        'duration': duration if duration is not None else getattr(oper, 'duration_net', None),
-        'technician': tech_required,
-        'technician_cost': (tech_required or 0) * (tech_cost or 0)
+            'vess_1': getattr(oper, 'vessel1_id', None),
+            'vess_2': getattr(oper, 'vessel2_id', None),
+            'duration': duration if duration is not None else getattr(oper, 'duration_net', None),
+            'technician': tech_required,
+            'technician_cost': (tech_required or 0) * (tech_cost or 0)
         }
 
         for olc in OLC_LIST:
@@ -161,58 +185,106 @@ def create_logs_merge(
                 oper_dict[op][olc] = minor_olc
 
         return oper_dict
+    
 
+    #-------------------------------------------------
+    # CODE
+    #-------------------------------------------------
+
+    log_events = deepcopy(log_events_original)
     log_events['ST_contract_1'] = False
     log_events['ST_contract_2'] = False
     log_events_merged = pd.DataFrame(columns=log_events.columns)
-    deferred_failures_correction = []
-    oper_per_vessel, oper_dict, operation_scheduler_dict = {}, {}, {}
+    df_port_operation_def_log, df_events_return = pd.DataFrame(),  pd.DataFrame()
+    deferred_failures_correction, deferred_failures_correction_tow, failures_correction_tow, index_overwrite_log_ev = [], [], [], []
+    oper_per_vessel, oper_dict, operation_scheduler_dict, oper_dict_tow = {}, {}, {}, {}
 
-    #------------------
+
     # ALL OTHER LOG
     #------------------
     # Copy all log_files that is not going to be merged
     log_event_filt = log_events.loc[log_events['event'].isin(FILTER_EVENT)]
+    log_event_to_merge = log_events.loc[~log_events['event'].isin(FILTER_EVENT)]
+
     log_events_merged = pd.concat([log_events_merged, log_event_filt],ignore_index=True)
 
     # Deferred operation merging, create a dict with 1st key vessel used and value deferred operation
-    creation_oper_vessel_dict(
+    merged_deferred_aux.creation_oper_vessel_dict(
         failures = failures,
         find_element_class = find_element_class,
         oper_per_vessel = oper_per_vessel,
-        deferred_failures_correction = deferred_failures_correction
+        deferred_failures_correction = deferred_failures_correction,
+        deferred_failures_correction_tow = deferred_failures_correction_tow,
+        failures_correction_tow = failures_correction_tow
     )
 
-
     #------------------
-    # TOW OPERATION
+    # TOW OPERATION DEFERRED
     #------------------
     # Deferred tow NOTE do not merge deferred operations tow
-    log_event_tow = log_events.loc[log_events['event'] == 'tow']
+    log_event_tow = log_event_to_merge.loc[log_event_to_merge['event'] == 'tow']
 
     if not log_event_tow.empty:
-        comments_failure_id_tow = log_event_tow['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
-        log_events_tow_def = log_event_tow[comments_failure_id_tow.isin(deferred_failures_correction)]
+        comments_failure_id_tow = comment_filtering(log_event_tow)
+        log_events_tow_def, deferred_comments_tow = filter_tow_op(
+            log_events = log_events, 
+            comments_failure_id_tow = comments_failure_id_tow, 
+            list_fail = deferred_failures_correction_tow
+        )
+        log_events_tow_imm, _ = filter_tow_op(
+            log_events = log_events, 
+            comments_failure_id_tow = comments_failure_id_tow, 
+            list_fail = failures_correction_tow
+        )
+
+        # DEFERRED TOW
+        #------------------
         if not log_events_tow_def.empty:
-            log_events_merged = pd.concat([log_events_merged, log_events_tow_def],ignore_index=False)
-            row_merged_def_tow = tow_deferred_mobi(COLS = COLS, log_events_tow_def = log_events_tow_def, find_element_class = find_element_class)
-            log_events_merged = pd.concat([log_events_merged, row_merged_def_tow],ignore_index=False)
+            for failure_id in deferred_comments_tow:
+                failure = find_element_class.find_failure_from_id(failure_id)
+                oper_port = find_element_class.find_operation(failure.operation_triggered)
+                oper_port.tow_data = TowData.from_operation(find_element_class, oper_port)
+                oper_port.tow_data.id_dict_oper(oper_dict_tow, oper_port)
 
-        # Immediate tow
-        log_events_tow_ = log_event_tow[~comments_failure_id_tow.isin(deferred_failures_correction)]
-        if not log_events_tow_.empty:
-            log_events_merged = pd.concat([log_events_merged, log_events_tow_],ignore_index=False)
+            oper_ids_tow = set(oper_dict_tow.keys())
 
+            log_events_tow_def = log_events.loc[log_events['id'].isin(oper_ids_tow)]
+            index_overwrite_log_ev = log_events_tow_def.index.tolist()
+            log_events_tow_def = merged_deferred_aux.manage_recommissioning(log_events_tow_def)
+
+            port_operation_deferred = OperationDeferredPortCreation(
+                log_events_tow_def,
+                oper_port,
+                oper_dict_tow,
+                find_element_class
+            )
+            df_port_operation_def_log = port_operation_deferred.deferred_port_manager(
+                time_fail_op_immediately = time_fail_op_immediately
+            )
+            df_port_operation_def_log.reset_index(drop=True, inplace=True)
+            df_events_return = deepcopy(df_port_operation_def_log.drop(columns=['year_month']))
+            df_port_operation_def_log = merged_deferred_aux.manage_recommissioning(df_port_operation_def_log, True)
+            df_port_operation_def_log = merged_deferred_aux.manage_chart(
+                df = df_port_operation_def_log,
+                vessels = vessels,
+                percentile = percentile
+            )
+            log_events_merged = pd.concat([log_events_merged, df_port_operation_def_log], ignore_index=False)
+
+        # IMMEDIATE TOW
+        #------------------
+        if not log_events_tow_imm.empty:
+            # Simply copy the row
+            log_events_merged = pd.concat([log_events_merged, log_events_tow_imm],ignore_index=False)
 
     #------------------
     # DEFERRED OPERATION
     #------------------
     # Filter log_events by the failure that require deferred intervention (failure extrapolated from 'comments' column)
-    log_event_op = log_events.loc[~log_events['event'].isin(FILTER_EVENT)]
-    if not log_event_op.empty:
-        comments_failure_id = log_event_op['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
-    else:
-        comments_failure_id = pd.DataFrame()
+    log_event_op = log_event_to_merge.loc[
+        (~log_event_to_merge['id'].isin(set(oper_dict_tow.keys())))
+    ]
+    comments_failure_id = comment_filtering(log_event_op)
 
     log_events_def = log_event_op[comments_failure_id.isin(deferred_failures_correction)]
 
@@ -234,8 +306,13 @@ def create_logs_merge(
     # IMMEDIATE OPERATION
     #------------------
     # Filter only operation & Filter avoiding deferred failures
-    mask = (log_events['event'].isin(['operation'])) & (~comments_failure_id.isin(deferred_failures_correction))
-    log_events_oper_imm = log_events[mask]
+    mask = (
+        (log_event_to_merge['event'].isin(['operation'])) &
+        (~comments_failure_id.isin(deferred_failures_correction)) &
+        (~comments_failure_id.isin(deferred_failures_correction_tow)) &
+        (~comments_failure_id.isin(failures_correction_tow))
+    )
+    log_events_oper_imm = log_event_to_merge[mask]
 
     if not log_events_oper_imm.empty:
         if vessel_to_merge:
@@ -281,9 +358,10 @@ def create_logs_merge(
         else:
             log_events_merged = pd.concat([log_events_merged, log_events_oper_imm],ignore_index=False)
 
+    log_events_merged = merged_deferred_aux.manage_recommissioning(log_events_merged)
     log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
 
-    return log_events_merged
+    return log_events_merged, index_overwrite_log_ev, df_events_return
 
 
 if __name__ == '__main__':

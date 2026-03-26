@@ -82,13 +82,6 @@ def merge_deferred_operations(
     for period, df_group in log_events_df.groupby('year_month'):
         # Regroup for vessel
         for vessel_id, ops in oper_per_vessel.items():
-            # If vessel tow is port operation and copy the line simply
-            if vessel_id == 'tow':
-                df_ops = df_group[df_group['id'].isin(ops)]
-                for op_id, op_row in df_ops.groupby('id'):
-                    row_merged_def = pd.concat([row_merged_def, op_row.drop(columns=['year_month'])], axis=0, ignore_index=False)
-                continue
-
             # Flag to track when operations change
             operation_number_analysed = 0
             # Filter for the operations
