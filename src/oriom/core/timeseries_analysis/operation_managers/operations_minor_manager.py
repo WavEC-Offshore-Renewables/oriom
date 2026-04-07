@@ -117,11 +117,17 @@ def opeartion_minor_manager(
                 out_dir = op_dir
         )
 
-        yaml_manager.update_yaml_each_attribute(file_dir=op_dir,file_name='attributes.yaml',data=op_working_shifts)
+        yaml_manager.update_yaml_each_attribute(
+            file_dir=op_dir,
+            file_name='attributes.yaml',
+            data=op_working_shifts,
+            operation_id=operation.id
+        )
         yaml_manager.update_yaml(
                 file_dir=op_dir,
                 file_name='attributes.yaml',
-                data=data_working_shifts
+                data=data_working_shifts,
+                operation_id=operation.id
         )
 
         try:

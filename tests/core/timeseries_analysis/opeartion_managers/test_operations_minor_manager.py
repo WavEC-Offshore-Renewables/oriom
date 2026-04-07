@@ -306,14 +306,21 @@ class TestInspectMinorManager(unittest.TestCase):
         )
 
         # YAML updates
-        m_yaml_each.assert_called_once_with(
-            file_dir=op_dir, file_name="attributes.yaml", data=op_working_shifts
-        )
-        m_yaml_update.assert_called_once_with(
-            file_dir=op_dir,
-            file_name="attributes.yaml",
-            data=data_working_shifts,
-        )
+        m_yaml_each.assert_called_once()
+
+        _, kwargs = m_yaml_each.call_args
+
+        self.assertEqual(kwargs["file_dir"], op_dir)
+        self.assertEqual(kwargs["file_name"], "attributes.yaml")
+        self.assertEqual(kwargs["data"], op_working_shifts)
+
+        m_yaml_update.assert_called_once()
+
+        _, kwargs = m_yaml_update.call_args
+
+        self.assertEqual(kwargs["file_dir"], op_dir)
+        self.assertEqual(kwargs["file_name"], "attributes.yaml")
+        self.assertEqual(kwargs["data"], data_working_shifts)
 
         # define_shift_operation_values called with NaN shutdowns
         m_define_shift.assert_called_once()

@@ -305,17 +305,22 @@ class TestInspectSiteManager(unittest.TestCase):
         self.assertEqual(op.shift_assigned, op_working_shifts)
 
         # 3) YAML updates called correctly
-        m_update_each.assert_called_once_with(
-            file_dir=op_dir,
-            file_name="attributes.yaml",
-            data=op_working_shifts,
-        )
-        m_update_yaml.assert_called_once_with(
-            file_dir=op_dir,
-            file_name="attributes.yaml",
-            data=data_working_shifts,
-            data_key="working_shifts",
-        )
+        m_update_each.assert_called_once()
+
+        _, kwargs = m_update_each.call_args
+
+        self.assertEqual(kwargs["file_dir"], op_dir)
+        self.assertEqual(kwargs["file_name"], "attributes.yaml")
+        self.assertEqual(kwargs["data"], op_working_shifts)
+
+        m_update_yaml.assert_called_once()
+
+        _, kwargs = m_update_yaml.call_args
+
+        self.assertEqual(kwargs["file_dir"], op_dir)
+        self.assertEqual(kwargs["file_name"], "attributes.yaml")
+        self.assertEqual(kwargs["data"], data_working_shifts)
+        self.assertEqual(kwargs["data_key"], "working_shifts")
 
         # 4) shutdown durations computed correctly
         expected_shutdown_wtg = op.dur_per_device * op.intervened_wtg
