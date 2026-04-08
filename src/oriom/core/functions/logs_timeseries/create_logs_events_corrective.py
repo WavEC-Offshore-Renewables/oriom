@@ -133,6 +133,7 @@ def create_logs_corrective_file(
             date_failure = row['datetime']
             operation_trig = row['operation_triggered']
             fail_index = row['matching_indices']
+            maintenance_strategy = row['maintenance_strategy']
             op_chart_month = oper_stat.dur_total_dict[str(date_failure.month)]
             date_failure_tow = None
 
@@ -148,7 +149,7 @@ def create_logs_corrective_file(
                     tow_stat_chart_month = oper.tow_data.tow_op_port_stat.dur_total_dict[str(date_failure.month)]
                     op_sched_add_tow_port = safe_getattr(oper.tow_data.add_op_tow_port, ['ts_data','oper_sched'])
                     vessel, ves_2, mob_time = _take_vessel_data(op = oper.tow_data.add_op_tow_port)
-                    if failure.maintenance_strategy == "specific month":
+                    if maintenance_strategy == "specific month":
                         deferred_tow = True
                     if op_chart_month < mob_time:
                         double_add = True
@@ -156,7 +157,8 @@ def create_logs_corrective_file(
                     row_add_op_tow_port, row_mob_line_op_tow_port = create_operation_site(
                         failure_ = {
                             'failure': failure,
-                            'date_failure': date_failure, 
+                            'date_failure': date_failure,
+                            'maintenance_strategy': maintenance_strategy
                         },
                         vessel_ = {'vessel': vessel, 'vessel_to_merge': vessel_to_merge},
                         vessels_ = {'vessel1_id': vessel.id, 'ves_1': oper.tow_data.add_op_tow_port.vessel1_qt, 'vessel2_id': oper.tow_data.add_op_tow_port.vessel2_id, 'ves_2': ves_2},
@@ -186,13 +188,13 @@ def create_logs_corrective_file(
                     end_add_op_time = approximate_hourly_data(row_add_op_tow_port['d_end_dur_net_site'].iloc[0])
                     fail_index = op_sched_add_tow_port.index[op_sched_add_tow_port['datetime'] == end_add_op_time][0]
                 else:
-                    if failure.maintenance_strategy == 'specific month':
+                    if maintenance_strategy == "specific month":
                         deferred_tow = True
                         deferred_tow_correction = CorrectionDeferred(
                             date_failure = date_failure,
                             vessel = vessel,
                             oper = oper,
-                            preferred_month = failure.preferred_month,
+                            preferred_month = row['preferred_month'],
                         )
                         deferred_tow_correction.leadtime_evaluation(lead_mob_time = mob_time)
                         index_found = deferred_tow_correction.check_leadtime_index(oper_sched = oper.tow_data.tow_port_oper_sched, CUTOFF_DATE = CUTOFF_DATE)
@@ -210,6 +212,7 @@ def create_logs_corrective_file(
                     vessel = vessel,
                     oper = oper.tow_data.tow_op_port,
                     failure = failure,
+                    maintenance_strategy = maintenance_strategy,
                     time_fail_op_immediately = time_fail_op_immediately,
                     date_start = date_start if deferred_tow else None
                 )
@@ -334,7 +337,8 @@ def create_logs_corrective_file(
                         'failure': failure, 
                         'date_failure': date_failure, 
                         'tow_op_previous': deferred_tow,
-                        'original_date_fail': row_tow_port['d_trigger'][0] if tow_op_flag else None
+                        'original_date_fail': row_tow_port['d_trigger'][0] if tow_op_flag else None,
+                        'maintenance_strategy': maintenance_strategy
                     },
                     vessel_ = {'vessel': vessel, 'vessel_to_merge': vessel_to_merge},
                     vessels_ = {'vessel1_id': vessel1_id, 'ves_1': ves_1, 'vessel2_id': vessel2_id, 'ves_2': ves_2},
@@ -440,7 +444,8 @@ def create_logs_corrective_file(
                             'date_failure': row_dates['d_end'][0] + timedelta(hours=time_fail_op_immediately), 
                             'end_add_op_time': end_add_op_time_site,
                             'tow_op_previous': deferred_tow,
-                            'original_date_fail': row_dates['d_trigger'][0] if deferred_tow else None
+                            'original_date_fail': row_dates['d_trigger'][0] if deferred_tow else None,
+                            'maintenance_strategy': maintenance_strategy
                         },
                         vessel_ = {'vessel': vessel, 'vessel_to_merge': vessel_to_merge},
                         vessels_ = {'vessel1_id': vessel.id, 'ves_1': oper.tow_data.add_op_tow_site.vessel1_qt, 'vessel2_id': oper.tow_data.add_op_tow_site.vessel2_id, 'ves_2': ves_2},

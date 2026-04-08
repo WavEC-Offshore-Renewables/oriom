@@ -34,6 +34,7 @@ def update_yaml_each_attribute(
         file_dir: str,
         file_name: str,
         data: dict,
+        operation_id: str = None
 ):
     """ Open a file yaml and add the attributes passed un the dictionary data """
 
@@ -49,6 +50,8 @@ def update_yaml_each_attribute(
 
     # Update the file yaml for each key of the dict that is not olc
     if data:
+        if operation_id and data.get('id_main') and data['id_main'] != operation_id:
+            data['id_main'] = operation_id
         for k, v in data.items():
             if 'olc' not in k:
                 if k == 'number_shifts_main':
@@ -77,7 +80,8 @@ def update_yaml(
         file_name: str,
         data: dict,
         data_key: str=None,
-        recursive: bool=False
+        recursive: bool=False,
+        operation_id:str=None
 ):
     if data_key is not None and recursive is True:
         _w = 'If "recursive" is True, "data_key" is ignored.'
@@ -87,7 +91,8 @@ def update_yaml(
     yaml=YAML(typ='safe')
     attr_yaml = yaml.load(f)
     f.close()
-
+    if operation_id and data.get('id_main') and data['id_main'] != operation_id:
+        data['id_main'] = operation_id
     if recursive:
         new_yaml = update_dict(attr_yaml, data)
     else:

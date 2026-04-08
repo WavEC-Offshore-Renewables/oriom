@@ -483,7 +483,7 @@ def define_operation_values(
             if type(elem) == dict
     ]
     if len(list_st_dur_wt) == 0:
-        _e = 'The operation can never occur. OLCs may be to resctric.'
+        _e = f'The operation {operation.id} can never occur. OLCs may be to resctric.'
         raise InterruptedError('Scheduling: ' + _e)
 
     else:

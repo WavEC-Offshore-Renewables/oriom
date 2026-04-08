@@ -324,7 +324,7 @@ class TestCreateOperationSite(unittest.TestCase):
             "oper_sched": oper_sched,
         }
         mobilisation_dict = {"mob_time": 2, "lead_mob_time": 2}
-        row_series = pd.Series({"id": "F1.0"})
+        row_series = pd.Series({"id": "F1.0", "maintenance_strategy": 'immediately'})
         row_dict = {
             "row": row_series,
             "tow_op_flag": False,
@@ -447,7 +447,7 @@ class TestCreateOperationSite(unittest.TestCase):
             "oper_sched": oper_sched,
         }
         mobilisation_dict = {"mob_time": 1, "lead_mob_time": 1}
-        row_series = pd.Series({"id": "F2.0"})
+        row_series = pd.Series({"id": "F2.0", "maintenance_strategy": 'specific month', 'preferred_month' : 2})
         row_dict = {
             "row": row_series,
             "tow_op_flag": False,
@@ -548,7 +548,7 @@ class TestCreateOperationSite(unittest.TestCase):
             "oper_sched": oper_sched,
         }
         mobilisation_dict = {"mob_time": 1, "lead_mob_time": 1}
-        row_series = pd.Series({"id": "F3.0"})
+        row_series = pd.Series({"id": "F3.0", "maintenance_strategy": 'specific month', 'preferred_month': 2})
         row_dict = {
             "row": row_series,
             "tow_op_flag": False,
@@ -679,7 +679,7 @@ class TestCreateOperationSite(unittest.TestCase):
             "oper_sched": oper_sched,
         }
         mobilisation_dict = {"mob_time": 0, "lead_mob_time": 0}
-        row_series = pd.Series({"id": "F5.0"})
+        row_series = pd.Series({"id": "F5.0", "maintenance_strategy": 'immediately'})
         row_dict = {
             "row": row_series,
             "tow_op_flag": False,

@@ -8,6 +8,25 @@ import numpy as np
 
 DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
 
+
+def find_month_available(month_check: int, dict_failures_variables_id: list):
+    """ Find the first available month of correction after the failure"""
+    checked_months = 0
+
+    while checked_months < 12:
+        if month_check not in dict_failures_variables_id:
+            # found month available
+            return month_check
+        month_check += 1
+        if month_check > 12:
+            month_check = 1
+        checked_months += 1
+    # month available not found
+    raise ValueError(
+        f"Failure Creation: No month to operate encountered. Blocked months {dict_failures_variables_id}"
+    )
+
+
 def failures_event(
         s: int,
         scenarios: list,
@@ -158,7 +177,8 @@ def failures_event(
             failure.id : [
                     failure.maintenance_strategy,
                     failure.operation_triggered,
-                    failure.preferred_month
+                    failure.preferred_month,
+                    getattr(failure, 'avoid_month_correction', None)
             ]
             for failure in failures
     }
@@ -230,9 +250,24 @@ def failures_event(
                 for d in dates:
                     list_dates.append(d)
                     list_ids.append(id_)
-                    list_maintenance_strategy.append(dict_failures_variables[id_][0])
+
+                    # If the failure is in an avoid operation month find first month available to operate
+                    if (
+                        dict_failures_variables[id_][3]
+                        and month in dict_failures_variables[id_][3]
+                    ):
+                        month_found = find_month_available(
+                            month_check = month, 
+                            dict_failures_variables_id = dict_failures_variables[id_][3]
+                        )
+                        list_maintenance_strategy.append('specific month')
+                        list_preferred_month.append(month_found)
+                    else: 
+                        list_maintenance_strategy.append(dict_failures_variables[id_][0])
+                        list_preferred_month.append(dict_failures_variables[id_][2])
+
                     list_operation_triggered.append(dict_failures_variables[id_][1])
-                    list_preferred_month.append(dict_failures_variables[id_][2])
+                    
 
         dates_failures = pd.DataFrame(columns=[
                 'datetime',
@@ -246,7 +281,7 @@ def failures_event(
         dates_failures['id'] = list_ids
         dates_failures['maintenance_strategy'] = list_maintenance_strategy
         dates_failures['operation_triggered'] = list_operation_triggered
-        dates_failures['preferred_month'] = list_preferred_month
+        dates_failures['preferred_month'] = pd.Series(list_preferred_month, dtype='Int64')
         dates_failures = dates_failures.sort_values(by ='datetime').reset_index(drop=True)
 
 

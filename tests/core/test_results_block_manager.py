@@ -114,6 +114,7 @@ class TestResultsBlock(unittest.TestCase):
             {
                 "datetime": pd.to_datetime(["2025-01-01 00:00:00"]),
                 "id": ["f1.0"],
+                'preferred_month': [1]
             }
         )
 

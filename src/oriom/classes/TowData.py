@@ -59,19 +59,20 @@ class TowData:
         """Initialize dictionaries after instance is created"""
         self.dict_tow_oper_sched = {
             self.tow_op_port.id: self.tow_port_oper_sched,
-            self.tow_op_site.id: self.tow_site_oper_sched,
-            self.tow_site_port.id: self.tow_site_port_oper_sched,
+            self.tow_op_site.id: self.tow_site_oper_sched
         }
         self.dict_tow_oper_last_idx = {
             self.tow_op_port.id: self.last_valid_idx_tow_port,
             self.tow_op_site.id: self.last_valid_idx_tow_site,
-            self.tow_site_port.id: self.last_valid_idx_tow_site_port,
         }
         self.dict_oper_stat = {
             self.tow_op_port.id: self.tow_op_port_stat,
             self.tow_op_site.id: self.tow_op_site_stat,
-            self.tow_site_port.id: self.tow_op_site_port_stat,
         }
+        if self.tow_site_port:
+            self.dict_tow_oper_sched[self.tow_site_port.id] = self.tow_site_port_oper_sched
+            self.dict_tow_oper_last_idx[self.tow_site_port.id] = self.last_valid_idx_tow_site_port
+            self.dict_oper_stat[self.tow_site_port.id] = self.tow_op_site_port_stat
 
 
     def id_dict_oper(self, oper_dict_tow: dict, op_at_port: object):
@@ -103,22 +104,22 @@ class TowData:
         """
         tow_op_port = finder.find_operation(getattr(oper, 'op_tow_port'))
         tow_op_site = finder.find_operation(getattr(oper, 'op_tow_site'))
-        tow_site_port = finder.find_operation(getattr(oper, 'op_tow_site_port'))
+        tow_site_port = finder.find_operation(getattr(oper, 'op_tow_site_port')) if getattr(oper, 'op_tow_site_port') else None
 
         add_op_tow_port = getattr(tow_op_port, 'addition_op_tow', None)
         add_op_tow_site = getattr(tow_op_site, 'addition_op_tow', None)
 
         tow_op_port_stat = finder.find_operation_stats_pmax(tow_op_port.id)
         tow_op_site_stat = finder.find_operation_stats_pmax(tow_op_site.id)
-        tow_op_site_port_stat = finder.find_operation_stats_pmax(tow_site_port.id)
+        tow_op_site_port_stat = finder.find_operation_stats_pmax(tow_site_port.id) if getattr(oper, 'op_tow_site_port') else None
 
         tow_port_oper_sched = safe_getattr(tow_op_port, ['ts_data', 'oper_sched'])
         tow_site_oper_sched = safe_getattr(tow_op_site, ['ts_data', 'oper_sched'])
-        tow_site_port_oper_sched = safe_getattr(tow_site_port, ['ts_data', 'oper_sched'])
+        tow_site_port_oper_sched = safe_getattr(tow_site_port, ['ts_data', 'oper_sched']) if getattr(oper, 'op_tow_site_port') else None
 
         last_valid_idx_tow_port = safe_getattr(tow_op_port, ['ts_data', 'last_valid_index'])
         last_valid_idx_tow_site = safe_getattr(tow_op_site, ['ts_data', 'last_valid_index'])
-        last_valid_idx_tow_site_port = safe_getattr(tow_site_port, ['ts_data', 'last_valid_index'])
+        last_valid_idx_tow_site_port = safe_getattr(tow_site_port, ['ts_data', 'last_valid_index']) if getattr(oper, 'op_tow_site_port') else None
 
         oper_stat_op_tow_port = (
             finder.find_operation_stats_pmax(add_op_tow_port.id)

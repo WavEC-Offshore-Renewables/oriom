@@ -16,7 +16,7 @@ The failures that occurs annually will be the amounts of component to install ea
 
 <span style="font-size: 20px; font-weight: bold;">HARD CODED PARAMETERS</span>
 
-- TO CONSIDER DIFFERENT CHANGE IN DISTANCE DUE TO CLOSER PORT FOR CERTAIN TYPE OF VESSEL
+- ## TO CONSIDER DIFFERENT CHANGE IN DISTANCE DUE TO CLOSER PORT FOR CERTAIN TYPE OF VESSEL
     - **diff_distance**: boolean value to say that there are vessel that are considered with other port distance
 
     - **distance from coast**: The distance might change for vessel type (port facilities differ)
@@ -24,14 +24,14 @@ The failures that occurs annually will be the amounts of component to install ea
     - **VESSEL_DIST_REDUCED_LIST**: List of vessel type that will have different distances from port as can use a closer port that have reduced port characteristic
 
 
-- OTHER
+- ## OTHER
     - **KM_MOTHER_VESSEL**: The distance on which evaluate the transit when a mother vessel is used. Might change for vessel mother
 
     - **fuel to add**: Dictionary of vessel id and **YEARLY FUEL COST** cost of fuel to add due to reduced travels (overnight stay at site). The cost will be added only at the averaged results
 
     - **mobilisation to add**: Dictionary of vessel id and **YEARLT MOBILISATION COST** to add. The cost will be added only at the averaged results
 
-<span style="font-size: 20px; font-weight: bold;">GEN_INPUTS</span>
+## GEN_INPUTS
 
 
 - **Use previous run directory**: Insert the path of the previous directory to reuse
@@ -48,7 +48,7 @@ The failures that occurs annually will be the amounts of component to install ea
 
 - **Failure events file**: Insert the path of the previous "failure" file directory to reuse
 
-<span style="font-size: 20px; font-weight: bold;">TSA_inputs</span>
+## TSA_inputs
 
 
 - **The Merge operation vessel**:
@@ -64,7 +64,7 @@ The failures that occurs annually will be the amounts of component to install ea
         Example:
         Merge operation vessel: ctv, sov, juv
 
-<span style="font-size: 20px; font-weight: bold;">SA_inputs</span>
+## SA_inputs
 
 
 - For Time series analysis the start year of the project have to be the start year of the metocean data available
@@ -72,7 +72,7 @@ The failures that occurs annually will be the amounts of component to install ea
 
 - **Failure rate sensitivity** Is a sensitivity factor to increase or reduce all the failures. Default to 1 or empty
 
-<span style="font-size: 20px; font-weight: bold;">Gen_PV</span>
+## Gen_PV
 
 
 - **Layout**: Layout 2 has the layout implemented till the inverter level. Lower component are considered for energy losses evaluation and corrections
@@ -89,9 +89,7 @@ The failures that occurs annually will be the amounts of component to install ea
 
     - The case on which a nÂº of pv module fail in the same string and cause a string shutdown is not considered in the energy availability. Anyway if it happens it is seen in the logging file. There it say how many time it happen in the lifetime of the farm
 
-<span style="font-size: 20px; font-weight: bold;">VESSEL
-</span>
-
+## VESSEL
 
 - **Charter**: put values equal to zero only if you only have long term vessel. No short term vessel will be rented, ideal for inspections or deferred maintenace that do use a vessel only if previous shift is completed. Usually consider both (long_term and short term) so fill both short and long term charts.
 Example of not consider short_term: particular vessel charted that should not be used with more than n_vessel long term chart in the same time
@@ -126,7 +124,7 @@ Example of not consider short_term: particular vessel charted that should not be
 - **remote reboot** can be simulated. For such failure create a vessel with id v999 and an extremly high speed transit. Assign it to an operation and failure
 
 
-<span style="font-size: 20px; font-weight: bold;">MOTHER VESSEL</span>
+## MOTHER VESSEL
 
 
 - mother Vessel should always be the second vessel of the operations vessel_2. Its mobilisation is calculated after log_events_calculation by a specific function. It calculate only one mobilisation so if more are required add externally
@@ -136,7 +134,7 @@ Example of not consider short_term: particular vessel charted that should not be
 - If the mother vessel is used for inspection campaign, to consider inspection campaign to be done together all the inspections must have the same month of start, otherwise they will be considered in another campaign.
 
 
-<span style="font-size: 20px; font-weight: bold;">Technologies definitions</span>
+## Technologies definitions
 
 
 - **power curve file**: must indicate the path and the file name of the power file of the device
@@ -144,7 +142,7 @@ Example of not consider short_term: particular vessel charted that should not be
 
 the devisce at port and stored at port must be present (if not know = 0)
 
-<span style="font-size: 20px; font-weight: bold;">Failure File</span>
+## Failure File
 
 
 - **op_trigger**: Each failure must be connected to a operation
@@ -154,6 +152,8 @@ the devisce at port and stored at port must be present (if not know = 0)
 - **level_failure**: Is the level of the component that is failing. Levels are connected to the layout choosen of the technology. Important for energy calculations
 
 - **probability_failure**: Is the failure rate expressed in failure/year
+
+- **avoid_month_correction**: If the failure Strategy is immediatly it can be avoided to operate in specific defined months. The failure that will occure in these periods will be considered as deferred operation in the first possible month available
 
 - **bath_tub**: Indicates if this failure will be have a bathtub curve failure characterization
 
@@ -166,7 +166,7 @@ the devisce at port and stored at port must be present (if not know = 0)
 
 
 
-<span style="font-size: 20px; font-weight: bold;">ALL OPERATIONS (INSPECTION & CORRECTION)</span>
+## ALL OPERATIONS (INSPECTION & CORRECTION)
 
 
 - Do not put in the same operations in vessel 1 & vessel 2 the same vessel type
@@ -216,14 +216,14 @@ the devisce at port and stored at port must be present (if not know = 0)
 
 
 
-<span style="font-size: 20px; font-weight: bold;">ALL INSPECTION & MINOR CORRECTION</span>
+## ALL INSPECTION & MINOR CORRECTION
 
 
 - **double shift**: The double shift parameters avoid the use of night hours to conduct the shift. Is similar to the ligh restriction. To work along the night day restriction must be empty or false and the double shift must be True
 
 - **other cost & part cost**: This value must be the total of the device inspected if is an ispection, cannot be the amount of part and other cost of sigle device
 
-<span style="font-size: 20px; font-weight: bold;">In Inspection Site</span>
+## In Inspection Site
 
 
 - For the inspections that require a vessel to be conducted (example export cable inspection) the duration of the inspection must be the total time of the inspection for each  component and the component inspected must be set from 0 to 1 otherwise consider possibility to drop of personnel if rov are not used
@@ -261,7 +261,7 @@ the devisce at port and stored at port must be present (if not know = 0)
 
 
 
-<span style="font-size: 20px; font-weight: bold;">Corrective MAJOR</span>
+## Corrective MAJOR
 
 
 - rov_drone column leave empty if no rov are used
@@ -269,7 +269,7 @@ the devisce at port and stored at port must be present (if not know = 0)
 - An operation that need tow cannot be done with deferred operation, it must be immediate. Otherwise implement an inspection
 
 
-<span style="font-size: 20px; font-weight: bold;">Operation TOW</span>
+## Operation TOW
 
 - Tow Operation must be inserted as:
     Technology prefix_action of tow in "id"
@@ -313,7 +313,7 @@ the devisce at port and stored at port must be present (if not know = 0)
     If additional operations is present that shutdown the entire string of the device a recommissioning period can be added. This must be int value and represent the hours of recommision to consider. In Additional Operations activity add recommissioning activity AFTER the TRANSIT to port as LOCATION == port
 
 
-<span style="font-size: 20px; font-weight: bold;">ACTIVITIES</span>
+## ACTIVITIES
 
 - More detailed are the activities and better it is, add more activities as refined as possible for long operations. One is a part of the O&M on which the work can be stopped and taken back in another day (when is decided by MAX HOUR BETWEEN ACTIVITY).
 
@@ -323,7 +323,7 @@ the devisce at port and stored at port must be present (if not know = 0)
 
 - If towing operation with redeply_removal_tow and the activity must define transit to one device and another in name must be contained "transit" and "next" i.e. ACT1 name: "Transit to next device"
 
-<span style="font-size: 20px; font-weight: bold;">KPIs OUTPUT Overview</span>
+## KPIs OUTPUT Overview
 
 - **TOTAL_COST_AVERAGED**:
     -   Direct cost comprehend all the farm cost except insurance cost

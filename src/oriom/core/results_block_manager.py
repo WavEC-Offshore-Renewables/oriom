@@ -84,6 +84,9 @@ def results_block(
         failure_dir = os.path.join(inputs.general.failureevent_file["value"], f"{'result_'}{r}", 'dates_failures.csv')
         dates_failures = pd.read_csv(failure_dir, sep=',')
         dates_failures = aux_functions.convert_stringtime(dates_failures)
+        dates_failures['preferred_month'] = pd.to_numeric(
+            dates_failures['preferred_month'], errors='coerce'
+        ).astype('Int64')
         logging.info('Uploading Failure file from previous run %d folder', r)
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 

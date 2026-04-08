@@ -175,7 +175,7 @@ class Matrix():
 
     Args:
         file_ (:obj:`str`): The path to the CSV file containing the power matrix data.
-        rated (:obj:`float`): The rated power value.
+        rated (:obj:`float`): The rated power value in kW.
     """
     def __init__(
 

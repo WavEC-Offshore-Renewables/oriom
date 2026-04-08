@@ -102,13 +102,19 @@ def inspect_site_manager(
         operation.assign_shift_attributes(op_working_shifts)
 
         # Update operation attributes.yaml file
-        yaml_manager.update_yaml_each_attribute(file_dir=op_dir, file_name='attributes.yaml', data=op_working_shifts)
+        yaml_manager.update_yaml_each_attribute(
+            file_dir=op_dir, 
+            file_name='attributes.yaml', 
+            data=op_working_shifts,
+            operation_id=operation.id
+        )
 
         yaml_manager.update_yaml(
                 file_dir=op_dir,
                 file_name='attributes.yaml',
                 data=data_working_shifts,
-                data_key='working_shifts'
+                data_key='working_shifts',
+                operation_id=operation.id
         )
 
         # Devices shutdown duration
