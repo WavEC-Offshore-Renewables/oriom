@@ -493,12 +493,14 @@ class TestInspectSiteManager(unittest.TestCase):
             file_dir=op_dir,
             file_name="attributes.yaml",
             data=op_working_shifts,
+            operation_id='ofw_insp_1'
         )
         m_update_yaml.assert_called_once_with(
             file_dir=op_dir,
             file_name="attributes.yaml",
             data=data_working_shifts,
             data_key="working_shifts",
+            operation_id='ofw_insp_1'
         )
 
         # 4) shutdown durations computed correctly

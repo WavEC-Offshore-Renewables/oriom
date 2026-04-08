@@ -716,15 +716,16 @@ class TestInspectMinorManager(unittest.TestCase):
         m_workability.assert_called_once_with(
             operation=op, df_metocean=self.df_metocean, out_dir=op_dir
         )
-
+        
         # YAML updates
         m_yaml_each.assert_called_once_with(
-            file_dir=op_dir, file_name="attributes.yaml", data=op_working_shifts
+            file_dir=op_dir, file_name="attributes.yaml", data=op_working_shifts, operation_id = 'ofw_min_002'
         )
         m_yaml_update.assert_called_once_with(
             file_dir=op_dir,
             file_name="attributes.yaml",
             data=data_working_shifts,
+            operation_id='ofw_min_002'
         )
 
         # define_shift_operation_values called with NaN shutdowns
