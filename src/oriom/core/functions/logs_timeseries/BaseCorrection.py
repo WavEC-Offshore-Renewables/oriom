@@ -150,10 +150,10 @@ class CorrectionTowPort(BaseCorrection):
     """
     CorrectionTowPort class for tow to port.
     """
-    def __init__(self, date_failure, vessel, oper, failure, time_fail_op_immediately=0, date_start = None):
+    def __init__(self, date_failure, vessel, oper, failure, maintenance_strategy = None, time_fail_op_immediately=0, date_start = None,):
         super().__init__(date_failure, vessel, oper, time_fail_op_immediately)
         self.tow_deferred = False
-        if failure.maintenance_strategy == "immediately" or date_start:
+        if maintenance_strategy == "immediately" or date_start:
             self.date_op = self.date_failure + timedelta(hours=time_fail_op_immediately)
             if date_start:
                 self.date_op = date_start

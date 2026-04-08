@@ -899,7 +899,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         # TowPort stub
         class StubTowPort:
-            def __init__(self, date_failure, vessel, oper, failure, time_fail_op_immediately, date_start):
+            def __init__(self, date_failure, vessel, oper, failure, maintenance_strategy, time_fail_op_immediately, date_start):
                 self.date_failure = date_failure
                 self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
                 self.idx_end_leadtime = None

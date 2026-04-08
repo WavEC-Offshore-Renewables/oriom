@@ -130,7 +130,7 @@ def create_operation_site(
 
     # Find the start of the vessel use
     op_port_start = failure_.get('tow_op_previous', None)
-    if failure_['failure'].maintenance_strategy == 'immediately' or op_port_start:
+    if row_['row']['maintenance_strategy'] == 'immediately' or op_port_start:
         immediate_correction = CorrectionImmediate(
             date_failure = failure_['date_failure'],
             vessel = vessel_['vessel'],
@@ -154,13 +154,12 @@ def create_operation_site(
         )
         date_op = immediate_correction.date_op
         idx_end_leadtime = immediate_correction.idx_end_leadtime
-
-    elif failure_['failure'].maintenance_strategy == 'specific month':
+    elif row_['row']['maintenance_strategy'] == 'specific month':
         deferred_correction = CorrectionDeferred(
             date_failure = failure_['date_failure'],
             vessel = vessel_['vessel'],
             oper = oper_['oper'],
-            preferred_month = failure_['failure'].preferred_month,
+            preferred_month = row_['row']['preferred_month'],
             tow_op = row_['tow_op_flag']
         )
 

@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from oriom.core.functions.logs_timeseries.failures import failures_event
+from oriom.core.functions.logs_timeseries.failures import failures_event, find_month_available
 from oriom.classes.Failure import Failure
 from oriom.classes.Scenario import Scenario
 
@@ -53,6 +53,7 @@ class DummyFailureSmall:
         maintenance_strategy="immediately",
         operation_triggered="op_dummy",
         preferred_month=None,
+        avoid_month_correction = []
     ):
         self.id = id_
         self.fail_rate = fail_rate
@@ -61,6 +62,7 @@ class DummyFailureSmall:
         self.maintenance_strategy = maintenance_strategy
         self.operation_triggered = operation_triggered
         self.preferred_month = preferred_month
+        self.avoid_month_correction = avoid_month_correction
 
 
 class TestFailuresEventUnit(unittest.TestCase):
@@ -365,6 +367,75 @@ class TestFailuresEventUnit(unittest.TestCase):
         years_bat = df_bat["datetime"].dt.year.value_counts(normalize=True).sort_index()
         years_norm = df_norm["datetime"].dt.year.value_counts(normalize=True).sort_index()
         self.assertFalse(years_bat.equals(years_norm))
+
+    def test_avoid_month_correction(self):
+        """
+        Create one failure in a forbidden month to operate.
+        """
+        scenarios = [DummyScenario([1,0,0,0,0,0,0,0,0,0,0,0])]
+        failures = [
+            DummyFailureSmall(
+                id_="compX",
+                fail_rate=1,
+                n_element=1,
+                bath_tub=False,
+                maintenance_strategy="immediately",
+                operation_triggered="op_compX",
+                avoid_month_correction=[1]
+            )
+        ]
+
+        kwargs = dict(
+            s=0,
+            scenarios=scenarios,
+            failures=failures,
+            N_LIFETIME=1,
+            START_YEAR=2020,
+            START_MONTH=1,
+            infant_mortality=0,
+            wear_out=0,
+            fail_ratio=1.0,
+            fixed_seed=True,
+        )
+
+        df1 = failures_event(**kwargs)
+
+        self.assertFalse(df1.empty)
+        self.assertEqual(df1['maintenance_strategy'].iloc[0], 'specific month')
+        self.assertEqual(df1['preferred_month'].iloc[0], 2)
+
+
+class TestFindMonthAvailable(unittest.TestCase):
+    """Targeted tests on finding month available"""
+
+    def test_find_month_available_one_month(self):
+        month = find_month_available(
+            month_check = 1, 
+            dict_failures_variables_id = [1]
+        )
+        self.assertEqual(month,2)
+
+    def test_find_month_available_more_months(self):
+        month = find_month_available(
+            month_check = 1, 
+            dict_failures_variables_id = [1,2]
+        )
+        self.assertEqual(month,3)
+
+    def test_find_month_available_more_months_december(self):
+        month = find_month_available(
+            month_check = 12, 
+            dict_failures_variables_id = [12,1]
+        )
+        self.assertEqual(month,2)
+
+    def test_find_month_available_all_month(self):
+        self.assertRaises(
+            ValueError,
+            find_month_available,
+            month_check=12,
+            dict_failures_variables_id=list(range(1, 13))
+        )
 
 
 if __name__ == '__main__':
