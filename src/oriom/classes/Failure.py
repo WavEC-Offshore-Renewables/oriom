@@ -35,6 +35,8 @@ class Failure():
             when this failure happens. Its value is ``None`` if not defined.
         preferred_month (:obj:`int`): In case the strategy is to schedule the
             operation in a specific month. Its value is ``None`` if not defined.
+        avoid_month_correction (:obj:`list`, *optional*): In case the strategy is
+                immediate but want to avoid some month to operate the Defaults to ``[]``.
         lead_time (:obj:`int`): Defines lead time in h. Its value
             is 0 if not defined.
         parts_cost (:obj:`float`, *optional*): Cost of replacement parts.
@@ -63,6 +65,7 @@ class Failure():
             operation_triggered: str=None,
             parts_cost: float=0,
             preferred_month: int=None,
+            avoid_month_correction: str=None,
             lead_time: int=None,
             bath_tub: bool=None,
             fail_variation: bool = None,
@@ -90,6 +93,8 @@ class Failure():
             preferred_month (:obj:`int`, *optional*): In case the strategy is
                 to schedule the operation in a specific month. Defaults to
                 ``None``.
+            avoid_month_correction (:obj:`str`, *optional*): In case the strategy is
+                immediate but want to avoid some month to operate the Defaults to ``None``.
             lead_time (:obj:`int`, *optional*): On the case of part replacement,
                 the lead time can be defined. Defaults to ``0``.
             bath_tub (:obj:`bool`, *optional*): True if the failure rate follows a
@@ -112,6 +117,7 @@ class Failure():
         self.potential_shutdown = bool(potential_shutdown)
         self.operation_triggered = None
         self.preferred_month = None
+        self.avoid_month_correction = []
         self.lead_time = 0
         self.parts_cost = 0
         self.bath_tub = False
@@ -122,6 +128,20 @@ class Failure():
             self.operation_triggered = str(operation_triggered).lower()
         if preferred_month is not None:
             self.preferred_month = int(preferred_month)
+        if avoid_month_correction:
+            try:
+                try: 
+                    self.avoid_month_correction = [
+                        m for m in dict.fromkeys(
+                            int(mnt) for mnt in avoid_month_correction.split(',')
+                        ) if 1 <= m <= 12
+                    ]
+                except AttributeError: self.avoid_month_correction = int(avoid_month_correction)
+            except ValueError:
+                _e = f'For Failure {self.id}, "avoid_month_correction" must be in the format '
+                _e += 'of "Month1, Month2, ..." (ex.: "06, 07, 08")'
+                logging.error('Failure: '+ _e)
+                raise ValueError(_e)
         if lead_time is not None:
             self.lead_time = int(lead_time)
         if bath_tub is not None:
@@ -203,8 +223,23 @@ class Failure():
         if (self.maintenance_strategy == 'immediately' and
             self.preferred_month is not None):
             _e = 'For an "Immediately" strategy, the argument '
-            _e += '"preferred_month" cannot be defined.'
-            logging.error('Failure:' + _e)
+            _e += 'Failure: "preferred_month" cannot be defined.'
+            logging.error(_e)
+            raise ValueError(_e)
+        if (self.maintenance_strategy != 'immediately' and
+            self.avoid_month_correction):
+            _e = 'For a strategy different from "Immediately", the argument '
+            _e += '"avoid_month_correction" cannot be defined.'
+            logging.error(_e)
+            raise ValueError(_e)
+        if self.avoid_month_correction:
+            if isinstance(self.avoid_month_correction, list) and len(self.avoid_month_correction) == 12:
+                _e = 'Failure: "avoid_month_correction" cannot contain all months of the year'
+                logging.error(_e)
+                raise ValueError(_e)
+        if isinstance(self.preferred_month, int) is True and not self.preferred_month in range(1,13):
+            _e = 'Failure: "preferred_month" must be between 1 and 12'
+            logging.error(_e)
             raise ValueError(_e)
         # TODO modify this with an automatic list taken by the layout used
         if any([
@@ -280,6 +315,7 @@ class Failure():
         no_mandatory_keys = [
                 'op_trigger',
                 'preferred_month',
+                'avoid_month_correction',
                 'lead_time',
                 'bath_tub',
                 'parts_cost',
@@ -318,6 +354,7 @@ class Failure():
                         operation_triggered = failure["op_trigger"],
                         parts_cost=failure["parts_cost"],
                         preferred_month = failure["preferred_month"],
+                        avoid_month_correction = failure["avoid_month_correction"],
                         lead_time = failure["lead_time"],
                         bath_tub = failure["bath_tub"],
                         fail_variation = failure["fail_variation"],

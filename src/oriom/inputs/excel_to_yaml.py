@@ -1499,6 +1499,7 @@ def excel_to_yaml(
                     "level_failure": row['level_failure'],
                     "op_trigger": row['op_trigger'],
                     "preferred_month": row['preferred_month'],
+                    "avoid_month_correction": row['avoid_month_correction'],
                     "lead_time": row['lead_time'],
                     "bath_tub": row['bath_tub'],
                     "fail_variation": row['fail_variation'],

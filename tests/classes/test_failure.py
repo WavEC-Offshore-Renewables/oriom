@@ -83,6 +83,19 @@ class TestaFailure(unittest.TestCase):
         args["lead_time"] = -1
         self.assertRaises(ValueError, Failure, **args)
 
+        args = deepcopy(args_default)
+        args["maintenance_strategy"] = 'specific month'
+        args["avoid_month_correction"] = '1,2'
+        self.assertRaises(ValueError, Failure, **args)
+
+        args = deepcopy(args_default)
+        args["avoid_month_correction"] = '1,2,3,4,5,6,7,8,9,10,11,12'
+        self.assertRaises(ValueError, Failure, **args)
+
+        args = deepcopy(args_default)
+        args["preferred_month"] = '13'
+        self.assertRaises(ValueError, Failure, **args)
+
 
 if __name__ == '__main__':
 
