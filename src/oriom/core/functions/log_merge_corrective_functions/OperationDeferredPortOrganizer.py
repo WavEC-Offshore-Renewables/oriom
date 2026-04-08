@@ -219,15 +219,16 @@ class OperationDeferredPortCreation():
             self.dev_idx_station_port = device_n
             row_dates_tow = row.to_frame().T
         else:
+            # If the space at port are full take the oldest date
             if self.dev_idx_station_port > self.n_device_at_port:
                 self.dev_idx_station_port = min(self.tow_at_site_date[vessel_used], key=lambda k: self.tow_at_site_date[vessel_used][k][0])
                 diff = 0
             # recreate row event
-                        # else take the end date of last redeploy_remove
             if date_start_op:
                 start_day_op = date_start_op
+            # else take the end date of last tow remove
             else:
-                start_day_op = self.oper_at_port_date[self.dev_idx_station_port-diff][1]
+                start_day_op = self.tow_at_port_date[vessel_used][self.dev_idx_station_port-diff][1]
 
             start_day_op_approx = approximate_hourly_data(start_day_op)
             
@@ -459,7 +460,7 @@ class OperationDeferredPortCreation():
         row: pd.Series,
         recommission: int
     ):
-        """ Add recommisioning row"""
+        """ Add recommissioning row"""
         row_dates_tow_recom['event'] = 'recommissioning'
         row_dates_tow_recom[["vessel_1", "n_vessel_1", "vessel_2", "n_vessel_2"]] = None                        
         modified_date = row_dates_tow_recom['d_end_dur_net_site'] + timedelta(hours=recommission)                  
@@ -495,8 +496,15 @@ class OperationDeferredPortCreation():
             pd.DataFrame: log_events_tow_deferred with mobilisation
         """
 
-        self.log_events_tow_def['year_month'] = self.log_events_tow_def['d_trigger'].dt.to_period('M')
-        total_failure_to_correct = {c.split('_')[-1]for c in self.log_events_tow_def['comments']}
+        # Extract failure type and number
+        suffix = self.log_events_tow_def['comments'].str.rsplit('_', n=1).str[-1]
+        # Evaluate year_month from the first operation of failure type
+        self.log_events_tow_def['year_month'] = (
+            self.log_events_tow_def
+            .groupby(suffix)['d_trigger']
+            .transform(lambda x: x.iloc[0].to_period('M'))
+        )
+        total_failure_to_correct = set(suffix.dropna())
 
         # For each period of deferred campaign
         for period, df_group in self.log_events_tow_def.groupby('year_month', sort=False):

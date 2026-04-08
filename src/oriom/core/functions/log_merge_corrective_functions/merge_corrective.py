@@ -49,7 +49,7 @@ def filter_tow_op(log_events: pd.DataFrame, comments_failure_id_tow: pd.Series, 
 def comment_filtering(log_event_op):
     """ Extrapolate comments for failures"""
     if not log_event_op.empty:
-        comments_failure_id = log_event_op['comments'].str.split('_', n=1, expand=True)[1].fillna('').str.split('.', n=1, expand=True)[0]
+        comments_failure_id = log_event_op['comments'].str.split('_', n=1, expand=True)[1].fillna('')
     else:
         comments_failure_id = pd.DataFrame()
 
@@ -210,6 +210,7 @@ def create_logs_merge(
 
     # Deferred operation merging, create a dict with 1st key vessel used and value deferred operation
     merged_deferred_aux.creation_oper_vessel_dict(
+        log_events = log_events,
         failures = failures,
         find_element_class = find_element_class,
         oper_per_vessel = oper_per_vessel,
@@ -221,26 +222,26 @@ def create_logs_merge(
     #------------------
     # TOW OPERATION DEFERRED
     #------------------
-    # Deferred tow NOTE do not merge deferred operations tow
     log_event_tow = log_event_to_merge.loc[log_event_to_merge['event'] == 'tow']
 
     if not log_event_tow.empty:
         comments_failure_id_tow = comment_filtering(log_event_tow)
         log_events_tow_def, deferred_comments_tow = filter_tow_op(
-            log_events = log_events, 
+            log_events = log_event_tow, 
             comments_failure_id_tow = comments_failure_id_tow, 
             list_fail = deferred_failures_correction_tow
         )
-        log_events_tow_imm, _ = filter_tow_op(
-            log_events = log_events, 
-            comments_failure_id_tow = comments_failure_id_tow, 
-            list_fail = failures_correction_tow
-        )
+        log_events_tow_imm = log_event_to_merge.loc[
+            log_events['comments'].str.split('_', n=1, expand=True)[1].fillna('').isin(failures_correction_tow)
+        ]
 
         # DEFERRED TOW
         #------------------
         if not log_events_tow_def.empty:
-            for failure_id in deferred_comments_tow:
+            # Create unique set of deferred tow failure
+            unique_failures = {f.split('.')[0] for f in deferred_comments_tow}
+            # fill oper_port tow data attributes
+            for failure_id in unique_failures:
                 failure = find_element_class.find_failure_from_id(failure_id)
                 oper_port = find_element_class.find_operation(failure.operation_triggered)
                 oper_port.tow_data = TowData.from_operation(find_element_class, oper_port)
@@ -248,7 +249,11 @@ def create_logs_merge(
 
             oper_ids_tow = set(oper_dict_tow.keys())
 
-            log_events_tow_def = log_events.loc[log_events['id'].isin(oper_ids_tow)]
+            # Take all events that regard a tow deferred (TOW, OP & RECOMMISSIONING events)
+            log_events_tow_def = log_events.loc[
+                (log_events['id'].isin(oper_ids_tow)) &
+                (log_events['comments'].str.split('_', n=1, expand=True)[1].fillna('').isin(deferred_comments_tow))
+            ]
             index_overwrite_log_ev = log_events_tow_def.index.tolist()
             log_events_tow_def = merged_deferred_aux.manage_recommissioning(log_events_tow_def)
 
@@ -274,8 +279,8 @@ def create_logs_merge(
         # IMMEDIATE TOW
         #------------------
         if not log_events_tow_imm.empty:
-            # Simply copy the row
-            log_events_merged = pd.concat([log_events_merged, log_events_tow_imm],ignore_index=False)
+            # Simply copy all events that regard a tow immediate (TOW, OP & RECOMMISSIONING events)
+            log_events_merged = pd.concat([log_events_merged, log_events_tow_imm], ignore_index=False)
 
     #------------------
     # DEFERRED OPERATION
@@ -305,12 +310,10 @@ def create_logs_merge(
     #------------------
     # IMMEDIATE OPERATION
     #------------------
-    # Filter only operation & Filter avoiding deferred failures
+    # From only that do not comply a tow filter avoiding deferred failures
     mask = (
         (log_event_to_merge['event'].isin(['operation'])) &
-        (~comments_failure_id.isin(deferred_failures_correction)) &
-        (~comments_failure_id.isin(deferred_failures_correction_tow)) &
-        (~comments_failure_id.isin(failures_correction_tow))
+        (~comments_failure_id.isin(deferred_failures_correction))
     )
     log_events_oper_imm = log_event_to_merge[mask]
 

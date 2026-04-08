@@ -295,21 +295,19 @@ class TestCreationOperVesselDict(unittest.TestCase):
         # Define operations
         opA = DummyOperation(oid="opA", vessel1_id="V1", tow_to_port=False)   # normal op
         opTow = DummyOperation(oid="opTow", vessel1_id="V2", tow_to_port=True)  # tow due to tow_to_port
-        opTowName = DummyOperation(oid="tow_special", vessel1_id="V3", tow_to_port=False)  # tow because name contains 'tow'
 
         operations_by_id = {
             "opA": opA,
-            "opTow": opTow,
-            "tow_special": opTowName,
+            "opTow": opTow
         }
         finder = DummyFinder(operations_by_id=operations_by_id)
 
         # Define failures
-        f1 = DummyFailure(fid="fail1", maintenance_strategy="specific month", operation_triggered="opA")
-        f2 = DummyFailure(fid="fail2", maintenance_strategy="specific month", operation_triggered="opTow")
-        f3 = DummyFailure(fid="fail3", maintenance_strategy="other", operation_triggered="opA")  # ignored
-        f4 = DummyFailure(fid="fail4", maintenance_strategy="specific month", operation_triggered="tow_special")
-        f5 = DummyFailure(fid="fail5", maintenance_strategy="immediate", operation_triggered="opTow")
+        f1 = DummyFailure(fid="ofw_fail_1", maintenance_strategy="specific month", operation_triggered="opA")
+        f2 = DummyFailure(fid="ofw_fail_2", maintenance_strategy="specific month", operation_triggered="opTow")
+        f3 = DummyFailure(fid="ofw_fail_3", maintenance_strategy="other", operation_triggered="opA")  # ignored
+        f4 = DummyFailure(fid="ofw_fail_4", maintenance_strategy="specific month", operation_triggered="opA")
+        f5 = DummyFailure(fid="ofw_fail_5", maintenance_strategy="immediate", operation_triggered="opTow")
 
         failures = [f1, f2, f3, f4, f5]
 
@@ -318,7 +316,33 @@ class TestCreationOperVesselDict(unittest.TestCase):
         deferred_failures_correction_tow = []
         failures_correction_tow = []
 
+        none_row = [None]*7
+
+        self.log_events = pd.DataFrame({
+            'd_trigger': pd.to_datetime(['2025-01-10']*7),
+            'd_end': pd.to_datetime(['2025-01-10']*7),
+            'comments': ['specific month', 'specific month', 'other', 'specific month', 'specific month', 'immediately', 'immediately'],
+            'event': ['failure']*7,
+            'id': ['ofw_fail_1.1', 'ofw_fail_2.1','ofw_fail_3.1','ofw_fail_4.1','ofw_fail_5.1','ofw_fail_1.2', 'ofw_fail_5.2'],
+            'vessel_1': ['V1']*7,
+            'n_vessel_1': [1]*7,
+            'vessel_2': none_row,
+            'n_vessel_2': none_row,
+            'd_end_leadtime': none_row,
+            'd_end_wait_start': none_row,
+            'd_end_dur_net_port': none_row,
+            'd_end_transit_ts': none_row,
+            'd_end_wait_site': none_row,
+            'd_end_dur_net_site': none_row,
+            'd_end_transit_tp': none_row,
+            'd_end_stat_chart': none_row,
+            'shutdown': [False]*7,
+            'ST_contract_1': [False]*7,
+            'ST_contract_2': [False]*7
+        })
+
         merged_deferred_aux.creation_oper_vessel_dict(
+            log_events=self.log_events,
             failures=failures,
             find_element_class=finder,
             oper_per_vessel=oper_per_vessel,
@@ -328,17 +352,18 @@ class TestCreationOperVesselDict(unittest.TestCase):
         )
 
         # Check failures list
+
         self.assertCountEqual(
             deferred_failures_correction,
-            ["fail1", "fail4"],
+            ['ofw_fail_1.1',  'ofw_fail_4.1',],
         )
         self.assertCountEqual(
             deferred_failures_correction_tow,
-            ["fail2"],
+            ['ofw_fail_2.1', 'ofw_fail_5.1'],
         )
         self.assertCountEqual(
             failures_correction_tow,
-            ["fail5"],
+            ['ofw_fail_5.2'],
         )
 
         # Check oper_per_vessel structure

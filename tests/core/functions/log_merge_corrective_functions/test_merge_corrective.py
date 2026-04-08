@@ -18,9 +18,9 @@ class TestCreateLogsMerge(unittest.TestCase):
         self.log_events = pd.DataFrame({
             'd_trigger': pd.to_datetime(['2025-01-10', '2025-01-11']),
             'd_end': pd.to_datetime(['2025-01-10', '2025-01-12']),
-            'comments': ['fail_1.x', 'fail_2.x'],
+            'comments': ['immediately', 'oper_ofw_fail_3.1'],
             'event': ['failure', 'operation'],
-            'id': [1, 2],
+            'id': ['ofw_fail_3.1', 'oper_001'],
             'vessel_1': ['V1', 'V1'],
             'n_vessel_1': [1, 1],
             'vessel_2': [None, None],
@@ -124,7 +124,7 @@ class TestCreateLogsMerge(unittest.TestCase):
         """
         Ensure the output is sorted by d_trigger.
         """
-
+ 
         df_out, index, df_tow_merge = merge_corrective.create_logs_merge(
             log_events_original=self.log_events.sample(frac=1),  # shuffle rows
             failures=self.failures,

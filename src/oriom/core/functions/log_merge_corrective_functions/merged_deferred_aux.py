@@ -217,33 +217,72 @@ def find_start_time(
 
 
 def creation_oper_vessel_dict(
-        failures: list,
-        find_element_class: object,
-        oper_per_vessel: dict,
-        deferred_failures_correction: list,
-        deferred_failures_correction_tow: list,
-        failures_correction_tow: list
+    log_events,
+    failures,
+    find_element_class,
+    oper_per_vessel,
+    deferred_failures_correction,
+    deferred_failures_correction_tow,
+    failures_correction_tow,
 ):
-    """ Create list of failures and dict vess: deferred_op"""
+    """Create dict vessel -> operations and classify failures."""
+
+    # -------------------------------
+    # 1) Build towing_op dictionary
+    # -------------------------------
+    towing_op = {}
+
     for failure in failures:
         oper = find_element_class.find_operation(failure.operation_triggered)
-        tow_op = getattr(oper, 'tow_to_port', False)
-        if not tow_op:
-            if failure.maintenance_strategy == 'specific month':
-                    deferred_failures_correction.append(failure.id)
-                    # Avoid to take for towing operation as there are no failure connected
-                    if not getattr(oper, 'tow_operation',False):
-                        # If site operation take the vessel
-                        if oper.vessel1_id in oper_per_vessel:
-                            oper_per_vessel[oper.vessel1_id].append(oper.id)
-                        else:
-                            oper_per_vessel[oper.vessel1_id] = [oper.id]
-        else:
-            if failure.maintenance_strategy == 'specific month':
-                deferred_failures_correction_tow.append(failure.id)
-            else:
-                failures_correction_tow.append(failure.id)
 
+        # Check if towing
+        tow_op = getattr(oper, "tow_to_port", False)
+
+        # Save by base id (before '.')
+        base_id = failure.id.split(".")[0]
+        towing_op[base_id] = tow_op
+
+        # Populate oper_per_vessel (no tow_operation)
+        if not tow_op:
+            if oper.vessel1_id in oper_per_vessel:
+                if oper.id not in oper_per_vessel[oper.vessel1_id]:
+                    oper_per_vessel[oper.vessel1_id].append(oper.id)
+            else:
+                oper_per_vessel[oper.vessel1_id] = [oper.id]
+
+    # -------------------------------
+    # 2) Filter failures from dataframe
+    # -------------------------------
+    df_fail = log_events[log_events["event"] == "failure"].copy()
+
+    if df_fail.empty:
+        return
+
+    # -------------------------------
+    # 3) Vectorized classification
+    # -------------------------------
+    df_fail["base_id"] = df_fail["id"].str.split(".").str[0]
+
+    df_fail["is_tow"] = df_fail["base_id"].map(towing_op).fillna(False)
+
+    # Conditions
+    mask_tow = df_fail["is_tow"]
+    mask_specific_month = df_fail["comments"] == "specific month"
+
+    # -------------------------------
+    # 4) Fill output lists
+    # -------------------------------
+    deferred_failures_correction_tow.extend(
+        df_fail.loc[mask_tow & mask_specific_month, "id"].tolist()
+    )
+
+    failures_correction_tow.extend(
+        df_fail.loc[mask_tow & ~mask_specific_month, "id"].tolist()
+    )
+
+    deferred_failures_correction.extend(
+        df_fail.loc[~mask_tow & mask_specific_month, "id"].tolist()
+    )
 
 if __name__ == '__main__':
     pass
