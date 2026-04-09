@@ -25,8 +25,8 @@ class Vessel():
             Defaults to ``0``
         mobilisation_time (:obj:`int`): Vessel mobilisation time, in h.
             Defaults to ``0``.
-        n_vessels (:obj:`int`): Number of similar vessels.
-            Defaults to ``1``.
+        n_vessels (:obj:`int`): Number of similar vessels considered available for 
+            deferred campaign and for InspectionPort. Defaults to ``1``.
         crew_berths (:obj:`int`): Maximum number of crew members overnight.
             Defaults to ``0``.
         fuel_type (:obj:`str`): Vessel fuel type. Defaults to ``None``.

@@ -44,11 +44,11 @@ class InspectionSite():
         level (:obj:`str`): Level for the electrical layout (device, array_cable, string_cable,
             exp_cable or dyn_cable-sub).
         vessel1_id (:obj:`str`): The ID of the main vessel.
-        vessel1_qt (:obj:`int`): Number of main vessel.
+        vessel1_qt (:obj:`int`): Number of main vessels available along the inspection.
             Its value is ``1`` if not defined.
         vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
-        vessel2_qt (:obj:`int`): Number of secondary vessel.
+        vessel2_qt (:obj:`int`): Number of secondary vessels available along the inspection .
             Its value is ``None`` if not defined.
         intervened_wtg (:obj:`int`): Number of WTG that are intervened in case
             this inspection occurs. Its value is ``None`` if not defided.
@@ -178,11 +178,11 @@ class InspectionSite():
             current_speed (:obj:`float`, *optional*): Limit current speed. Defaults to ``None``.
             light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
             vessel1_id (:obj:`str`): The ID of the main vessel.
-            vessel1_qt (:obj:`int`): Number of main vessel.
+            vessel1_qt (:obj:`int`): Number of main vessels available for the inspection.
                 Defaults to ``1``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
-            vessel2_qt (:obj:`int`): Number of second vessel.
+            vessel2_qt (:obj:`int`): Number of second vessels available for the inspection.
                 Defaults to ``1`` if vesse_id not ´´None´´.
             rov_drone (:obj:`str`, *optional*): The ID of the ROV/Drone.
                 Defaults to ``None``.

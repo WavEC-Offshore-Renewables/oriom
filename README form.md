@@ -7,7 +7,7 @@
 
 To use ORIOM as Installation mode
 -   Generate a pre existing failure file that corrispond to the component to install.
--   Create deferred operation to fix them.
+-   Create deferred operation (installation procedure) to fix them.
 
 The failures that occurs annually will be the amounts of component to install each year and they will undergoes to an installation plan considered from the start of the deffered maintenance
 
@@ -94,7 +94,7 @@ The failures that occurs annually will be the amounts of component to install ea
 - **Charter**: put values equal to zero only if you only have long term vessel. No short term vessel will be rented, ideal for inspections or deferred maintenace that do use a vessel only if previous shift is completed. Usually consider both (long_term and short term) so fill both short and long term charts.
 Example of not consider short_term: particular vessel charted that should not be used with more than n_vessel long term chart in the same time
 
-- **n_vessel**: This value will indicate the maximum number of vessel that will be considered in deferred operations
+- **n_vessel**: This value will indicate the maximum number of vessel that will be considered in deferred operations and in inspection at port
 
 - **Fuel_cons**: Do never put the consumptions equal to zero if you do not want to evaluate the fuel consumptions apart.
 

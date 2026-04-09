@@ -26,11 +26,11 @@ class OperationTow():
         tech_cost (:obj:`float`): The daily cost of each technician [€/day].
             Its value is ``0`` if not defined.
         vessel1_id (:obj:`str`): The ID of the main vessel.
-        vessel1_qt (:obj:`int`): Number of main vessel. Its value is
+        vessel1_qt (:obj:`int`): Number of main vessels required. Its value is
             ``1`` if not defined.
         vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
-        vessel2_qt (:obj:`int`): Number of secondary vessel. Its value is
+        vessel2_qt (:obj:`int`): Number of secondary vessels required. Its value is
             ``1`` if not defined.
         other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
@@ -89,9 +89,9 @@ class OperationTow():
                 after towing operation. Default to ``0``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
-            vessel1_qt (:obj:`int`): Number of main vessel.
+            vessel1_qt (:obj:`int`): Number of main vessels required.
                 Defaults to ``1``.
-            vessel2_qt (:obj:`int`): Number of second vessel.
+            vessel2_qt (:obj:`int`): Number of second vessels required.
                 Defaults to ``1`` if vesse_id not ´´None´´.
             other_costs (:obj:`float`, *optional*): Other costs (port, cranes,
                 insurance, etc.). Defaults to :obj:`0.0`.
