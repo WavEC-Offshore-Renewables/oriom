@@ -68,7 +68,8 @@ def create_logs_preventive(
                     vessel = insp.vessel1,
                     oper_list = [insp.insp_class.id],
                     count_fail = insp.id,
-                    concat = False
+                    concat = False,
+                    n_vessel=insp.insp_class.vessel1_qt
                 )
                 rows_to_add.append(row_mob_prev)
 
@@ -103,7 +104,8 @@ def create_logs_preventive(
                     vessel = insp.vessel1,
                     oper_list = [insp.insp_class.id],
                     count_fail = insp.id,
-                    concat = False
+                    concat = False,
+                    n_vessel=row['n_vessel_1']
                 )
                 rows_to_add.append(row_mob_prev)
 

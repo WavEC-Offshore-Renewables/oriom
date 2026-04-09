@@ -41,7 +41,7 @@ class CorrectiveMinor():
         vessel2_id (:obj:`str`): The ID of the auxiliary vessel.
             Its value is ``None`` if not defided.
         vessel2_qt (:obj:`int`): Number of secondary vessel.
-            Its value is ``1`` if not defined.
+            Its value is ``None`` if not defined.
         other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
         vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel

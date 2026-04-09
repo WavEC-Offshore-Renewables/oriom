@@ -3,6 +3,7 @@
   tech_required: 1
   tech_cost: 200
   vessel1_id: V006
+  vessel1_qt: 1
 
 - id: owc_redeploy_removal_tow
   name: WEC re-deploy and removal

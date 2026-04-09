@@ -19,7 +19,6 @@ class DummyStats:
         self.start_month = {"value": start_month}
         self.lifetime = {"value": lifetime}
 
-
 class DummyInputs:
     """Minimal Inputs object exposing a .stats attribute."""
 
@@ -41,6 +40,7 @@ class DummyInspClass:
     def __init__(self, iid: str, vessel1: DummyVessel):
         self.id = iid
         self.vessel1 = vessel1
+        self.vessel1_qt = {"value": 1}
 
 
 class DummyInspection:
@@ -66,7 +66,7 @@ class TestCreateLogsPreventive(unittest.TestCase):
 
     def setUp(self):
         # Minimal set of columns required to run the function
-        self.COLS = ["d_trigger", "d_end", "event", "id", "vessel_1"]
+        self.COLS = ["d_trigger", "d_end", "event", "id", "vessel_1", "n_vessel_1"]
         stats = DummyStats(start_year=2020, start_month=1, lifetime=1)
         self.inputs = DummyInputs(stats=stats)
 
@@ -111,14 +111,14 @@ class TestCreateLogsPreventive(unittest.TestCase):
         # Simulate define_dates_inspection returning one inspection row
         d_trigger = datetime(2020, 1, 10, 8, 0, 0)
         df_site = pd.DataFrame(
-            [[d_trigger, d_trigger + timedelta(hours=1), "inspection_site", "S1", vessel.id]],
+            [[d_trigger, d_trigger + timedelta(hours=1), "inspection_site", "S1", vessel.id, 1]],
             columns=self.COLS,
         )
         mock_define_dates.return_value = df_site
 
         # Simulate create_mobilisation returning a single mobilisation row
         mob_row = pd.DataFrame(
-            [[d_trigger, d_trigger + timedelta(days=1), "mobilisation", "mob_S1", vessel.id]],
+            [[d_trigger, d_trigger + timedelta(days=1), "mobilisation", "mob_S1", vessel.id, 1]],
             columns=self.COLS,
         )
         mock_create_mob.return_value = mob_row
@@ -167,7 +167,7 @@ class TestCreateLogsPreventive(unittest.TestCase):
 
         d_trigger = datetime(2020, 1, 15, 9, 0, 0)
         df_site = pd.DataFrame(
-            [[d_trigger, d_trigger + timedelta(hours=2), "inspection_site", "S2", vessel.id]],
+            [[d_trigger, d_trigger + timedelta(hours=2), "inspection_site", "S2", vessel.id, 1]],
             columns=self.COLS,
         )
         mock_define_dates.return_value = df_site
@@ -214,13 +214,13 @@ class TestCreateLogsPreventive(unittest.TestCase):
         d_trigger = datetime(2020, 2, 5, 7, 0, 0)
         # define_dates does not need to set vessel_1 correctly, function will override it.
         df_port = pd.DataFrame(
-            [[d_trigger, d_trigger + timedelta(hours=3), "inspection_port", "P1", "WRONG"]],
+            [[d_trigger, d_trigger + timedelta(hours=3), "inspection_port", "P1", "WRONG", 1]],
             columns=self.COLS,
         )
         mock_define_dates.return_value = df_port
 
         mob_row = pd.DataFrame(
-            [[d_trigger, d_trigger + timedelta(days=1), "mobilisation", "mob_P1", vessel.id]],
+            [[d_trigger, d_trigger + timedelta(days=1), "mobilisation", "mob_P1", vessel.id, 1]],
             columns=self.COLS,
         )
         mock_create_mob.return_value = mob_row
@@ -273,7 +273,7 @@ class TestCreateLogsPreventive(unittest.TestCase):
 
         d_trigger = datetime(2020, 3, 1, 10, 0, 0)
         df_port = pd.DataFrame(
-            [[d_trigger, d_trigger + timedelta(hours=1), "inspection_port", "P2", "WRONG"]],
+            [[d_trigger, d_trigger + timedelta(hours=1), "inspection_port", "P2", "WRONG", 1]],
             columns=self.COLS,
         )
         mock_define_dates.return_value = df_port

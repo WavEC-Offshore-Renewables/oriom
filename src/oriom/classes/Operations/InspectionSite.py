@@ -44,8 +44,12 @@ class InspectionSite():
         level (:obj:`str`): Level for the electrical layout (device, array_cable, string_cable,
             exp_cable or dyn_cable-sub).
         vessel1_id (:obj:`str`): The ID of the main vessel.
+        vessel1_qt (:obj:`int`): Number of main vessel.
+            Its value is ``1`` if not defined.
         vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
+        vessel2_qt (:obj:`int`): Number of secondary vessel.
+            Its value is ``None`` if not defined.
         intervened_wtg (:obj:`int`): Number of WTG that are intervened in case
             this inspection occurs. Its value is ``None`` if not defided.
         intervened_wec (:obj:`int`): Number of WEC that are intervened in case
@@ -113,6 +117,7 @@ class InspectionSite():
             device_shutdown: bool,
             level: str,
             vessel1_id: str,
+            vessel1_qt: int=1,
             tech_cost: float=0,
             months: str=None,
             day_start: int=None,
@@ -126,6 +131,7 @@ class InspectionSite():
             current_speed: float=None,
             light: bool=False,
             vessel2_id: str=None,
+            vessel2_qt: int=None,
             rov_drone: str=None,
             parts_cost: float=0,
             other_costs: float=0,
@@ -172,8 +178,12 @@ class InspectionSite():
             current_speed (:obj:`float`, *optional*): Limit current speed. Defaults to ``None``.
             light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
             vessel1_id (:obj:`str`): The ID of the main vessel.
+            vessel1_qt (:obj:`int`): Number of main vessel.
+                Defaults to ``1``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
+            vessel2_qt (:obj:`int`): Number of second vessel.
+                Defaults to ``1`` if vesse_id not ´´None´´.
             rov_drone (:obj:`str`, *optional*): The ID of the ROV/Drone.
                 Defaults to ``None``.
             parts_cost (:obj:`float`, *optional*): Cost of replacement parts.
@@ -214,8 +224,10 @@ class InspectionSite():
         self.months = list(range(1, 13))
         self.day_start = 1
         self.vessel1_id = str(vessel1_id).lower()
+        self.vessel1_qt = 1
         self.tech_cost = 0
         self.vessel2_id = None
+        self.vessel2_qt = None
         self.rov_drone = None
         self.intervened_wtg = 0
         self.intervened_wec = 0
@@ -302,17 +314,20 @@ class InspectionSite():
                     raise ValueError(_e)
         else:
             self.light = False
-
+        if vessel1_qt is not None:
+            self.vessel1_qt = int(vessel1_qt)
         if vessel2_id is not None:
             self.vessel2_id = str(vessel2_id).lower()
+            if vessel2_qt is not None:
+                self.vessel2_qt = int(vessel2_qt)
+            else:
+                self.vessel2_qt = int(1)
         if rov_drone is not None:
             self.rov_drone = str(rov_drone).lower()
-
         if parts_cost is not None:
             self.parts_cost = float(parts_cost)
         if other_costs is not None:
             self.other_costs = float(other_costs)
-
         if to_group_with is not None:
             if isinstance(to_group_with,str):
                 self.to_group_with = str(to_group_with).lower()
@@ -418,6 +433,12 @@ class InspectionSite():
             raise ValueError('"parts_cost" must not be negative')
         if self.other_costs is not None and self.other_costs < 0:
             raise ValueError('"other_costs" must not be negative')
+        if self.vessel1_qt < 1:
+            raise ValueError('"vessel1_qt" must be positive')
+        if self.vessel2_id is not None:
+            if self.vessel2_qt < 1:
+                raise ValueError('"vessel2_qt" must be positive if a "vessel2_id" is defined')
+
 
         logging.debug('InspectionSite: inspection %s attributes within ranges and valid.' % self.id)
 
@@ -454,7 +475,8 @@ class InspectionSite():
                 'tech_per_device',
                 'dur_per_device',
                 'device_shutdown',
-                'level'
+                'level',
+                'vessel1_id',
         ]
         no_mandatory_keys = [
                 'months',
@@ -469,8 +491,9 @@ class InspectionSite():
                 'wind_speed_hub',
                 'current_speed',
                 'light',
-                'vessel1_id',
+                'vessel1_qt',
                 'vessel2_id',
+                'vessel2_qt',
                 'rov_drone',
                 'parts_cost',
                 'other_costs',
@@ -492,7 +515,7 @@ class InspectionSite():
                     for key in keys_mandatory
             ]) is True:
                 _e = '"id", "name", "overnight_stay", "periodicity", '
-                _e += '"tech_per_device",'
+                _e += '"tech_per_device", "vessel1_id"'
                 _e += '"dur_per_device", "device_shutdown" and "level" '
                 _e += 'are mandatory keys.'
                 logging.error('InspectionSite: ' + _e)
@@ -527,7 +550,9 @@ class InspectionSite():
                     current_speed=operation["current_speed"],
                     light=operation["light"],
                     vessel1_id=operation["vessel1_id"],
+                    vessel1_qt=operation["vessel1_qt"],
                     vessel2_id=operation["vessel2_id"],
+                    vessel2_qt=operation["vessel2_qt"],
                     rov_drone=operation["rov_drone"],
                     parts_cost=operation["parts_cost"],
                     other_costs=operation["other_costs"],
@@ -595,13 +620,13 @@ class InspectionSite():
         if self.vessel1 is not None:
             vessel1 = {
                     "id": self.vessel1.id,
-                    "number": self.vessel1.n_vessels
+                    "number": self.vessel1_qt
             }
         vessel2 = self.vessel2_id
         if self.vessel2 is not None:
             vessel2 = {
                     "id": self.vessel2.id,
-                    "number": self.vessel2.n_vessels
+                    "number": self.vessel2_qt
             }
         rov_drone = self.rov_drone
         if self.rov_drone is not None:

@@ -219,7 +219,8 @@ class VesselDayCounter():
                                         vessel = vessel,
                                         oper_list = [oper.id],
                                         count_fail = row['id'],
-                                        concat=False
+                                        concat=False,
+                                        n_vessel = oper.vessel1_qt
                                     ) """
                     break
         if self.usage_records:

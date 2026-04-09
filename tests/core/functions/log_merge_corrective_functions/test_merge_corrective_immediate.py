@@ -51,13 +51,19 @@ class DummyOperSchedule:
         self.dur_total = dur_total
         self.last_valid_index = last_valid_index
 
+class DummyOP:
+    """Fake OP with only what we need."""
+
+    def __init__(self, vessel1_qt):
+        self.vessel1_qt = vessel1_qt
 
 class DummyFinder:
     """Fake Find_element_class with only what we need."""
 
-    def __init__(self, vessel, oper_schedule):
+    def __init__(self, vessel, oper_schedule, op):
         self._vessel = vessel
         self._oper_schedule = oper_schedule
+        self._op = op
 
     def find_vessel(self, vessel_id):
         # Always return the test vessel
@@ -66,6 +72,10 @@ class DummyFinder:
     def find_oper_schedule(self, op_id):
         # Always return the same schedule for simplicity
         return self._oper_schedule
+
+    def find_operation(self, op_id):
+        return self._op
+
 
 
 class TestMergeOperationSingleOp(unittest.TestCase):
@@ -261,7 +271,8 @@ class TestMergeOperationMultipleOps(unittest.TestCase):
         )
 
         vessel = DummyVessel(vid="CTV1", crew_capacity=10, mobilisation_time=0.0)
-        finder = DummyFinder(vessel=vessel, oper_schedule=dummy_schedule)
+        op = DummyOP(1)
+        finder = DummyFinder(vessel=vessel, oper_schedule=dummy_schedule, op = op)
 
         # time_between_devices: use 1h per tech
         time_between_devices = {"opv": 1.0, "ofw": 1.0, "owc": 1.0}

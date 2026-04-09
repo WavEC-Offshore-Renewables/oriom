@@ -77,6 +77,7 @@ class TestCreateMobilisation(unittest.TestCase):
             oper_list=oper_list,
             count_fail="F001",
             concat=True,
+            n_vessel=2
         )
 
         self.assertEqual(len(out), 1)

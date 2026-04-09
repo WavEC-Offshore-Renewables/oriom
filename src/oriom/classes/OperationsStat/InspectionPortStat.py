@@ -258,7 +258,8 @@ class InspectionPortStat():
         transit_time_month = {}
         standby_time_month = {}
         shutdown_month = {}
-        n_vessels = op_tow_port.vessel1.n_vessels
+        # Use the greater value between required vessels and available vessels
+        n_vessels = max(op_tow_port.op_class.vessel1_qt,op_tow_port.vessel1.n_vessels)
         op_path = os.path.join(run_dir, inspection.id, 'statistical_analysis_P' + str(PERCENTILE) + '.csv')
         df_stat = pd.read_csv(op_path)
         dur_total = df_stat[

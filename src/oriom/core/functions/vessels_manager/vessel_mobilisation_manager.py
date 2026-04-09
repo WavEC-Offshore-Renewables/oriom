@@ -57,7 +57,8 @@ def create_yearly_mobilisation_mother_vessel(
                             vessel = mother_vessel,
                             oper_list = first_year_date_row['id'],
                             count_fail = count_failure,
-                            concat = True
+                            concat = True,
+                            n_vess = first_year_date_row['n_vessel_2']
                         )
 
 
