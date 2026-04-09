@@ -43,7 +43,9 @@ class TestCreateYearlyMobilisationMotherVessel(unittest.TestCase):
             {
                 "id": ["OP_001"],
                 "vessel_1": ["SOV1"],
+                "n_vessel_1": [1],
                 "vessel_2": [None],
+                "n_vessel_2": [1],
                 "d_trigger": [datetime(2025, 3, 15, 10, 0, 0)],
                 "comments": ["failure_fail_001"],
                 "event": ["inspection_site"],

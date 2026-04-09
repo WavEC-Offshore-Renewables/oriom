@@ -85,14 +85,14 @@ class TestMainEndToEnd(unittest.TestCase):
         excel_dir = repo_root / "tests" / "test_files" / "test_end_to_end"
 
         if check_files_spec:
-            print('\n')
+            print('\n\n***')
             print('private repo detected based on check_files module presence. Using private repo inputs and expected outputs.')
-            print('\n')
+            print('***\n')
             expected_result0_dir = excel_dir / "repo_private" / "result_0"
         else:
-            print('\n')
+            print('\n\n***')
             print('private repo not detected. Using public repo inputs and expected outputs.')
-            print('\n')
+            print('***\n')
             expected_result0_dir = excel_dir / "repo_public" / "result_0"
 
         # This is the value you want to inject into inputs.general.failureevent_file["value"]

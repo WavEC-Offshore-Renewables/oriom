@@ -110,11 +110,11 @@ def inspect_site_manager(
         )
 
         yaml_manager.update_yaml(
-                file_dir=op_dir,
-                file_name='attributes.yaml',
-                data=data_working_shifts,
-                data_key='working_shifts',
-                operation_id=operation.id
+            file_dir=op_dir,
+            file_name='attributes.yaml',
+            data=data_working_shifts,
+            data_key='working_shifts',
+            operation_id=operation.id
         )
 
         # Devices shutdown duration

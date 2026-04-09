@@ -261,6 +261,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
         oper_list,
         count_fail,
         concat,
+        n_vessel
     ):
         """
         Create a minimal mobilisation row compatible with the class output schema.
@@ -567,6 +568,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
             row=row,
             time_fail_op_immediately=2.0,
             vessel=self.vessel,
+            n_vess=1
         )
 
         self.assertFalse(result.empty)

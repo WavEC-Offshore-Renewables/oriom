@@ -36,6 +36,7 @@ class TestWorkingShifts(unittest.TestCase):
                 device_shutdown=False,
                 level='device',
                 vessel1_id='V005',
+                vessel1_qt=5,
                 intervened_wtg=20,
                 rov_drone=None
         )
@@ -59,6 +60,7 @@ class TestWorkingShifts(unittest.TestCase):
                 device_shutdown=False,
                 level='device',
                 vessel1_id='V005',
+                vessel1_qt=5,
                 intervened_wec=66,
                 rov_drone=None,
                 to_group_with=operation_1
@@ -82,6 +84,7 @@ class TestWorkingShifts(unittest.TestCase):
                 device_shutdown=False,
                 level='device',
                 vessel1_id='V005',
+                vessel1_qt=5,
                 intervened_wtg=20,
                 rov_drone=None
         )
@@ -104,6 +107,7 @@ class TestWorkingShifts(unittest.TestCase):
                 device_shutdown=False,
                 level='device',
                 vessel1_id='V005',
+                vessel1_qt=5,
                 intervened_wtg=20,
                 rov_drone='rov_1'
         )

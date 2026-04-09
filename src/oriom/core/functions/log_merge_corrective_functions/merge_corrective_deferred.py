@@ -143,7 +143,8 @@ def merge_deferred_operations(
                                 event = 'mobilisation_merged',
                                 vessel = vessel,
                                 oper_list = [oper.id],
-                                count_fail = count_fail
+                                count_fail = count_fail,
+                                n_vessel = oper.vessel1_qt if oper.vessel1_qt < n_oper else n_oper
                             )
 
                     # If is not first operation to be conducted consider the end of previous operation, delay of wait to start and wait to site

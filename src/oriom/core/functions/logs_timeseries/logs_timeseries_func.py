@@ -14,7 +14,8 @@ def create_mobilisation(
         vessel: object,
         oper_list: list,
         count_fail: str = None,
-        concat: bool = True
+        concat: bool = True,
+        n_vessel: int = 1
     )->pd.DataFrame:
 
     """
@@ -28,8 +29,9 @@ def create_mobilisation(
         event (:obj:`str`): The event description.
         vessel (:obj:`class`): The vessel class that needs to be mobilitate
         oper_list (:obj:`list`): List of operations that called the mobilisation
-        count_fail (:obj:`str`): The counter of the failure mobilized. Defaul to None
-        concat (:obj:`bool`): Boolean to return the concatenated dataframe or the single row. Defaul to True
+        count_fail (:obj:`str`): The counter of the failure mobilized. Defaul to ``None``
+        concat (:obj:`bool`): Boolean to return the concatenated dataframe or the single row. Defaul to ``True``
+        n_vessel (:obj:`bool`): Number of vessel to mobilise. Defaul to ``1``
     Returns:
         pd.DataFrame: The dataframe with the new row added or the row itself if concat is False
     """
@@ -55,7 +57,7 @@ def create_mobilisation(
         event,
         id_mobilisation,
         vessel.id,
-        vessel.n_vessels,
+        n_vessel,
         None,
         None,
         [oper_list] if isinstance(oper_list, str) else list(oper_list),

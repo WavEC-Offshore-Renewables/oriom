@@ -268,7 +268,7 @@ def working_shifts(
         N_devices_to_inspect_1=1
         duration_inspection_1 = operation.duration_net
         N_technicians_per_inspection_1 = operation.tech_required
-    N_vessels = operation.vessel1.n_vessels
+    N_vessels = operation.vessel1_qt
     vessel_type = operation.vessel1.type
     if N_devices_to_inspect_1 <= N_vessels:
         N_vessels == N_devices_to_inspect_1

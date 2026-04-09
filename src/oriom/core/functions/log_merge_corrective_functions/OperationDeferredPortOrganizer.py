@@ -436,7 +436,8 @@ class OperationDeferredPortCreation():
         self,
         row: pd.Series,
         time_fail_op_immediately: float,
-        vessel: object
+        vessel: object,
+        n_vess: int
     ):
         """ Create mobilisation row and save them on the self.df_port_oper_def_log"""
 
@@ -449,7 +450,8 @@ class OperationDeferredPortCreation():
             vessel = vessel,
             oper_list = [row['id']],
             count_fail = row['comments'].split("_", 1)[1],
-            concat = False
+            concat = False,
+            n_vessel = n_vess
         )
         return row_mobi
 
@@ -573,7 +575,8 @@ class OperationDeferredPortCreation():
                                 row_mobi = self.create_mobi(
                                     row = row[:-1],
                                     time_fail_op_immediately = time_fail_op_immediately,
-                                    vessel = vessel
+                                    vessel = vessel,
+                                    n_vess = row['n_vessel_1']
                                 )
                                 row_mobi['year_month'] = period
                                 self.write_event_row(row_mobi)

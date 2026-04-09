@@ -50,7 +50,8 @@ class BaseCorrection:
             vessel=self.vessel,
             oper_list=[self.oper.id],
             count_fail=row['id'],
-            concat=False
+            concat=False,
+            n_vessel=self.oper.vessel1_qt
         )
         return row_mob_line
 

@@ -309,6 +309,7 @@ def merge_operation(
                 operaz=group[0][1]
                 vess_group = oper_dict[operaz]['vess_1']
                 vess_group = find_element_class.find_vessel(vess_group)
+                n_vess = find_element_class.find_operation(operaz).vessel1_qt
                 crew_capacity = vess_group.crew_capacity
 
                 crew_on_board, crew_on_board_cost, op_longest_dur, hours_to_add, hours_to_add_rounded, o = merge_group_operation(group, time_between_devices, crew_capacity, oper_dict)
@@ -408,7 +409,8 @@ def merge_operation(
                                 vessel = vess_group,
                                 oper_list = group,
                                 count_fail = oper_group_comments['failures'],
-                                concat = True
+                                concat = True,
+                                n_vessel = n_vess
                                 )
 
                         row_merged = pd.concat([row_merged,row_dates], axis=0, ignore_index=False)
@@ -427,7 +429,8 @@ def merge_operation(
                                 vessel = row['vessel_1'],
                                 oper_list = row['id'],
                                 count_fail = row['comments'],
-                                concat=True
+                                concat=True,
+                                n_vessel = row['n_vessel_1']
                             )
 
             # If only one operation, do not merge
