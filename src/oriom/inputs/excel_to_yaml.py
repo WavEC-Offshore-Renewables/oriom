@@ -603,9 +603,13 @@ def excel_to_yaml(
                      value = value.replace('\\', '/')
                 wec["power matrix file"] = {"value": value, "units": None}
 
-            elif 'strings' in name:
+            elif 'strings' in name and 'connector' not in name:
                 value = int(value)
                 wec["number of strings"] = {"value": value, "units": None}
+
+            elif 'strings' in name and 'connector' in name:
+                value = int(value)
+                wec["n strings to connector"] = {"value": value, "units": None}
 
             elif 'substations' in name:
                 value = int(value)

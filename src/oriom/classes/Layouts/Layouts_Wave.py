@@ -497,11 +497,11 @@ class Layout_Wave():
 if '__main__' in __name__:
     lw = Layout_Wave()
     G = lw.layout_wave(
-        n_layout = 5,
-        n_wec = 3,
+        n_layout = 4,
+        n_wec = 6,
         n_strings = 3,
         n_string_to_connector = 3,
-        n_substations = 1,
+        n_substations = 2,
         n_exports = 1,
         tow_string_shutdown = False
     )

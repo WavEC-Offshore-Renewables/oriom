@@ -4,6 +4,7 @@ import logging
 from distutils.util import strtobool
 from ruamel.yaml import YAML
 
+from oriom.common.constants import FAILURE_LEVEL_LIST
 
 class Failure():
     """Failure class.
@@ -241,25 +242,7 @@ class Failure():
             _e = 'Failure: "preferred_month" must be between 1 and 12'
             logging.error(_e)
             raise ValueError(_e)
-        # TODO modify this with an automatic list taken by the layout used
-        if any([
-            self.level_failure == 'exp_cable',
-            self.level_failure == 'exp_cable_island',
-            self.level_failure == 'dyn_cable-sub',
-            self.level_failure == 'array_cable',
-            self.level_failure == 'cable_cb',
-            self.level_failure == 'cable_transf',
-            self.level_failure == 'cable_switch',
-            self.level_failure == 'cable_inv',
-            self.level_failure == 'string_cable',
-            self.level_failure == 'substation',
-            self.level_failure == 'hub',
-            self.level_failure == 'mv_transformer',
-            self.level_failure == 'circuit_braker',
-            self.level_failure == 'switcher',
-            self.level_failure == 'inverter',
-            self.level_failure == 'device'
-        ]) is False:
+        if self.level_failure not in FAILURE_LEVEL_LIST:
             _e = f'level_failure not recognized {self.level_failure}'
             logging.error('Failure:' + _e)
             raise ValueError(_e)

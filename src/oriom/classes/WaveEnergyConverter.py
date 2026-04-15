@@ -19,6 +19,7 @@ class WaveEnergyConverter():
         number_strings (:obj:`int`): Number of strings of WEC devices. Defaults to ``None``.
         number_substations (:obj:`int`): Number of substations of WEC farm. Defaults to ``1``.
         number_exportcables (:obj:`int`): Number of export cables of WEC farm. Defaults to ``1``.
+        n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``1``
         n_device_at_port (:obj:`int`): Number of device that can be mantained simultaneously at port. Defaults to ``1``
         n_device_stored_at_port (:obj:`int`): Number of device that can be stored when not in maintenance. Defaults to ``0``
         wec_layout (:obj:`int`): Type layout. Defaults to ``1``.
@@ -47,6 +48,7 @@ class WaveEnergyConverter():
             rated_power: float=None,
             pmatrix_file: str=None,
             number_strings: int=None,
+            n_string_to_connector: int=None,
             number_substations: int=1,
             number_exportcables: int=1,
             n_device_at_port: int=None,
@@ -63,6 +65,7 @@ class WaveEnergyConverter():
             pmatrix_file (:obj:`str`): WEC power matrix file path. Defaults to ``None``.
             out_dir (:obj:`str`): Directory to save the WEC parameters. Defaults to `None`.
             number_strings (:obj:`int`): Number of strings of WEC devices. Defaults to ``None``.
+            n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``None``.
             wec_layout (:obj:`int`): Type layout. Defaults to ``1``.
             number_substations (:obj:`int`): Number of substations of WEC farm. Defaults to ``1``.
             number_exportcables (:obj:`int`): Number of export cables of WEC farm. Defaults to ``1``.
@@ -92,6 +95,11 @@ class WaveEnergyConverter():
             self.number_strings = int(number_strings)
         else:
             self.number_strings = 1
+
+        if n_string_to_connector != 0 and n_string_to_connector is not None:
+            self.n_string_to_connector = int(n_string_to_connector)
+        else:
+            self.n_string_to_connector = 1
 
         try:
             self.number_substations = int(number_substations)
@@ -192,6 +200,7 @@ class WaveEnergyConverter():
         rated_power = None
         pmatrix_file = None
         number_strings = None
+        n_string_to_connector = None
         number_substations = None
         number_exportcables = None
         n_device_at_port = None
@@ -250,13 +259,21 @@ class WaveEnergyConverter():
                     _e += '"matrix" and "file".'
                     logging.error('WaveEnergyConverter: ' + _e)
                     raise FileNotFoundError(_e)
-            if 'strings' in key:
+            if 'strings' in key and 'connector' not in key:
                 if number_strings is None:
                     number_strings = value
                 else:
                     _e = '"number_strings" alredy defines '
                     _e += 'Check if any of the other inputs have the word "strings".'
                     logging.error('WaveEnergyConverter: ' + _e)
+                    raise FileNotFoundError(_e)
+            if 'string' in key and 'connector' in key:
+                if n_string_to_connector is None:
+                    n_string_to_connector = value
+                else:
+                    _e = '"n_string_to_connector" alredy defined.'
+                    _e += 'Check if any of the other inputs have the word "n_string_to_connector".'
+                    logging.error('WindTurbineGenerator: ' + _e)
                     raise FileNotFoundError(_e)
             if 'substations' in key:
                 if number_substations is None:
@@ -302,6 +319,7 @@ class WaveEnergyConverter():
                 rated_power=rated_power,
                 pmatrix_file=pmatrix_file,
                 number_strings=number_strings,
+                n_string_to_connector = n_string_to_connector,
                 number_substations=number_substations,
                 number_exportcables=number_exportcables,
                 n_device_at_port=n_device_at_port,
@@ -334,6 +352,7 @@ class WaveEnergyConverter():
                 "wec rated power": {"value": self.rated_power, "units": "MW"},
                 "wec power matrix file": {"value": self.pmatrix_file, "units": "-"},
                 "wec number of strings": {"value": self.number_strings, "units": "-"},
+                "wec n strings to connector": {"value": self.n_string_to_connector, "units": "-"},
                 "wec number of hub/substations": {"value": self.number_substations, "units": "-"},
                 "wec number of export cables": {"value": self.number_exportcables, "units": "-"},
                 "wec number of n device at port": {"value": self.n_device_at_port, "units": "-"},
@@ -356,6 +375,7 @@ class WaveEnergyConverter():
                 "rated_power": wec_yaml["wec rated power"]["value"],
                 "pmatrix_file": wec_yaml["wec power matrix file"]["value"],
                 "number_strings": wec_yaml["wec number of strings"]["value"],
+                "n_string_to_connector": wec_yaml["wec n strings to connector"]["value"],
                 "number_substations": wec_yaml["wec number of hub/substations"]["value"],
                 "number_exportcables": wec_yaml["wec number of export cables"]["value"],
                 "n_device_at_port": wec_yaml["wec number of n device at port"]["value"],

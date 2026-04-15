@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
+from oriom.common.constants import FAILURE_NODE_LEVEL_LIST, FAILURE_EDGE_LEVEL_LIST
 from oriom.utils.read_dataframe_value import approximate_hourly_data, get_inspections_date
 from oriom.core.functions.layout_power import aux_layout_power_func
 
@@ -114,17 +115,7 @@ def choose_loc(
         location of the event, node (int) /edge (tuple).
     '''
 
-    if any([
-        level == 'device',
-        level == 'string',
-        level == 'substation',
-        level == 'mv_transformer',
-        level == 'inverter',
-        level == 'circuit_braker',
-        level == 'switcher'
-    ]):
-
-
+    if level in FAILURE_NODE_LEVEL_LIST:
         if tech == 'PV':
             if any(keyword in level for keyword in ['device', 'string']):
                 level = component_level_power
@@ -144,16 +135,7 @@ def choose_loc(
 
         loc = random.choice(list(list_nG_not_failed))
 
-    elif any([
-        level == 'array_cable',
-        level == 'string_cable',
-        level == 'exp_cable',
-        level == 'exp_cable_island',
-        level == 'dyn_cable-sub',
-        level == 'dyn_cable-transf',
-        level == 'dyn_cable-cb'
-    ]) is True:
-
+    elif level in FAILURE_EDGE_LEVEL_LIST:
         list_eG = [(s, e) for s, e, attr in G.edges(data=True) if attr.get('level') == level and attr.get('visible') is True]
         if list_failed is None:
             list_failed = set()
