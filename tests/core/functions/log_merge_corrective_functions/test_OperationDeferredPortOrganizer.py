@@ -58,7 +58,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
         self.add_op_tow_port = None
         self.add_op_tow_site = None
         
-        self.oper_port = SimpleNamespace(
+        self.oper_port_dict = {100: SimpleNamespace(
             id=100,
             n_device_at_port=1,
             n_device_stored_at_port=0,
@@ -96,7 +96,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
                 tow_site_oper_sched=self.schedule,
                 last_valid_idx_tow_site=len(self.schedule) - 1,
             ),
-        )
+        )}
 
         self.oper_dict_tow = {
             10: SimpleNamespace(id=10, vessel1_id="V1", vessel1=self.vessel, recommissioning_time=0),
@@ -302,7 +302,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
 
         return OperationDeferredPortCreation(
             log_events_tow_def=log_events_tow_def.copy(),
-            oper_port=self.oper_port,
+            oper_port_dict=self.oper_port_dict,
             oper_dict_tow=self.oper_dict_tow,
             find_element_class=self.find_element_class,
         )
@@ -535,6 +535,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
         log_events_tow_def = self._build_log_events_three_rows()
         manager = self._build_instance(log_events_tow_def)
         manager.n_device_at_port = 2
+        manager.oper_port = manager.oper_port_dict[100]
         manager.dev_idx_station_port = 2
         row = log_events_tow_def.iloc[2]
         manager.tow_at_site_date["V1"][1] = (
@@ -589,6 +590,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
             row_dates_tow_recom["d_end"].iloc[0],
             row_dates_tow_recom["d_end_wait_start"].iloc[0],
         )
+        manager.oper_port = manager.oper_port_dict[100]
         manager.oper_port.tow_data.add_op_tow_port = SimpleNamespace(
             id=11,
             ts_data=SimpleNamespace(
@@ -624,9 +626,9 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
 
         log_events_tow_def = self._build_log_events_three_rows()
         manager = self._build_instance(log_events_tow_def)
-
+        self.find_element_class.find_operation.return_value = self.oper_port_dict[100]
         result = manager.deferred_port_manager(time_fail_op_immediately=2.0)
-
+        
         self.assertIsInstance(result, pd.DataFrame)
         self.assertFalse(result.empty)
         self.assertIn("mobilisation_merged", result["event"].values)
@@ -642,7 +644,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
 
         log_events_tow_def = self._build_log_events_five_rows()
         manager = self._build_instance(log_events_tow_def)
-
+        self.find_element_class.find_operation.return_value = self.oper_port_dict[100]
         result = manager.deferred_port_manager(time_fail_op_immediately=2.0)
 
         self.assertIsInstance(result, pd.DataFrame)
@@ -662,7 +664,9 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
 
         log_events_tow_def = self._build_log_events_three_rows()
         manager = self._build_instance(log_events_tow_def)
-
+        manager.oper_port = manager.oper_port_dict[100]
+        manager.oper_port.tow_data.add_op_tow_port = False
+        self.find_element_class.find_operation.return_value = self.oper_port_dict[100]
         with patch.object(
             manager,
             "tow_to_port",

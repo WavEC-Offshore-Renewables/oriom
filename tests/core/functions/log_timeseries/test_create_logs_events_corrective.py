@@ -856,6 +856,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
                     "id": "F1.0",
                     "maintenance_strategy": "immediately",
                     "operation_triggered": op_main.id.lower(),
+                    "preferred_month": None
                 }
             ]
         )
@@ -899,7 +900,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         # TowPort stub
         class StubTowPort:
-            def __init__(self, date_failure, vessel, oper, failure, maintenance_strategy, time_fail_op_immediately, date_start):
+            def __init__(self, date_failure, vessel, oper, failure, maintenance_strategy, time_fail_op_immediately, date_start, preferred_months):
                 self.date_failure = date_failure
                 self.date_op = date_failure + timedelta(hours=time_fail_op_immediately)
                 self.idx_end_leadtime = None
@@ -916,7 +917,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
 
         # TowSite stub
         class StubTowSite:
-            def __init__(self, date_failure, vessel, oper, date_start):
+            def __init__(self, date_failure, vessel, oper, date_start, preferred_months = None):
                 self.date_failure = date_failure
                 self.idx_end_leadtime = 0
 
@@ -938,8 +939,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             oper_stat = None,
             tow_stat_chart_month = None,
             double = None,
-            add_op_end = None,
-
+            add_op_end = None
         ):
 
             t0 = df_filtered_start["datetime"].iloc[0]

@@ -18,7 +18,8 @@ class OperationDeferredPortCreation():
     Class to generate and manage the Deferred Operation at Port considering towing, operations, WoW, n_vessels and port spaces
 
     Attributes:
-        oper_port (:object): Object of OperationMajor operations
+        oper_port_dict (: dict): Dict of object of class ``OperationMajor`` that will be conducted at port
+        oper_port (:object): Object of OperationMajor operations under specific analysis
         oper_dict_tow (:dict): Dict of operation that must be deferred with tow op
         tow_at_port_date (: dict): Dictionary storing towing to port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
         tow_at_site_date (: dict): Dictionary storing towing to site operations; keys are device indices, values are tuples (end_datetime, start_datetime).
@@ -30,6 +31,8 @@ class OperationDeferredPortCreation():
         dict_oper_last_idx: Dictionary containing last_valid_index for towing op
         actual_df_port_inspection_log (: pd.DataFrame): log_events created of deferred tow
         vessel_available (: dict): Dictionary of vessels number available
+        find_element_class (: object) callable used to find objects.
+
 
         NOTE: The utilization of device to store at port (wet storage) must be implemented
     """
@@ -37,26 +40,29 @@ class OperationDeferredPortCreation():
     def __init__(
             self,
             log_events_tow_def: pd.DataFrame,
-            oper_port: object,
+            oper_port_dict: dict,
             oper_dict_tow: dict,
             find_element_class: object
         ):
         """
         Args:
             log_events_tow_def (: pd.DataFrame): Events related to deferred towing corrective op
-            oper_port (: object): object of class ``OperationMajor`` that will be conducted at port
+            oper_port_dict (: dict): Dict of object of class ``OperationMajor`` that will be conducted at port
             oper_dict_tow (:dict): Dict of operation that must be deferred with tow op
-            find_element_class (: object) callable used by logs_preventive_aux to find classes/elements in schedules.
+            find_element_class (: object) callable used callable used to find objects.
         """
+        self.dict_oper_sched, self.dict_oper_last_idx, self.dict_oper_stat = {}, {}, {}
 
+        self.find_element_class = find_element_class
         self.log_events_tow_def = log_events_tow_def.sort_values(by=['d_trigger', 'd_end'])
         self.df_port_oper_def_log = pd.DataFrame(columns=self.log_events_tow_def.columns)
 
-        self.oper_port = oper_port
+        self.oper_port_dict = oper_port_dict
         self.oper_dict_tow = oper_dict_tow
-        self.n_device_at_port = oper_port.n_device_at_port
-        self.n_device_stored_at_port = oper_port.n_device_stored_at_port
+        self.n_device_at_port = next(iter(oper_port_dict.values())).n_device_at_port
+        self.n_device_stored_at_port = next(iter(oper_port_dict.values())).n_device_stored_at_port
         self.vessels = {oper.vessel1_id : oper.vessel1 for oper in self.oper_dict_tow.values() if oper.vessel1_id is not None}
+        self.oper_port = None
 
         self.reset_data_period()
 
@@ -65,15 +71,26 @@ class OperationDeferredPortCreation():
         min_val = min(v.n_vessels for v in self.vessels.values())
         self.vessel_available = {v.id: min_val for v in self.vessels.values()}
 
-        self.dict_oper_sched = oper_port.tow_data.dict_tow_oper_sched
-        self.dict_oper_last_idx = oper_port.tow_data.dict_tow_oper_last_idx
-        self.dict_oper_stat = oper_port.tow_data.dict_oper_stat
-        
-        for op_add in [oper_port, oper_port.tow_data.add_op_tow_port, oper_port.tow_data.add_op_tow_site]:
-            if op_add:
-                self.dict_oper_sched[op_add.id] = safe_getattr(op_add, ['ts_data','oper_sched'])
-                self.dict_oper_last_idx[op_add.id] = safe_getattr(op_add, ['ts_data','last_valid_index'])
-                self.dict_oper_stat[op_add.id] = find_element_class.find_operation_stats(op_add.id)
+        # Building dict opeartions
+        for oper_port in oper_port_dict.values():
+            for k, v in oper_port.tow_data.dict_tow_oper_sched.items():
+                self.dict_oper_sched.setdefault(k, v)
+
+            for k, v in oper_port.tow_data.dict_tow_oper_last_idx.items():
+                self.dict_oper_last_idx.setdefault(k, v)
+
+            for k, v in oper_port.tow_data.dict_oper_stat.items():
+                self.dict_oper_stat.setdefault(k, v)
+
+            for op_add in [oper_port, oper_port.tow_data.add_op_tow_port, oper_port.tow_data.add_op_tow_site]:
+                if op_add and op_add.id not in self.dict_oper_sched:
+                    self.dict_oper_sched[op_add.id] = safe_getattr(op_add, ['ts_data', 'oper_sched'])
+
+                if op_add and op_add.id not in self.dict_oper_last_idx:
+                    self.dict_oper_last_idx[op_add.id] = safe_getattr(op_add, ['ts_data', 'last_valid_index'])
+
+                if op_add and op_add.id not in self.dict_oper_stat:
+                    self.dict_oper_stat[op_add.id] = find_element_class.find_operation_stats(op_add.id)
 
 
     def reset_data_period(self):
@@ -491,6 +508,8 @@ class OperationDeferredPortCreation():
         All the operations are stored in dict tow_at_port_date, oper_at_port and tow_at_site_date with key the vessel and device number
         and value a tuple with the date of end of the operation and the date of start of the operation.
 
+        NOTE Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
+
         Args:
             time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
 
@@ -510,19 +529,21 @@ class OperationDeferredPortCreation():
 
         # For each period of deferred campaign
         for period, df_group in self.log_events_tow_def.groupby('year_month', sort=False):
-            failures_to_correct = {c.split('_')[-1]for c in df_group['comments']}
+            failures_to_correct = {c.split('_', 1)[1] for c in df_group['comments'] if '_' in c}
             self.reset_data_period()
 
             # For each failure to correct associated to an operation needed
             for n_device, failure in enumerate(failures_to_correct, start = 1):
+                fail_obj = self.find_element_class.find_failure_from_id(failure.split('.')[0])
+                self.oper_port = self.find_element_class.find_operation(fail_obj.operation_triggered)
                 write_event = True
                 row_dates_tow_recom = pd.DataFrame()
                 df_failure = df_group[df_group['comments'].str.endswith(failure)]
                 ttp, tts = True, True
                 recommission = 0
                 for _, row in df_failure.iterrows():
-                    ## Inspect the device at port ##
-                    if row['id'] == self.oper_port.id:
+                    ## Correct the device at port ##
+                    if row['id'] in self.oper_port_dict:
                         row_dates_tow = self.operation_at_port(
                             row = row, 
                             device_n = n_device,
@@ -569,6 +590,7 @@ class OperationDeferredPortCreation():
                         self.write_event_row(row_dates_tow)
                         if not row_dates_tow_recom.empty:
                             self.write_event_row(row_dates_tow_recom)
+                        # Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
                         if n_device == 1 and ttp:
                             vessel = self.vessels[row['vessel_1']]
                             if vessel.mobilisation_time !=0 and row['id'] != self.oper_port.id:

@@ -129,8 +129,7 @@ class TestCorrectionTowPort(unittest.TestCase):
     def test_deferred_strategy(self):
         date_fail = datetime(2026, 4, 7, 8)
         failure = MagicMock()
-        failure.preferred_month = [6,7]
-        corr = CorrectionTowPort(date_fail, self.vessel, self.oper, failure)
+        corr = CorrectionTowPort(date_fail, self.vessel, self.oper, failure, preferred_months = [6,7])
         self.assertIn(corr.date_op.month, [6,7])
         self.assertTrue(corr.tow_deferred)
 

@@ -283,11 +283,11 @@ class TestVesselMobilisationScheduler(unittest.TestCase):
         """
         # reuse_recall_vess_dict: one relevant, one with mobi_id=None
         self.scheduler.reuse_recall_vess_dict = {
-            10: {"date": "reuse_vessel", "mobi_id": "ofw_fail_001"},
-            20: {"date": "reuse_vessel", "mobi_id": None},
+            10: {"date": "reuse_vessel", "mobi_id": "ofw_fail_001", "oper_id": 'oper_owc_OP1'},
+            20: {"date": "reuse_vessel", "mobi_id": None, 'oper_id': None},
         }
 
-        m_get_first_failure.return_value = "ofw_fail_001"
+        m_get_first_failure.return_value = "mobi_ofw_fail_001"
 
         df = pd.DataFrame(
             {
@@ -297,6 +297,11 @@ class TestVesselMobilisationScheduler(unittest.TestCase):
                     "mobi_ofw_fail_001",
                     "mobi_ofw_fail_999",
                     "ofw_fail_001.1",
+                ],
+                "comments": [
+                    ["oper_owc_OP1"],
+                    ["oper_owc_OP1"],
+                    "oper_owc_OP1",
                 ],
             },
             index=[100, 200, 300],
