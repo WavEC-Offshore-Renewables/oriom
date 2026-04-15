@@ -273,6 +273,7 @@ class TestLoadSimilarOpYaml(unittest.TestCase):
             op_working_shifts, data_working_shifts = yaml_manager.load_similar_op_yaml(
                 file_dir=tmpdir,
                 file_name="similar.yaml",
+                operation_id = "op_A"
             )
 
         # op_working_shifts: non-olc keys from root 'content', olc_* from 'working_shifts'
