@@ -99,6 +99,11 @@ def excel_to_yaml(
                         "value": str(value),
                         "units": None
                 }
+            elif ('power' in name and 'file' in name):
+                inputs["power event file"] = {
+                        "value": str(value),
+                        "units": None
+                }
             else:
                 _w = 'ExcelToYAML.Inputs.General: input "%s" not recognized. Ignored.' % row['input']
                 logging.warning(_w)
