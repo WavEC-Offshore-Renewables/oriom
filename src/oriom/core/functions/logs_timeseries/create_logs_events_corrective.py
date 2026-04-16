@@ -190,6 +190,7 @@ def create_logs_corrective_file(
                 else:
                     if maintenance_strategy == "specific month":
                         deferred_tow = True
+                        vessel, ves_2, mob_time = _take_vessel_data(op = oper.tow_data.tow_op_port)
                         deferred_tow_correction = CorrectionDeferred(
                             date_failure = date_failure,
                             vessel = vessel,
@@ -205,8 +206,8 @@ def create_logs_corrective_file(
                 elif deferred_tow:
                     date_failure_tow = deferred_tow_correction.date_op
                     date_start = date_failure_tow + timedelta(hours=time_fail_op_immediately)
-
-                vessel, ves_2, mob_time = _take_vessel_data(op = oper.tow_data.tow_op_port)
+                else:
+                    vessel, ves_2, mob_time = _take_vessel_data(op = oper.tow_data.tow_op_port)
                 towing_port = CorrectionTowPort(
                     date_failure = date_failure_tow if date_failure_tow else date_failure,
                     vessel = vessel,
@@ -214,7 +215,8 @@ def create_logs_corrective_file(
                     failure = failure,
                     maintenance_strategy = maintenance_strategy,
                     time_fail_op_immediately = time_fail_op_immediately,
-                    date_start = date_start if deferred_tow else None
+                    date_start = date_start if deferred_tow else None,
+                    preferred_months = row['preferred_month']
                 )
                 
                 # Evaluate differently for deferred and immediate towing
@@ -237,7 +239,9 @@ def create_logs_corrective_file(
                     # mobilisation in deferred_merged
                     towing_port.leadtime_evaluation(
                         lead_mob_time = mob_time,
-                        date_original = row_add_op_tow_port['d_trigger'][0] if row_add_op_tow_port is None or row_add_op_tow_port.empty else date_start
+                        date_original = row_add_op_tow_port['d_trigger'][0] 
+                            if row_add_op_tow_port is not None and not row_add_op_tow_port.empty 
+                            else date_start
                     )
                     index_found = towing_port.check_leadtime_index(oper_sched = oper.tow_data.tow_port_oper_sched, CUTOFF_DATE = CUTOFF_DATE)
                     if not index_found:

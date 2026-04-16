@@ -38,5 +38,5 @@ length export cable:
     value: 6.0
     units: km
 merge vessel:
-    value: "['v001']"
+    value: ['v001']
     units: '-'

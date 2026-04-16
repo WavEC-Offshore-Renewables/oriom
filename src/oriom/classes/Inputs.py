@@ -362,7 +362,7 @@ class Inputs():
                 **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
             shift_duration (:obj:`dict`): Duration of a working shift, in hours.
                 **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
-            merge_vessel (:obj:`dict`): Vessel type that can be merged in corrective operation
+            merge_vessel (:obj:`list`): Vessel type that can be merged in corrective operation
                 **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
             file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs.
                 Its value is ``None`` if not defined.
@@ -418,7 +418,7 @@ class Inputs():
                 montecarlo_percentage (:obj:`float`,*optional*): Ratio of metocean timesteps to be analyzed. Defaults to ``0.3``.
                 failure_scenario (:obj:`float`,*optional*): failure scenario selection. Defaults to ``0``.
                 shift_duration (:obj:`int`,*optional*): Duration of a working shift. Defaults to ``12``.
-                merge_vessel (:obj:`str`,*optional*): Vessel type that can be merged in corrective operation.
+                merge_vessel (:obj:`list`,*optional*): Vessel type that can be merged in corrective operation.
                 file_inputs (:obj:`str`,*optional*): Path for the file with all previous mandatory inputs. Defaults to ``None``.
                 file_metocean_tow_location (:obj:`dict`): Dictionary of Path location of the X metocean date timeseries from site to port.
                 file_metocean_tow_number (:obj:`int`): Number of Path location of the X metocean date timeseries from site to port.
@@ -549,7 +549,7 @@ class Inputs():
                         self.inputs["double shifts"] = {"value": bool(value), "units": str(units)}
 
                     elif 'merge' in name and 'vessel' in name:
-                        self.inputs["merge vessel"] = {"value": str(value), "units": str(units)}
+                        self.inputs["merge vessel"] = {"value": list(value), "units": str(units)}
 
                     elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' in name:
                         self.inputs["metocean file tow number"] = {"value": int(value), "units": None}
@@ -645,7 +645,7 @@ class Inputs():
                         }
                     elif key.lower() == 'merge_vessel':
                         self.inputs["merge vessel"] = {
-                                "value": str(value).lower(),
+                                "value": list(value),
                                 "units": None
                         }
                     elif key.lower() == 'out_dir':

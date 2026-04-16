@@ -240,10 +240,12 @@ def create_logs_merge(
         if not log_events_tow_def.empty:
             # Create unique set of deferred tow failure
             unique_failures = {f.split('.')[0] for f in deferred_comments_tow}
+            oper_port_dict = {}
             # fill oper_port tow data attributes
             for failure_id in unique_failures:
                 failure = find_element_class.find_failure_from_id(failure_id)
                 oper_port = find_element_class.find_operation(failure.operation_triggered)
+                oper_port_dict[oper_port.id] = oper_port
                 oper_port.tow_data = TowData.from_operation(find_element_class, oper_port)
                 oper_port.tow_data.id_dict_oper(oper_dict_tow, oper_port)
 
@@ -259,7 +261,7 @@ def create_logs_merge(
 
             port_operation_deferred = OperationDeferredPortCreation(
                 log_events_tow_def,
-                oper_port,
+                oper_port_dict,
                 oper_dict_tow,
                 find_element_class
             )
@@ -310,10 +312,11 @@ def create_logs_merge(
     #------------------
     # IMMEDIATE OPERATION
     #------------------
-    # From only that do not comply a tow filter avoiding deferred failures
+    # From only that comply a tow filter avoiding deferred failures and tow failures
+    failure_avoid = deferred_failures_correction + failures_correction_tow + deferred_failures_correction_tow
     mask = (
         (log_event_to_merge['event'].isin(['operation'])) &
-        (~comments_failure_id.isin(deferred_failures_correction))
+        (~comments_failure_id.isin(failure_avoid))
     )
     log_events_oper_imm = log_event_to_merge[mask]
 
@@ -326,8 +329,9 @@ def create_logs_merge(
                 failure_id = getattr(getattr(oper, 'failure', None), 'id', None)
                 if (
                     oper.vessel1.id in vessel_to_merge
-                    and not oper.rov_drone
+                    and not getattr(oper, 'rov_drone', False)
                     and not getattr(oper, 'tow_to_port', False)
+                    and not getattr(oper, 'tow_operation', False)
                     and (failure_id is None or failure_id not in deferred_failures_correction)
                 ):
                     oper_dict = op_to_dict(oper, OLC_LIST, oper_dict)

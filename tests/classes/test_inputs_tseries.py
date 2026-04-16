@@ -81,7 +81,7 @@ class TestInputsTimeSeries(unittest.TestCase):
         if isinstance(mv_val, list):
             self.assertEqual(mv_val, ['v001'])
         elif isinstance(mv_val, str):
-            self.assertIn("['v001']", mv_val)
+            self.assertIn(['v001'], mv_val)
         else:
             self.fail(f"Unexpected type for merge_vessel: {type(mv_val)}")
         # Units can be '-' or absent; do not strictly assert units here.
@@ -108,7 +108,7 @@ class TestInputsTimeSeries(unittest.TestCase):
             max_wait=16,
             montecarlo_percentage=0.3,
             shift_duration=12,
-            merge_vessel="['v001']",
+            merge_vessel=['v001'],
         )
         self.std_asserts(inputs)
 

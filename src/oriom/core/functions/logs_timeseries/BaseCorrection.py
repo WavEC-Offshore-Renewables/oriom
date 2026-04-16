@@ -151,7 +151,7 @@ class CorrectionTowPort(BaseCorrection):
     """
     CorrectionTowPort class for tow to port.
     """
-    def __init__(self, date_failure, vessel, oper, failure, maintenance_strategy = None, time_fail_op_immediately=0, date_start = None,):
+    def __init__(self, date_failure, vessel, oper, failure, maintenance_strategy = None, time_fail_op_immediately=0, date_start = None, preferred_months = None):
         super().__init__(date_failure, vessel, oper, time_fail_op_immediately)
         self.tow_deferred = False
         if maintenance_strategy == "immediately" or date_start:
@@ -162,7 +162,6 @@ class CorrectionTowPort(BaseCorrection):
         else:
             # Calculate deferred for tow
             self.tow_deferred = True
-            preferred_months = failure.preferred_month
             if isinstance(preferred_months, list):
                 preferred_month = random.choice(preferred_months)
             else:

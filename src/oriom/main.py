@@ -65,7 +65,7 @@ except ImportError:
 
 warnings.simplefilter('ignore')
 logging.basicConfig(
-    level=logging.ERROR,       # Mostra solo ERROR e CRITICAL
+    level=logging.ERROR,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
@@ -73,7 +73,7 @@ logging.basicConfig(
 ### Parameters hard coded to define ###
 DEFAULT_CONFIG  = ConfigRun(
     STATISTICAL_CHART=True,
-    DIFF_DISTANCE=True,
+    DIFF_DISTANCE=False,
     DIFF_KM_DISTANCE=5,
     KM_MOTHER_VESSEL=5,
     VESSEL_DIST_REDUCED_LIST=["ctv","sv"],
@@ -81,11 +81,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="TEST",
+    PROJECT_NAME="test_E2E",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\rmeda\Richi documents\Projects\ORIOM\files\FORM",
+    EXCEL_FILE_PATH=r"",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_CT_string_disconnection.xlsx",
+    FORM_NAME="form_test.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

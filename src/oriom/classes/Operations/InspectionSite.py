@@ -4,8 +4,8 @@ import os
 from ruamel.yaml import YAML
 from distutils.util import strtobool
 
+from oriom.common.constants import FAILURE_LEVEL_LIST
 from oriom.core.functions.layout_power.aux_layout_power_func import find_highest_power_node
-
 
 class InspectionSite():
     """
@@ -379,26 +379,8 @@ class InspectionSite():
             raise ValueError('"tech_cost" must not be negative')
         if self.dur_per_device <= 0:
             raise ValueError('"dur_per_device" must be positive')
-        # TODO modify this with an automatic list taken by the layout used
-        if any([
-            self.level == None,
-            self.level == 'exp_cable',
-            self.level == 'exp_cable_island',
-            self.level == 'dyn_cable-sub',
-            self.level == 'array_cable',
-            self.level == 'cable_cb',
-            self.level == 'cable_transf',
-            self.level == 'cable_switch',
-            self.level == 'cable_inv',
-            self.level == 'string_cable',
-            self.level == 'substation',
-            self.level == 'mv_transformer',
-            self.level == 'circuit_braker',
-            self.level == 'switcher',
-            self.level == 'inverter',
-            self.level == 'device'
-        ]) is False:
-            raise ValueError('"level" must be "device", "array_cable", "string_cable", "exp_cable" or "dyn_cable-sub"')
+        if self.level not in FAILURE_LEVEL_LIST:
+            raise ValueError(f'"level" must be one of the value {FAILURE_LEVEL_LIST}')
         if isinstance(self.months, int) is True and self.months in range(1,13) is False:
             raise NameError('"months" must be between 1 and 12')
         if isinstance(self.months, int) is False and all([month in range(1, 13) for month in self.months]) is False:

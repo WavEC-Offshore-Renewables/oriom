@@ -5,6 +5,7 @@ import os
 from ruamel.yaml import YAML
 from distutils.util import strtobool
 
+from oriom.common.constants import FAILURE_LEVEL_LIST
 
 class CorrectiveMinor():
     """
@@ -252,24 +253,8 @@ class CorrectiveMinor():
             raise ValueError('"prefix not recognized"')
         if self.duration_net <= 0:
             raise ValueError('"duration_net" must be positive')
-        if any([
-            self.level == 'exp_cable',
-            self.level == 'exp_cable_island',
-            self.level == 'dyn_cable-sub',
-            self.level == 'cable_cb',
-            self.level == 'cable_transf',
-            self.level == 'cable_switch',
-            self.level == 'cable_inv',
-            self.level == 'array_cable',
-            self.level == 'string_cable',
-            self.level == 'substation',
-            self.level == 'mv_transformer',
-            self.level == 'circuit_braker',
-            self.level == 'switcher',
-            self.level == 'inverter',
-            self.level == 'device'
-        ]) is False:
-            raise ValueError('"level" must be “exp_cable”, “dyn_cable-sub”, “cable_cb”, “string_cable”, “cable_transf”, “cable_switch”, “cable_inv”, “array_cable”, “substation”, “mv_transformer”, “circuit_braker”, “switcher”, “inverter”, “device”')
+        if self.level not in FAILURE_LEVEL_LIST:
+            raise ValueError(f'"level" must be one of the value {FAILURE_LEVEL_LIST}')
         if self.tech_required < 1:
             raise ValueError('"tech_required" must be positive')
         if self.tech_cost < 0:

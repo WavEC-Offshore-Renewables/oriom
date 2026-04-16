@@ -34,6 +34,7 @@ class LayoutManager:
                 n_strings=wec.number_strings,
                 n_substations=getattr(wec, "number_substations", 1),
                 n_exports=getattr(wec, "number_exportcables", 1),
+                n_string_to_connector=getattr(wec, "n_string_to_connector", 6),
                 tow_string_shutdown = getattr(wec, "tow_string_shutdown", False),
                 save_dir=graph_dir,
                 show_plot=False

@@ -5,6 +5,7 @@ import os
 from ruamel.yaml import YAML
 from distutils.util import strtobool
 
+from oriom.common.constants import FAILURE_LEVEL_LIST
 from oriom.utils.aux_operation import define_tow_operations
 from oriom.core.functions.layout_power.aux_layout_power_func import find_highest_power_node
 
@@ -299,26 +300,8 @@ class InspectionPort():
                     last_day = min(day_dict[m], last_day)
             if self.day_start not in range(1, last_day+1):
                 raise ValueError(f'"day_start" must be between 1 and {last_day} for the months considered {self.months}')
-        # TODO modify this with an automatic list taken by the layout used
-        if any([
-            self.level == None,
-            self.level == 'exp_cable',
-            self.level == 'exp_cable_island',
-            self.level == 'dyn_cable-sub',
-            self.level == 'array_cable',
-            self.level == 'cable_cb',
-            self.level == 'cable_transf',
-            self.level == 'cable_switch',
-            self.level == 'cable_inv',
-            self.level == 'string_cable',
-            self.level == 'substation',
-            self.level == 'mv_transformer',
-            self.level == 'circuit_braker',
-            self.level == 'switcher',
-            self.level == 'inverter',
-            self.level == 'device'
-        ]) is False:
-            raise ValueError('"level" must be "device", "array_cable", "string_cable", "exp_cable" or "dyn_cable-sub"')
+        if self.level not in FAILURE_LEVEL_LIST:
+            raise ValueError(f'"level" must be one of the value {FAILURE_LEVEL_LIST}')
         if self.intervened_devices < 0:
             raise ValueError('"intervened_devices" must not be negative')
         if self.ws is not None and self.ws < 0:

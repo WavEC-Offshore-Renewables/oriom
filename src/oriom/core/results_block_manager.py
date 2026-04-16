@@ -194,7 +194,7 @@ def results_block(
                     vessels = vessels,
                     find_element = find_element
                 )
-
+ 
             # Recreate the usage_record considering the reused vessels
             vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
             _ = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged)

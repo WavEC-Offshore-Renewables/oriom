@@ -287,7 +287,7 @@ class Layout_Wave():
                 att_w = {count_nodes:{
                         'name' : "Connector_node",
                         'coords' : (s+(n_string_to_connector/2)-0.5,1),
-                        'level' : '',
+                        'level' : 'hub',
                         'power' : 0
                 }}
                 nx.set_node_attributes(G, values=att_w)
@@ -426,7 +426,7 @@ class Layout_Wave():
                 att_w = {count_nodes:{
                         'name' : "Connector_node",
                         'coords' : (s+(n_string_to_connector/2)-0.5,-1),
-                        'level' : '',
+                        'level' : 'hub',
                         'power' : 0
                 }}
                 nx.set_node_attributes(G, values=att_w)
@@ -497,11 +497,11 @@ class Layout_Wave():
 if '__main__' in __name__:
     lw = Layout_Wave()
     G = lw.layout_wave(
-        n_layout = 5,
-        n_wec = 10,
-        n_strings = 5,
-        n_string_to_connector = 2,
-        n_substations = 1,
+        n_layout = 4,
+        n_wec = 6,
+        n_strings = 3,
+        n_string_to_connector = 3,
+        n_substations = 2,
         n_exports = 1,
         tow_string_shutdown = False
     )

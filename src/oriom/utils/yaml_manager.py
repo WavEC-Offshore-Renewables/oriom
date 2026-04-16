@@ -133,21 +133,14 @@ def load_shift_values_from_yaml(file_dir: str, file_name: str):
     return op_working_shifts
 
 
-def load_similar_op_yaml(file_dir: str, file_name: str) -> dict:
+def load_similar_op_yaml(file_dir: str, file_name: str, operation_id: str = None) -> dict:
     """
     Recycling the values obtained from another operation, extrapolate from the similar operation the values
     regarding the shifts and return them in two dictionaries
     """
 
-    op_working_shifts_key = [
-        "id_main", "days_main", "days_last", "duration_main", "duration_last",
-        "n_vessel_main", "n_vessel_last", "n_crew_main", "n_crew_last",
-        "n_dev_inspected_main_shift", "n_dev_inspected_last_shift",
-        "olc_main", "olc_last"
-    ]
-
     data_working_shifts_key = [
-        "days_main", "duration_main", "rov_main",
+        "days_main", "duration_main", "rov_main", "n_crew_main", "n_crew_last",
         "id_grouped", "days_grouped", "duration_grouped", "rov_grouped",
         "n_vessels_main", "n_vessels_last",
     ]
@@ -162,9 +155,8 @@ def load_similar_op_yaml(file_dir: str, file_name: str) -> dict:
     section_data = data.get('working_shifts', {})
 
     # take only the values from the allowed_keys
-    op_working_shifts = {
-        k: section_data[k] for k in op_working_shifts_key if k in section_data
-    }
+    section_data['id_main'] = operation_id
+    op_working_shifts = section_data
 
     data_working_shifts = {k: data.get(k) for k in data_working_shifts_key if k in data}
 
