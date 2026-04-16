@@ -122,23 +122,24 @@ def corrective_layout(
         ValueError: if "n_device_pv" defined and "power_pv" not defined.
 
     Returns:
-        pd.DataFrame: dataframe with all the failure and operationsevents,
-            percentage farm available and power for WTG farm.
-        pd.DataFrame: dataframe with all the failure and operationsevents,
-            percentage farm available and power for WEC farm.
-        pd.DataFrame: dataframe with all the failure and operationsevents,
-            percentage farm available and power for PV farm.
+        dict{
+            pd.DataFrame: dataframe with all the failure and operationsevents,
+                percentage farm available and power for WTG farm.
+            pd.DataFrame: dataframe with all the failure and operationsevents,
+                percentage farm available and power for WEC farm.
+            pd.DataFrame: dataframe with all the failure and operationsevents,
+                percentage farm available and power for PV farm.
+        }
     """
 
-    if n_device_wtg is not None and G_wind is None:
-        logging.error('Layout perc: n_device_wtg defined and graph missing')
-        raise ValueError('Layout perc: n_device_wtg defined and graph missing')
-    if n_device_wec is not None and G_wave is None:
-        logging.error('Layout perc: n_device_wec defined and graph missing')
-        raise ValueError('Layout perc: n_device_wec defined and graph missing')
-    if n_device_pv is not None and G_pv is None:
-        logging.error('Layout perc: n_device_pv defined and graph missing')
-        raise ValueError('Layout perc: n_device_pv defined and graph missing')
+    for dev_tech, G_tech, attr in zip(
+        [n_device_wtg, n_device_wec, n_device_pv],
+        [G_wind, G_wave, G_pv],
+        ['n_device_wtg', 'n_device_wec', 'n_device_pv']
+    ):
+        if dev_tech is not None and G_tech is None:
+            logging.error(f'Layout perc: {attr} defined and graph missing')
+            raise ValueError(f'Layout perc: {attr} defined and graph missing')
 
 
     df_wind, df_wave, df_pv = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
@@ -256,4 +257,4 @@ def corrective_layout(
         df_pv.sort_values(by='Date', inplace=True)
         df_pv.reset_index(drop=True, inplace=True)
 
-    return df_wind, df_wave, df_pv
+    return {'wind': df_wind, 'wave': df_wave, 'pv': df_pv}

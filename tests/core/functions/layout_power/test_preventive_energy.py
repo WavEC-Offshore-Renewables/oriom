@@ -72,7 +72,7 @@ class TestPreventiveEnergyNoDevices(unittest.TestCase):
 
         dummy_finder = DummyFindElement([])
 
-        df_wind, df_wave, df_pv = preventive_energy.preventive_energy(
+        data_result = preventive_energy.preventive_energy(
             log_events=log_events,
             inspections_site_stat=[],
             inspections_port_stat=[],
@@ -80,9 +80,9 @@ class TestPreventiveEnergyNoDevices(unittest.TestCase):
             find_element_class=dummy_finder,
         )
 
-        self.assertTrue(df_wind.empty)
-        self.assertTrue(df_wave.empty)
-        self.assertTrue(df_pv.empty)
+        self.assertTrue(data_result['wind'].empty)
+        self.assertTrue(data_result['wave'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
 
 class TestPreventiveEnergyWind(unittest.TestCase):
@@ -147,7 +147,7 @@ class TestPreventiveEnergyWind(unittest.TestCase):
         """
         mock_stat_eval.return_value = 42.0
 
-        df_wind, df_wave, df_pv = preventive_energy.preventive_energy(
+        data_result = preventive_energy.preventive_energy(
             log_events=self.log_events.copy(),
             inspections_site_stat=self.inspections_site_stat,
             inspections_port_stat=self.inspections_port_stat,
@@ -167,12 +167,12 @@ class TestPreventiveEnergyWind(unittest.TestCase):
         )
 
         # Solo il ramo wind deve essere popolato
-        self.assertFalse(df_wind.empty)
-        self.assertTrue(df_wave.empty)
-        self.assertTrue(df_pv.empty)
+        self.assertFalse(data_result['wind'].empty)
+        self.assertTrue(data_result['wave'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
-        self.assertEqual(len(df_wind), 1)
-        row = df_wind.iloc[0]
+        self.assertEqual(len(data_result['wind']), 1)
+        row = data_result['wind'].iloc[0]
 
         self.assertEqual(row["Event"], "inspection_site")
         self.assertEqual(row["id"], "ofw_insp_001")
@@ -256,7 +256,7 @@ class TestPreventiveEnergyWindTimeseries(unittest.TestCase):
         # timeseries_power_preventive_evaluation restituisce una lista con un elemento
         mock_ts_eval.return_value = ([100.0], [5.0])
 
-        df_wind, df_wave, df_pv = preventive_energy.preventive_energy(
+        data_result = preventive_energy.preventive_energy(
             log_events=self.log_events.copy(),
             inspections_site_stat=self.inspections_site_stat,
             inspections_port_stat=self.inspections_port_stat,
@@ -276,12 +276,12 @@ class TestPreventiveEnergyWindTimeseries(unittest.TestCase):
         )
 
         # Solo df_wind deve essere popolato
-        self.assertFalse(df_wind.empty)
-        self.assertTrue(df_wave.empty)
-        self.assertTrue(df_pv.empty)
+        self.assertFalse(data_result['wind'].empty)
+        self.assertTrue(data_result['wave'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
-        self.assertEqual(len(df_wind), 1)
-        row = df_wind.iloc[0]
+        self.assertEqual(len(data_result['wind']), 1)
+        row = data_result['wind'].iloc[0]
 
         self.assertEqual(row["Event"], "inspection_site")
         self.assertEqual(row["id"], "ofw_insp_ts_001")
@@ -352,7 +352,7 @@ class TestPreventiveEnergyWave(unittest.TestCase):
         """
         mock_stat_eval.return_value = 10.0
 
-        df_wind, df_wave, df_pv = preventive_energy.preventive_energy(
+        data_result = preventive_energy.preventive_energy(
             log_events=self.log_events.copy(),
             inspections_site_stat=self.inspections_site_stat,
             inspections_port_stat=self.inspections_port_stat,
@@ -371,12 +371,12 @@ class TestPreventiveEnergyWave(unittest.TestCase):
             STATISTIC_ENERGY=True,  # ramo statistico
         )
 
-        self.assertTrue(df_wind.empty)
-        self.assertFalse(df_wave.empty)
-        self.assertTrue(df_pv.empty)
+        self.assertTrue(data_result['wind'].empty)
+        self.assertFalse(data_result['wave'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
-        self.assertEqual(len(df_wave), 1)
-        row = df_wave.iloc[0]
+        self.assertEqual(len(data_result['wave']), 1)
+        row = data_result['wave'].iloc[0]
         self.assertEqual(row["Event"], "inspection_port")
         self.assertEqual(row["id"], "owc_insp_001")
         self.assertEqual(row["Name"], "WEC Port Inspection")
@@ -448,7 +448,7 @@ class TestPreventiveEnergyPV(unittest.TestCase):
         """
         mock_stat_eval.return_value = 123.0
 
-        df_wind, df_wave, df_pv = preventive_energy.preventive_energy(
+        data_result = preventive_energy.preventive_energy(
             log_events=self.log_events.copy(),
             inspections_site_stat=self.inspections_site_stat,
             inspections_port_stat=self.inspections_port_stat,
@@ -467,12 +467,12 @@ class TestPreventiveEnergyPV(unittest.TestCase):
             STATISTIC_ENERGY=False,  # 'opv' forza comunque il ramo statistico
         )
 
-        self.assertTrue(df_wind.empty)
-        self.assertTrue(df_wave.empty)
-        self.assertFalse(df_pv.empty)
+        self.assertTrue(data_result['wind'].empty)
+        self.assertTrue(data_result['wave'].empty)
+        self.assertFalse(data_result['pv'].empty)
 
-        self.assertEqual(len(df_pv), 1)
-        row = df_pv.iloc[0]
+        self.assertEqual(len(data_result['pv']), 1)
+        row = data_result['pv'].iloc[0]
         self.assertEqual(row["Event"], "inspection_site")
         self.assertEqual(row["id"], "opv_insp_001")
         self.assertEqual(row["Name"], "PV Site Inspection")

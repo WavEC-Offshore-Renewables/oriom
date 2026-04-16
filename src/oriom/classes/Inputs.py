@@ -59,10 +59,15 @@ class Inputs():
             shift_doube (:obj:`bool`): If True the timeseries analysis is not
                 constrained to a shift duration for scheduling the operations.
                 **keys**: *value*: :obj:`bool ; *units*: :obj:`bool`.
-            logevents_file (:obj:`dict`): Path to a log_events.csv file.
+            logevents_file (:obj:`dict`): Path to a log_events.csv and
+                log_events_merged.csv file.
                 Its value is ``None`` if not defined.
                 **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
             failureevent_file (:obj:`dict`): Path to a failure_events.csv file.
+                Its value is ``None`` if not defined.
+                **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
+            powerevent_file (:obj:`dict`): Path to wave_corrective_energy.csv 
+                and wave_preventive_energy file.
                 Its value is ``None`` if not defined.
                 **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
 
@@ -102,7 +107,9 @@ class Inputs():
                     constrained to a shift duration for scheduling the operations.
                 logevents_file (:obj:`str`,*optional*): Path to a log_events.csv file.
                     Default to ``None``.
-                failureevent_file (:obj:`str`,*optional*): Path to a failureevent_file.csv file.
+                failureevent_file (:obj:`str`,*optional*): Path to a failure_event_file.csv file.
+                    Default to ``None``.
+                powerevent_file (:obj:`str`,*optional*): Path to a failure_event_file.csv file.
                     Default to ``None``.
             """
             self.out_dir = kwargs.get('out_dir', None)
@@ -114,6 +121,7 @@ class Inputs():
             self.inputs["consider double shifts"] = {"value" : False, "units": None}
             self.inputs["logevents_file"] = {"value": None, "units": None}
             self.inputs["failureevent_file"] = {"value": None, "units": None}
+            self.inputs["powerevent_file"] = {"value": None, "units": None}
 
             file_path = kwargs.get('file_inputs', None)
             if file_path is not None:
@@ -160,12 +168,17 @@ class Inputs():
                         }
                     elif ('log' in name and 'file' in name):
                         self.inputs["logevents file"] = {
-                                "value": str(value),
+                                "value": str(value) if value else None,
                                 "units": None
                         }
                     elif ('fail' in name and 'file' in name):
                         self.inputs["failureevent file"] = {
-                                "value": str(value),
+                                "value": str(value) if value else None,
+                                "units": None
+                        }
+                    elif ('power' in name and 'file' in name):
+                        self.inputs["powerevent file"] = {
+                                "value": str(value) if value else None,
                                 "units": None
                         }
                     else:
@@ -202,12 +215,17 @@ class Inputs():
                         }
                     elif key.lower() == 'logevents_file':
                         self.inputs["logevents file"] = {
-                                "value": str(value),
+                                "value": str(value) if value else None,
                                 "units": None
                         }
                     elif key.lower() == 'failureevent_file':
                         self.inputs["failureevent file"] = {
-                                "value": str(value),
+                                "value": str(value) if value else None,
+                                "units": None
+                        }
+                    elif key.lower() == 'powerevent_file':
+                        self.inputs["powerevent file"] = {
+                                "value": str(value) if value else None,
                                 "units": None
                         }
                     else:
@@ -223,6 +241,7 @@ class Inputs():
             self.shift_double = self.inputs.get('consider double shifts')
             self.logevents_file = self.inputs.get('logevents file')
             self.failureevent_file = self.inputs.get('failureevent file')
+            self.powerevent_file = self.inputs.get('powerevent file')
 
             self._check_attributes()
 
@@ -282,6 +301,11 @@ class Inputs():
 
             Raises errors if any attribute is outside the specified range.
             """
+            def error_path_reuse(error_file, dependency):
+                _e = f'If "{error_file}" is to be used, you must define "{dependency}"'
+                logging.error('Inputs.General: ' + _e)
+                raise FileNotFoundError(_e)
+            
             if self.out_dir is None:
                 _e = '"out_dir" must be defined.'
                 logging.error('Inputs.General: ' + _e)
@@ -298,9 +322,20 @@ class Inputs():
                     self.consider_tseries is not None and
                     self.consider_tseries["value"] is True
             ):
-                _e = 'If "Previous Timeseries is to be used, you must define "Previous run dir"'
-                logging.error('Inputs.General: ' + _e)
-                raise AttributeError(_e)
+                error_path_reuse('Previous Timeseries', "Previous run dir")
+            if (
+                    self.failureevent_file is not None and
+                    self.failureevent_file["value"] is None and
+                    self.logevents_file["value"] is not None
+            ):
+                error_path_reuse('Log_events file', "Failure events file")
+            if (
+                    self.powerevent_file is not None and
+                    self.powerevent_file["value"] is not None and
+                    (self.failureevent_file is None or self.failureevent_file["value"] is None or 
+                     self.logevents_file is None or self.logevents_file["value"] is None)
+            ):
+                error_path_reuse('Power events file', 'Log_events file" or "Failure events file')
             if (
                     self.consider_tseries is not None and
                     self.consider_tseries["value"] is True and

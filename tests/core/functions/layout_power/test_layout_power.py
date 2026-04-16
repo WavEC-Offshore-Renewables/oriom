@@ -205,6 +205,22 @@ class DummyOp:
         self.id = id
         self.tow_to_port = tow_to_port
 
+class DummyStats:
+    def __init__(self, start_year, start_month, lifetime):
+        self.start_year = start_year
+        self.start_month = start_month
+        self.lifetime = lifetime
+
+class DummyGen:
+    def __init__(self, energy_path):
+        self.powerevent_file = energy_path
+
+class DummyInput:
+    def __init__(self, start_year, start_month, lifetime, energy_path):
+        self.stats = DummyStats(start_year, start_month, lifetime)
+        self.general = DummyGen(energy_path)
+
+
 
 class TestEnergyAvailabilityWindIntegration(unittest.TestCase):
     """
@@ -224,7 +240,9 @@ class TestEnergyAvailabilityWindIntegration(unittest.TestCase):
             }
         )
 
-        # --- df_corrective for wind (3 rows for time_op>0) ---
+        corrective_res = {}
+        preventive_res = {}
+
         df_wind_corr = pd.DataFrame(
             {
                 "Date": pd.to_datetime(
@@ -238,29 +256,26 @@ class TestEnergyAvailabilityWindIntegration(unittest.TestCase):
                 "Power_loss_kW": [0.0, 10.0, 0.0],
             }
         )
-        df_wave_corr = pd.DataFrame()
-        df_pv_corr = pd.DataFrame()
-        mock_corrective_layout.return_value = (
-            df_wind_corr.copy(),
-            df_wave_corr,
-            df_pv_corr,
+        df_wind_prev = pd.DataFrame(
+                {
+                    "Date": pd.to_datetime(["2025-01-15 00:00:00"]),
+                    "En_loss_kWh": [100.0],
+                    "Time_shutdown": [5.0]
+                }
         )
 
+        corrective_res['wind'] = df_wind_corr.copy()
+        corrective_res['wave'] = pd.DataFrame()
+        corrective_res['pv'] = pd.DataFrame()
+
+        preventive_res['wind'] = df_wind_prev.copy()
+        preventive_res['wave'] = pd.DataFrame()
+        preventive_res['pv'] = pd.DataFrame()
+
+        # --- df_corrective for wind (3 rows for time_op>0) ---
+        mock_corrective_layout.return_value = (corrective_res)
         # --- df_preventive for wind ---
-        df_wind_prev = pd.DataFrame(
-            {
-                "Date": pd.to_datetime(["2025-01-15 00:00:00"]),
-                "En_loss_kWh": [100.0],
-                "Time_shutdown": [5.0],
-            }
-        )
-        df_wave_prev = pd.DataFrame()
-        df_pv_prev = pd.DataFrame()
-        mock_preventive_energy.return_value = (
-            df_wind_prev.copy(),
-            df_wave_prev,
-            df_pv_prev,
-        )
+        mock_preventive_energy.return_value = (preventive_res)
 
         # power_wind as dict: only January
         power_wind = {1: 10.0}
@@ -269,14 +284,15 @@ class TestEnergyAvailabilityWindIntegration(unittest.TestCase):
         # Dummy operations_corrective_stat not empty
         ops_corr_stats = [DummyOp("op_corr_001", tow_to_port=False)]
 
+        inputs = DummyInput({'value': 2025}, {'value': 1}, {'value': 1}, {'value': 'path'})
+
         result = ea.energy_availability(
+            inputs=inputs,
+            r=1,
             log_events_energy=log_events_energy,
             operations_corrective_stat=ops_corr_stats,
             inspections_site_stat=[],
             inspections_port_stat=[],
-            start_year=2025,
-            start_month=1,
-            n_lifetime=1,
             find_element_class=lambda *args, **kwargs: None,
             power_wind=power_wind,
             power_wave=None,
@@ -362,15 +378,16 @@ class TestEnergyAvailabilityPVErrors(unittest.TestCase):
         months = list(range(1, 13))
         power_pv_df = pd.DataFrame({m: [1.0] * 24 for m in months})
 
+        inputs = DummyInput({'value': 2025}, {'value': 1}, {'value': 1}, {'value': 'path'})
+        
         with self.assertRaises(ValueError):
             ea.energy_availability(
+                inputs= inputs,
+                r = 1,
                 log_events_energy=log_events_energy,
                 operations_corrective_stat=[DummyOp("op_corr_001")],
                 inspections_site_stat=[],
                 inspections_port_stat=[],
-                start_year=2025,
-                start_month=1,
-                n_lifetime=1,
                 find_element_class=lambda *args, **kwargs: None,
                 power_wind=None,
                 power_wave=None,
@@ -437,6 +454,128 @@ class TestConfigEnergyAvailability(unittest.TestCase):
         self.assertIsNone(result['max_failure_module'])
 
 
+class TestRecicleFile(unittest.TestCase):
+    """
+    Tests for recicle_file: checks reuse of corrective/preventive CSV files
+    when available, and recompute flag when files are missing or path is invalid.
+    """
 
+    def _make_inputs(self, powerevent_path):
+        """Helper to build a DummyInput with a given powerevent_file path."""
+        return DummyInput(
+            {'value': 2025},   # start_year
+            {'value': 1},      # start_month
+            {'value': 1},      # lifetime
+            {'value': powerevent_path}  # powerevent_file
+        )
+
+    # ------------------------------------------------------------------
+    # Scenario 1: all CSV files exist → data loaded, need_recompute=False
+    # ------------------------------------------------------------------
+    @patch("oriom.core.functions.layout_power.layout_power.aux_functions.convert_stringtime")
+    @patch("pandas.read_csv")
+    @patch("os.path.exists")
+    def test_all_files_exist_returns_data_no_recompute(
+        self, mock_exists, mock_read_csv, mock_convert
+    ):
+        df_corr = pd.DataFrame({'Date': ['2025-01-01'], 'value': [1.0]})
+        df_prev = pd.DataFrame({'Date': ['2025-01-01'], 'value': [2.0]})
+
+        # Both corrective and preventive CSVs exist for every tech
+        mock_exists.return_value = True
+        # read_csv alternates: corrective then preventive for each tech
+        mock_read_csv.side_effect = [
+            df_corr.copy(), df_prev.copy(),  # wind
+            df_corr.copy(), df_prev.copy(),  # wave
+            df_corr.copy(), df_prev.copy(),  # pv
+        ]
+
+        inputs = self._make_inputs('some/path')
+        tech_devices = {'wind': 5, 'wave': 3, 'pv': 10}
+
+        data, need_recompute = ea.recicle_file(inputs, r=1, tech_devices=tech_devices)
+
+        self.assertFalse(need_recompute)
+        for tech in ['wind', 'wave', 'pv']:
+            self.assertFalse(data['corrective'][tech].empty)
+            self.assertFalse(data['preventive'][tech].empty)
+
+    # ------------------------------------------------------------------
+    # Scenario 2: one tech has no device (None) → empty DataFrame inserted
+    # ------------------------------------------------------------------
+    @patch("oriom.core.functions.layout_power.layout_power.aux_functions.convert_stringtime")
+    @patch("pandas.read_csv")
+    @patch("os.path.exists")
+    def test_none_device_inserts_empty_dataframe(
+        self, mock_exists, mock_read_csv, mock_convert
+    ):
+        df_corr = pd.DataFrame({'Date': ['2025-01-01'], 'value': [1.0]})
+        df_prev = pd.DataFrame({'Date': ['2025-01-01'], 'value': [2.0]})
+
+        mock_exists.return_value = True
+        mock_read_csv.side_effect = [
+            df_corr.copy(), df_prev.copy(),  # wind
+            df_corr.copy(), df_prev.copy(),  # pv
+        ]
+
+        inputs = self._make_inputs('some/path')
+        tech_devices = {'wind': 5, 'wave': None, 'pv': 10}
+
+        data, need_recompute = ea.recicle_file(inputs, r=1, tech_devices=tech_devices)
+
+        self.assertFalse(need_recompute)
+        self.assertTrue(data['corrective']['wave'].empty)
+        self.assertTrue(data['preventive']['wave'].empty)
+
+    # ------------------------------------------------------------------
+    # Scenario 3: a CSV is missing → need_recompute=True, loop breaks
+    # ------------------------------------------------------------------
+    @patch("os.path.exists")
+    def test_missing_file_sets_need_recompute(self, mock_exists):
+        # Simulate that at least one file does not exist
+        mock_exists.return_value = False
+
+        inputs = self._make_inputs('some/path')
+        tech_devices = {'wind': 5, 'wave': 3, 'pv': 10}
+
+        data, need_recompute = ea.recicle_file(inputs, r=1, tech_devices=tech_devices)
+
+        self.assertTrue(need_recompute)
+
+    # ------------------------------------------------------------------
+    # Scenario 4: powerevent_file is None → TypeError caught → need_recompute=True
+    # ------------------------------------------------------------------
+    def test_none_powerevent_path_sets_need_recompute(self):
+        inputs = self._make_inputs(None)  # will raise TypeError in os.path.join
+        tech_devices = {'wind': 5, 'wave': 3, 'pv': 10}
+
+        data, need_recompute = ea.recicle_file(inputs, r=1, tech_devices=tech_devices)
+
+        self.assertTrue(need_recompute)
+
+    # ------------------------------------------------------------------
+    # Scenario 5: CSV exists but is empty → stored as empty DataFrame,
+    #             convert_stringtime NOT called
+    # ------------------------------------------------------------------
+    @patch("oriom.core.functions.layout_power.layout_power.aux_functions.convert_stringtime")
+    @patch("pandas.read_csv")
+    @patch("os.path.exists")
+    def test_empty_csv_skips_convert_stringtime(
+        self, mock_exists, mock_read_csv, mock_convert
+    ):
+        mock_exists.return_value = True
+        mock_read_csv.return_value = pd.DataFrame()  # always empty
+
+        inputs = self._make_inputs('some/path')
+        tech_devices = {'wind': 5}
+
+        data, need_recompute = ea.recicle_file(inputs, r=1, tech_devices=tech_devices)
+
+        mock_convert.assert_not_called()
+        self.assertFalse(need_recompute)
+        self.assertTrue(data['corrective']['wind'].empty)
+        self.assertTrue(data['preventive']['wind'].empty)
+
+        
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -197,6 +197,8 @@ class VesselDayCounter():
                             if ST:
                                 log_events_merged.loc[idx, f'ST_contract_{vessel_slot}'] = True
 
+                    if end_date == 'reuse_vessel':
+                        end_date = row['d_end_stat_chart_orig']
                     days_needed = pd.date_range(start_date.normalize(), end_date.normalize())
                     for d in days_needed:
                         key = (d, vessel)
