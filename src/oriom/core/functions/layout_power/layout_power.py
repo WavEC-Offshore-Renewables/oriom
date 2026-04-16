@@ -1,14 +1,62 @@
 import pandas as pd
 import networkx as nx
 import logging
+import os 
 from itertools import repeat
 
-from oriom.utils.aux_functions import save_file_csv
+from oriom.utils import aux_functions
 from oriom.core.functions.layout_power.corrective_energy import corrective_layout
 from oriom.core.functions.layout_power.preventive_energy import preventive_energy
 
 LIST_MONTHS = list(range(1,13))
 
+def recicle_file(inputs, r, tech_devices):
+    """ 
+    Check and reuse corrective and preventive data if are available
+        Both files must be present of the technology
+    """
+
+    
+    op_types = ['corrective', 'preventive']
+    data = {op: {} for op in op_types}
+    paths = {}
+    need_recompute = False
+    energy_path = None
+
+    try:
+        energy_path = os.path.join(inputs.general.powerevent_file["value"], f"result_{r}")
+    except TypeError:
+        need_recompute = True
+
+    for tech, dev_tech in tech_devices.items():
+        paths[tech] = {}
+        # avoid if no device installed
+        if dev_tech is None:
+            for op_type in op_types:
+                data[op_type][tech] = pd.DataFrame()
+            continue
+
+        if energy_path:
+            for op_type in op_types:
+                paths[tech][op_type] = os.path.join(
+                    energy_path, f"{tech}_{op_type}_energy.csv"
+                )
+
+            # Check if exist
+            tech_files_exist = all(os.path.exists(paths[tech][op]) for op in op_types)
+            # recicle
+            if tech_files_exist:
+                for op_type in op_types:
+                    df = pd.read_csv(paths[tech][op_type])
+                    if not df.empty:
+                        aux_functions.convert_stringtime(df, 'Date')
+
+                    data[op_type][tech] = df
+            else:
+                need_recompute = True
+                break
+
+    return data, need_recompute
 
 def config_energy_availability(G_layouts: dict, farm_technologies: object):
     try:
@@ -113,13 +161,12 @@ def get_energy_data(df, year, month=None, mode='preventive'):
 
 
 def energy_availability(
+    inputs: object,
+    r: int,
     log_events_energy: pd.DataFrame,
     operations_corrective_stat: list,
     inspections_site_stat: list,
     inspections_port_stat: list,
-    start_year: int,
-    start_month: int,
-    n_lifetime: int,
     find_element_class,
     power_wind=None,
     power_wave=None,
@@ -147,13 +194,12 @@ def energy_availability(
         of interventions.
 
     Args:
+        inputs( pbj: object): Object of ``Input`` class
+        r (int): number of the simulation,
         log_events (:obj:`pd.DataFrame`): Log of all the events (failure, operation, inspection_port, inspection_site).
         operations_corrective_stat (:obj:`list`): list of objects :class:`OperationsCorrectiveStat`.
         inspections_site_stat (:obj:`list`): list of objects :class:`InspectionsSiteStat`.
         inspections_port_stat (:obj:`list`): list of objects :class:`InspectionsPortStat`.
-        start_year (:obj:`int`): Start_year of the project.
-        start_month (:obj:`int`): Start_month of the project
-        n_lifetime (:obj:`int`): Lifetime of the project in years.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         dict_power_wind (dict, *optional*): dictionary with the average hourly power production [kW] of wind farm. Default as None
@@ -422,64 +468,92 @@ def energy_availability(
     dict_power_wave = create_dict_power(power_wave, 'wave')
     dict_power_pv = create_dict_power(power_pv, 'PV', degradation_rate, True)
 
+    start_year = inputs.stats.start_year["value"]
+    start_month = inputs.stats.start_month["value"]
+    n_lifetime = inputs.stats.lifetime["value"]
+    
     # Reorder all the events by the effective date that occurs (operations for their esecution not for the call)
     mask = ~log_events['event'].isin(['failure', 'inspection_site', 'inspection_port', 'mobilisation'])
     log_events.loc[mask, 'd_trigger'] = log_events.loc[mask, 'd_end_transit_ts']
     log_events = log_events.sort_values(by='d_trigger').reset_index(drop=True)
 
-    df_wind,df_wave,df_pv = corrective_layout(
-        log_events = log_events,
-        start_year = start_year,
-        start_month = start_month,
-        n_lifetime = n_lifetime,
-        operations_corrective_stat = operations_corrective_stat,
-        find_element_class  =  find_element_class,
-        n_device_wtg = n_device_wtg,
-        n_device_wec = n_device_wec,
-        n_device_pv = n_device_pv,
-        G_wind = G_wind,
-        G_wave = G_wave,
-        G_pv = G_pv,
-        dict_power_wind = dict_power_wind,
-        dict_power_wave = dict_power_wave,
-        dict_power_pv = dict_power_pv,
-        degradation_rate = degradation_rate,
-        n_strings_per_inv  =  n_strings_per_inv,
-        n_modules_per_strings = n_modules_per_strings,
-        max_failure_module = max_failure_module,
-        metocean_timeseries = metocean_timeseries,
-        STATISTIC_ENERGY = ENERGY_STATISTICAL_CALCULATION
-    )
+    tech_devices = {'wind': n_device_wtg, 'wave': n_device_wec, 'pv': n_device_pv}
+    energy_data, need_recompute = recicle_file(inputs, r, tech_devices)
 
-    df_wind_p, df_wave_p, df_pv_p = preventive_energy(
-        log_events=log_events,
-        inspections_site_stat=inspections_site_stat,
-        inspections_port_stat=inspections_port_stat,
-        start_year=start_year,
-        find_element_class = find_element_class,
-        n_device_wtg=n_device_wtg,
-        n_device_wec=n_device_wec,
-        n_device_pv=n_device_pv,
-        G_wind = G_wind,
-        G_wave = G_wave,
-        G_pv = G_pv,
-        power_wind=dict_power_wind,
-        power_wave=dict_power_wave,
-        power_pv=dict_power_pv,
-        degradation_rate=degradation_rate,
-        metocean_timeseries = metocean_timeseries,
-        STATISTIC_ENERGY = ENERGY_STATISTICAL_CALCULATION
-    )
+    if need_recompute:
+        energy_data['corrective'] = corrective_layout(
+            log_events = log_events,
+            start_year = start_year,
+            start_month = start_month,
+            n_lifetime = n_lifetime,
+            operations_corrective_stat = operations_corrective_stat,
+            find_element_class  =  find_element_class,
+            n_device_wtg = n_device_wtg,
+            n_device_wec = n_device_wec,
+            n_device_pv = n_device_pv,
+            G_wind = G_wind,
+            G_wave = G_wave,
+            G_pv = G_pv,
+            dict_power_wind = dict_power_wind,
+            dict_power_wave = dict_power_wave,
+            dict_power_pv = dict_power_pv,
+            degradation_rate = degradation_rate,
+            n_strings_per_inv  =  n_strings_per_inv,
+            n_modules_per_strings = n_modules_per_strings,
+            max_failure_module = max_failure_module,
+            metocean_timeseries = metocean_timeseries,
+            STATISTIC_ENERGY = ENERGY_STATISTICAL_CALCULATION
+        )
 
-    for df_c, df_p, tech in [(df_wind, df_wind_p, "wind"), (df_wave, df_wave_p, "wave"), (df_pv, df_pv_p, "pv")]:
-        for df, intervention in [(df_c, 'corrective'), (df_p, 'preventive')]:
+        energy_data['preventive']  = preventive_energy(
+            log_events=log_events,
+            inspections_site_stat=inspections_site_stat,
+            inspections_port_stat=inspections_port_stat,
+            start_year=start_year,
+            find_element_class = find_element_class,
+            n_device_wtg=n_device_wtg,
+            n_device_wec=n_device_wec,
+            n_device_pv=n_device_pv,
+            G_wind = G_wind,
+            G_wave = G_wave,
+            G_pv = G_pv,
+            power_wind=dict_power_wind,
+            power_wave=dict_power_wave,
+            power_pv=dict_power_pv,
+            degradation_rate=degradation_rate,
+            metocean_timeseries = metocean_timeseries,
+            STATISTIC_ENERGY = ENERGY_STATISTICAL_CALCULATION
+        )
+    else:
+        logging.info(f'Uploading power file from previous run {r} folder')
+
+    for op_type, tech_dict in energy_data.items():
+        for tech, df in tech_dict.items():
             if df.empty is False and result_dir_r:
-                name = f'{tech}_{intervention}_energy.csv'
-                save_file_csv(df,result_dir_r,name)
+                filename = f"{tech}_{op_type}_energy.csv"
+                aux_functions.save_file_csv(df,result_dir_r,filename) 
 
-    availability_wind_m, availability_wind_y = create_monthly_yearly_availability(df_wind_p, df_wind, dict_power_wind, n_device_wtg, 'wind', degradation_rate=None)
-    availability_wave_m, availability_wave_y = create_monthly_yearly_availability(df_wave_p, df_wave, dict_power_wave, n_device_wec, 'wave', degradation_rate=None)
-    availability_pv_m, availability_pv_y = create_monthly_yearly_availability(df_pv_p, df_pv, dict_power_pv, n_device_pv, 'PV', degradation_rate=degradation_rate)
+    availability_wind_m, availability_wind_y = create_monthly_yearly_availability(
+        energy_data['preventive']['wind'], 
+        energy_data['corrective']['wind'],
+        dict_power_wind, n_device_wtg,
+        'wind', degradation_rate=None
+    )
+    availability_wave_m, availability_wave_y = create_monthly_yearly_availability(
+        energy_data['preventive']['wave'],
+        energy_data['corrective']['wave'],
+        dict_power_wave, n_device_wec,
+        'wave',
+        degradation_rate=None
+    )
+    availability_pv_m, availability_pv_y = create_monthly_yearly_availability(
+        energy_data['preventive']['pv'],
+        energy_data['corrective']['pv'],
+        dict_power_pv,
+        n_device_pv,
+        'PV',
+        degradation_rate=degradation_rate
+    )
 
     compressed_output = {
         'Availability_month_wind': availability_wind_m,
