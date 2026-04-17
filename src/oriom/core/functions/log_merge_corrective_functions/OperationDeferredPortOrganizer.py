@@ -542,73 +542,104 @@ class OperationDeferredPortCreation():
                 ttp, tts = True, True
                 recommission = 0
                 for _, row in df_failure.iterrows():
-                    ## Correct the device at port ##
-                    if row['id'] in self.oper_port_dict:
-                        row_dates_tow = self.operation_at_port(
-                            row = row, 
-                            device_n = n_device,
-                            date_start_op = row_dates_tow['d_end'].iloc[0],
-                            period = period
-                        )
-                        ttp = False
+                    # Create towing only for first operation
+                    if n_device == 1:
+                        ## Correct the device at port ##
+                        if row['id'] in self.oper_port_dict:
+                            row_dates_tow = self.operation_at_port(
+                                row = row, 
+                                device_n = n_device,
+                                date_start_op = row_dates_tow['d_end'].iloc[0],
+                                period = period
+                            )
+                            ttp = False
 
-                    ## Tow the device to port ##
-                    elif ttp:
-                        if self.oper_port.tow_data.add_op_tow_port:
-                            if row['id'] != self.oper_port.tow_data.add_op_tow_port.id:
-                                date_start_op = row_dates_tow['d_end'].iloc[0]
+                        ## Tow the device to port ##
+                        elif ttp:
+                            if self.oper_port.tow_data.add_op_tow_port:
+                                if row['id'] != self.oper_port.tow_data.add_op_tow_port.id:
+                                    date_start_op = row_dates_tow['d_end'].iloc[0]
+                                else:
+                                    date_start_op = None
                             else:
                                 date_start_op = None
+                            row_dates_tow, write_event = self.tow_to_port(row, n_device, period, date_start_op)
+
+                        ## Tow the device to site ##
                         else:
-                            date_start_op = None
-                        row_dates_tow, write_event = self.tow_to_port(row, n_device, period, date_start_op)
+                            row_dates_tow = self.tow_to_site(
+                                row = row, 
+                                device_n = n_device,
+                                tts = tts,
+                                date_start_op = row_dates_tow['d_end'].iloc[0],
+                                period = period
+                            )
+                            if getattr(self.oper_dict_tow[row['id']], 'recommissioning_time', None):
+                                recommission = self.oper_dict_tow[row['id']].recommissioning_time
+                            if not tts and not row_dates_tow.empty:
+                                if recommission > 0:
+                                    row_dates_tow_recom = self.add_recommission(
+                                        deepcopy(row_dates_tow), 
+                                        row, 
+                                        recommission,
+                                    )
+                            tts = False
 
-                    ## Tow the device to site ##
+                        # Store data
+                        if not self.operation_completed:
+                            break
+                        if write_event:
+                            self.write_event_row(row_dates_tow)
+                            if not row_dates_tow_recom.empty:
+                                self.write_event_row(row_dates_tow_recom)
+                            # Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
+                            if n_device == 1 and ttp:
+                                vessel = self.vessels[row['vessel_1']]
+                                if vessel.mobilisation_time !=0 and row['id'] != self.oper_port.id:
+                                    row_mobi = self.create_mobi(
+                                        row = row[:-1],
+                                        time_fail_op_immediately = time_fail_op_immediately,
+                                        vessel = vessel,
+                                        n_vess = row['n_vessel_1']
+                                    )
+                                    row_mobi['year_month'] = period
+                                    self.write_event_row(row_mobi)
+                    # Avoid other operation
                     else:
-                        row_dates_tow = self.tow_to_site(
-                            row = row, 
-                            device_n = n_device,
-                            tts = tts,
-                            date_start_op = row_dates_tow['d_end'].iloc[0],
-                            period = period
-                        )
-                        if getattr(self.oper_dict_tow[row['id']], 'recommissioning_time', None):
-                            recommission = self.oper_dict_tow[row['id']].recommissioning_time
-                        if not tts and not row_dates_tow.empty:
-                            if recommission > 0:
-                                row_dates_tow_recom = self.add_recommission(
-                                    deepcopy(row_dates_tow), 
-                                    row, 
-                                    recommission,
-                                )
-                        tts = False
+                        if row['vessel_1']:
+                            continue
+                        row_dates_tow_failure = pd.DataFrame([[
+                            row['d_trigger'],
+                            row['d_end_leadtime'],
+                            row['d_end_wait_start'],
+                            row['d_end_dur_net_port'],
+                            row['d_end_transit_ts'],
+                            row['d_end_wait_site'],
+                            row['d_end_dur_net_site'],
+                            row['d_end_transit_tp'],
+                            row['d_end'],
+                            row['d_end_stat_chart'],
+                            row['event'],
+                            row['id'],
+                            None,
+                            None,
+                            None,
+                            None,
+                            row['comments'],
+                            False,
+                            False,
+                            False,
+                            period
+                        ]],columns=self.df_port_oper_def_log.columns)
+                        self.write_event_row(row_dates_tow_failure)
+                
 
-                    # Store data
-                    if not self.operation_completed:
-                        break
-                    if write_event:
-                        self.write_event_row(row_dates_tow)
-                        if not row_dates_tow_recom.empty:
-                            self.write_event_row(row_dates_tow_recom)
-                        # Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
-                        if n_device == 1 and ttp:
-                            vessel = self.vessels[row['vessel_1']]
-                            if vessel.mobilisation_time !=0 and row['id'] != self.oper_port.id:
-                                row_mobi = self.create_mobi(
-                                    row = row[:-1],
-                                    time_fail_op_immediately = time_fail_op_immediately,
-                                    vessel = vessel,
-                                    n_vess = row['n_vessel_1']
-                                )
-                                row_mobi['year_month'] = period
-                                self.write_event_row(row_mobi)
-
+                        
                 if not self.operation_completed:
                     break
-
                 total_failure_to_correct.discard(failure)
                 self.dev_idx_station_port+=1
-            
+
             if not self.operation_completed:
                 logging.error(
                     f"Log event merged: TTP operation deferred not completed\n"

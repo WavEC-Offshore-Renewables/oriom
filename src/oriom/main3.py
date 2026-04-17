@@ -65,7 +65,7 @@ except ImportError:
 
 warnings.simplefilter('ignore')
 logging.basicConfig(
-    level=logging.ERROR,
+    level=logging.ERROR,       # Mostra solo ERROR e CRITICAL
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
@@ -81,11 +81,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="CETO_MEGA",
+    PROJECT_NAME="MOCEAN_MEGA",
     BASEFILES_FROM_EXCEL=False,
     EXCEL_FILE_PATH=r"C:\Users\rmeda\WavEC Offshore Renewables\Equipa WavEC - Documents\General\20 Projects\MegaWavePTO\WP8\T8.1\CaseStudies\Case study",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="ORIOM_CETO_MEGAWAVE.xlsx",
+    FORM_NAME="ORIOM_MOCEAN_MEGAWAVE.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 
