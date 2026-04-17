@@ -416,11 +416,11 @@ def merge_operation(
                         row_merged = pd.concat([row_merged,row_dates], axis=0, ignore_index=False)
 
                 # If cannot start at the same day return the log_event rows
-                if not merge:
+                else:
                     row_merged = pd.concat([row_merged, selected_rows], axis=0, ignore_index=False)
 
                     if vess_group.mobilisation_time != 0:
-                        for row in selected_rows.iterrows():
+                        for idx, row in selected_rows.iterrows():
                             row_merged = create_mobilisation(
                                 df = row_merged,
                                 mobilisation_date = row['d_trigger'],
