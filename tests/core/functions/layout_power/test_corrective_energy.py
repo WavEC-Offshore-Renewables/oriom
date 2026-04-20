@@ -157,7 +157,7 @@ class TestCorrectiveLayoutBasicChecks(unittest.TestCase):
         """
         If no n_device_* is defined, all output DataFrames must be empty.
         """
-        df_wind, df_wave, df_pv = corrective_energy.corrective_layout(
+        data_result = corrective_energy.corrective_layout(
             log_events=self.log_events,
             start_year=2025,
             start_month=1,
@@ -166,9 +166,9 @@ class TestCorrectiveLayoutBasicChecks(unittest.TestCase):
             find_element_class=lambda *args, **kwargs: None,
         )
 
-        self.assertTrue(df_wind.empty)
-        self.assertTrue(df_wave.empty)
-        self.assertTrue(df_pv.empty)
+        self.assertTrue(data_result['wind'].empty)
+        self.assertTrue(data_result['wave'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
     @patch(
         "oriom.core.functions.layout_power.corrective_energy.return_percentage"
@@ -281,7 +281,7 @@ class TestCorrectiveLayoutWind(unittest.TestCase):
 
         dict_power_wind = {1: 1000.0}  # January average farm power [kW]
 
-        df_wind_out, df_wave_out, df_pv_out = corrective_energy.corrective_layout(
+        data_result = corrective_energy.corrective_layout(
             log_events=self.log_events,
             start_year=2025,
             start_month=1,
@@ -295,15 +295,15 @@ class TestCorrectiveLayoutWind(unittest.TestCase):
         )
 
         # Wave / PV are not requested
-        self.assertTrue(df_wave_out.empty)
-        self.assertTrue(df_pv_out.empty)
+        self.assertTrue(data_result['wave'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
         # Check Power_loss_kW formula
         # row 0: (100-100)*1000/100 = 0
         # row 1: (100-50) *1000/100 = 50*10 = 500
-        self.assertIn("Power_loss_kW", df_wind_out.columns)
+        self.assertIn("Power_loss_kW", data_result['wind'].columns)
         self.assertListEqual(
-            df_wind_out["Power_loss_kW"].tolist(), [0.0, 500.0]
+            data_result['wind']["Power_loss_kW"].tolist(), [0.0, 500.0]
         )
 
     @patch(
@@ -346,7 +346,7 @@ class TestCorrectiveLayoutWind(unittest.TestCase):
 
         dict_power_wind = {1: 500.0}  # not used when STATISTIC_ENERGY=False
 
-        df_wind_out, df_wave_out, df_pv_out = corrective_energy.corrective_layout(
+        data_result = corrective_energy.corrective_layout(
             log_events=self.log_events,
             start_year=2025,
             start_month=1,
@@ -361,16 +361,16 @@ class TestCorrectiveLayoutWind(unittest.TestCase):
         )
 
         # Wave / PV not requested
-        self.assertTrue(df_wave_out.empty)
-        self.assertTrue(df_pv_out.empty)
+        self.assertTrue(data_result['wave'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
         # energy_list from metocean: sum of 4 points of 10 = 40
         # Power_loss_kW:
         #  row 0: 40 * (100-0)/100 = 40
         #  row 1: 40 * (100-50)/100 = 20
-        self.assertIn("Power_loss_kW", df_wind_out.columns)
+        self.assertIn("Power_loss_kW", data_result['wind'].columns)
         self.assertListEqual(
-            df_wind_out["Power_loss_kW"].tolist(), [40.0, 20.0]
+            data_result['wind']["Power_loss_kW"].tolist(), [40.0, 20.0]
         )
 
 class TestCorrectiveLayoutWave(unittest.TestCase):
@@ -432,7 +432,7 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
 
         dict_power_wave = {1: 500.0}  # not used in non-STATISTIC_ENERGY
 
-        df_wind_out, df_wave_out, df_pv_out = corrective_energy.corrective_layout(
+        data_result = corrective_energy.corrective_layout(
             log_events=self.log_events,
             start_year=2025,
             start_month=1,
@@ -447,16 +447,16 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
         )
 
         # Wind / PV not requested
-        self.assertTrue(df_wind_out.empty)
-        self.assertTrue(df_pv_out.empty)
+        self.assertTrue(data_result['wind'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
         # energy_list from metocean: sum of 4 points of 10 = 40
         # Power_loss_kW:
         #  row 0: 40 * (100-0)/100 = 40
         #  row 1: 40 * (100-50)/100 = 20
-        self.assertIn("Power_loss_kW", df_wave_out.columns)
+        self.assertIn("Power_loss_kW", data_result['wave'].columns)
         self.assertListEqual(
-            df_wave_out["Power_loss_kW"].tolist(), [40.0, 20.0]
+            data_result['wave']["Power_loss_kW"].tolist(), [40.0, 20.0]
         )
 
     @patch(
@@ -479,7 +479,7 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
 
         dict_power_wave = {1: 2000.0}
 
-        df_wind_out, df_wave_out, df_pv_out = corrective_energy.corrective_layout(
+        data_result = corrective_energy.corrective_layout(
             log_events=self.log_events,
             start_year=2025,
             start_month=1,
@@ -492,14 +492,14 @@ class TestCorrectiveLayoutWave(unittest.TestCase):
             STATISTIC_ENERGY=True,
         )
 
-        self.assertTrue(df_wind_out.empty)
-        self.assertTrue(df_pv_out.empty)
+        self.assertTrue(data_result['wind'].empty)
+        self.assertTrue(data_result['pv'].empty)
 
         # row 0: (100-90)*2000/100 = 10*20 = 200
         # row 1: (100-50)*2000/100 = 50*20 = 1000
-        self.assertIn("Power_loss_kW", df_wave_out.columns)
+        self.assertIn("Power_loss_kW", data_result['wave'].columns)
         self.assertListEqual(
-            df_wave_out["Power_loss_kW"].tolist(), [200.0, 1000.0]
+            data_result['wave']["Power_loss_kW"].tolist(), [200.0, 1000.0]
         )
 
 
@@ -575,7 +575,7 @@ class TestCorrectiveLayoutPV(unittest.TestCase):
         dict_power_pv = pd.DataFrame(dict_power_pv)
         dict_power_pv.index.name = "hour"
 
-        df_wind_out, df_wave_out, df_pv_out = corrective_energy.corrective_layout(
+        data_result = corrective_energy.corrective_layout(
             log_events=self.log_events,
             start_year=2025,
             start_month=1,
@@ -592,13 +592,13 @@ class TestCorrectiveLayoutPV(unittest.TestCase):
         )
 
         # Wind / wave not requested
-        self.assertTrue(df_wind_out.empty)
-        self.assertTrue(df_wave_out.empty)
+        self.assertTrue(data_result['wind'].empty)
+        self.assertTrue(data_result['wave'].empty)
 
         # Power_loss_kW updated via calculate_energy_loss_pv
-        self.assertIn("Power_loss_kW", df_pv_out.columns)
+        self.assertIn("Power_loss_kW", data_result['pv'].columns)
         self.assertListEqual(
-            df_pv_out["Power_loss_kW"].tolist(), [50.0, 50.0]
+            data_result['pv']["Power_loss_kW"].tolist(), [50.0, 50.0]
         )
 
         # calculate_energy_loss_pv must be called twice (two rows)

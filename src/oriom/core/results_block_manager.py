@@ -213,17 +213,17 @@ def results_block(
     graph_dir_r = os.path.join(result_dir_r,'graph_dir')
     os.makedirs(graph_dir_r)
 
+    
     if Config.ENERGY_AVAILABILITY_CALCULATION:
         energy_config = config_energy_availability(G_layouts, farm_technologies)
 
         availability_total = energy_availability(
+            inputs = inputs,
+            r = r,
             log_events_energy = log_events,
             operations_corrective_stat = operations_corrective_stats["pmain"],
             inspections_site_stat = inspections_site_stats["pmain"],
             inspections_port_stat = inspections_port_stats["pmain"],
-            start_year = inputs.stats.start_year["value"],
-            start_month = inputs.stats.start_month["value"],
-            n_lifetime = inputs.stats.lifetime["value"],
             find_element_class = find_element,
             power_wind = dict_power_wind,
             power_wave = dict_power_wave,
@@ -243,13 +243,9 @@ def results_block(
             result_dir_r = result_dir_r
         )
 
-        log_events = log_events[log_events['event'] != 'recommissioning']
-        log_events_merged = log_events_merged[log_events_merged['event'] != 'recommissioning']
-
         combined = {}
-        for k in availability_total.keys():
-            if availability_total[k].empty is False:
-                df = availability_total[k]
+        for k, df in availability_total.items():
+            if df.empty is False:
                 name = k
                 aux_functions.save_file_csv(df,result_dir_r,name +'.csv')
 
@@ -276,6 +272,9 @@ def results_block(
     logging.info('----------------------------------------------------')
     logging.info('--------------------\tKPIs\t----------------')
 
+    log_events = log_events[log_events['event'] != 'recommissioning']
+    log_events_merged = log_events_merged[log_events_merged['event'] != 'recommissioning']
+    
     kpi_total_timeseries, kpi_yearly_timeseries, ctv_dict, daily_vessel, kpi_om_type_cost = kpi_final_total_cost(
         log_events=log_events,
         log_events_merged=log_events_merged,

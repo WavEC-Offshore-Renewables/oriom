@@ -68,12 +68,54 @@ class TestInputsGeneral(unittest.TestCase):
         self.std_asserts(inputs)
 
     def test_errors(self):
-        args = {}
-        self.assertRaises(AttributeError, Inputs.General, **args)
-        args["out_dir"] = self.test_dir
-        args["previous_run_dir"] = 'something'
-        self.assertRaises(FileNotFoundError, Inputs.General, **args)
+        # 1. Test: out_dir missing (AttributeError)
+        with self.assertRaises(AttributeError) as cm:
+            Inputs.General(out_dir=None)
+        self.assertIn('"out_dir" must be defined', str(cm.exception))
 
+        # 2. Test: directory previous not existing (FileNotFoundError)
+        with self.assertRaises(FileNotFoundError):
+            Inputs.General(
+                out_dir=self.test_dir, 
+                previous_run_dir={"value": "percorso/fantasma"}
+            )
+
+        # 3. Test: tseries active but directory missing  (FileNotFoundError)
+        with self.assertRaises(FileNotFoundError):
+            Inputs.General(
+                out_dir=self.test_dir,
+                previous_run_dir=None,
+                consider_tseries={"value": True}
+            )
+
+        # 4. Test: logevents present without failureevent (FileNotFoundError)
+        with self.assertRaises(FileNotFoundError):
+            Inputs.General(
+                out_dir=self.test_dir,
+                failureevent_file=None,
+                logevents_file="exists.log"
+            )
+
+        # 5. Test: powerevent present without log or failure (FileNotFoundError)
+        # Caso A: missing failure
+        with self.assertRaises(FileNotFoundError):
+            Inputs.General(
+                out_dir=self.test_dir,
+                powerevent_file="power.log",
+                failureevent_file=None,
+                logevents_file="exists.log"
+            )
+
+        # 6. Test: tseries present but file timeseries.csv missing (FileNotFoundError)
+        empty_dir = os.path.join(self.test_dir, 'empty')
+        if not os.path.exists(empty_dir): os.makedirs(empty_dir)
+        
+        with self.assertRaises(FileNotFoundError):
+            Inputs.General(
+                out_dir=self.test_dir,
+                previous_run_dir={"value": empty_dir},
+                consider_tseries={"value": True}
+            )
 
 if __name__ == '__main__':
 

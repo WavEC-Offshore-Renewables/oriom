@@ -69,12 +69,14 @@ def preventive_energy(
         ValueError: if "power_pv" is defined and "degradation_rate" not defined.
 
     Returns:
-        pd.DataFrame: dataframe with all the inspections events, percentage farm available and
-            power for WTG farm.
-        pd.DataFrame: dataframe with all the inspections events, percentage farm available and
-            power for WEC farm.
-        pd.DataFrame: dataframe with all the inpsections events, percentage farm available and
-            power for PV farm.
+        dict{
+            pd.DataFrame: dataframe with all the inspections events, percentage farm available and
+                power for WTG farm.
+            pd.DataFrame: dataframe with all the inspections events, percentage farm available and
+                power for WEC farm.
+            pd.DataFrame: dataframe with all the inpsections events, percentage farm available and
+                power for PV farm.
+        }
     """
 
     def preventive_rows(
@@ -288,7 +290,7 @@ def preventive_energy(
             STATISTIC_ENERGY=STATISTIC_ENERGY
         )
 
-    return df_wind,df_wave,df_pv
+    return {'wind': df_wind, 'wave': df_wave, 'pv': df_pv}
 
 
 if __name__ == '__main__':
