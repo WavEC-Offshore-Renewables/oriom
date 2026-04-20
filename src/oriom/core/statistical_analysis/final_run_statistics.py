@@ -16,6 +16,48 @@ except ImportError:
     KPI_Insight = None
 
 
+def normalize_df(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    # vessel_id as index
+    if "vessel_id" in df.columns:
+        df = df.set_index("vessel_id")
+    else:
+        df = df.set_index(df.columns[0])
+
+    # flatten MultiIndex columns (year, metric)
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = [(str(a), str(b)) for a, b in df.columns]
+
+    df = df.apply(pd.to_numeric, errors="coerce")
+
+    return df
+
+
+def safe_stack(dfs_lists):
+
+    dfs = [normalize_df(df) for df in dfs_lists]
+    # Global INDEX
+    all_index = pd.Index(sorted(set.union(*[set(df.index) for df in dfs])))
+    # Global col
+    all_columns = pd.Index(sorted(set.union(*[set(df.columns) for df in dfs])))
+    # ALIGN + FILL ZEROS
+    aligned = [df.reindex(index=all_index, columns=all_columns).fillna(0)for df in dfs]
+    # STACK
+    stack = np.stack([df.to_numpy(dtype=float) for df in aligned], axis=0)
+
+    return stack, all_index, all_columns
+
+
+def compute_mean(dfs_lists):
+
+    stack, idx, cols = safe_stack(dfs_lists)
+    mean = np.mean(stack, axis=0)
+    df_out = pd.DataFrame(mean, index=idx, columns=cols)
+
+    return df_out.reset_index().rename(columns={"index": "vessel_id"})
+
+    
 def return_statistics_runs(
         n_lifetime: int,
         find_element_class: dict,
@@ -149,17 +191,14 @@ def return_statistics_runs(
     if recycled:
         for i in range(len(results_dict.dfs_tot_yearly_cost_list)):
             results_dict.dfs_tot_yearly_cost_list[i] = restructure_df_year(results_dict.dfs_tot_yearly_cost_list[i])
-
-    array_stack = np.stack([df.iloc[:, 1:].to_numpy(dtype=np.float64) for df in results_dict.dfs_tot_yearly_cost_list], axis=0)
-
+    
+    array_stack, all_index, all_columns = safe_stack(results_dict.dfs_tot_yearly_cost_list)
     # Evaluate the average for each cell
     mean_array = np.nanmean(array_stack, axis=0)
 
     # Reconstruct the df
-    vessel_ids = results_dict.dfs_tot_yearly_cost_list[0].iloc[:, 0].values  # first column "vessel_id"
-    column_names = results_dict.dfs_tot_yearly_cost_list[0].columns[1:]  # exclude 'vessel_id'
-    df_cost_yearly = pd.DataFrame(mean_array, columns=column_names)
-    df_cost_yearly.insert(0, "vessel_id", vessel_ids)
+    df_cost_yearly = pd.DataFrame(mean_array, index=all_index, columns=all_columns)
+    df_cost_yearly = df_cost_yearly.reset_index().rename(columns={"index": "vessel_id"})
 
     years = sorted(set(col[0] for col in df_cost_yearly.columns if col[1] == 'direct_costs'))
 

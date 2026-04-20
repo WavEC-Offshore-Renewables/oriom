@@ -426,7 +426,7 @@ def merge_operation(
                                 mobilisation_date = row['d_trigger'],
                                 end_mobi = row['d_end_wait_start'],
                                 event = 'mobilisation',
-                                vessel = row['vessel_1'],
+                                vessel = vess_group,
                                 oper_list = row['id'],
                                 count_fail = row['comments'],
                                 concat=True,

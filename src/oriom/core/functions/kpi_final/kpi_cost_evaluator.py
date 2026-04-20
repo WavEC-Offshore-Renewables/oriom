@@ -294,13 +294,17 @@ def part_other_cost(
 
     # Total cost calculation
     part_cost = merged['parts_cost'].sum()
-    other_cost = (
-        merged['other_costs'].sum()
-        + (merged['port_costs']* (
-                merged['d_end']
-                - merged['d_end_leadtime'].fillna(merged['d_trigger'])
-            ).dt.days).sum()
-    )
+    try:
+        other_cost = (
+            merged['other_costs'].sum()
+            + (merged['port_costs']* (
+                    merged['d_end']
+                    - merged['d_end_leadtime'].fillna(merged['d_trigger'])
+                ).dt.days).sum()
+        )
+    except AttributeError:
+        merged.to_csv(r'C:\Users\rmeda\Desktop\Temporary\temp.csv')
+        raise AttributeError()
 
     return part_cost, other_cost
 

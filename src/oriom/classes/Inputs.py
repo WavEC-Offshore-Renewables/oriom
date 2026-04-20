@@ -269,7 +269,7 @@ class Inputs():
                         _i = 'Inputs.General: "%s" file removed ' % file_name
                         _i += 'from base folder "%s".' % base_folder
                         logging.info(_i)
-                    except FileNotFoundError:
+                    except (FileNotFoundError, shutil.SameFileError):
                         logging.warning('Inputs.General: "%s" file not copied from "%s".' % (file_name, source))
 
             if self.consider_tseries is not None and self.consider_tseries["value"] is True:
@@ -290,7 +290,7 @@ class Inputs():
                         _i += 'from base folder "%s".' % base_folder
                         logging.info(_i)
                         logging.info('Inputs.General: "%s" file copied from "%s".' % (file_name, source))
-                    except FileNotFoundError:
+                    except (FileNotFoundError, shutil.SameFileError):
                         if file_name not in [f'timeseries_{i}.csv' for i in range(1, 10)]:
                             logging.warning('Inputs.General: "%s" file not copied from "%s".' % (file_name, source))
 
