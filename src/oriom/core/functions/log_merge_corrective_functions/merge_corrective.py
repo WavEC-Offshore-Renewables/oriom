@@ -237,7 +237,7 @@ def create_logs_merge(
 
         # DEFERRED TOW
         #------------------
-        if not log_events_tow_def.empty:
+        if not log_events_tow_def.empty and deferred_comments_tow:
             # Create unique set of deferred tow failure
             unique_failures = {f.split('.')[0] for f in deferred_comments_tow}
             oper_port_dict = {}

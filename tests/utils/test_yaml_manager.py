@@ -82,12 +82,12 @@ class TestUpdateYamlEachAttribute(unittest.TestCase):
 
         # Check mapped keys
         self.assertEqual(updated["existing_key"], 1)
-        self.assertEqual(updated["days_main"], 2)
-        self.assertEqual(updated["days_last"], 1)
-        self.assertEqual(updated["duration_main"], 12.0)
-        self.assertEqual(updated["duration_last"], 4.0)
-        self.assertEqual(updated["n_vessel_main"], 3)
-        self.assertEqual(updated["n_vessel_last"], 1)
+        self.assertEqual(updated["working_shifts"]["days_main"], 2)
+        self.assertEqual(updated["working_shifts"]["days_last"], 1)
+        self.assertEqual(updated["working_shifts"]["duration_main"], 12.0)
+        self.assertEqual(updated["working_shifts"]["duration_last"], 4.0)
+        self.assertEqual(updated["working_shifts"]["n_vessel_main"], 3)
+        self.assertEqual(updated["working_shifts"]["n_vessel_last"], 1)
 
         # olc_main must remain as in the original file
         self.assertEqual(updated["olc_main"], {"hs": 1.0})
