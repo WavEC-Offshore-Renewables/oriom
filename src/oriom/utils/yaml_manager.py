@@ -48,6 +48,8 @@ def update_yaml_each_attribute(
         attr_yaml = {}
         raise ValueError(f'UPDATE YAML: The file {file_dir}/{file_name} is empty')
 
+    attr_yaml.setdefault('working_shifts', {})
+
     # Update the file yaml for each key of the dict that is not olc
     if data:
         if operation_id and data.get('id_main') and data['id_main'] != operation_id:
@@ -66,7 +68,7 @@ def update_yaml_each_attribute(
                     k = 'n_vessel_main'
                 elif k == 'n_vessels_last':
                     k = 'n_vessel_last'
-                attr_yaml[k] = v
+                attr_yaml['working_shifts'][k] = v
 
     # Save the file YAML updated
     with open(file_path, 'w') as f:
