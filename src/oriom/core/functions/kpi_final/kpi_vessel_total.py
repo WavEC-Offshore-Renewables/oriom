@@ -249,21 +249,21 @@ def kpi_cost_vessel_internal(
         # Calculate for operations other costs, parts costs and daily port costs
         if not log_o.empty:
             log_o = kpi_aux.remove_row_vessel_double(df = log_o, ves = ves, rov_tech_vessel_count = rov_tech_vessel_count)
-            part_cost, other_cost = part_other_cost(
-                df = log_o,
-                total_operations = total_operations,
-                find_element_class = find_element_class
-            )
-            
-            # Reduce the part cost that were already counted in the port operations
-            log_o_cost_reduce = log_o[log_o['comments'].isin(failure_corrected_port)]
-            if not log_o_cost_reduce.empty:
-                part_cost_reduce, _ = part_other_cost(
-                    df = log_o_cost_reduce,
+            if not log_o.empty:
+                part_cost, other_cost = part_other_cost(
+                    df = log_o,
                     total_operations = total_operations,
                     find_element_class = find_element_class
                 )
-                part_cost -= part_cost_reduce
+                # Reduce the part cost that were already counted in the port operations
+                log_o_cost_reduce = log_o[log_o['comments'].isin(failure_corrected_port)]
+                if not log_o_cost_reduce.empty:
+                    part_cost_reduce, _ = part_other_cost(
+                        df = log_o_cost_reduce,
+                        total_operations = total_operations,
+                        find_element_class = find_element_class
+                    )
+                    part_cost -= part_cost_reduce
 
         else:
             part_cost = 0
