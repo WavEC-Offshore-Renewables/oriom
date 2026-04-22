@@ -4,11 +4,11 @@ import logging
 import os 
 from itertools import repeat
 
+from oriom.common.constants import LIST_MONTHS, DICT_DAYS
 from oriom.utils import aux_functions
 from oriom.core.functions.layout_power.corrective_energy import corrective_layout
 from oriom.core.functions.layout_power.preventive_energy import preventive_energy
 
-LIST_MONTHS = list(range(1,13))
 
 def recicle_file(inputs, r, tech_devices):
     """ 
@@ -300,8 +300,6 @@ def energy_availability(
         energy_availability_m['Months'] = months
         energy_availability_y['Years'] = list_years
 
-        dict_days = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
-
         for y in list_years:
             # --- Annual preventive/corrective ---
             months_p, tot_loss_p, tot_shut_p, _ = get_energy_data(df_preventive, y, mode='preventive')
@@ -314,7 +312,7 @@ def energy_availability(
             # --- Annual energy calculation ---
             power_col = f'p_{tech}'
             en_total = [
-                calculate_energy(dict_power, dict_days, k, y, start_year, hour_energy,
+                calculate_energy(dict_power, DICT_DAYS, k, y, start_year, hour_energy,
                                 degradation_rate, ENERGY_STATISTICAL_CALCULATION,
                                 metocean_timeseries, power_col)
                 for k in list_months_file
@@ -334,7 +332,7 @@ def energy_availability(
                 _, tot_loss_p_m, tot_shut_p_m, _ = get_energy_data(df_preventive, y, m, 'preventive')
 
                 en_month = calculate_energy(
-                    dict_power, dict_days, m, y, start_year, hour_energy,
+                    dict_power, DICT_DAYS, m, y, start_year, hour_energy,
                     degradation_rate, ENERGY_STATISTICAL_CALCULATION,
                     metocean_timeseries, power_col
                 )
