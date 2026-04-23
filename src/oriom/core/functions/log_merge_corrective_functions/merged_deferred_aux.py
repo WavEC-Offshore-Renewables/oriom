@@ -284,5 +284,14 @@ def creation_oper_vessel_dict(
         df_fail.loc[~mask_tow & mask_specific_month, "id"].tolist()
     )
 
+
+def remove_single_mobilisation(log_mobilisation: pd.DataFrame, failures_list: list) -> pd.DataFrame:
+    """ Remove single mobilisation operation from id_failure"""
+    failure_suffixes = {f.split('_', 1)[1] for f in failures_list if '_' in f}
+    mask = ~log_mobilisation['_suffix'].isin(failure_suffixes)
+
+    return log_mobilisation.loc[mask]
+    
+
 if __name__ == '__main__':
     pass
