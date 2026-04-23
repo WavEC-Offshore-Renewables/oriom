@@ -203,7 +203,7 @@ def create_logs_merge(
     # ALL OTHER LOG
     #------------------
     # Copy all log_files that is not going to be merged
-    log_mobilisation = log_events[log_events['event' == 'mobilisation']]
+    log_mobilisation = log_events[log_events['event'] == 'mobilisation']
     log_event_filt = log_events.loc[log_events['event'].isin(FILTER_EVENT)]
     FILTER_EVENT.append('mobilisation')
     log_event_to_merge = log_events.loc[~log_events['event'].isin(FILTER_EVENT)]
@@ -347,7 +347,7 @@ def create_logs_merge(
             log_events_to_merge = log_events_oper_imm[log_events_oper_imm['id'].isin(keys_dict_oper)]
             log_events_not_to_merge = log_events_oper_imm[~log_events_oper_imm['id'].isin(keys_dict_oper)]
 
-            if not log_mobilisation.empty
+            if not log_mobilisation.empty:
                 log_mobilisation['_suffix'] = log_mobilisation['id'].str.split('_', n=1).str[1]
 
             if not log_events_to_merge.empty:

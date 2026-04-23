@@ -28,7 +28,7 @@ COLS_MERGED = [
     "ves_2",              # 15
     "comments",           # 16
     "extra",              # 17
-    "flag",               # 18
+    "id",               # 18
     "ST_flag_1"           # 19
     "ST_flag_2"           # 20
 ]
@@ -130,9 +130,29 @@ class TestMergeOperationSingleOp(unittest.TestCase):
             }
         }
 
+        log_mobilisation = pd.DataFrame(
+            [
+                [
+                    base,                      # d_trigger
+                    None, None, None, None, None, None, None, None, None,
+                    "mobilisation",
+                    None,
+                    "CTV1",                    # vessel_1
+                    1,
+                    None, None,
+                    "mobi_fail_001",
+                    None,
+                    "mobi_fail_001",
+                    None
+                ]
+            ],
+            columns=COLS_MERGED,
+        )
+
         # No vessel actually needed in the single-op branch
-        result = merge_operation(
+        result, log_m = merge_operation(
             log_events_oper_imm=log_events_oper_imm,
+            log_mobilisation = log_mobilisation,
             vessels=[],
             find_element_class=None,  # never used
             time_between_devices={"opv": 1.0, "ofw": 1.0, "owc": 1.0},
@@ -192,7 +212,7 @@ class TestMergeOperationMultipleOps(unittest.TestCase):
                     "CTV1",                    # vessel_1
                     1,
                     None, None,
-                    "fail_001",
+                    "oper_owc_fail_001",
                     None,
                     False,
                 ],
@@ -207,11 +227,43 @@ class TestMergeOperationMultipleOps(unittest.TestCase):
                     "CTV1",
                     1,
                     None, None,
-                    "fail_002",
+                    "oper_owc_fail_002",
                     None,
                     False,
                     False
                 ],
+            ],
+            columns=COLS_MERGED,
+        )
+
+        log_mobilisation = pd.DataFrame(
+            [
+                [
+                    base,                      # d_trigger
+                    None, None, None, None, None, None, None, None, None,
+                    "mobilisation",
+                    None,
+                    "CTV1",                    # vessel_1
+                    1,
+                    None, None,
+                    "mobi_owc_fail_001",
+                    None,
+                    "mobi_owc_fail_001",
+                    None
+                ],
+                [
+                    base,                      # d_trigger
+                    None, None, None, None, None, None, None, None, None,
+                    "mobilisation",
+                    None,
+                    "CTV1",                    # vessel_1
+                    1,
+                    None, None,
+                    "mobi_owc_fail_002",
+                    None,
+                    "mobi_owc_fail_002",
+                    None
+                ]
             ],
             columns=COLS_MERGED,
         )
@@ -270,15 +322,18 @@ class TestMergeOperationMultipleOps(unittest.TestCase):
             last_valid_index=oper_sched_df.index.max(),
         )
 
-        vessel = DummyVessel(vid="CTV1", crew_capacity=10, mobilisation_time=0.0)
+        vessel = DummyVessel(vid="CTV1", crew_capacity=10, mobilisation_time=2)
         op = DummyOP(1)
         finder = DummyFinder(vessel=vessel, oper_schedule=dummy_schedule, op = op)
 
         # time_between_devices: use 1h per tech
         time_between_devices = {"opv": 1.0, "ofw": 1.0, "owc": 1.0}
 
-        result = merge_operation(
+        log_mobilisation['_suffix'] = log_mobilisation['id'].str.split('_', n=1).str[1]
+
+        result, log_m = merge_operation(
             log_events_oper_imm=log_events_oper_imm,
+            log_mobilisation=log_mobilisation,
             vessels=[vessel],
             find_element_class=finder,
             time_between_devices=time_between_devices,
@@ -288,8 +343,11 @@ class TestMergeOperationMultipleOps(unittest.TestCase):
         )
 
         # We expect a single merged row
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
         self.assertEqual(result.iloc[0]["event"], "operation_merged")
+        self.assertEqual(result.iloc[1]["event"], "mobilisation_merged")
+
+        self.assertEqual(len(log_m), 0)
 
         # group_def_id must contain both original operations (index 0 and 1)
         group_def_id = result.iloc[0]["group_def_id"]
@@ -303,7 +361,7 @@ class TestMergeOperationMultipleOps(unittest.TestCase):
         self.assertIsInstance(oper_group_comments, dict)
         self.assertIn("failures", oper_group_comments)
         self.assertCountEqual(
-            oper_group_comments["failures"], ["fail_001", "fail_002"]
+            oper_group_comments["failures"], ["oper_owc_fail_001", "oper_owc_fail_002"]
         )
 
 

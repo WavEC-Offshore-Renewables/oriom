@@ -18,3 +18,8 @@ FAILURE_EDGE_LEVEL_LIST = [
     'array_cable', 'cable_cb', 'cable_transf', 'cable_switch',
     'cable_inv', 'string_cable'
 ]
+
+LIST_MONTHS_STR = [str(c) for c in range(1,13)]
+LIST_MONTHS = [c for c in range(1,13)]
+
+DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
