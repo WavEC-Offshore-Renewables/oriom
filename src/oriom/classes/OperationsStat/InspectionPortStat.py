@@ -2,7 +2,9 @@ import logging
 import os
 import pandas as pd
 import math
-from datetime import datetime
+
+from oriom.common.constants import LIST_MONTHS_STR
+
 
 class InspectionPortStat():
     '''InspectionPortStat class.
@@ -476,13 +478,13 @@ class InspectionPortStat():
         list_months = [str(c) for c in range(1,13)]
 
         wtg_shutdown_row = df_stats[df_stats['percentile'] == 'dur_shutdown_wtg']
-        wtg_shutdown_dict=wtg_shutdown_row[list_months].to_dict(orient='records')[0]
+        wtg_shutdown_dict=wtg_shutdown_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
 
         wec_shutdown_row = df_stats[df_stats['percentile'] == 'dur_shutdown_wec']
-        wec_shutdown_dict=wec_shutdown_row[list_months].to_dict(orient='records')[0]
+        wec_shutdown_dict=wec_shutdown_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
 
         pv_shutdown_row = df_stats[df_stats['percentile'] == 'dur_shutdown_pv']
-        pv_shutdown_dict=pv_shutdown_row[list_months].to_dict(orient='records')[0]
+        pv_shutdown_dict=pv_shutdown_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
 
         # Return only the dict with non zeros values
         for d in [pv_shutdown_dict, wec_shutdown_dict, wtg_shutdown_dict]:
