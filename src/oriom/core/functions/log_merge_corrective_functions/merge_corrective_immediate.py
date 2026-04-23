@@ -7,10 +7,11 @@ from collections import defaultdict
 from oriom.core.functions.logs_timeseries.logs_timeseries_func import create_data, create_mobilisation
 from oriom.core.functions.vessels_manager.vessels_merge_day import df_vessel_merge_use
 from oriom.utils.read_dataframe_value import approximate_hourly_data
-
+from oriom.core.functions.log_merge_corrective_functions.merged_deferred_aux import remove_single_mobilisation
 
 def merge_operation(
         log_events_oper_imm: pd.DataFrame,
+        log_mobilisation: pd.DataFrame,
         vessels: list,
         find_element_class,
         time_between_devices,
@@ -26,6 +27,7 @@ def merge_operation(
 
     Args:
         log_events_oper_imm (pd.DataFrame): Dataframe with the immediate corrective log events.
+        log_mobilisation (pd.DataFrame): Dataframe with the mobilisation log events.
         vessels (list):List of objectts :class:`Vessel`.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         time_between_devices (dict): Dictionary with the time between devices.
@@ -35,11 +37,15 @@ def merge_operation(
         COLS (list): List of columns to be used in the dataframe.
 
     Returns:
-        pd.DataFrame: Dataframe with the immediate corrective merged operations.
+        tuple: 
+            (pd.DataFrame: Dataframe with the immediate corrective merged operations,
+            pd.DataFrame: Dataframe with the mobilisation operations).
+
     """
 
     def merge_operation_row(
             log_events: pd.DataFrame,
+            log_mobilisation: pd.DataFrame,
             day_oper,
             vessels: list,
             time_between_devices,
@@ -72,6 +78,7 @@ def merge_operation(
             with 3 groups of operation merged insthead of 10 vessel. This do not happen many times.
         Args:
             log_events (:obj: `pd.DataFrame`): Dataframe with the log events.
+            log_mobilisation (pd.DataFrame): Dataframe with the mobilisation log events.
             day_oper (:obj:`pd.Series`): Row of days_vessel DataFrame that show how many vessel are used and which are the ops on the day under
                 analysis.
             vessels (:obj:`list`):List of objectts :class:`Vessel`.
@@ -83,7 +90,9 @@ def merge_operation(
             operation_already_merged (set): set of index of operation already merged or passed
 
         Returns:
-            pd.DataFrame: Dataframe with the immediate corrective merged operations.
+            tuple: 
+                (pd.DataFrame: Dataframe with the immediate corrective merged operations,
+                pd.DataFrame: Dataframe with the mobilisation operations).
         """
         def find_operation_groups(
             operations: dict[int, str],
@@ -412,32 +421,23 @@ def merge_operation(
                                 concat = True,
                                 n_vessel = n_vess
                                 )
+                        
+                        log_mobilisation = remove_single_mobilisation(
+                            log_mobilisation = log_mobilisation,
+                            failures_list = oper_group_comments['failures']
+                        )
 
                         row_merged = pd.concat([row_merged,row_dates], axis=0, ignore_index=False)
 
                 # If cannot start at the same day return the log_event rows
-                else:
+                if not merge:
                     row_merged = pd.concat([row_merged, selected_rows], axis=0, ignore_index=False)
-
-                    if vess_group.mobilisation_time != 0:
-                        for idx, row in selected_rows.iterrows():
-                            row_merged = create_mobilisation(
-                                df = row_merged,
-                                mobilisation_date = row['d_trigger'],
-                                end_mobi = row['d_end_wait_start'],
-                                event = 'mobilisation',
-                                vessel = vess_group,
-                                oper_list = row['id'],
-                                count_fail = row['comments'],
-                                concat=True,
-                                n_vessel = row['n_vessel_1']
-                            )
 
             # If only one operation, do not merge
             else:
                 row_merged = pd.concat([row_merged, selected_rows], axis=0, ignore_index=False)
 
-        return row_merged
+        return row_merged, log_mobilisation
 
 
     ############### MAIN CODE ###############
@@ -452,8 +452,9 @@ def merge_operation(
 
     # Merge the operations for each day that operations are conducted
     for idx, day_oper in daily_vessel.iterrows():
-        row_merged = merge_operation_row(
+        row_merged, log_mobilisation = merge_operation_row(
             log_events=log_events_oper_imm,
+            log_mobilisation = log_mobilisation,
             day_oper=day_oper,
             vessels=vessels,
             time_between_devices=time_between_devices,
@@ -466,4 +467,4 @@ def merge_operation(
         if not row_merged.empty:
             row_merged_imm = pd.concat([row_merged_imm, row_merged], axis=0, ignore_index=False)
 
-    return row_merged_imm
+    return row_merged_imm, log_mobilisation

@@ -2,7 +2,7 @@ import logging
 import os
 import pandas as pd
 
-from oriom.common.constants import LIST_MONTHS
+from oriom.common.constants import LIST_MONTHS_STR
 
 
 class InspectionSiteStat():
@@ -151,91 +151,91 @@ class InspectionSiteStat():
         dur_total_row = df_stats[
             df_stats['percentile'] == 'dur_total_p'
         ]
-        dur_total_dict = dur_total_row[LIST_MONTHS].to_dict(orient='records')[0]
+        dur_total_dict = dur_total_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
         wait_start_row = df_stats[
             df_stats['percentile'] == 'wait_start'
         ]
-        wait_start_dict= wait_start_row[LIST_MONTHS].to_dict(orient='records')[0]
+        wait_start_dict= wait_start_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
         if 'dur_net_site' in df_stats['percentile'].tolist():
             dur_net_site_row = df_stats[
                 df_stats['percentile'] == 'dur_net_site'
             ]
-            dur_net_site_dict=dur_net_site_row[LIST_MONTHS].to_dict(orient='records')[0]
+            dur_net_site_dict=dur_net_site_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             dur_net_site_group_dict = None
             dur_net_site_solo_dict = None
         else:
             dur_net_site_group_row = df_stats[
                 df_stats['percentile'] == 'dur_net_site_group'
             ]
-            dur_net_site_group_dict=dur_net_site_group_row[LIST_MONTHS].to_dict(orient='records')[0]
+            dur_net_site_group_dict=dur_net_site_group_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             dur_net_site_solo_row = df_stats[
                 df_stats['percentile'] == 'dur_net_site_solo'
             ]
-            dur_net_site_solo_dict=dur_net_site_solo_row[LIST_MONTHS].to_dict(orient='records')[0]
+            dur_net_site_solo_dict=dur_net_site_solo_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             dur_net_site_dict = None
         if 'transit_to_site' in df_stats['percentile'].tolist():
             transit_to_site_row = df_stats[
                 df_stats['percentile'] == 'transit_to_site'
             ]
-            transit_to_site_dict=transit_to_site_row[LIST_MONTHS].to_dict(orient='records')[0]
+            transit_to_site_dict=transit_to_site_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             transit_to_site_group_dict=None
             transit_to_site_solo_dict=None
         else:
             transit_to_site_group_row = df_stats[
                 df_stats['percentile'] == 'transit_to_site_group'
             ]
-            transit_to_site_group_dict=transit_to_site_group_row[LIST_MONTHS].to_dict(orient='records')[0]
+            transit_to_site_group_dict=transit_to_site_group_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             transit_to_site_solo_row = df_stats[
                 df_stats['percentile'] == 'transit_to_site_solo'
             ]
-            transit_to_site_solo_dict=transit_to_site_solo_row[LIST_MONTHS].to_dict(orient='records')[0]
+            transit_to_site_solo_dict=transit_to_site_solo_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             transit_to_site_dict = None
         if 'transit_to_port' in df_stats['percentile'].tolist():
             transit_to_port_row = df_stats[
                 df_stats['percentile'] == 'transit_to_port'
             ]
-            transit_to_port_dict=transit_to_port_row[LIST_MONTHS].to_dict(orient='records')[0]
+            transit_to_port_dict=transit_to_port_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             transit_to_port_group_dict=None
             transit_to_port_solo_dict=None
         else:
             transit_to_port_group_row = df_stats[
                 df_stats['percentile'] == 'transit_to_port_group'
             ]
-            transit_to_port_group_dict=transit_to_port_group_row[LIST_MONTHS].to_dict(orient='records')[0]
+            transit_to_port_group_dict=transit_to_port_group_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             transit_to_port_solo_row = df_stats[
                 df_stats['percentile'] == 'transit_to_port_solo'
             ]
-            transit_to_port_solo_dict=transit_to_port_solo_row[LIST_MONTHS].to_dict(orient='records')[0]
+            transit_to_port_solo_dict=transit_to_port_solo_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             transit_to_port_dict=None
         if 'wait_port' in df_stats['percentile'].tolist():
             wait_port_row = df_stats[
                 df_stats['percentile'] == 'wait_port'
             ]
-            wait_port_dict=wait_port_row[LIST_MONTHS].to_dict(orient='records')[0]
+            wait_port_dict=wait_port_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             wait_port_group_dict=None
             wait_port_solo_dict=None
         else:
             wait_port_group_row = df_stats[
                 df_stats['percentile'] == 'wait_port_group'
             ]
-            wait_port_group_dict=wait_port_group_row[LIST_MONTHS].to_dict(orient='records')[0]
+            wait_port_group_dict=wait_port_group_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             wait_port_solo_row = df_stats[
                 df_stats['percentile'] == 'wait_port_solo'
             ]
-            wait_port_solo_dict=wait_port_solo_row[LIST_MONTHS].to_dict(orient='records')[0]
+            wait_port_solo_dict=wait_port_solo_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
             wait_port_dict = None
         wtg_shutdown_row = df_stats[
             df_stats['percentile'] == 'dur_shutdown_wtg'
         ]
-        wtg_shutdown_dict=wtg_shutdown_row[LIST_MONTHS].to_dict(orient='records')[0]
+        wtg_shutdown_dict=wtg_shutdown_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
         wec_shutdown_row = df_stats[
             df_stats['percentile'] == 'dur_shutdown_wec'
         ]
-        wec_shutdown_dict=wec_shutdown_row[LIST_MONTHS].to_dict(orient='records')[0]
+        wec_shutdown_dict=wec_shutdown_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
         pv_shutdown_row = df_stats[
             df_stats['percentile'] == 'dur_shutdown_pv'
         ]
-        pv_shutdown_dict=pv_shutdown_row[LIST_MONTHS].to_dict(orient='records')[0]
+        pv_shutdown_dict=pv_shutdown_row[LIST_MONTHS_STR].to_dict(orient='records')[0]
 
         dict_statistics = {
             'dur_total_dict' : dur_total_dict,

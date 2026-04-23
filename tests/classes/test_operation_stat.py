@@ -16,8 +16,6 @@ from oriom.classes.Vessel import Vessel
 from oriom.classes.DefineOperationTechs import Define_operation
 
 
-
-
 file_vessels=os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'vessels.yaml')
 file_fuel_cons=os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'vessels_fuels.yaml')
 file_load_factor=os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'vessels_loads.yaml')
