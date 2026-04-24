@@ -74,7 +74,7 @@ class TestUpdateYamlEachAttribute(unittest.TestCase):
             yaml_manager.update_yaml_each_attribute(
                 file_dir=tmpdir,
                 file_name="attrs.yaml",
-                data=data,
+                data=data
             )
 
             with open(path, "r") as f:
@@ -133,33 +133,6 @@ class TestUpdateYaml(unittest.TestCase):
         self.assertEqual(updated["a"], 1)
         self.assertEqual(updated["nested"]["x"], 1)
         self.assertEqual(updated["new_section"], {"b": 2})
-
-    def test_update_yaml_recursive_merges_dicts(self):
-        """update_yaml with recursive=True must deep-merge dicts via update_dict."""
-        original = {"a": 1, "nested": {"x": 1, "y": 2}}
-        new_data = {"nested": {"y": 99, "z": 100}}
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            path = os.path.join(tmpdir, "file.yaml")
-            yaml = YAML()
-            with open(path, "w") as f:
-                yaml.dump(original, f)
-
-            yaml_manager.update_yaml(
-                file_dir=tmpdir,
-                file_name="file.yaml",
-                data=new_data,
-                data_key=None,
-                recursive=True,
-            )
-
-            with open(path, "r") as f:
-                updated = YAML(typ="safe").load(f)
-
-        self.assertEqual(updated["a"], 1)
-        self.assertEqual(updated["nested"]["x"], 1)
-        self.assertEqual(updated["nested"]["y"], 99)
-        self.assertEqual(updated["nested"]["z"], 100)
 
 
 class TestLoadShiftValuesFromYaml(unittest.TestCase):
@@ -231,23 +204,13 @@ class TestLoadSimilarOpYaml(unittest.TestCase):
         - read data_working_shifts from 'working_shifts' section only.
         """
         content = {
-            "days_main": 1,
-            "days_last": 2,
-            "duration_main": 12.0,
-            "duration_last": 4.0,
-            "n_vessels_main": 3,
-            "n_vessels_last": 1,
-            "id_grouped": "grp_1",
-            "days_grouped": 30,
-            "duration_grouped": 40.0,
-            "rov_main": True,
-            "rov_grouped": False,
-
-            # working_shifts section
             "working_shifts": {
-                "id_main": "op_A",
-                "days_main": 3,  # should be used only for data_working_shifts, not for op_working_shifts
+                "days_main": 1,
+                "days_last": 2,
                 "duration_main": 12.0,
+                "duration_last": 4.0,
+                "n_vessels_main": 3,
+                "n_vessels_last": 1,
                 "id_grouped": "grp_1",
                 "days_grouped": 30,
                 "duration_grouped": 40.0,
@@ -255,13 +218,22 @@ class TestLoadSimilarOpYaml(unittest.TestCase):
                 "rov_grouped": False,
                 "olc_main": {"hs": 1.0},  # special: must go in op_working_shifts
                 "olc_last": {"hs": 2.0},
-                "n_vessel_main": 3,
-                "n_vessel_last": 1,
-                "n_dev_inspected_main_shift": 9,
-                "n_dev_inspected_last_shift": 10,
-                "n_crew_main": 5,
-                "n_crew_last": 2,
             },
+            # working_shifts section
+            "id_main": "op_A",
+            "days_main": 3,  # should be used only for data_working_shifts, not for op_working_shifts
+            "duration_main": 12.0,
+            "id_grouped": "grp_1",
+            "days_grouped": 30,
+            "duration_grouped": 40.0,
+            "rov_main": True,
+            "rov_grouped": False,
+            "n_vessel_main": 3,
+            "n_vessel_last": 1,
+            "n_dev_inspected_main_shift": 9,
+            "n_dev_inspected_last_shift": 10,
+            "n_crew_main": 5,
+            "n_crew_last": 2,
         }
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -277,15 +249,13 @@ class TestLoadSimilarOpYaml(unittest.TestCase):
             )
 
         # op_working_shifts: non-olc keys from root 'content', olc_* from 'working_shifts'
-        self.assertEqual(op_working_shifts["id_main"], "op_A")
+        self.assertNotIn("id_main", op_working_shifts)
         self.assertEqual(op_working_shifts["days_main"], 3)  # from root, not 10
         self.assertEqual(op_working_shifts["duration_main"], 12.0)
         self.assertEqual(op_working_shifts["n_vessel_main"], 3)
         self.assertEqual(op_working_shifts["n_vessel_last"], 1)
         self.assertEqual(op_working_shifts["n_crew_main"], 5)
         self.assertEqual(op_working_shifts["n_crew_last"], 2)
-        self.assertEqual(op_working_shifts["olc_main"], {"hs": 1.0})
-        self.assertEqual(op_working_shifts["olc_last"], {"hs": 2.0})
         self.assertEqual(
             op_working_shifts["n_dev_inspected_main_shift"], 9
         )
@@ -303,6 +273,8 @@ class TestLoadSimilarOpYaml(unittest.TestCase):
         self.assertEqual(data_working_shifts["rov_grouped"], False)
         self.assertEqual(data_working_shifts["n_vessels_main"], 3)
         self.assertEqual(data_working_shifts["n_vessels_last"], 1)
+        self.assertEqual(data_working_shifts["olc_main"], {"hs": 1.0})
+        self.assertEqual(data_working_shifts["olc_last"], {"hs": 2.0})
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

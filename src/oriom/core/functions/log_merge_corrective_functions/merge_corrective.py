@@ -9,7 +9,7 @@ from oriom.core.functions.log_merge_corrective_functions.merge_corrective_immedi
 from oriom.core.functions.log_merge_corrective_functions.group_merging_immediate import mergeble_operation
 
 
-FILTER_EVENT = ['failure', 'inspection_site', 'inspection_port', 'mobilisation']
+FILTER_EVENT = ['failure', 'inspection_site', 'inspection_port']
 OLC_LIST = ['hs', 'cs', 'ws', 'ws_hub', 'tp', 'light']
 COLS = [
     'd_trigger',
@@ -203,6 +203,7 @@ def create_logs_merge(
     # ALL OTHER LOG
     #------------------
     # Copy all log_files that is not going to be merged
+    log_mobilisation = log_events[log_events['event'] == 'mobilisation']
     log_event_filt = log_events.loc[log_events['event'].isin(FILTER_EVENT)]
     log_event_to_merge = log_events.loc[~log_events['event'].isin(FILTER_EVENT)]
 
@@ -237,7 +238,7 @@ def create_logs_merge(
 
         # DEFERRED TOW
         #------------------
-        if not log_events_tow_def.empty:
+        if not log_events_tow_def.empty and deferred_comments_tow:
             # Create unique set of deferred tow failure
             unique_failures = {f.split('.')[0] for f in deferred_comments_tow}
             oper_port_dict = {}
@@ -345,10 +346,14 @@ def create_logs_merge(
             log_events_to_merge = log_events_oper_imm[log_events_oper_imm['id'].isin(keys_dict_oper)]
             log_events_not_to_merge = log_events_oper_imm[~log_events_oper_imm['id'].isin(keys_dict_oper)]
 
+            if not log_mobilisation.empty:
+                log_mobilisation['_suffix'] = log_mobilisation['id'].str.split('_', n=1).str[1]
+
             if not log_events_to_merge.empty:
                 # Merge immediate corrective operations
-                log_events_merged_immediate = merge_operation(
+                log_events_merged_immediate, log_mobilisation = merge_operation(
                     log_events_oper_imm=log_events_to_merge,
+                    log_mobilisation = log_mobilisation,
                     vessels=vessels,
                     find_element_class=find_element_class,
                     time_between_devices=time_between_devices,
@@ -359,12 +364,18 @@ def create_logs_merge(
 
                 log_events_merged = pd.concat([log_events_merged, log_events_merged_immediate],ignore_index=False)
 
+            if not log_mobilisation.empty:
+                log_mobilisation = log_mobilisation.drop(columns=['_suffix'])
+
             # copy non mergeble operations
             if not log_events_not_to_merge.empty:
                 log_events_merged = pd.concat([log_events_merged, log_events_not_to_merge],ignore_index=False)
         else:
             log_events_merged = pd.concat([log_events_merged, log_events_oper_imm],ignore_index=False)
 
+    if not log_mobilisation.empty:
+        log_events_merged = pd.concat([log_events_merged, log_mobilisation],ignore_index=False)
+    
     log_events_merged = merged_deferred_aux.manage_recommissioning(log_events_merged)
     log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
 

@@ -87,7 +87,7 @@ def yearly_vessel_cost(
     """   Plot the lifetime costs based   """
 
     # df preparation
-    direct_costs_cols = df.loc[:, df.columns.get_level_values('metric') == 'direct_costs']
+    direct_costs_cols = df.loc[:, df.columns.get_level_values(1) == 'direct_costs']
     avg_direct_costs = direct_costs_cols.mean(axis=1, skipna=True)
     result_df = pd.DataFrame({
         'cost_type': df[('vessel_id', '')],
