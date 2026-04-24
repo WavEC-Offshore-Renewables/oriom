@@ -417,7 +417,7 @@ def merge_operation(
                                 event = 'mobilisation_merged',
                                 vessel = vess_group,
                                 oper_list = group,
-                                count_fail = oper_group_comments['failures'],
+                                count_fail = oper_group_comments['failures'][0],
                                 concat = True,
                                 n_vessel = n_vess
                                 )
