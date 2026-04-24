@@ -121,6 +121,9 @@ def start_date_inspection(
         else:
             month = inspection.insp_class.months
 
+        if inspection.insp_class.periodicity > 1:
+            y += + int(inspection.insp_class.periodicity)
+
         list_year = [y]
         while y < start_year + tot_years:
             y = y + int(inspection.insp_class.periodicity)

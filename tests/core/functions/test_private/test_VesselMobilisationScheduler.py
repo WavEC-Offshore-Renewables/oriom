@@ -65,7 +65,7 @@ class TestVesselMobilisationScheduler(unittest.TestCase):
         # Row with required fields
         row = pd.Series(
             {
-                "id": "ofw_fail_001.1",
+                "id": "oper_ofw_fail_001.1",
                 "comments": "ofw_fail_001",
                 "event": "operation_corrective",
                 "d_end_stat_chart": datetime(2025, 1, 10, 0, 0),
@@ -79,8 +79,8 @@ class TestVesselMobilisationScheduler(unittest.TestCase):
             row[col_name] = row[col_name].date()
 
         # Mock read_dataframe_value utilities
-        m_take_id_operation.return_value = [["ofw_fail_001.1", "ofw_op001"]]
-        m_get_first_failure.return_value = "ofw_fail_001"
+        m_take_id_operation.return_value = [["oper_ofw_fail_001.1", "oper_ofw_op001.1"]]
+        m_get_first_failure.return_value = "oper_ofw_fail_001.1"
 
         # Dummy operation stats returned by find_element
         op_stats = SimpleNamespace(
@@ -118,7 +118,7 @@ class TestVesselMobilisationScheduler(unittest.TestCase):
         # op_end for non-inspection = d_end_wait_start_date
         self.assertEqual(mob_entry["op_end"][-1], row["d_end_wait_start"])
         # comments uses get_first_failure
-        self.assertIn("ofw_fail_001", mob_entry["comments"][-1])
+        self.assertIn("ofw_fail_001.1", mob_entry["comments"][-1])
 
         # reuse_recall_vess_dict must be updated with the new chart time
         self.assertIn(idx, self.scheduler.reuse_recall_vess_dict)
@@ -416,6 +416,7 @@ class TestVesselMobilisationScheduler(unittest.TestCase):
                 "event": ["operation", "operation"],
                 "vessel_1": ["V1", "V1"],
                 "n_vessel_1": [1, 1],
+                "n_vessel_2": [None, None],
                 "vessel_2": [np.nan, np.nan],
                 "comments": ["", ""],
                 "ST_contract_1": [False, False],

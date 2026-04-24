@@ -209,7 +209,7 @@ class TestStartDateInspectionPeriodicGE1(unittest.TestCase):
             n_lifetime=5,
         )
         # Minimum dur_total is at month 9
-        expected_years = [2020, 2022, 2024]
+        expected_years = [2022, 2024]
         self.assertEqual(len(datetimes), len(expected_years))
         for year, dt in zip(expected_years, datetimes):
             self.assertEqual(dt, datetime(year, 9, 5, 8, 0, 0))
