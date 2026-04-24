@@ -120,12 +120,13 @@ def create_logs_timeseries_file(
         mother_vessels_list = mother_vessels_list
     )
 
-    inspection_campaign_stat = Stat_chart_inspection_campaign(inspections_site_stat = inspections_site_stat)
-    log_preventive = inspection_campaign_stat.create_stat_chart_inspection_campaign(
-        df = log_preventive,
-        vessels = vessels,
-        percentile = inputs.stats.percentile_max["value"]
-    )
+    if not log_preventive.empty:
+        inspection_campaign_stat = Stat_chart_inspection_campaign(inspections_site_stat = inspections_site_stat)
+        log_preventive = inspection_campaign_stat.create_stat_chart_inspection_campaign(
+            df = log_preventive,
+            vessels = vessels,
+            percentile = inputs.stats.percentile_max["value"]
+        )
 
     log_events = pd.concat([log_corrective,log_preventive], axis=0, ignore_index=True)
 
