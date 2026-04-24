@@ -83,9 +83,9 @@ DEFAULT_CONFIG  = ConfigRun(
     ENERGY_STATISTICAL_CALCULATION=False,
     PROJECT_NAME="MOCEAN_MEGAWAVE",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\rmeda\WavEC Offshore Renewables\Equipa WavEC - Documents\General\20 Projects\MegaWavePTO\WP8\T8.1\CaseStudies\Case study",
+    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Equipa WavEC - T8.1\CaseStudies\Case study",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="ORIOM_MOCEAN_MEGAWAVE.xlsx",
+    FORM_NAME="ORIOM_MOCEAN_MEGAWAVE1.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 
