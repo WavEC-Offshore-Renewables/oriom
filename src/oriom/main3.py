@@ -85,7 +85,7 @@ DEFAULT_CONFIG  = ConfigRun(
     BASEFILES_FROM_EXCEL=False,
     EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Equipa WavEC - T8.1\CaseStudies\Case study",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="ORIOM_MOCEAN_MEGAWAVE1.xlsx",
+    FORM_NAME="ORIOM_MOCEAN_MEGAWAVE.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 
