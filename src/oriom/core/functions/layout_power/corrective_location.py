@@ -15,6 +15,14 @@ RENAME_COL = {
 
 
 def choose_spec_loc_string(G, start_node):
+    """ 
+    Find the first node to start_node after the node with level attribute == ``substation`` 
+        with the shortest path from ``substation``. Used to deenergize a string.
+    
+    Args:
+        G (:obj:nx.DiGraph): Graph of tech farm.
+        start_node (int): Position of the node to evaluate
+    """
     # Shorterst path to the HUB
     percorso = nx.shortest_path(G, source=start_node, target=0)
     # Find first node with level != power_level
