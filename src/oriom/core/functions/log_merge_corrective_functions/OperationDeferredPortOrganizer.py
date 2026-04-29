@@ -518,7 +518,7 @@ class OperationDeferredPortCreation():
         """
 
         # Extract failure type and number
-        suffix = self.log_events_tow_def['comments'].str.rsplit('_', n=1).str[-1]
+        suffix = self.log_events_tow_def['comments'].str.split('_', n=1).str[-1]
         # Evaluate year_month from the first operation of failure type
         self.log_events_tow_def['year_month'] = (
             self.log_events_tow_def
