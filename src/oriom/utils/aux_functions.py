@@ -89,7 +89,8 @@ def convert_stringtime(
         "%d-%m-%y %H:%M",
         "%d-%m-%Y %H:%M",
         "%Y/%m/%d %H:%M:%S",
-        "%Y/%m/%d %H:%M"
+        "%Y/%m/%d %H:%M",
+        "%m/%d/%Y %H:%M"
     ]
 
     i=0
