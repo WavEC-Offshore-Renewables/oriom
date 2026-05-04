@@ -308,14 +308,19 @@ the devisce at port and stored at port must be present (if not know = 0)
     Require String disconnection == True
 
 - String disconnection: <br>
-    If additional operations is present, shutdown the entire string of the device that is towed for the whole duration of the additional operation. This deenergize the string on which the device is disconnected along the additional operation. If False, no deenergization is required and only the device shut.
+    If additional operations is present, shutdown the entire string of the device that is towed for the whole duration of the additional operation
 
 - Recommissioning: <br>
     If additional operations is present that shutdown the entire string of the device a recommissioning period can be added. This must be int value and represent the hours of recommision to consider. In Additional Operations activity add recommissioning activity AFTER the TRANSIT to port as LOCATION == port
 
+- The chart time for Towing operations works as:
+    - For additional operation removal:
+        - If the mobilisation of the vessel is higher than the operation at port, add the towing operational duration to the statistical chart time
+    - For Tow removal:
+        - If the mobilisation of the vessel is higher than the operation at port, double the duration of tow to the statistical chart time
+    - Other future chart for TTP operations are simply evaluated. If previous contract stipulated cover these lasts operation, the vessel will be reused (PRIVATE FUNCTIONALITIES)
 
 ## ACTIVITIES
-
 - More detailed are the activities and better it is, add more activities as refined as possible for long operations. One is a part of the O&M on which the work can be stopped and taken back in another day (when is decided by MAX HOUR BETWEEN ACTIVITY).
 
 
