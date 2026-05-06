@@ -206,8 +206,8 @@ def create_logs_corrective_file(
                 elif deferred_tow:
                     date_failure_tow = deferred_tow_correction.date_op
                     date_start = date_failure_tow + timedelta(hours=time_fail_op_immediately)
-                else:
-                    vessel, ves_2, mob_time = _take_vessel_data(op = oper.tow_data.tow_op_port)
+                    
+                vessel, ves_2, mob_time = _take_vessel_data(op = oper.tow_data.tow_op_port)
                 towing_port = CorrectionTowPort(
                     date_failure = date_failure_tow if date_failure_tow else date_failure,
                     vessel = vessel,
