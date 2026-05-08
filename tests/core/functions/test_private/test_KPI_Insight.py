@@ -133,42 +133,46 @@ class TestKPIInsightEndToEnd(unittest.TestCase):
             # Plain operation, belongs to V1 as vessel_1
             dict(event="operation",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=24),
                  d_end_wait_start=base,  # => 1 day
+                 d_end_leadtime=base,
                  d_trigger=base - timedelta(hours=1),
-                 d_end_stat_chart="normal",
+                 d_end_stat_chart=base + timedelta(hours=48),
                  comments="{}",
                  id="OP-A"),
 
             # Merged op, belongs to V1, 2 days, comments carry tech_tot
             dict(event="operation_merged",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=48),
                  d_end_wait_start=base,  # => 2 days
+                 d_end_leadtime=base,
                  d_trigger=base - timedelta(hours=2),
-                 d_end_stat_chart="normal",
+                 d_end_stat_chart=base + timedelta(hours=72),
                  comments="{'tech_tot': 6}",
                  id="OP-B"),
 
             # Inspection on V1 as vessel_1, 1 day counted from trigger
             dict(event="inspection_site",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=24),
                  d_end_wait_start=base,  # not used for inspection_site days
+                 d_end_leadtime=base,  # not used for inspection_site days
                  d_trigger=base,
-                 d_end_stat_chart="normal",
+                 d_end_stat_chart=base + timedelta(hours=48),
                  comments="{}",
                  id="INSP-C"),
 
             # A reused row to contribute to reuse% numerator
             dict(event="operation",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=6),
                  d_end_wait_start=base,
+                 d_end_leadtime=base,
                  d_trigger=base,
                  d_end_stat_chart="reuse_vessel",
                  comments="{}",
