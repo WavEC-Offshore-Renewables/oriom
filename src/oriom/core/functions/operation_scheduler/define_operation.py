@@ -247,7 +247,7 @@ def define_operation_values(
                 if act_startability.sum() == 0:
                     # This activity cannot start anymore.
                     # Get out from this while loop and
-                    # test most restrictive activity next possible timstep.
+                    # test most restrictive activity next possible timestep.
                     break
 
                 # This activity can occur in this interval
@@ -359,6 +359,9 @@ def define_operation_values(
                         "waitings": waitings,
                         "towing_shut": towing_to_site
                 }
+            else:
+                # reset previous solution if the next_solution_found is not satisfied
+                prev_solution_found = False
 
         return metocean_ts
 
