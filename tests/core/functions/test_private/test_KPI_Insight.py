@@ -31,10 +31,12 @@ class DummyOp:
     """
     Minimal op carrying the attributes used by add_costs_to_dict / create_dict_cost.
     """
-    def __init__(self, op_id, vessel1_id=None, vessel2_id=None,
-                 parts_cost=0, tech_required=0, tech_cost=0,
-                 tech_per_device=None, rov_daily=None, failures=None, days_main=None,
-                 other_costs=0):
+    def __init__(
+            self, op_id, vessel1_id=None, vessel2_id=None,
+            parts_cost=0, tech_required=0, tech_cost=0,
+            tech_per_device=None, rov_daily=None, failures=None, days_main=None,
+            other_costs=0
+        ):
         self.id = op_id
         self.vessel1_id = vessel1_id
         self.vessel2_id = vessel2_id
@@ -131,42 +133,46 @@ class TestKPIInsightEndToEnd(unittest.TestCase):
             # Plain operation, belongs to V1 as vessel_1
             dict(event="operation",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=24),
                  d_end_wait_start=base,  # => 1 day
+                 d_end_leadtime=base,
                  d_trigger=base - timedelta(hours=1),
-                 d_end_stat_chart="normal",
+                 d_end_stat_chart=base + timedelta(hours=48),
                  comments="{}",
                  id="OP-A"),
 
             # Merged op, belongs to V1, 2 days, comments carry tech_tot
             dict(event="operation_merged",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=48),
                  d_end_wait_start=base,  # => 2 days
+                 d_end_leadtime=base,
                  d_trigger=base - timedelta(hours=2),
-                 d_end_stat_chart="normal",
+                 d_end_stat_chart=base + timedelta(hours=72),
                  comments="{'tech_tot': 6}",
                  id="OP-B"),
 
             # Inspection on V1 as vessel_1, 1 day counted from trigger
             dict(event="inspection_site",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=24),
                  d_end_wait_start=base,  # not used for inspection_site days
+                 d_end_leadtime=base,  # not used for inspection_site days
                  d_trigger=base,
-                 d_end_stat_chart="normal",
+                 d_end_stat_chart=base + timedelta(hours=48),
                  comments="{}",
                  id="INSP-C"),
 
             # A reused row to contribute to reuse% numerator
             dict(event="operation",
                  vessel_1=v1, vessel_2=np.nan,
-                 n_vessel_1=1, n_vessel_2=0,
+                 n_vessel_1_effective=1, n_vessel_2=0,
                  d_end=base + timedelta(hours=6),
                  d_end_wait_start=base,
+                 d_end_leadtime=base,
                  d_trigger=base,
                  d_end_stat_chart="reuse_vessel",
                  comments="{}",
@@ -249,14 +255,14 @@ class TestKPIInsightEndToEnd(unittest.TestCase):
         # average tech merged from comments{'tech_tot': 6}
         self.assertEqual(df_avg.loc["ctv", "average tech merged"], 6.00)
 
-        # merge % = merged_op / tot_op (operation + operation_merged) = 1 / 3
-        self.assertAlmostEqual(df_avg.loc["ctv", "merge %"], round(1/3,2))
+        # merge % = merged_op / tot_op (operation + operation_merged) = 100 / 3
+        self.assertAlmostEqual(df_avg.loc["ctv", "merge %"], round(100/3,2))
 
         # reuse % = reused_rows / total_rows_for_ratio
         # reused_rows = 1 (OP-RUSE)
         # total considered = all ops+inspections excluding tow (operation, operation_merged, inspection_site, inspection_port)
-        # here: 3 rows (operation, operation_merged, inspection) + OP-RUSE (operation) = 4 -> 1/4 = 0.25
-        self.assertAlmostEqual(df_avg.loc["ctv", "reuse %"], 0.25)
+        # here: 3 rows (operation, operation_merged, inspection) + OP-RUSE (operation) = 4 -> 100/4 = 25.0
+        self.assertAlmostEqual(df_avg.loc["ctv", "reuse %"], 25.0)
 
         # Cost columns from dfs_tot_cost_list average of the kept two rows (ctv/sov grouped by vessel type index):
         # For 'ctv' we only have one data row with tot_vessel_costs=1000, tot_mobilization_costs=100
