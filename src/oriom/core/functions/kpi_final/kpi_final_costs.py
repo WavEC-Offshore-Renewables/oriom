@@ -230,18 +230,20 @@ def kpi_final_total_cost(
     for year in years:
         log_events_year = log_events[log_events['d_end'].dt.year == year].copy()
         log_events_merged_year = log_events_merged[log_events_merged['d_end'].dt.year == year].copy()
-        vessel_day_count_year = deepcopy(vessel_day_counter)
-        vessel_day_count_ST_year = deepcopy(vessel_day_count_ST)
-
-        # Filter only desired year
-        vessel_day_count_year.vessels_calendar = vessel_day_count_year.vessels_calendar[
-            vessel_day_count_year.vessels_calendar.index.year == year
-        ]
-        vessel_day_count_ST_year.vessels_calendar = vessel_day_count_ST_year.vessels_calendar[
-            vessel_day_count_ST_year.vessels_calendar.index.year == year
-        ]
-
+        
         if not log_events_merged_year.empty:
+            vessel_day_count_year = deepcopy(vessel_day_counter)
+            vessel_day_count_ST_year = deepcopy(vessel_day_count_ST)
+
+            # Filter only desired year
+            vessel_day_count_year.vessels_calendar = vessel_day_count_year.vessels_calendar[
+                vessel_day_count_year.vessels_calendar.index.year == year
+            ]
+            if not (vessel_day_count_ST_year.vessels_calendar == 0).all().all():
+                vessel_day_count_ST_year.vessels_calendar = vessel_day_count_ST_year.vessels_calendar[
+                    vessel_day_count_ST_year.vessels_calendar.index.year == year
+                ]
+                
             (log_events_op_y, log_events_op_ST, log_events_op_merged_y,
             log_events_op_def_merged_y, log_events_op_merged_oper_y,
             log_events_insp_merged_y, log_events_mobi_merged_y,
