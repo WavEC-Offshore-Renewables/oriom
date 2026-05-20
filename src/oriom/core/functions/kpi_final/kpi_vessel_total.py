@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import math as mt
 
-from oriom.utils.aux_functions import safe_copy_df
+from oriom.utils.aux_functions import safe_copy_df, save_file_csv
 
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.kpi_final import kpi_aux
@@ -73,7 +73,7 @@ def kpi_cost_vessel_internal(
     fuel_cost_mgo: float,
     fuel_cost_mdo: float,
     find_element_class: object,
-    years: int = 1
+    years: int = 1,
 )->tuple[pd.DataFrame,pd.DataFrame]:
 
     """
@@ -110,7 +110,7 @@ def kpi_cost_vessel_internal(
     Returns:
         :obj:`pd.DataFrame`: dataframe directs costs for all the operations divided by vessels .
     """
-
+    vessel_fuel_usage = {}
     kpi_om = pd.DataFrame(columns=COLS)
     rov_tech_vessel_count = {}
     failure_corrected_port = []
@@ -328,6 +328,15 @@ def kpi_cost_vessel_internal(
         op_cost += rov_cost - rov_insp
         insp_cost += rov_insp
 
+        vessel_fuel_usage = kpi_aux.store_fuel_data(
+            vessel_usage = vessel_fuel_usage,
+            ves = ves,
+            transit_cost = transit_cost,
+            maneuver_cost = maneuver_cost,
+            standby_cost = standby_cost,
+            fuel_cost_times_density = fuel_cost_times_density,
+        )
+
         vessel_cost = charter_cost+transit_cost+maneuver_cost+standby_cost
 
         vessel_cost_avg = averaged_res(vessel_cost,charter_days)
@@ -355,16 +364,15 @@ def kpi_cost_vessel_internal(
         ]], columns=COLS)
 
         kpi_om = pd.concat([kpi_om, kpi], ignore_index=True)
-
-
+    
     kpi_om_type_cost = pd.DataFrame({
-                'description': ['corrective', 'preventive'],
-                'values': [op_cost,  insp_cost]
-            })
+        'description': ['corrective', 'preventive'],
+        'values': [op_cost,  insp_cost]
+    })
 
     kpi_om = create_lifetime_cost(kpi_om)
 
-    return kpi_om, kpi_om_type_cost
+    return kpi_om, kpi_om_type_cost, vessel_fuel_usage
 
 if __name__ == '__main__':
     pass

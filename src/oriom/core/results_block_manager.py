@@ -275,7 +275,7 @@ def results_block(
     log_events = log_events[log_events['event'] != 'recommissioning']
     log_events_merged = log_events_merged[log_events_merged['event'] != 'recommissioning']
     
-    kpi_total_timeseries, kpi_yearly_timeseries, ctv_dict, daily_vessel, kpi_om_type_cost = kpi_final_total_cost(
+    kpi_total_timeseries, kpi_yearly_timeseries, ctv_dict, daily_vessel, kpi_om_type_cost, vessel_fuel_usage = kpi_final_total_cost(
         log_events=log_events,
         log_events_merged=log_events_merged,
         vessels=vessels,
@@ -300,7 +300,13 @@ def results_block(
     aux_functions.save_file_csv(kpi_total_timeseries,result_dir_r,'kpi_total_final.csv')
     aux_functions.save_file_csv(kpi_yearly_timeseries,result_dir_r,'kpi_yearly_final.csv')
     aux_functions.save_file_csv(daily_vessel,result_dir_r,'daily_vessel_ST.csv', indexing = True)
-
+    
+    if vessel_fuel_usage:
+        df_vessel_fuel_usage = pd.DataFrame(vessel_fuel_usage).T
+        df_vessel_fuel_usage.index.name = "vessel_type"
+        aux_functions.save_file_csv(df_vessel_fuel_usage, os.path.join(result_dir_r,'vessel_fuel_usage.csv'), indexing = True)
+        results_dict.dfs_vessel_fuel_usage.append(df_vessel_fuel_usage)
+        
     if ctv_dict:
         ctv_df = pd.DataFrame.from_dict(ctv_dict, orient='index')
         aux_functions.save_file_csv(ctv_df,result_dir_r,'ctv_df.csv', True)

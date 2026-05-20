@@ -325,7 +325,7 @@ def farm_availability(
     plt.xticks(xticks_filtered)
     plt.xlabel('Years')
     plt.ylabel('Energy availability %')
-    plt.ylim(min(energy_av) * 0.9, 100)
+    plt.ylim(0 * 0.9, 100)
 
     plt.title('Energy availability per year : Avg %i' %avg_en)
     if save_dir is not None:
@@ -500,4 +500,54 @@ def distribution_mobilization(
 
 
 if '__main__' == __name__:
+    
+    df = pd.DataFrame({
+        'Years': range(2002, 2022),
+        'En_availability': [
+            80.91949809,
+            77.78189792,
+            92.85591332,
+            99.88120906,
+            94.69590883,
+            99.94856446,
+            44.1647771,
+            58.29272253,
+            99.95807511,
+            47.33591076,
+            75.40622683,
+            79.87218453,
+            69.35512126,
+            47.52555481,
+            70.45086651,
+            60.01287536,
+            99.95885721,
+            99.30031705,
+            48.15382663,
+            0
+        ],
+        'Time_availability': [
+            80.80831145,
+            74.15525114,
+            91.8715847,
+            98.65296804,
+            88.83561644,
+            99.79452055,
+            59.28961749,
+            69.96575342,
+            99.80593607,
+            56.95205479,
+            76.01320583,
+            74.70319635,
+            77.3630137,
+            58.90410959,
+            81.50045537,
+            66.39269406,
+            99.71461187,
+            97.29452055,
+            60.05236794,
+            0
+        ]
+    })
+
+    farm_availability(df, 'MOCEAN_STD', r'C:\Users\RiccardoMeda\tmp')
     pass
