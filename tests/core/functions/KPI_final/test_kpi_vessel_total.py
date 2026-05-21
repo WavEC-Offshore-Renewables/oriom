@@ -28,14 +28,11 @@ class TestKpiCostVesselInternalNoEvents(unittest.TestCase):
     Basic test: no events, one vessel, everything should be zero.
     """
 
-    @patch("oriom.core.functions.kpi_final.kpi_vessel_total.safe_copy_df",
-           side_effect=lambda df, cols: df.copy())
+    @patch("oriom.core.functions.kpi_final.kpi_vessel_total.safe_copy_df", side_effect=lambda df, cols: df.copy())
     @patch("oriom.core.functions.kpi_final.kpi_vessel_total.calculate_event_costs")
     @patch("oriom.core.functions.kpi_final.kpi_vessel_total.part_other_cost")
-    @patch("oriom.core.functions.kpi_final.kpi_vessel_total.kpi_aux.filter_df_events_per_vessel",
-           side_effect=lambda df, ves_id, *args, **kwargs: df)
-    @patch("oriom.core.functions.kpi_final.kpi_vessel_total.kpi_aux.define_fuel_cost",
-           return_value=0.0)
+    @patch("oriom.core.functions.kpi_final.kpi_vessel_total.kpi_aux.filter_df_events_per_vessel", side_effect=lambda df, ves_id, *args, **kwargs: df)
+    @patch("oriom.core.functions.kpi_final.kpi_vessel_total.kpi_aux.define_fuel_cost", return_value=0.0)
     @patch("oriom.core.functions.kpi_final.kpi_vessel_total.VesselDayCounter")
     def test_single_vessel_no_events_zero_costs(
         self,
@@ -84,7 +81,7 @@ class TestKpiCostVesselInternalNoEvents(unittest.TestCase):
             mobilisation_cost=0.0,
         )
 
-        kpi_om, kpi_om_type_cost = kpi_vessel_total.kpi_cost_vessel_internal(
+        kpi_om, kpi_om_type_cost, _ = kpi_vessel_total.kpi_cost_vessel_internal(
             log_events_op_orig=log_events_op_orig,
             log_events_op_merged_orig=log_events_op_merged_orig,
             log_events_op_def_merged_orig=log_events_op_def_merged_orig,
@@ -158,6 +155,7 @@ class TestKpiCostVesselInternalWithEvents(unittest.TestCase):
     @patch("oriom.core.functions.kpi_final.kpi_vessel_total.kpi_aux.define_fuel_cost",
            return_value=1.0)
     @patch("oriom.core.functions.kpi_final.kpi_vessel_total.VesselDayCounter")
+
     def test_single_vessel_with_costs_and_port_operations(
         self,
         mock_vdc_cls,
@@ -244,7 +242,7 @@ class TestKpiCostVesselInternalWithEvents(unittest.TestCase):
             mobilisation_cost=10000.0,  # €/mobilisation day
         )
 
-        kpi_om, kpi_om_type_cost = kpi_vessel_total.kpi_cost_vessel_internal(
+        kpi_om, kpi_om_type_cost, df_fuel = kpi_vessel_total.kpi_cost_vessel_internal(
             log_events_op_orig=log_events_op_orig,
             log_events_op_merged_orig=log_events_op_merged_orig,
             log_events_op_def_merged_orig=log_events_op_def_merged_orig,

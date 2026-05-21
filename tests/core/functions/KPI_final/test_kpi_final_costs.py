@@ -138,11 +138,13 @@ class TestKpiFinalTotalCost(unittest.TestCase):
 
         kpi_life = self._mk_kpi(["V1", "V2"], direct_cost=100, days=2)
         kpi_year_2025 = self._mk_kpi(["V1", "V2"], direct_cost=100, days=2)
+        kpi_fuel = pd.DataFrame()
 
         # Called twice: (1) lifetime, (2) for year 2025 (since 2026 has no events)
         mock_kpi_cost.side_effect = [
-            (kpi_life, pd.DataFrame()),
-            (kpi_year_2025, pd.DataFrame()),
+            (kpi_life, pd.DataFrame(), pd.DataFrame()),
+            (kpi_year_2025, pd.DataFrame(), pd.DataFrame()),
+            (kpi_fuel, pd.DataFrame(), pd.DataFrame()),
         ]
 
         kpi_total, kpi_yearly, *_ = kpi_final_total_cost(
@@ -188,7 +190,7 @@ class TestKpiFinalTotalCost(unittest.TestCase):
 
         # Lifetime call happens even if year is empty; mock it.
         kpi_life = self._mk_kpi(["V1"], direct_cost=0, days=0)
-        mock_kpi_cost.return_value = (kpi_life, pd.DataFrame())
+        mock_kpi_cost.return_value = (kpi_life, pd.DataFrame(), pd.DataFrame())
 
         _, kpi_yearly, *_ = kpi_final_total_cost(
             log_events,
@@ -236,10 +238,12 @@ class TestKpiFinalTotalCost(unittest.TestCase):
 
         # yearly call also needs n_chart_days
         kpi_year_2025 = kpi_life.copy()
+        kpi_fuel = pd.DataFrame()
 
         mock_kpi_cost.side_effect = [
-            (kpi_life, pd.DataFrame()),
-            (kpi_year_2025, pd.DataFrame()),
+            (kpi_life, pd.DataFrame(), pd.DataFrame()),
+            (kpi_year_2025, pd.DataFrame(), pd.DataFrame()),
+            (kpi_fuel, pd.DataFrame(), pd.DataFrame()),
         ]
 
         kpi_total, *_ = kpi_final_total_cost(

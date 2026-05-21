@@ -35,7 +35,7 @@ def kpi_final_total_cost(
     Based on the log of events it calculates the direct costs for corrective
         operations.
 
-     Args:
+    Args:
         log_events (:obj:`pd.DataFrame`): Log of all the events (failure,
             operation, inspection_port, inspection_site).
         log_events_merged: (:obj:`pd.DataFrame`): Log of all the events merged (failure,
@@ -192,7 +192,7 @@ def kpi_final_total_cost(
         rov_cost_dict[op.id] = getattr(getattr(op.op_class, "rov_drone", None), "daily_charter", 0)
 
     # Total lifetime costs
-    kpi_om, kpi_om_type_cost = kpi_cost_vessel_internal(
+    kpi_om, kpi_om_type_cost, df_vessel_fuel_usage = kpi_cost_vessel_internal(
         log_events_op_orig = log_events_op,
         log_events_op_merged_orig = log_events_op_merged,
         log_events_op_def_merged_orig = log_events_op_def_merged,
@@ -216,7 +216,7 @@ def kpi_final_total_cost(
         fuel_cost_mgo = fuel_cost_mgo,
         fuel_cost_mdo = fuel_cost_mdo,
         find_element_class = find_element_class,
-        years = inputs.stats.lifetime["value"]
+        years = inputs.stats.lifetime["value"],
     )
 
     # Extract years
@@ -249,7 +249,7 @@ def kpi_final_total_cost(
             log_events_insp_merged_y, log_events_mobi_merged_y,
             log_events_tow_y, log_event_op_port_y) = filter_log_file_per_operations(log_events_year,log_events_merged_year)
 
-            kpi_year, kpi_om_type_cost_year = kpi_cost_vessel_internal(
+            kpi_year, kpi_om_type_cost_year, _ = kpi_cost_vessel_internal(
                 log_events_op_orig = log_events_op_y,
                 log_events_op_merged_orig = log_events_op_merged_y,
                 log_events_op_def_merged_orig = log_events_op_def_merged_y,
@@ -328,7 +328,7 @@ def kpi_final_total_cost(
     else:
         ctv_dict = {}
 
-    return kpi_om, kpi_om_year_final, ctv_dict, daily_vessel, kpi_om_type_cost
+    return kpi_om, kpi_om_year_final, ctv_dict, daily_vessel, kpi_om_type_cost, df_vessel_fuel_usage
 
 
 if __name__ == '__main__':

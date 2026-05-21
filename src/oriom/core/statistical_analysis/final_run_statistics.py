@@ -230,6 +230,16 @@ def return_statistics_runs(
             ws4.append(row)
         final_economic_graphs.plot_ctv_annual_chart_strategy(df_ctv = df_ctv, save_dir = save_dir)
 
+    if results_dict.dfs_vessel_fuel_usage and any(not df.empty for df in results_dict.dfs_vessel_fuel_usage):
+        df_avg_fuel_usage = (
+            pd.concat(results_dict.dfs_vessel_fuel_usage)
+            .groupby(level=0)
+            .sum()
+            .div(len(results_dict.dfs_vessel_fuel_usage))
+        )
+        aux_functions.save_file_csv(df_to_save = df_avg_fuel_usage, save_dir = save_dir, filename = f'df_avg_fuel_usage.csv', indexing = True)
+        
+        
     # Average type cost
     if results_dict.kpi_om_type_cost_list:
         kpi_om_type_cost_concat = pd.concat(results_dict.kpi_om_type_cost_list)
