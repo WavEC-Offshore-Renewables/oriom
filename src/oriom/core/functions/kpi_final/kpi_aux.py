@@ -5,6 +5,26 @@ import ast
 
 from oriom.utils.read_dataframe_value import compute_rov_cost
 
+
+def store_fuel_data(
+    vessel_usage,
+    ves,
+    transit_cost,
+    maneuver_cost,
+    standby_cost,
+    fuel_cost_times_density,
+):
+    vessel_key = f"{ves.id}_{ves.type}"
+    vessel_usage[vessel_key] = {}
+    for fuel_use, value_fuel in zip(['transit', 'maneuver', 'standby'], [transit_cost, maneuver_cost, standby_cost]):
+        if fuel_cost_times_density != 0:
+            vessel_usage[vessel_key][fuel_use] = value_fuel/fuel_cost_times_density
+        else:
+            vessel_usage[vessel_key][fuel_use] = 0
+
+    return vessel_usage
+
+
 def calculate_cost(
         transit_time_merged: float,
         maneuver_time_merged: float,
@@ -16,11 +36,11 @@ def calculate_cost(
     Calculate transit fuel costs
 
     Args:
-        transit_time_merged (float): time of transit in hours
-        maneuver_time_merged (float): time of manuver in hours
-        standby_time_merged (float): time of stand_by at port in hours
-        vessel (class: ´Vessel´): time of in hours
-        fuel_cost_times_density (float): fuel cost*density of fuel
+        transit_time_merged (float): time of transit in hours [h]
+        maneuver_time_merged (float): time of manuver in hours [h]
+        standby_time_merged (float): time of stand_by at port in hours [h]
+        vessel (class: ´Vessel´): object of the class ´Vessel´ considered
+        fuel_cost_times_density (float): fuel cost*density of fuel [euros/l]
 
     Return:
         float: cost of transitfuel
@@ -243,7 +263,7 @@ def tech_rov_cost(
         df (pd.DataFrame): Dataframe of Log_events for the operation type analysed
         rov_cost_dict (:obj:`dict`): Dict of rov per operations
         duration_shift (float):
-        tech_per_oper_dict (:obj:`dict`): Dict of technicians costs per operations
+        oper_dict_tech (:obj:`dict`): Dict of technicians costs per operations
 
     Returns:
         float: Total cost of technician for the operation type analysed

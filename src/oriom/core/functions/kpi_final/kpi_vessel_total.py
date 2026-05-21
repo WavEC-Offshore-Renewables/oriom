@@ -73,7 +73,7 @@ def kpi_cost_vessel_internal(
     fuel_cost_mgo: float,
     fuel_cost_mdo: float,
     find_element_class: object,
-    years: int = 1
+    years: int = 1,
 )->tuple[pd.DataFrame,pd.DataFrame]:
 
     """
@@ -113,6 +113,7 @@ def kpi_cost_vessel_internal(
 
     kpi_om = pd.DataFrame(columns=COLS)
     rov_tech_vessel_count = {}
+    vessel_fuel_usage = {}
     failure_corrected_port = []
 
     op_cost = 0 ## VALUE NOT RETURNED, USEFULL FOR A DEBUG AND CHECK THE INSPECTION vs CORRECTION COST
@@ -328,6 +329,15 @@ def kpi_cost_vessel_internal(
         op_cost += rov_cost - rov_insp
         insp_cost += rov_insp
 
+        vessel_fuel_usage = kpi_aux.store_fuel_data(
+            vessel_usage = vessel_fuel_usage,
+            ves = ves,
+            transit_cost = transit_cost,
+            maneuver_cost = maneuver_cost,
+            standby_cost = standby_cost,
+            fuel_cost_times_density = fuel_cost_times_density,
+        )
+
         vessel_cost = charter_cost+transit_cost+maneuver_cost+standby_cost
 
         vessel_cost_avg = averaged_res(vessel_cost,charter_days)
@@ -356,15 +366,17 @@ def kpi_cost_vessel_internal(
 
         kpi_om = pd.concat([kpi_om, kpi], ignore_index=True)
 
-
+    df_vessel_usage = pd.DataFrame(vessel_fuel_usage).T
+    df_vessel_usage.index.name = "vessel_type"
+    
     kpi_om_type_cost = pd.DataFrame({
-                'description': ['corrective', 'preventive'],
-                'values': [op_cost,  insp_cost]
-            })
+        'description': ['corrective', 'preventive'],
+        'values': [op_cost,  insp_cost]
+    })
 
     kpi_om = create_lifetime_cost(kpi_om)
 
-    return kpi_om, kpi_om_type_cost
+    return kpi_om, kpi_om_type_cost, df_vessel_usage
 
 if __name__ == '__main__':
     pass

@@ -20,6 +20,7 @@ try:
     )
 except ModuleNotFoundError:
     check_files_spec = None
+    
 
 class TestMainEndToEnd(unittest.TestCase):
     """End-to-end regression test for oriom.main."""
@@ -162,7 +163,6 @@ class TestMainEndToEnd(unittest.TestCase):
         self.assertTrue(actual_result0_dir.exists(), f"Actual result_0 directory not found: {actual_result0_dir}")
 
         self._assert_csv_dirs_equal(expected_dir=expected_result0_dir, actual_dir=actual_result0_dir)
-
 
 
 if __name__ == "__main__":
