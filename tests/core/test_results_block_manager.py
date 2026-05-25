@@ -27,6 +27,7 @@ class DummyResults:
         self.kpi_om_type_cost_list = []
         self.dfs_log_events = []
         self.dfs_log_events_merged = []
+        self.dfs_vessel_fuel_usage = []
 
 
 class DummyVesselDayCounter:
@@ -245,6 +246,12 @@ class TestResultsBlock(unittest.TestCase):
             {"ctv_1": {"days": 12}},
             self.daily_vessel_df,
             {"corrective": 10.0},
+            pd.DataFrame({
+                "vessel_type": ["v001_ctv"],
+                "transit": [80],
+                "maneuver": [50],
+                "standby": [20],
+            })
         )
 
         with patch(
@@ -300,6 +307,7 @@ class TestResultsBlock(unittest.TestCase):
         self.assertEqual(len(self.results_dict.dfs_log_events), 1)
         self.assertEqual(len(self.results_dict.dfs_log_events_merged), 1)
         self.assertEqual(len(self.results_dict.dfs_ctv_list), 1)
+        self.assertEqual(len(self.results_dict.dfs_vessel_fuel_usage), 1)
 
         self.assertEqual(len(self.results_dict.dfs_energy_yearly_month_dict["availability_month_wind"]), 1)
         self.assertEqual(len(self.results_dict.dfs_energy_yearly_month_dict["availability_month_wave"]), 1)
@@ -364,6 +372,12 @@ class TestResultsBlock(unittest.TestCase):
             {},
             self.daily_vessel_df,
             {"preventive": 20.0},
+            pd.DataFrame({
+                "vessel_type": ["v001_ctv"],
+                "transit": [80],
+                "maneuver": [50],
+                "standby": [20],
+            })
         )
 
         with patch("oriom.core.results_block_manager.failures_event") as mock_failures_event, \

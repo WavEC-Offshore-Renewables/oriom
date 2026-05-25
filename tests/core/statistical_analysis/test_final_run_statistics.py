@@ -214,6 +214,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
             kpi_om_type_cost_list=kpi_type_cost_list,
             dfs_energy_yearly_dict=dfs_energy_yearly_dict,
             dfs_energy_yearly_month_dict=dfs_energy_yearly_month_dict,
+            dfs_vessel_fuel_usage={}
         )
 
         fuel_add = {"vA": 10.0}
@@ -314,6 +315,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
             kpi_om_type_cost_list=[],
             dfs_energy_yearly_dict={},
             dfs_energy_yearly_month_dict={},
+            dfs_vessel_fuel_usage={}
         )
 
         fuel_add = {"vA": 5.0}
