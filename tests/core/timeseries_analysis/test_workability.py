@@ -11,7 +11,7 @@ import numpy as np
 from oriom.classes.Metocean import Metocean
 from oriom.classes.Activity import Activity
 
-from oriom.core.timeseries_analysis.workability import workability, workability_tow
+from oriom.core.timeseries_analysis.workability import workability, workability_tow, workability_tow_distance_lag
 
 
 class TestWorkability(unittest.TestCase):
@@ -259,7 +259,7 @@ class DummyMetoceanPoint:
 
 
 class TestWorkabilityTow(unittest.TestCase):
-    def _make_base_operation_and_metocean(self):
+    def _make_base_operation_and_metocean(self, TTS=False):
         """
         Construct a DummyTowOperation with:
         - activity 'act_site' (location='site')
@@ -268,18 +268,26 @@ class TestWorkabilityTow(unittest.TestCase):
         """
         act_site = DummyTowActivity(id_="act_site", location="site", towing=False)
         act_tow = DummyTowActivity(id_="act_tow", location="tow", towing=True)
-        operation = DummyTowOperation(activities=[act_site, act_tow])
+        if TTS:
+            operation = DummyTowOperation(activities=[act_tow, act_site])
+        else:
+            operation = DummyTowOperation(activities=[act_site, act_tow])
 
         # df_metocean of site (not actually used when workability is mocked)
-        idx = pd.date_range("2025-01-01", periods=4, freq="H")
-        df_site = pd.DataFrame({"dummy": [0, 1, 2, 3]}, index=idx)
+        idx = pd.date_range("2025-01-01", periods=9, freq="H")
+        df_site = pd.DataFrame({"dummy": [0, 1, 2, 3, 4, 5, 6, 7, 8]}, index=idx)
 
         # metocean_tow with 2 points
         metocean_tow = {
             1: DummyMetoceanPoint(df_site.copy()),
             2: DummyMetoceanPoint(df_site.copy()),
         }
-        return operation, df_site, metocean_tow
+        
+        metocean_distance_lag = {
+            1: 1.8,
+            2: 3.6,
+        }
+        return operation, df_site, metocean_tow, metocean_distance_lag
 
     @patch("oriom.core.timeseries_analysis.workability.workability")
     def test_towing_and_series_basic(self, mock_workability):
@@ -288,27 +296,27 @@ class TestWorkabilityTow(unittest.TestCase):
         - workability is mocked and returns df_works[0], df_works[1], df_works[2]
         - and_series_on_ref must AND the various points for 'act_tow'.
         """
-        operation, df_site, metocean_tow = self._make_base_operation_and_metocean()
+        operation, df_site, metocean_tow, metocean_distance_lag = self._make_base_operation_and_metocean()
 
         idx = df_site.index
         df0 = pd.DataFrame(
             {
-                "act_site": [True, True, True, True],
-                "act_tow": [True, True, True, True],
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, True, True, True, True, True, True, True],
             },
             index=idx,
         )
         df1 = pd.DataFrame(
             {
-                "act_site": [True, True, True, True],
-                "act_tow": [True, False, True, True],
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, False, True, True, True, True, True, True, True],
             },
             index=idx,
         )
         df2 = pd.DataFrame(
             {
-                "act_site": [True, True, True, True],
-                "act_tow": [True, True, np.nan, True],
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, np.nan, True, True, True, True, True, True],
             },
             index=idx,
         )
@@ -325,6 +333,7 @@ class TestWorkabilityTow(unittest.TestCase):
         df_work = workability_tow(
             df_metocean=df_site,
             metocean_tow=metocean_tow,
+            metocean_distance_lag = {1:0, 2:0},
             operation=operation,
             op_dir=None,
         )
@@ -334,7 +343,127 @@ class TestWorkabilityTow(unittest.TestCase):
 
         # act_tow must be AND of df0, df1, df2 (NaN -> False)
         expected_tow = pd.Series(
-            [True, False, False, True],
+            [True, False, False, True, True, True, True, True, True],
+            index=idx,
+            name="act_tow",
+        )
+        pd.testing.assert_series_equal(df_work["act_tow"], expected_tow)
+    
+    @patch("oriom.core.timeseries_analysis.workability.workability")
+    def test_towing_and_series_basic_with_lag_TTP(self, mock_workability):
+        """
+        Base case towing:
+        - workability is mocked and returns df_works[0], df_works[1], df_works[2]
+        - and_series_on_ref must AND the various points for 'act_tow'.
+        """
+        operation, df_site, metocean_tow, metocean_distance_lag = self._make_base_operation_and_metocean()
+
+        idx = df_site.index
+        df0 = pd.DataFrame(
+            {
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, True, True, True, True, True, True, True],
+            },
+            index=idx,
+        )
+        df1 = pd.DataFrame(
+            {
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, False, True, True, True, True, True, True, True],
+            },
+            index=idx,
+        )
+        df2 = pd.DataFrame(
+            {
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, np.nan, True, True, True, True, True, True],
+            },
+            index=idx,
+        )
+
+        df_map = {0: df0, 1: df1, 2: df2}
+        counter = itertools.count(0)
+
+        def fake_workability(*args, **kwargs):
+            i = next(counter)
+            return df_map[i]
+
+        mock_workability.side_effect = fake_workability
+
+        df_work = workability_tow(
+            df_metocean=df_site,
+            metocean_tow=metocean_tow,
+            metocean_distance_lag = metocean_distance_lag,
+            operation=operation,
+            op_dir=None,
+        )
+
+        # act_site taken from site
+        pd.testing.assert_series_equal(df_work["act_site"], df0["act_site"])
+
+        # act_tow must be AND of df0, df1, df2 (NaN -> False)
+        expected_tow = pd.Series(
+            [False, True, True, True, True, False, False, False, False],
+            index=idx,
+            name="act_tow",
+        )
+        pd.testing.assert_series_equal(df_work["act_tow"], expected_tow)
+
+    @patch("oriom.core.timeseries_analysis.workability.workability")
+    def test_towing_and_series_basic_with_lag_TTS(self, mock_workability):
+        """
+        Base case towing:
+        - workability is mocked and returns df_works[0], df_works[1], df_works[2]
+        - and_series_on_ref must AND the various points for 'act_tow'.
+        """
+        operation, df_site, metocean_tow, metocean_distance_lag = self._make_base_operation_and_metocean(TTS=True)
+
+        idx = df_site.index
+        df0 = pd.DataFrame(
+            {
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, True, True, True, True, True, True, True],
+            },
+            index=idx,
+        )
+        df1 = pd.DataFrame(
+            {
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, False, True, True, True, True, True, True, True],
+            },
+            index=idx,
+        )
+        df2 = pd.DataFrame(
+            {
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, np.nan, True, True, True, True, True, True],
+            },
+            index=idx,
+        )
+
+        df_map = {0: df0, 1: df1, 2: df2}
+        counter = itertools.count(0)
+
+        def fake_workability(*args, **kwargs):
+            i = next(counter)
+            return df_map[i]
+
+        mock_workability.side_effect = fake_workability
+
+        df_work = workability_tow(
+            df_metocean=df_site,
+            metocean_tow=metocean_tow,
+            metocean_distance_lag = metocean_distance_lag,
+            operation=operation,
+            op_dir=None,
+        )
+
+        # act_site taken from site
+        pd.testing.assert_series_equal(df_work["act_site"], df0["act_site"])
+
+        # act_tow must be AND of df0, df1, df2 (NaN -> False)
+        expected_tow = pd.Series(
+            [False, False, False, False, True, True, False, True, True],
             index=idx,
             name="act_tow",
         )
@@ -348,19 +477,19 @@ class TestWorkabilityTow(unittest.TestCase):
         If a df_works[i] does not have the act_tow column, and_series_on_ref should
         log a warning and simply return the site series.
         """
-        operation, df_site, metocean_tow = self._make_base_operation_and_metocean()
+        operation, df_site, metocean_tow, metocean_distance_lag = self._make_base_operation_and_metocean()
         idx = df_site.index
 
         df0 = pd.DataFrame(
             {
-                "act_site": [True, True, True, True],
-                "act_tow": [True, True, True, True],
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, True, True, True, True, True, True, True],
             },
             index=idx,
         )
         df1 = pd.DataFrame(
             {
-                "act_site": [False, False, False, False],
+                "act_site": [False, False, False, False, False, False, False, False, False],
                 # column act_tow missing
             },
             index=idx,
@@ -378,6 +507,7 @@ class TestWorkabilityTow(unittest.TestCase):
         df_work = workability_tow(
             df_metocean=df_site,
             metocean_tow=metocean_tow,
+            metocean_distance_lag = metocean_distance_lag,
             operation=operation,
             op_dir=None,
         )
@@ -394,21 +524,21 @@ class TestWorkabilityTow(unittest.TestCase):
         If a df_works[i] has an incompatible index, and_series_on_ref should
         log a warning and return the site series.
         """
-        operation, df_site, metocean_tow = self._make_base_operation_and_metocean()
+        operation, df_site, metocean_tow, metocean_distance_lag = self._make_base_operation_and_metocean()
         idx = df_site.index
 
         df0 = pd.DataFrame(
             {
-                "act_site": [True, True, True, True],
-                "act_tow": [True, True, True, True],
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [True, True, True, True, True, True, True, True, True],
             },
             index=idx,
         )
         # different index (shifted by 1 day) -> is_in not compatible
         df_bad = pd.DataFrame(
             {
-                "act_site": [True, True, True, True],
-                "act_tow": [False, False, False, False],
+                "act_site": [True, True, True, True, True, True, True, True, True],
+                "act_tow": [False, False, False, False, False, False, False, False, False],
             },
             index=idx + pd.Timedelta(days=1),
         )
@@ -426,6 +556,7 @@ class TestWorkabilityTow(unittest.TestCase):
         df_work = workability_tow(
             df_metocean=df_site,
             metocean_tow=metocean_tow,
+            metocean_distance_lag=metocean_distance_lag,
             operation=operation,
             op_dir=None,
         )
@@ -435,5 +566,57 @@ class TestWorkabilityTow(unittest.TestCase):
         self.assertIn("has different index", m_log_warning.call_args[0][0])
 
 
+class DummyVessel:
+    def __init__(self, speed_tow):
+        self.speed_tow = speed_tow
+
+
+class DummyTowOperationLag:
+    def __init__(self, speed_tow):
+        self.vessel1 = DummyVessel(speed_tow=speed_tow)
+
+
+class TestWorkabilityTowDistanceLag(unittest.TestCase):
+
+    def test_workability_tow_distance_lag_basic(self):
+        """
+        Test towing transit lag evaluation between metocean points.
+
+        Distances are expressed in km.
+        speed_tow is expressed in m/s.
+
+        Formula:
+            (((total_distance + distance/2) * 1000) / speed_tow) / 3600
+        """
+
+        operation = DummyTowOperationLag(speed_tow=10)
+
+        metocean_tow_distance = {
+            1: 10,   # km
+            2: 20,   # km
+            3: 30,   # km
+        }
+
+        result = workability_tow_distance_lag(
+            metocean_tow_distance=metocean_tow_distance,
+            operation=operation,
+        )
+
+        expected = {
+            # ((0 + 10/2) * 1000) / 10 / 3600
+            1: 0.1388888888888889,
+
+            # ((10 + 20/2) * 1000) / 10 / 3600
+            2: 0.5555555555555556,
+
+            # ((30 + 30/2) * 1000) / 10 / 3600
+            3: 1.25,
+        }
+
+        for k in expected:
+            self.assertAlmostEqual(result[k], expected[k], places=6)
+
+
 if __name__ == "__main__":
     unittest.main()
+    

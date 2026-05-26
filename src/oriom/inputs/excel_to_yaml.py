@@ -5,7 +5,7 @@ import platform
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedSeq as CS
 import logging
-
+from pathlib import Path
 
 def excel_to_yaml(
         file_excel:str,
@@ -126,7 +126,6 @@ def excel_to_yaml(
         inputs["montecarlo percentage"] = {"value": 0.3, "units": None}
         inputs["shift duration"] = {"value": 12, "units": 'hours'}
         inputs["failure scenario"] = {"value": 0, "units": None}
-        inputs["metocean file location tow"] = {}
 
         # Gets inputs from an excel spreadsheet
         try:
@@ -153,20 +152,20 @@ def excel_to_yaml(
                 inputs["site longitude"] = {"value": float(value), "units": str(units)}
 
             elif 'metocean' in name and 'file' in name and 'tow' not in name:
-                value = str(value)
-                if platform.system().lower() != 'windows':
-                     value = value.replace('\\', '/')
+                value = str(Path(value))
                 inputs["metocean file location"] = {"value": value, "units": None}
 
             elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' in name:
                 inputs[f"metocean tow file number"] = {"value": int(value), "units": None}
 
             elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' not in name:
-                value = str(value)
+                value = str(Path(value))
                 i = name[-1]
-                if platform.system().lower() != 'windows':
-                    value = value.replace('\\', '/')
                 inputs[f"metocean file location tow{i}"] = {"value": value, "units": None}
+
+            elif 'metocean' in name and 'tow' in name and 'distance' in name:
+                i = name[-1]
+                inputs[f"metocean file distance tow{i}"] = {"value": float(value), "units": str(units)}
 
             elif 'metocean' in name and any(word in name for word in ['windspeed', 'wind speed', 'ws']) and 'height' in name:
                 inputs["metocean ws height"] = {"value": float(value), "units": str(units)}
@@ -243,8 +242,7 @@ def excel_to_yaml(
                 logging.warning(_w)
         _i = 'ExcelToYAML.Inputs.TimeSeries: inputs read from an Excel file: "%s".' % FILE_EXCEL
         logging.info(_i)
-        if not inputs[f"metocean file location tow"]:
-            inputs.pop("metocean file location tow", None)
+
         f_inputs = os.path.join(OUT_DIR, 'inputs_tseries.yaml')
         f_inputs = open(f_inputs, 'w')
         yaml=YAML()

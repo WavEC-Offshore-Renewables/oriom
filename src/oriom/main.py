@@ -166,7 +166,7 @@ def run(config: ConfigRun | None = None):
 
     logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')
     # Build or reuse Metocean in one call
-    metocean = Metocean.from_run_dir(
+    metocean, _ = Metocean.from_run_dir(
         run_dir=dirs.run_dir,
         tseries_inputs=inputs.tseries,
         power_farm=farm_technologies.power,
@@ -176,7 +176,7 @@ def run(config: ConfigRun | None = None):
     )
 
     # Build Metocean tow in one call
-    metocean_tow = Metocean.from_run_dir(
+    metocean_tow, metocean_tow_distance = Metocean.from_run_dir(
         run_dir=dirs.run_dir,
         tseries_inputs=inputs.tseries,
         stat_inputs=inputs.stats,
@@ -382,7 +382,8 @@ def run(config: ConfigRun | None = None):
         timesteps = timesteps,
         Config = Config,
         inputs_tseries = inputs.tseries,
-        metocean_tow = metocean_tow
+        metocean_tow = metocean_tow,
+        metocean_tow_distance = metocean_tow_distance
     )
 
     inspect_site_manager(

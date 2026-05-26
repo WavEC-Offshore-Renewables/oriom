@@ -404,6 +404,8 @@ class Inputs():
             time_between_devices_dict (:obj:`dict`): Time between device per each tech
             file_metocean_tow_location (:obj:`dict`): Dictionary of X Path location of the metocean date timeseries X  file between site and port.
                 **keys**: dict(X :obj:`int`: *value*: :obj:`str` ; *units*: :obj:`str`.)
+            file_metocean_tow_distance (:obj:`dict`): Dictionary of X distance from site of the metocean date timeseries X file between site and port.
+                **keys**: dict(X :obj:`int`: *value*: :obj:`flaot` ; *units*: :obj:`str`.)
             file_metocean_tow_number (:obj:`dict`): Path location of the metocean date timeseries.
                 **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
 
@@ -456,6 +458,7 @@ class Inputs():
                 merge_vessel (:obj:`list`,*optional*): Vessel type that can be merged in corrective operation.
                 file_inputs (:obj:`str`,*optional*): Path for the file with all previous mandatory inputs. Defaults to ``None``.
                 file_metocean_tow_location (:obj:`dict`): Dictionary of Path location of the X metocean date timeseries from site to port.
+                file_metocean_tow_distance (:obj:`dict`): Dictionary of X distance in km from site of the metocean timeseries X file.
                 file_metocean_tow_number (:obj:`int`): Number of Path location of the X metocean date timeseries from site to port.
 
 
@@ -482,6 +485,7 @@ class Inputs():
             self.inputs["failure scenario"] = {"value": 0, "units": None}
             self.inputs["metocean file tow number"] = {"value": 0, "units": None}
             self.inputs["metocean file tow location"] = {}
+            self.inputs["metocean file tow distance"] = {}
 
             file_path = kwargs.get('file_inputs', None)
             if file_path is not None:
@@ -589,10 +593,14 @@ class Inputs():
                     elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' in name:
                         self.inputs["metocean file tow number"] = {"value": int(value), "units": None}
 
-                    elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' not in name:
+                    elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' not in name and 'distance' not in name:
                         if value:
                             key_n = name[-1]
                             self.inputs["metocean file tow location"][int(key_n)] = {"value": value, "units": None}
+                    elif 'metocean' in name and 'tow' in name and 'distance' in name:
+                        if value:
+                            key_n = name[-1]
+                            self.inputs["metocean file tow distance"][int(key_n)] = {"value": value, "units": None}
                     else:
                         logging.warning('Inputs.TimeSeries: input "%s" not recognized. Ignored.' % key)
                 logging.info('Inputs.TimeSeries: inputs read from a YAML file: "%s".' % file_path)
@@ -689,6 +697,10 @@ class Inputs():
                         if value:
                             key_n = key[-1]
                             self.inputs["metocean file tow location"][int(key_n)] = {"value": value, "units": None}
+                    elif key.lower().startswith('file_metocean_tow_distance'):
+                        if value:
+                            key_n = key[-1]
+                            self.inputs["metocean file tow distance"][int(key_n)] = {"value": value, "units": None}
                     elif key.lower() == 'file_metocean_tow_number':
                         self.inputs["metocean file tow number"] = {
                                 "value": int(value),
@@ -721,6 +733,10 @@ class Inputs():
                 self.file_metocean_tow_location = self.inputs.get('metocean file tow location')
             else:
                 self.inputs.pop('metocean file tow location')
+            if self.inputs.get('metocean file tow distance'):
+                self.file_metocean_tow_distance = self.inputs.get('metocean file tow distance')
+            else:
+                self.inputs.pop('metocean file tow distance')
             self.scenario = 0
             self.time_between_devices_dict = {
                 'opv': self.time_between_devices_pv["value"],
@@ -797,8 +813,13 @@ class Inputs():
                         raise ValueError('Number of "Metocean tow file location" and "Metocean tow file number" must coincide')
                     for i in range(1, self.file_metocean_tow_number["value"]+1):
                         open(self.file_metocean_tow_location[i]["value"], 'r')
+                    if len(self.file_metocean_tow_distance) != len(self.file_metocean_tow_location):
+                        raise ValueError('Number of "Metocean tow file location" and "Metocean tow file distance" must coincide')
+                    for i in range(1, self.file_metocean_tow_number["value"]+1):
+                        if self.file_metocean_tow_distance[i]["value"] <= 0:
+                            raise ValueError(f'"Metocean tow file distance" from site of the metocean location {i}" must be greater than 0')
                 else:
-                    raise ValueError('"Metocean file path tow" must be defined if "Metocean tow file number" is defined')
+                    raise ValueError('"Metocean file path location tow" must be defined if "Metocean tow file number" is defined')
             if getattr(self, "file_metocean_tow_location", None) and self.file_metocean_tow_number["value"] == 0:
                 raise ValueError('"Metocean tow file number" must be defined if ""Metocean file path tow"" are defined')
             logging.debug('Inputs.TimeSeries: attributes within ranges and valid.')
@@ -838,7 +859,7 @@ class Inputs():
             if number_tow_file > 0:
                 for i in range(1, number_tow_file + 1):
                     input_args[f"file_metocean_tow_location_{i}"] = input_yaml[f"metocean file tow location {i}"]["value"]
-
+                    input_args[f"file_metocean_tow_distance_{i}"] = input_yaml[f"metocean file tow distance {i}"]["value"]
 
             input_args = {k: v for k, v in input_args.items() if v is not None}
 

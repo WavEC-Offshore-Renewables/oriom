@@ -2,16 +2,112 @@
 
 <span style="font-size: 24px; font-weight: bold;">Excel Input General informations</span>
 
-<span style="font-size: 20px; font-weight: bold;">INSTALLATION MODE</span>
+This file give informations and assist the user to better understand how to compile the input excel form file for ORIOM.
+
+Informations are divided for each sheet of the excel form
 
 
-To use ORIOM as Installation mode
--   Generate a pre existing failure file that corrispond to the component to install.
--   Create deferred operation (installation procedure) to fix them.
+# 
+<span style="font-size: 26px; font-weight: bold;">INSTALLATION MODE</span>
 
-The failures that occurs annually will be the amounts of component to install each year and they will undergoes to an installation plan considered from the start of the deffered maintenance
+To use ORIOM in **Installation Mode**, the workflow is based on:
 
-<span style="font-size: 20px; font-weight: bold;">O&M MODE</span>
+- creation of pre-existing failures representing installation demand
+- execution through deferred corrective (installation) operations
+
+Each failure corresponds to a **component to be installed** or an **installation campaign**, depending on the chosen configuration.
+
+
+##  Core Concept
+
+The installation process is modeled as follows:
+
+1. **Failures creation**
+   - Each failure represents a component that must be installed.
+   - The number of failures corresponds to the number of devices to install (or grouped campaigns).
+
+2. **Deferred operations**
+   - Each failure is resolved through an installation operation.
+   - The operation defines the installation activity and scheduling.
+
+3. **Scheduling**
+   - Failures are deferred to specific months.
+   - Installation is executed progressively according to the defined campaign strategy.
+
+## ⚙️ Installation Strategies
+
+### a) Example A — Single Device per Trip
+
+**Scenario:**
+- 5 devices to install
+- 1 device installed per trip
+- vessel returns to port after each installation
+
+**Implementation:**
+1. Create 5 failures (one per device)
+2. Define an operation to fix each failure
+3. Each operation consists of:
+   - install 1 device
+   - return to port
+4. Defer each operation to a target month
+
+**Behavior:**
+- Devices are installed sequentially
+- Each installation requires a separate trip
+
+---
+
+### b) Example B — Batch Installation (All Devices in One Trip)
+
+**Scenario:**
+- 5 devices to install
+- 5 devices installed in a single trip
+- vessel returns to port once
+
+**Implementation:**
+1. Create 1 failure (representing the full campaign)
+2. Define a single operation to install all devices
+3. Operation consists of:
+   - install 5 devices
+   - return to port
+4. Defer operation to a target month
+
+**Behavior:**
+- All devices are installed consecutively
+- No intermediate return to port
+
+---
+
+### c) Example C — Partial Batch Installation
+
+**Scenario:**
+- 10 devices to install
+- batches of 5 devices per trip
+
+**Implementation:**
+1. Create 2 failures (each representing a batch of 5 devices)
+2. Define operations to install 5 devices per campaign
+3. Each operation consists of:
+   - install 5 devices
+   - return to port
+4. Defer operations within the same month or scheduled sequence
+
+**Behavior:**
+- First batch of 5 devices installed consecutively
+- Second batch starts after the first campaign completes
+
+    ## ⚠️ Edge Case Handling
+
+    If the last operation contains fewer devices than the batch size:
+
+    - create a **separate operation** for the remaining devices
+    - schedule it in the same month with a consecutive day respect to the previous ones
+    - ensure sequential execution on consecutive days
+    - complete the installation campaign without loss of remaining units
+
+
+#
+<span style="font-size: 26px; font-weight: bold;"> 🔧 O&M MODE</span>
 
 
 <span style="font-size: 20px; font-weight: bold;">HARD CODED PARAMETERS</span>
