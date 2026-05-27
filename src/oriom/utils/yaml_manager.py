@@ -17,11 +17,11 @@ def inputs_to_yaml(inputs_object, out_dir: str, out_name: str):
     f_inputs = open(os.path.join(out_dir, input_file_name), 'w')
     data = {}
     for input, value in inputs_object.inputs.items():
-        if input != "metocean file tow location" or input != "metocean file tow ":
-            data[input] = {"value": value["value"], "units": value["units"]}
-        else:
+        if input == "metocean file tow location" or input == "metocean file tow distance":
             for input_n, value_n in value.items():
                 data[f'{input} {input_n}'] = value_n
+        else:
+            data[input] = {"value": value["value"], "units": value["units"]}
 
     yaml=YAML()
     yaml.indent(mapping=4)

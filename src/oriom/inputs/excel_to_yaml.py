@@ -151,9 +151,13 @@ def excel_to_yaml(
                     raise NameError('Units "%s" not recognized for Site Longitude input.' % units)
                 inputs["site longitude"] = {"value": float(value), "units": str(units)}
 
-            elif 'metocean' in name and 'file' in name and 'tow' not in name:
+            elif 'metocean' in name and 'file' in name and 'tow' not in name and 'port' not in name:
                 value = str(Path(value))
                 inputs["metocean file location"] = {"value": value, "units": None}
+
+            elif 'metocean' in name and 'file' in name and 'tow' not in name and 'port' in name:
+                value = str(Path(value))
+                inputs["metocean file port"] = {"value": value, "units": None}
 
             elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' in name:
                 inputs[f"metocean tow file number"] = {"value": int(value), "units": None}

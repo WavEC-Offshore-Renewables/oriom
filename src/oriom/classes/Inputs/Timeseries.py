@@ -24,7 +24,9 @@ class TimeSeries():
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
         site_lon (:obj:`dict`): Site longitude, in degrees.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        file_metocean (:obj:`dict`): Path location of the metocean date timeseries.
+        file_metocean (:obj:`dict`): Path location of the site metocean date timeseries.
+            **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
+        file_metocean_port (:obj:`dict`): Path location of the port metocean date timeseries.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
         metocean_ws_height (:obj:`dict`): Wind speed at measurement height, in meters.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
@@ -93,7 +95,8 @@ class TimeSeries():
         Keyword Args:
             site_latitude (:obj:`float`): Site latitude, in degrees.
             site_longitude (:obj:`float`): Site longitude, in degrees.
-            file_metocean (:obj:`str`): Path location of the metocean date timeseries.
+            file_metocean (:obj:`str`): Path location of the site metocean date timeseries.
+            file_metocean_port (:obj:`str`): Path location of the port metocean date timeseries.
             dist_port (:obj:`float`): Marine distance from site to port, in killometers.
             time_between_devices_PV (:obj:`float`): Transit time to move from one PV device to anorther, in hours.
             time_between_devices_WT (:obj:`float`): Transit time to move from one WT device to anorther, in hours.
@@ -133,6 +136,7 @@ class TimeSeries():
         self.inputs["merge vessel"] = {"value": None, "units": 'vessel type'}
         self.inputs["failure scenario"] = {"value": 0, "units": None}
         self.inputs["metocean file tow number"] = {"value": 0, "units": None}
+        self.inputs["metocean file port"] = {"value": None, "units": None}
         self.inputs["metocean file tow location"] = {}
         self.inputs["metocean file tow distance"] = {}
 
@@ -167,8 +171,11 @@ class TimeSeries():
                         raise NameError('Units "%s" not recognized for Site Longitude input.' % units)
                     self.inputs["site longitude"] = {"value": float(value), "units": str(units)}
 
-                elif 'metocean' in name and 'file' in name and 'tow' not in name:
+                elif 'metocean' in name and 'file' in name and 'tow' not in name and 'port' not in name:
                     self.inputs["metocean file location"] = {"value": value, "units": None}
+
+                elif 'metocean' in name and 'file' in name and 'tow' not in name and 'port' in name:
+                    self.inputs["metocean file port"] = {"value": value, "units": None}
 
                 elif 'metocean' in name and any(word in name for word in ['windspeed', 'wind speed', 'ws']) and 'height' in name:
                     self.inputs["metocean ws height"] = {"value": float(value), "units": str(units)}
@@ -272,6 +279,11 @@ class TimeSeries():
                             "value": str(value),
                             "units": None
                     }
+                elif key.lower() == 'file_metocean_port':
+                    self.inputs["metocean file port"] = {
+                            "value": str(value),
+                            "units": None
+                    }
                 elif key.lower() == 'metocean_ws_height':
                     self.inputs["metocean ws height"] = {
                             "value": float(value),
@@ -364,6 +376,7 @@ class TimeSeries():
         self.site_lat = self.inputs.get('site latitude')
         self.site_lon = self.inputs.get('site longitude')
         self.file_metocean = self.inputs.get('metocean file location')
+        self.file_metocean_port = self.inputs.get('metocean file port')
         self.metocean_ws_height = self.inputs.get('metocean ws height')
         self.surface_roughness = self.inputs.get('surface roughness')
         self.distance = self.inputs.get('distance to port')
@@ -422,6 +435,8 @@ class TimeSeries():
         if self.site_lon["value"] < -180 or self.site_lon["value"] > 180:
             raise ValueError('"Site longitude" must be between -180 and 180 degrees')
         open(self.file_metocean["value"], 'r')
+        if self.file_metocean_port["value"]:
+            open(self.file_metocean_port["value"], 'r')
         if self.metocean_ws_height["value"] <= 0:
             raise ValueError('"Metocean wind speed height" must be greater than 0')
         if self.surface_roughness["value"] <= 0:
@@ -489,6 +504,7 @@ class TimeSeries():
                 "site_latitude": input_yaml["site latitude"]["value"],
                 "site_longitude": input_yaml["site longitude"]["value"],
                 "file_metocean": input_yaml["metocean file location"]["value"],
+                "file_metocean_port": input_yaml["metocean file port"]["value"],
                 "surface_roughness": input_yaml["surface roughness"]["value"],
                 "dist_port": input_yaml["distance to port"]["value"],
                 "time_between_devices_pv": input_yaml["time between devices pv"]["value"],
