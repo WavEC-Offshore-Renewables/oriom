@@ -1,22 +1,119 @@
-<span style="font-size: 26px; font-weight: bold;">READ ME</span>
+# READ ME
 
-<span style="font-size: 24px; font-weight: bold;">Excel Input General informations</span>
+## Excel Input General informations
 
-<span style="font-size: 20px; font-weight: bold;">INSTALLATION MODE</span>
+This file give informations and assist the user to better understand how to compile the input excel form file for ORIOM.
 
-
-To use ORIOM as Installation mode
--   Generate a pre existing failure file that corrispond to the component to install.
--   Create deferred operation (installation procedure) to fix them.
-
-The failures that occurs annually will be the amounts of component to install each year and they will undergoes to an installation plan considered from the start of the deffered maintenance
-
-<span style="font-size: 20px; font-weight: bold;">O&M MODE</span>
+Informations are divided for each sheet of the excel form
 
 
-<span style="font-size: 20px; font-weight: bold;">HARD CODED PARAMETERS</span>
+# INSTALLATION MODE
 
-- ## TO CONSIDER DIFFERENT CHANGE IN DISTANCE DUE TO CLOSER PORT FOR CERTAIN TYPE OF VESSEL
+To use ORIOM in **Installation Mode**, the workflow is based on:
+
+- creation of pre-existing failures representing installation demand
+- execution through deferred corrective (installation) operations
+
+Each failure corresponds to a **component to be installed** or an **installation campaign**, depending on the chosen configuration.
+
+
+##  Core Concept
+
+The installation process is modeled as follows:
+
+1. **Failures creation**
+   - Each failure represents a component that must be installed.
+   - The number of failures corresponds to the number of devices to install (or grouped campaigns).
+
+2. **Deferred operations**
+   - Each failure is resolved through an installation operation.
+   - The operation defines the installation activity and scheduling.
+
+3. **Scheduling**
+   - Failures are deferred to specific months.
+   - Installation is executed progressively according to the defined campaign strategy.
+
+## ⚙️ Installation Strategies
+
+### a) Example A — Single Device per Trip
+
+**Scenario:**
+- 5 devices to install
+- 1 device installed per trip
+- vessel returns to port after each installation
+
+**Implementation:**
+```
+1. Create 5 failures (one per device)
+2. Define an operation to fix each failure
+3. Each operation consists of:
+   - install 1 device
+   - return to port
+4. Defer each operation to a target month
+```
+**Behavior:**
+- Devices are installed sequentially
+- Each installation requires a separate trip
+
+---
+
+### b) Example B — Batch Installation (All Devices in One Trip)
+
+**Scenario:**
+- 5 devices to install
+- 5 devices installed in a single trip
+- vessel returns to port once
+
+**Implementation:**
+```
+1. Create 1 failure (representing the full campaign)
+2. Define a single operation to install all devices
+3. Operation consists of:
+   - install 5 devices
+   - return to port
+4. Defer operation to a target month
+```
+**Behavior:**
+- All devices are installed consecutively
+- No intermediate return to port
+
+---
+
+### c) Example C — Partial Batch Installation
+
+**Scenario:**
+- 10 devices to install
+- batches of 5 devices per trip
+
+**Implementation:**
+```
+1. Create 2 failures (each representing a batch of 5 devices)
+2. Define operations to install 5 devices per campaign
+3. Each operation consists of:
+   - install 5 devices
+   - return to port
+4. Defer operations within the same month or scheduled sequence
+```
+**Behavior:**
+- First batch of 5 devices installed consecutively
+- Second batch starts after the first campaign completes
+
+    ## ⚠️ Edge Case Handling
+
+    If the last operation contains fewer devices than the batch size:
+
+    - create a **separate operation** for the remaining devices
+    - schedule it in the same month with a consecutive day respect to the previous ones
+    - ensure sequential execution on consecutive days
+    - complete the installation campaign without loss of remaining units
+
+
+# 🔧 O&M MODE
+
+
+## HARD CODED PARAMETERS
+
+- ### TO CONSIDER DIFFERENT CHANGE IN DISTANCE DUE TO CLOSER PORT FOR CERTAIN TYPE OF VESSEL
     - **diff_distance**: boolean value to say that there are vessel that are considered with other port distance
 
     - **distance from coast**: The distance might change for vessel type (port facilities differ)
@@ -24,7 +121,7 @@ The failures that occurs annually will be the amounts of component to install ea
     - **VESSEL_DIST_REDUCED_LIST**: List of vessel type that will have different distances from port as can use a closer port that have reduced port characteristic
 
 
-- ## OTHER
+- ### OTHER
     - **KM_MOTHER_VESSEL**: The distance on which evaluate the transit when a mother vessel is used. Might change for vessel mother
 
     - **fuel to add**: Dictionary of vessel id and **YEARLY FUEL COST** cost of fuel to add due to reduced travels (overnight stay at site). The cost will be added only at the averaged results
@@ -50,7 +147,6 @@ The failures that occurs annually will be the amounts of component to install ea
 
 ## TSA_inputs
 
-
 - **The Merge operation vessel**:
 
     This parameter will set the vessels that will be merged together along the immediate corrective operations that will occurs in the same day.
@@ -73,7 +169,6 @@ The failures that occurs annually will be the amounts of component to install ea
 - **Failure rate sensitivity** Is a sensitivity factor to increase or reduce all the failures. Default to 1 or empty
 
 ## Gen_PV
-
 
 - **Layout**: Layout 2 has the layout implemented till the inverter level. Lower component are considered for energy losses evaluation and corrections
     - **NODE/EDGE**: in failure sheet the components level must be:
@@ -164,17 +259,12 @@ the devisce at port and stored at port must be present (if not know = 0)
 
 - **Name**: In FOPV the layout is setted with inverter resolution. To count failure on "device" or "string" level add "_device" and "_string" in the name of the failure to consider them. The level must be 'device' and 'array_cable' relatively. Event if the layout 4 of OPV do not take into consideration these levels, the availability algorithm will acocunt the reduction of the availability due to solar module and string failure. An eccess of module broken in a single line will cause a shutdown of the entire line
 
-
-
-
 ## ALL OPERATIONS (INSPECTION & CORRECTION)
-
 
 - Do not put in the same operations in vessel 1 & vessel 2 the same vessel type
 
 
 - Each major and minor corrective operation must have a failure that triggers it.
-
 
 - Each operation should start with the same prefix:
     - for floating solar:
@@ -193,8 +283,6 @@ the devisce at port and stored at port must be present (if not know = 0)
     ```
     oce
     ```
-
-
 
 - The ROV must be present in the first vessel called (vessel_1) otherwhise its cost will not be shown in the economic results
 

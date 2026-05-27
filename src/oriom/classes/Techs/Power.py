@@ -1,8 +1,6 @@
-# Import packages
 import pandas as pd
 import numpy as np
 import logging
-
 
 class Curve():
     """Based on a CSV file, fetched data related with the WTG power curve and

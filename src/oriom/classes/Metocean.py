@@ -488,17 +488,36 @@ class Metocean():
         cls,
         run_dir,
         stat_inputs,
-        tseries_inputs=None,   # expects fields like file_metocean/site_lat/site_lon/metocean_ws_height
-        power_farm=None,       # expects fields like wtg_number_devices
-        wtg=None,              # expects .hub_height if power_farm.wtg_number_devices is not None
-        z0=None,                # surface roughness (e.g., inputs_tseries.surface_roughness["value"])
+        tseries_inputs=None,
+        power_farm=None,
+        wtg=None,
+        z0=None,
         tow_metocean=False
-    )-> (object | dict):
+    ) -> tuple[object | dict, dict]:
         """
-        Build or reuse Metocean from a run directory.
-        - If timeseries.csv exists: reuse YAML + load CSV.
-        - Else: create from inputs (tseries_inputs).
-        - Always: add wind speed at hub height column (with or without params).
+        Create or load a Metocean object from a run directory.
+        - If the file exists:
+            - load the existing Metocean configuration from YAML and the associated time series data from CSV
+
+        - If the file does not exist:
+            - create a new Metocean object using the provided input data
+
+        The method computes and appends the wind speed at hub height, either using the provided turbine/farm
+        parameters or default assumptions.
+
+        Args:
+            run_dir (str | Path): Path to the simulation or run directory.
+            stat_inputs (object): Statistical input configuration used to initialize the Metocean data.
+            tseries_inputs (object, optional): Object of class ``tseries_inputs``.
+            power_farm (object, optional): Wind farm configuration object.
+            wtg (object, optional): Wind turbine generator configuration object.
+            z0 (float, optional): Surface roughness length used for wind speed extrapolation.
+            tow_metocean (bool, default=False): If True, use tow/metocean-specific handling for wind speed processing.
+
+        Returns:
+            object | dict:
+                A Metocean instance or serialized Metocean representation, depending on the implementation context.
+            dict: Empty dictionary or dictionary of distances of metocean tow file to site
         """
 
         def check_create_metocean(
@@ -525,7 +544,8 @@ class Metocean():
                     out_dir=os.path.join(run_dir, file_name.split('.')[0])
                 )
             return met
-
+        
+        met_dist = {}
         # reuse path or create new
         if not tow_metocean:
             met = check_create_metocean(run_dir)
@@ -541,6 +561,7 @@ class Metocean():
                 met.add_wind_speed_h_hub_column()
         else:
             met = {}
+            
             for i in range(1, tseries_inputs.file_metocean_tow_number["value"]+1):
                 met[int(i)] = check_create_metocean(
                     run_dir = run_dir,
@@ -548,8 +569,8 @@ class Metocean():
                     file = tseries_inputs.file_metocean_tow_location[i]["value"],
                     loc = f"metocean file tow location {i}"
                 )
-
-        return met
+                met_dist[int(i)] = tseries_inputs.file_metocean_tow_distance[i]["value"]
+        return met, met_dist
 
     def attach_power_columns(metocean, power_farm, out_dir):
         """Attach wind/wave power columns to metocean.df_timeseries in-place and return df_power slice."""

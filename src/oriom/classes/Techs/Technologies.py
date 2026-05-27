@@ -1,14 +1,10 @@
-# technology_builder.py
-import os
-import logging
-
-from oriom.classes.WindTurbineGenerator import WindTurbineGenerator
-from oriom.classes.WaveEnergyConverter import  WaveEnergyConverter
-from oriom.classes.PVProduction import  PVProduction
-from oriom.classes.Power import Curve as PowerCurve
-from oriom.classes.Power import Matrix as PowerMatrix
-from oriom.classes.Power import PVPower as PVPower
-from oriom.classes.Power import PVPower as PVPower
+# technology_builder
+from oriom.classes.Techs.WindTurbineGenerator import WindTurbineGenerator
+from oriom.classes.Techs.WaveEnergyConverter import  WaveEnergyConverter
+from oriom.classes.Techs.PVProduction import  PVProduction
+from oriom.classes.Techs.Power import Curve as PowerCurve
+from oriom.classes.Techs.Power import Matrix as PowerMatrix
+from oriom.classes.Techs.Power import PVPower as PVPower
 from oriom.utils.aux_functions import save_file_csv
 
 try:

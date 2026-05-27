@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from oriom.classes.WaveEnergyConverter import WaveEnergyConverter
+from oriom.classes.Techs.WaveEnergyConverter import WaveEnergyConverter
 
 
 

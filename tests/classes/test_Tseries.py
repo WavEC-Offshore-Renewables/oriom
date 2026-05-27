@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from oriom.classes.Inputs import Inputs
+from oriom.classes.Inputs.Inputs import Inputs
 
 
 def skipIfNotLocal():
@@ -150,6 +150,7 @@ class TestInputsTimeSeries(unittest.TestCase):
                 os.getcwd(),
                 'tests', 'test_files', 'metocean', 'metocean_dummy.csv'
             ),
+            "file_metocean_tow_distance_1": 50
         }
 
         # Latitude out of range
@@ -233,6 +234,19 @@ class TestInputsTimeSeries(unittest.TestCase):
         args["failure_scenario"] = -1
         self.assertRaises(ValueError, Inputs.TimeSeries, **args)
 
+        # Distance to previous point negative (<=0)
+        args = deepcopy(args_def)
+        args["file_metocean_tow_distance_1"] = -1
+        self.assertRaises(ValueError, Inputs.TimeSeries, **args)
+
+        # Distance to previous point different from number of tow metocean file
+        args = deepcopy(args_def)
+        args["file_metocean_tow_number"] = 2
+        args["file_metocean_tow_location_2"] = os.path.join(
+                os.getcwd(),
+                'tests', 'test_files', 'metocean', 'metocean_dummy.csv'
+            )
+        self.assertRaises(ValueError, Inputs.TimeSeries, **args)
 
 if __name__ == '__main__':
 

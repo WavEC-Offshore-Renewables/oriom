@@ -14,7 +14,7 @@ from oriom.inputs.Input_manager import Input_Files, extract_input_from_excel, ha
 from oriom.utils import aux_functions
 from oriom.utils import aux_operation
 
-from oriom.classes.Inputs import Inputs
+from oriom.classes.Inputs.Inputs import Inputs
 from oriom.classes.Metocean import Metocean
 from oriom.classes.RovDrone import RovDrone
 from oriom.classes.Operations.InspectionSite import InspectionSite
@@ -30,9 +30,9 @@ from oriom.classes.DefineOperationTechs import Define_operation
 from oriom.classes.Failure import Failure
 from oriom.classes.Results import Results
 from oriom.classes.Scenario import Scenario
-from oriom.classes.Power import PVPower as PVPower
+from oriom.classes.Techs.Power import PVPower as PVPower
 from oriom.classes.FindElementClass import Find_Element
-from oriom.classes.Technologies import TechnologyBuilder
+from oriom.classes.Techs.Technologies import TechnologyBuilder
 
 from oriom.classes.Layouts.Layouts_Managers import LayoutManager
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import inspect_site_manager
@@ -166,7 +166,7 @@ def run(config: ConfigRun | None = None):
 
     logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')
     # Build or reuse Metocean in one call
-    metocean = Metocean.from_run_dir(
+    metocean, _ = Metocean.from_run_dir(
         run_dir=dirs.run_dir,
         tseries_inputs=inputs.tseries,
         power_farm=farm_technologies.power,
@@ -176,7 +176,7 @@ def run(config: ConfigRun | None = None):
     )
 
     # Build Metocean tow in one call
-    metocean_tow = Metocean.from_run_dir(
+    metocean_tow, metocean_tow_distance = Metocean.from_run_dir(
         run_dir=dirs.run_dir,
         tseries_inputs=inputs.tseries,
         stat_inputs=inputs.stats,
@@ -382,7 +382,8 @@ def run(config: ConfigRun | None = None):
         timesteps = timesteps,
         Config = Config,
         inputs_tseries = inputs.tseries,
-        metocean_tow = metocean_tow
+        metocean_tow = metocean_tow,
+        metocean_tow_distance = metocean_tow_distance
     )
 
     inspect_site_manager(
