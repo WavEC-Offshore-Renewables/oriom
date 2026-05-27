@@ -492,7 +492,8 @@ class Metocean():
         power_farm=None,
         wtg=None,
         z0=None,
-        tow_metocean=False
+        tow_metocean=False,
+        port_metocean = False
     ) -> tuple[object | dict, dict]:
         """
         Create or load a Metocean object from a run directory.
@@ -512,12 +513,13 @@ class Metocean():
             power_farm (object, optional): Wind farm configuration object.
             wtg (object, optional): Wind turbine generator configuration object.
             z0 (float, optional): Surface roughness length used for wind speed extrapolation.
-            tow_metocean (bool, default=False): If True, use tow/metocean-specific handling for wind speed processing.
+            tow_metocean (bool, default=False): If True, use tow/metocean without processing wind speed.
+            port_metocean (bool, default=False): If True, use metocean port without processing wind speed.
 
         Returns:
-            object | dict:
+            object | dict | None:
                 A Metocean instance or serialized Metocean representation, depending on the implementation context.
-            dict: Empty dictionary or dictionary of distances of metocean tow file to site
+            empty dict | dict: Empty dictionary or dictionary of distances of metocean tow file to site
         """
 
         def check_create_metocean(
@@ -548,17 +550,42 @@ class Metocean():
         met_dist = {}
         # reuse path or create new
         if not tow_metocean:
-            met = check_create_metocean(run_dir)
-
-            # add wind speed at hub height column
-            if power_farm is not None and getattr(power_farm, "wtg_number_devices", None) is not None:
-                if wtg is None or z0 is None:
-                    # fallback if missing params
-                    met.add_wind_speed_h_hub_column()
+            # SITE METOCEAN
+            if not port_metocean:
+                met = check_create_metocean(run_dir)
+                # add wind speed at hub height column
+                if power_farm is not None and getattr(power_farm, "wtg_number_devices", None) is not None:
+                    if wtg is None or z0 is None:
+                        # fallback if missing params
+                        met.add_wind_speed_h_hub_column()
+                    else:
+                        met.add_wind_speed_h_hub_column(h_hub=wtg.hub_height, z0=z0)
                 else:
-                    met.add_wind_speed_h_hub_column(h_hub=wtg.hub_height, z0=z0)
+                    met.add_wind_speed_h_hub_column()
+            # PORT METOCEAN
             else:
-                met.add_wind_speed_h_hub_column()
+                if tseries_inputs.file_metocean_port["value"]:
+                    met = check_create_metocean(
+                        run_dir = run_dir,
+                        file_name=f"timeseries_port.csv",
+                        file = tseries_inputs.file_metocean_port["value"],
+                        loc = f"metocean file port"
+                    )
+                    if power_farm is not None and getattr(power_farm, "wtg_number_devices", None) is not None:
+                        if wtg is None or z0 is None:
+                            # fallback if missing params
+                            met.add_wind_speed_h_hub_column()
+                        else:
+                            met.add_wind_speed_h_hub_column(h_hub=wtg.hub_height, z0=z0)
+                    else:
+                        met.add_wind_speed_h_hub_column()
+
+                    met.df_timeseries['hs'] = 0
+                    met.df_timeseries['te'] = 10
+                    met.df_timeseries['cs'] = 0
+                else:
+                    met = None
+        # TOW METOCEAN
         else:
             met = {}
             

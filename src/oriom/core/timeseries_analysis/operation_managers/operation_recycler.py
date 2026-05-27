@@ -1,6 +1,7 @@
 import os
-import logging
 import pandas as pd
+
+from oriom.common.constants import REUSE_FIELDS_MAJOR_TO_COMPARE
 
 try:
     from oriom.core.functions.private import check_files
@@ -79,16 +80,15 @@ def recycle_major_other_oper_scheduler(
 def compare_operations(op1, op2):
     """
     Compare two operations activities: return True if all values
-    duration, location, wtg_shutdown_dur, vessels of each activity are equals.
+    attributes in REUSE_FIELDS_MAJOR_TO_COMPARE, vessels and activities number 
+    of each activity are equals.
     """
     if len(op1.activities) != len(op2.activities):
         return False
     if op1.vessel1_id != op2.vessel1_id:
         return False
     for a1, a2 in zip(op1.activities, op2.activities):
-        if (a1.duration != a2.duration or
-            a1.location != a2.location or
-            a1.wtg_shutdown_dur != a2.wtg_shutdown_dur):
-            return False
-
+        for field in REUSE_FIELDS_MAJOR_TO_COMPARE:
+            if getattr(a1, field, None) != getattr(a2, field, None):
+                return False
     return True

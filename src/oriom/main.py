@@ -6,6 +6,7 @@ import warnings
 from copy import deepcopy
 import time
 from datetime import datetime
+import pandas as pd
 
 # Import oriom package
 from oriom.inputs.Configuration import ConfigRun, ProjectDirs
@@ -173,6 +174,13 @@ def run(config: ConfigRun | None = None):
         wtg=farm_technologies.wtg,
         z0=inputs.tseries.surface_roughness["value"],
         stat_inputs=inputs.stats
+    )
+    
+    metocean_port, _ = Metocean.from_run_dir(
+        run_dir=dirs.run_dir,
+        tseries_inputs=inputs.tseries,
+        stat_inputs=inputs.stats,
+        port_metocean = True
     )
 
     # Build Metocean tow in one call
@@ -396,7 +404,7 @@ def run(config: ConfigRun | None = None):
 
     operation_inspect_port_manager(
         operation_dir = dirs.operation_dir,
-        df_metocean = metocean.df_timeseries,
+        df_metocean = metocean_port.df_timeseries if metocean_port is not None else metocean.df_timeseries,
         duration_shift = inputs.tseries.shift_duration["value"],
         operations_inspect_port = operations_inspect_port
     )
@@ -404,6 +412,7 @@ def run(config: ConfigRun | None = None):
     operation_major_manager(
         operation_dir = dirs.operation_dir,
         df_metocean = metocean.df_timeseries,
+        df_metocean_port = metocean_port.df_timeseries if metocean_port is not None else pd.DataFrame,
         operations_corr_major = operations_corr_major,
         inputs_tseries = inputs.tseries,
         Config = Config,
