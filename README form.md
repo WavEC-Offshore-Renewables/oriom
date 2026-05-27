@@ -1,14 +1,13 @@
-<span style="font-size: 26px; font-weight: bold;">READ ME</span>
+# READ ME
 
-<span style="font-size: 24px; font-weight: bold;">Excel Input General informations</span>
+## Excel Input General informations
 
 This file give informations and assist the user to better understand how to compile the input excel form file for ORIOM.
 
 Informations are divided for each sheet of the excel form
 
 
-# 
-<span style="font-size: 26px; font-weight: bold;">INSTALLATION MODE</span>
+# INSTALLATION MODE
 
 To use ORIOM in **Installation Mode**, the workflow is based on:
 
@@ -44,13 +43,14 @@ The installation process is modeled as follows:
 - vessel returns to port after each installation
 
 **Implementation:**
+```
 1. Create 5 failures (one per device)
 2. Define an operation to fix each failure
 3. Each operation consists of:
    - install 1 device
    - return to port
 4. Defer each operation to a target month
-
+```
 **Behavior:**
 - Devices are installed sequentially
 - Each installation requires a separate trip
@@ -65,13 +65,14 @@ The installation process is modeled as follows:
 - vessel returns to port once
 
 **Implementation:**
+```
 1. Create 1 failure (representing the full campaign)
 2. Define a single operation to install all devices
 3. Operation consists of:
    - install 5 devices
    - return to port
 4. Defer operation to a target month
-
+```
 **Behavior:**
 - All devices are installed consecutively
 - No intermediate return to port
@@ -85,13 +86,14 @@ The installation process is modeled as follows:
 - batches of 5 devices per trip
 
 **Implementation:**
+```
 1. Create 2 failures (each representing a batch of 5 devices)
 2. Define operations to install 5 devices per campaign
 3. Each operation consists of:
    - install 5 devices
    - return to port
 4. Defer operations within the same month or scheduled sequence
-
+```
 **Behavior:**
 - First batch of 5 devices installed consecutively
 - Second batch starts after the first campaign completes
@@ -106,13 +108,12 @@ The installation process is modeled as follows:
     - complete the installation campaign without loss of remaining units
 
 
-#
-<span style="font-size: 26px; font-weight: bold;"> 🔧 O&M MODE</span>
+# 🔧 O&M MODE
 
 
-<span style="font-size: 20px; font-weight: bold;">HARD CODED PARAMETERS</span>
+## HARD CODED PARAMETERS
 
-- ## TO CONSIDER DIFFERENT CHANGE IN DISTANCE DUE TO CLOSER PORT FOR CERTAIN TYPE OF VESSEL
+- ### TO CONSIDER DIFFERENT CHANGE IN DISTANCE DUE TO CLOSER PORT FOR CERTAIN TYPE OF VESSEL
     - **diff_distance**: boolean value to say that there are vessel that are considered with other port distance
 
     - **distance from coast**: The distance might change for vessel type (port facilities differ)
@@ -120,7 +121,7 @@ The installation process is modeled as follows:
     - **VESSEL_DIST_REDUCED_LIST**: List of vessel type that will have different distances from port as can use a closer port that have reduced port characteristic
 
 
-- ## OTHER
+- ### OTHER
     - **KM_MOTHER_VESSEL**: The distance on which evaluate the transit when a mother vessel is used. Might change for vessel mother
 
     - **fuel to add**: Dictionary of vessel id and **YEARLY FUEL COST** cost of fuel to add due to reduced travels (overnight stay at site). The cost will be added only at the averaged results
@@ -146,7 +147,6 @@ The installation process is modeled as follows:
 
 ## TSA_inputs
 
-
 - **The Merge operation vessel**:
 
     This parameter will set the vessels that will be merged together along the immediate corrective operations that will occurs in the same day.
@@ -169,7 +169,6 @@ The installation process is modeled as follows:
 - **Failure rate sensitivity** Is a sensitivity factor to increase or reduce all the failures. Default to 1 or empty
 
 ## Gen_PV
-
 
 - **Layout**: Layout 2 has the layout implemented till the inverter level. Lower component are considered for energy losses evaluation and corrections
     - **NODE/EDGE**: in failure sheet the components level must be:
@@ -260,17 +259,12 @@ the devisce at port and stored at port must be present (if not know = 0)
 
 - **Name**: In FOPV the layout is setted with inverter resolution. To count failure on "device" or "string" level add "_device" and "_string" in the name of the failure to consider them. The level must be 'device' and 'array_cable' relatively. Event if the layout 4 of OPV do not take into consideration these levels, the availability algorithm will acocunt the reduction of the availability due to solar module and string failure. An eccess of module broken in a single line will cause a shutdown of the entire line
 
-
-
-
 ## ALL OPERATIONS (INSPECTION & CORRECTION)
-
 
 - Do not put in the same operations in vessel 1 & vessel 2 the same vessel type
 
 
 - Each major and minor corrective operation must have a failure that triggers it.
-
 
 - Each operation should start with the same prefix:
     - for floating solar:
@@ -289,8 +283,6 @@ the devisce at port and stored at port must be present (if not know = 0)
     ```
     oce
     ```
-
-
 
 - The ROV must be present in the first vessel called (vessel_1) otherwhise its cost will not be shown in the economic results
 

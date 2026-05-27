@@ -14,7 +14,7 @@ from oriom.inputs.Input_manager import Input_Files, extract_input_from_excel, ha
 from oriom.utils import aux_functions
 from oriom.utils import aux_operation
 
-from oriom.classes.Inputs import Inputs
+from oriom.classes.Inputs.Inputs import Inputs
 from oriom.classes.Metocean import Metocean
 from oriom.classes.RovDrone import RovDrone
 from oriom.classes.Operations.InspectionSite import InspectionSite
@@ -30,9 +30,9 @@ from oriom.classes.DefineOperationTechs import Define_operation
 from oriom.classes.Failure import Failure
 from oriom.classes.Results import Results
 from oriom.classes.Scenario import Scenario
-from oriom.classes.Power import PVPower as PVPower
+from oriom.classes.Techs.Power import PVPower as PVPower
 from oriom.classes.FindElementClass import Find_Element
-from oriom.classes.Technologies import TechnologyBuilder
+from oriom.classes.Techs.Technologies import TechnologyBuilder
 
 from oriom.classes.Layouts.Layouts_Managers import LayoutManager
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import inspect_site_manager

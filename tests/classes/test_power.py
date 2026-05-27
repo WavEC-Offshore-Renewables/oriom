@@ -3,8 +3,8 @@ from unittest.case import skip
 import os
 from copy import deepcopy
 
-from oriom.classes.Power import Curve
-from oriom.classes.Power import Matrix
+from oriom.classes.Techs.Power import Curve
+from oriom.classes.Techs.Power import Matrix
 
 
 class TestCurve(unittest.TestCase):

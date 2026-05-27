@@ -1,12 +1,8 @@
-# Import packages
 import logging
-import os
 from ruamel.yaml import YAML
 from copy import deepcopy
 
-# Import classes
 from oriom.classes.Vessel import Vessel
-
 
 class Define_operation():
 

@@ -6,8 +6,8 @@ import os
 
 # Import classes
 from oriom.classes import Metocean
-from oriom.classes.Power import Curve as PowerCurve
-from oriom.classes.Power import Matrix
+from oriom.classes.Techs.Power import Curve as PowerCurve
+from oriom.classes.Techs.Power import Matrix
 
 
 def add_power_columns(

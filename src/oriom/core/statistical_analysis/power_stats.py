@@ -119,8 +119,8 @@ if __name__ == '__main__':
 
     import os
     from oriom.classes.Metocean import Metocean
-    from oriom.classes.Power import Curve as PowerCurve
-    from oriom.classes.Power import Matrix as PowerMatrix
+    from oriom.classes.Techs.Power import Curve as PowerCurve
+    from oriom.classes.Techs.Power import Matrix as PowerMatrix
     from oriom.timeseries_analysis.timestep_power import add_power_columns
 
     pcurve_wind = PowerCurve(

@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from oriom.classes.Inputs import Inputs
+from oriom.classes.Inputs.Inputs import Inputs
 
 
 def skipIfNotLocal():
