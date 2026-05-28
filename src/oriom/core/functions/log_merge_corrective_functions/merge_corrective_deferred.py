@@ -25,9 +25,9 @@ def merge_deferred_operations(
 ):
     """
     This function merge the deferred operations similarly as inspection at site are conducted.
-    Merge only same deferred operations togheter, and consider the fact that more operations can be done consecutevely or
+    Merge only same deferred operations together, and consider the fact that more operations can be done consecutevely or
     even simultaneously (drop off personnel). To conduct the next shift must wait the vessel that return to port from the previous
-    shift done.
+    shift done. Deferred opeartions are joint in campaign if they are deferred in the same month.
 
     Workflow:
     1. Regroup the log events by month and vessel

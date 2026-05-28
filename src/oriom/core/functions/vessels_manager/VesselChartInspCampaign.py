@@ -167,21 +167,25 @@ class Stat_chart_inspection_campaign():
             # Evaluate duration of deferred operations in days for each deferred month
             grouped['duration_days'] = (grouped['max_end'] - grouped['min_trigger']).dt.total_seconds() / 86400  # in days
 
-            # CHIAVE DI RAGGRUPPAMENTO: "stesso d_trigger iniziale"
-            # uso la data normalizzata (00:00) per evitare problemi di ore/minuti
-            grouped["start_key"] = list(zip(grouped["min_trigger"].dt.month,
-                                            grouped["min_trigger"].dt.day))
+            # Regrouping keys: "same initial d_trigger"
+            # Normalize data (00:00) to avoid minutes/second differences
+            grouped["start_key"] = list(zip(
+                grouped["min_trigger"].dt.month,
+                grouped["min_trigger"].dt.day
+                )
+            )
 
-            # percentile della durata tra blocchi con lo stesso start_key
+            # percentile duration of block start_key
             q = (grouped
                 .groupby("start_key")["duration_days"]
                 .quantile(percentile)
-                .reset_index(name="q_days"))
+                .reset_index(name="q_days")
+            )
 
-            # unisci la durata-quantile al singolo blocco tramite la sua start_key
+            # join duration-quantile of single block through its start_key
             grouped = grouped.merge(q, on="start_key", how="left")
 
-            # stat_end del blocco = min_trigger + ceil(q_days)
+            # stat_end of block = min_trigger + ceil(q_days)
             grouped["stat_end"] = [
                 row["min_trigger"] + timedelta(days=row["q_days"] if not pd.isna(row["q_days"]) else 0)
                 for _, row in grouped.iterrows()

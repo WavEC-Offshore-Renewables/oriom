@@ -97,8 +97,8 @@ def manage_chart(df: pd.DataFrame, vessels: list, percentile: float = 0.9):
     # Modify event name
     df['event'] = np.where(
         df['event'] != 'mobilisation_merged',
-        'operation_deferred_merged',  # valore se condizione True
-        df['event']                   # valore se condizione False (lascia invariato)
+        'operation_deferred_merged',  # value if True
+        df['event']                   # value if False (keep the same)
     )
 
     # Uniform d_trigger and d_end_leadtime

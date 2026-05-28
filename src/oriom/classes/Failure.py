@@ -5,6 +5,7 @@ from distutils.util import strtobool
 from ruamel.yaml import YAML
 
 from oriom.common.constants import FAILURE_LEVEL_LIST
+from oriom.common.constants import DICT_DAYS
 
 class Failure():
     """Failure class.
@@ -35,7 +36,9 @@ class Failure():
         operation_triggered (:obj:`str`): Operation that is triggered
             when this failure happens. Its value is ``None`` if not defined.
         preferred_month (:obj:`int`): In case the strategy is to schedule the
-            operation in a specific month. Its value is ``None`` if not defined.
+            operation in a specific month. Its value is ``None`` if not defined.~
+        preferred_day (:obj:`int`): In case the strategy is to schedule the
+            operation in a specific day of the month. Its value is ``1`` if not defined.
         avoid_month_correction (:obj:`list`, *optional*): In case the strategy is
                 immediate but want to avoid some month to operate the Defaults to ``[]``.
         lead_time (:obj:`int`): Defines lead time in h. Its value
@@ -66,6 +69,7 @@ class Failure():
             operation_triggered: str=None,
             parts_cost: float=0,
             preferred_month: int=None,
+            preferred_day: int=1,
             avoid_month_correction: str=None,
             lead_time: int=None,
             bath_tub: bool=None,
@@ -78,11 +82,9 @@ class Failure():
             id_(:obj:`str`): The unique identifier of the Failure.
             name (:obj:`str`): Failure name.
             n_element (:obj:`int`) : Number of element to refer the failure rate.
-            fail_rate (:obj:`float`): The operation failure rate per year per
-                element.
+            fail_rate (:obj:`float`): The operation failure rate per year per element.
             maintenance_strategy (:obj:`str`): When the failure occurs it can
-                lead to the following strategies: never repair, specific month,
-                immediately.
+                lead to the following strategies: never repair, specific month, immediately.
             level_failure (:obj:`str`): Level at which the failure occurs for
                 the graph.
             potential_shutdown (:obj:`bool`): If the failure could lead to potential
@@ -92,15 +94,15 @@ class Failure():
             parts_cost (:obj:`float`): Cost of replacement parts. Its value is
                 :obj:`0.0` if not defided.
             preferred_month (:obj:`int`, *optional*): In case the strategy is
-                to schedule the operation in a specific month. Defaults to
-                ``None``.
+                to schedule the operation in a specific month. Defaults to ``None``.
+            preferred_day (:obj:`int`, *optional*): In case the strategy is
+                to schedule the operation in a specific day of the month. Defaults to ``1``.
             avoid_month_correction (:obj:`str`, *optional*): In case the strategy is
                 immediate but want to avoid some month to operate the Defaults to ``None``.
             lead_time (:obj:`int`, *optional*): On the case of part replacement,
                 the lead time can be defined. Defaults to ``0``.
             bath_tub (:obj:`bool`, *optional*): True if the failure rate follows a
-                bath-tub trend during the lifetime, False if it doesn't. Defaults
-                to ``False``.
+                bath-tub trend during the lifetime, False if it doesn't. Defaults to ``False``.
             fail_variation (:obj:`bool`, *optional*): True if the failure rate will variate in the
                 sensitivity analysis. Defaults to ``False``.
             perc_shutdown_fail (:obj:`int`, *optional*): Is the probability that the component shut
@@ -118,6 +120,7 @@ class Failure():
         self.potential_shutdown = bool(potential_shutdown)
         self.operation_triggered = None
         self.preferred_month = None
+        self.preferred_day = 1
         self.avoid_month_correction = []
         self.lead_time = 0
         self.parts_cost = 0
@@ -129,6 +132,8 @@ class Failure():
             self.operation_triggered = str(operation_triggered).lower()
         if preferred_month is not None:
             self.preferred_month = int(preferred_month)
+        if preferred_day is not None:
+            self.preferred_day = int(preferred_day)
         if avoid_month_correction:
             try:
                 try: 
@@ -242,6 +247,11 @@ class Failure():
             _e = 'Failure: "preferred_month" must be between 1 and 12'
             logging.error(_e)
             raise ValueError(_e)
+        if isinstance(self.preferred_day, int) is True and isinstance(self.preferred_month, int) is True:
+            if self.preferred_day not in range(1, DICT_DAYS[self.preferred_month]+1):
+                _e = f'Failure: "preferred_day" must be between 1 and {DICT_DAYS[self.preferred_month]+1} for the month selected'
+                logging.error(_e)
+                raise ValueError(_e)
         if self.level_failure not in FAILURE_LEVEL_LIST:
             _e = f'level_failure not recognized {self.level_failure}'
             logging.error('Failure:' + _e)
@@ -298,6 +308,7 @@ class Failure():
         no_mandatory_keys = [
                 'op_trigger',
                 'preferred_month',
+                'preferred_day',
                 'avoid_month_correction',
                 'lead_time',
                 'bath_tub',
@@ -337,6 +348,7 @@ class Failure():
                         operation_triggered = failure["op_trigger"],
                         parts_cost=failure["parts_cost"],
                         preferred_month = failure["preferred_month"],
+                        preferred_day = failure["preferred_day"],
                         avoid_month_correction = failure["avoid_month_correction"],
                         lead_time = failure["lead_time"],
                         bath_tub = failure["bath_tub"],

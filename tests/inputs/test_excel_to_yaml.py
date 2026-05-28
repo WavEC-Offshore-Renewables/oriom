@@ -697,6 +697,7 @@ class TestExcelToYaml(unittest.TestCase):
                 "level_failure": ["UNIT", 1],
                 "op_trigger": ["UNIT", "OP1"],
                 "preferred_month": ["UNIT", 1],
+                "preferred_day": ["UNIT", 1],
                 "avoid_month_correction": ["UNIT", '1,2'],
                 "lead_time": ["UNIT", 30],
                 "bath_tub": ["UNIT", "no"],
