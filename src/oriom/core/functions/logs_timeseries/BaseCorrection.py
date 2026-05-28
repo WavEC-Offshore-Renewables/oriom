@@ -121,7 +121,16 @@ class CorrectionDeferred(BaseCorrection):
     Attributes:
         tow_op (bool): Flag to reconnize if a towing operation have been conducted
     """
-    def __init__(self, date_failure, vessel, oper, preferred_month, time_fail_op_immediately=0, tow_op=False):
+    def __init__(
+        self, 
+        date_failure, 
+        vessel, 
+        oper, 
+        preferred_month, 
+        time_fail_op_immediately=0, 
+        tow_op=False, 
+        day_preferred = 1
+    ):
         super().__init__(date_failure, vessel, oper, time_fail_op_immediately)
         # Calculate date in base on deferred month
         self.tow_op = tow_op
@@ -133,7 +142,7 @@ class CorrectionDeferred(BaseCorrection):
         self.date_op = datetime(
             year=self.date_failure.year if preferred_month > self.date_failure.month else self.date_failure.year + 1,
             month=preferred_month,
-            day=1,
+            day=day_preferred,
             hour=5,
             minute=0,
             second=0

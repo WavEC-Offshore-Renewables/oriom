@@ -96,6 +96,12 @@ class TestaFailure(unittest.TestCase):
         args["preferred_month"] = '13'
         self.assertRaises(ValueError, Failure, **args)
 
+        args = deepcopy(args_default)
+        args["maintenance_strategy"] = 'specific month'
+        args["preferred_month"] = '6'
+        args["preferred_day"] = '31'
+        self.assertRaises(ValueError, Failure, **args)
+
 
 if __name__ == '__main__':
 

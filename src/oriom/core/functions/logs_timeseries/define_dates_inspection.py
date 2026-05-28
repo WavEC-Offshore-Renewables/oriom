@@ -108,7 +108,11 @@ def define_dates(
                 if ii == len(datetimes) - 1:
                     df_port_inspection_log = aux_functions.log_event_convert_stringtime(df_port_inspection_log)
                     inspection.insp_class.towing_log = df_port_inspection_log
-                    aux_functions.save_file_csv(df_port_inspection_log, aux_functions.safe_getattr(inspection, ['insp_class', 'insp_port_dir']), 'towing_inspection_log.csv')
+                    aux_functions.save_file_csv(
+                        df_port_inspection_log, aux_functions.safe_getattr(
+                            inspection, ['insp_class', 'insp_port_dir']
+                        ), 'towing_inspection_log.csv'
+                    )
 
                 if not port_inspection.operation_completed:
                     break

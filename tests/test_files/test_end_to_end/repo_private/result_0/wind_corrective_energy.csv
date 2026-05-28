@@ -54,6 +54,8 @@ Date,Event,id,Comments,Name,Loc,Shutdown,Shut/Fix,Perc_availability,Power_loss_k
 2011-07-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
 2011-07-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
 2011-08-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
+2011-08-20 06:10:12,operation,ofw_op001,oper_ofw_fail_1.1,Minor repair,6,True,shut,80.0,4938.345
+2011-08-20 14:10:12,operation,ofw_op001,oper_ofw_fail_1.1,Minor repair,6,True,fix,100.0,0.0
 2011-08-31 23:59:59,Last Day of month,-,-,-,-,-,-,100.0,0.0
 2011-09-01 00:00:00,First Day of month,-,-,-,-,-,-,100.0,0.0
 2011-09-24 02:00:00,failure,ofw_fail_4.1,immediately,failure 4,3,True,shut,80.0,45871.66

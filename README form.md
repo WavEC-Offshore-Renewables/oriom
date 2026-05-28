@@ -103,8 +103,13 @@ The installation process is modeled as follows:
     If the last operation contains fewer devices than the batch size:
 
     - create a **separate operation** for the remaining devices
+
+    - such operation must by with consecutive to the batch operations considering lexicografic order, so if Batch_operation.id == 'op_001' the separate operation must be with an id 'op_002' or higher in order to be conducted as last operation of the campaign
+
     - schedule it in the same month with a consecutive day respect to the previous ones
+
     - ensure sequential execution on consecutive days
+    
     - complete the installation campaign without loss of remaining units
 
 

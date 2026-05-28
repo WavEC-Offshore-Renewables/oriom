@@ -38,9 +38,10 @@ class DummyOperStat:
 
 
 class DummyFailure:
-    def __init__(self, maintenance_strategy, preferred_month=None):
+    def __init__(self, maintenance_strategy, preferred_month=None, preferred_day = 1):
         self.maintenance_strategy = maintenance_strategy
         self.preferred_month = preferred_month
+        self.preferred_day = preferred_day
         # lead_time is not used directly in this module but exists in upstream code
         self.lead_time = 0
 
@@ -461,7 +462,7 @@ class TestCreateOperationSite(unittest.TestCase):
         }
 
         class StubDeferred:
-            def __init__(self, date_failure, vessel, oper, preferred_month, tow_op):
+            def __init__(self, date_failure, vessel, oper, preferred_month, tow_op, day_preferred):
                 self.date_failure = date_failure
                 self.date_op = date_failure
                 self.idx_end_leadtime = 0
@@ -562,7 +563,7 @@ class TestCreateOperationSite(unittest.TestCase):
         }
 
         class StubDeferred:
-            def __init__(self, date_failure, vessel, oper, preferred_month, tow_op):
+            def __init__(self, date_failure, vessel, oper, preferred_month, tow_op, day_preferred):
                 self.date_failure = date_failure
                 self.date_op = date_failure
                 self.idx_end_leadtime = 0

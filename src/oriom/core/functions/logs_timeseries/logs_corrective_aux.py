@@ -1,6 +1,6 @@
 import pandas as pd
 import logging
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 from oriom.utils.aux_functions import save_file_csv, safe_getattr
 from oriom.core.functions.logs_timeseries.BaseCorrection import CorrectionImmediate, CorrectionDeferred
@@ -160,7 +160,8 @@ def create_operation_site(
             vessel = vessel_['vessel'],
             oper = oper_['oper'],
             preferred_month = row_['row']['preferred_month'],
-            tow_op = row_['tow_op_flag']
+            tow_op = row_['tow_op_flag'],
+            day_preferred = failure_['failure'].preferred_day
         )
 
         # Evaluate end of leadtime date
