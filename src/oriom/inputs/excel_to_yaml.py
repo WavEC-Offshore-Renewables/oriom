@@ -160,7 +160,7 @@ def excel_to_yaml(
                 inputs["metocean file port"] = {"value": value, "units": None}
 
             elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' in name:
-                inputs[f"metocean tow file number"] = {"value": int(value), "units": None}
+                inputs["metocean tow file number"] = {"value": int(value), "units": None}
 
             elif 'metocean' in name and 'file' in name and 'tow' in name and 'number' not in name:
                 value = str(Path(value))
@@ -230,6 +230,12 @@ def excel_to_yaml(
 
             elif 'length' in name and 'export' in name:
                 inputs["length export cable"] = {"value": float(value), "units": str(units)}
+
+            elif 'losses' in name and 'electric' in name and 'location' in name:
+                inputs["electric losses file location"] = {"value": str(value), "units": str(units)}
+
+            elif 'losses' in name and 'wake' in name and 'location' in name:
+                inputs["wake losses file location"] = {"value": str(value), "units": str(units)}
 
             elif 'shift' in name and 'duration' in name:
                 inputs["shift duration"] = {"value": int(value), "units": str(units)}
@@ -319,7 +325,7 @@ def excel_to_yaml(
                     inputs['period wear out'] = {"value": 0, "units": units}
                 else:
                     inputs['period wear out'] = {"value": int(value), "units": units}
-            elif 'fail' in name and 'ratio' in name and not 'sensitivity' in name:
+            elif 'fail' in name and 'ratio' in name and 'sensitivity'not in name:
                 if pd.isna(value) or value == 0:
                     inputs['failure ratio'] = {"value": 0, "units": None}
                 else:
@@ -525,7 +531,7 @@ def excel_to_yaml(
                 value = int(value)
                 wtg["moorings per wtg"] = {"value": value, "units": None}
 
-            elif 'strings' in name and not 'connector' in name:
+            elif 'strings' in name and 'connector' not in name:
                 value = int(value)
                 wtg["number of strings"] = {"value": value, "units": None}
 
@@ -893,8 +899,8 @@ def excel_to_yaml(
         yaml=YAML()
         yaml.indent(mapping=4)
         loads = CS(loads)
-        for l in range(1, len(loads)):
-            loads.yaml_set_comment_before_after_key(l, before='\n')
+        for loa in range(1, len(loads)):
+            loads.yaml_set_comment_before_after_key(loa, before='\n')
         yaml.dump(loads, f_loads)
         f_loads.close()
 
@@ -926,8 +932,8 @@ def excel_to_yaml(
         yaml=YAML()
         yaml.indent(mapping=4)
         densities = CS(densities)
-        for l in range(1, len(densities)):
-            densities.yaml_set_comment_before_after_key(l, before='\n')
+        for loa in range(1, len(densities)):
+            densities.yaml_set_comment_before_after_key(loa, before='\n')
         yaml.dump(densities, f_densities)
         f_densities.close()
 

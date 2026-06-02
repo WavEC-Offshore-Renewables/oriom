@@ -148,15 +148,6 @@ def run(config: ConfigRun | None = None):
     ### ---------- INPUTS ---------- ###
     files = Input_Files(dirs.base_dir)
 
-
-    logging.info('--------------------\tINPUTS - TECHNOLOGIES - POWER PRODUCTION\t--------------------')
-    farm_technologies = TechnologyBuilder.build_technologies(
-        run_dir=dirs.run_dir,
-        wtg_file=files.wtg_file,
-        wec_file=files.wec_file,
-        pv_file=files.pv_file,
-    )
-
     logging.info('--------------------\tINPUTS\t--------------------')
     inputs = Inputs(
         general = inputs_gen,
@@ -164,6 +155,17 @@ def run(config: ConfigRun | None = None):
         cost = Inputs.Cost(file_inputs = files.inputs_costs_file, out_dir = dirs.run_dir),
         tseries = Inputs.TimeSeries.from_run_dir(run_dir = dirs.run_dir, file_inputs = files.inputs_tseries_file),
     )
+
+    logging.info('--------------------\tINPUTS - TECHNOLOGIES - POWER PRODUCTION\t--------------------')
+    farm_technologies = TechnologyBuilder.build_technologies(
+        run_dir=dirs.run_dir,
+        wtg_file=files.wtg_file,
+        wec_file=files.wec_file,
+        pv_file=files.pv_file,
+        file_electrical_loss = inputs.tseries.file_wake_loss['value'],
+        file_wake_loss = inputs.tseries.file_wake_loss['value']
+    )
+
 
     logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')
     # Build or reuse Metocean in one call
@@ -173,14 +175,15 @@ def run(config: ConfigRun | None = None):
         power_farm=farm_technologies.power,
         wtg=farm_technologies.wtg,
         z0=inputs.tseries.surface_roughness["value"],
-        stat_inputs=inputs.stats
+        stat_inputs=inputs.stats,
     )
     
     metocean_port, _ = Metocean.from_run_dir(
         run_dir=dirs.run_dir,
         tseries_inputs=inputs.tseries,
         stat_inputs=inputs.stats,
-        port_metocean = True
+        port_metocean = True,
+        site_metocean = metocean
     )
 
     # Build Metocean tow in one call
@@ -192,7 +195,7 @@ def run(config: ConfigRun | None = None):
     )
 
     # Attach power columns and get power-only view
-    metocean = Metocean.attach_power_columns(metocean, farm_technologies.power, out_dir=dirs.run_dir)
+    metocean = Metocean.attach_power_columns(metocean = metocean, power_farm = farm_technologies.power, out_dir=dirs.run_dir)
 
 
     logging.info('--------------------\tLAYOUT\t--------------------')
@@ -404,7 +407,7 @@ def run(config: ConfigRun | None = None):
 
     operation_inspect_port_manager(
         operation_dir = dirs.operation_dir,
-        df_metocean = metocean_port.df_timeseries if metocean_port is not None else metocean.df_timeseries,
+        df_metocean = metocean_port.df_timeseries,
         duration_shift = inputs.tseries.shift_duration["value"],
         operations_inspect_port = operations_inspect_port
     )
@@ -412,7 +415,7 @@ def run(config: ConfigRun | None = None):
     operation_major_manager(
         operation_dir = dirs.operation_dir,
         df_metocean = metocean.df_timeseries,
-        df_metocean_port = metocean_port.df_timeseries if metocean_port is not None else pd.DataFrame,
+        df_metocean_port = metocean_port.df_timeseries,
         operations_corr_major = operations_corr_major,
         inputs_tseries = inputs.tseries,
         Config = Config,

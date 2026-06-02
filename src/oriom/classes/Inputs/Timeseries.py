@@ -59,6 +59,10 @@ class TimeSeries():
             **keys**: dict(X :obj:`int`: *value*: :obj:`flaot` ; *units*: :obj:`str`.)
         file_metocean_tow_number (:obj:`dict`): Path location of the metocean date timeseries.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
+        file_electric_loss (:obj:`dict`): Path location of the electric losses file.
+            **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
+        file_wake_loss (:obj:`dict`): Path location of the wake losses file.
+            **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
 
     Note:
         When the class is initialized :func:`_check_attributes` is run.
@@ -112,6 +116,8 @@ class TimeSeries():
             file_metocean_tow_location (:obj:`dict`): Dictionary of Path location of the X metocean date timeseries from site to port.
             file_metocean_tow_distance (:obj:`dict`): Dictionary of X distance in km from site of the metocean timeseries X file.
             file_metocean_tow_number (:obj:`int`): Number of Path location of the X metocean date timeseries from site to port.
+            file_electric_loss (:obj:`str`): Path location of the electric losses file.
+            file_wake_loss (:obj:`str`): Path location of the wake losses file.
 
 
         Raises:
@@ -139,6 +145,8 @@ class TimeSeries():
         self.inputs["metocean file port"] = {"value": None, "units": None}
         self.inputs["metocean file tow location"] = {}
         self.inputs["metocean file tow distance"] = {}
+        self.inputs["electric file losses"] = {"value": None, "units": None}
+        self.inputs["wake file losses"] = {"value": None, "units": None}
 
         file_path = kwargs.get('file_inputs', None)
         if file_path is not None:
@@ -257,6 +265,10 @@ class TimeSeries():
                     if value:
                         key_n = name[-1]
                         self.inputs["metocean file tow distance"][int(key_n)] = {"value": value, "units": None}
+                elif 'electric' in name and 'losses' in name:
+                    self.inputs["electric file losses"] = {"value": value, "units": None}
+                elif 'wake' in name and 'losses' in name:
+                    self.inputs["wake file losses"] = {"value": value, "units": None}
                 else:
                     logging.warning('Inputs.TimeSeries: input "%s" not recognized. Ignored.' % key)
             logging.info('Inputs.TimeSeries: inputs read from a YAML file: "%s".' % file_path)
@@ -352,6 +364,16 @@ class TimeSeries():
                             "value": list(value),
                             "units": None
                     }
+                elif key.lower() == 'file_electrical_losses':
+                    self.inputs["electric file losses"] = {
+                            "value": str(value),
+                            "units": None
+                    }
+                elif key.lower() == 'file_wake_losses':
+                    self.inputs["wake file losses"] = {
+                            "value": str(value),
+                            "units": None
+                    }
                 elif key.lower() == 'out_dir':
                     pass
                 elif key.lower().startswith('file_metocean_tow_location'):
@@ -389,6 +411,9 @@ class TimeSeries():
         self.length_export = self.inputs.get('length export cable')
         self.shift_duration = self.inputs.get('shift duration')
         self.double_shifts = self.inputs.get('double shifts')
+        self.merge_vessel = self.inputs.get('merge vessel')
+        self.file_wake_loss = self.inputs.get('wake file losses')
+        self.file_electrical_loss = self.inputs.get('electric file losses')
         self.merge_vessel = self.inputs.get('merge vessel')
         self.file_metocean_tow_number = self.inputs.get('metocean file tow number')
         if self.inputs.get('metocean file tow location'):
@@ -455,12 +480,13 @@ class TimeSeries():
             raise ValueError('"Transit Time Between wec Devices" must be greater than 0')
         if self.max_wait is not None and self.max_wait["value"] < 0:
             raise ValueError('"Max WoW between activities" must not be negative')
-        if (
-                self.montecarlo_percent is not None and
-                (
-                        self.montecarlo_percent["value"] <= 0 or
-                    self.montecarlo_percent["value"] > 1
-                )
+        if self.file_wake_loss["value"]:
+            open(self.file_wake_loss["value"], 'r')
+        if self.file_electrical_loss["value"]:
+            open(self.file_electrical_loss["value"], 'r')
+        if (self.montecarlo_percent is not None and(
+            self.montecarlo_percent["value"] <= 0 or self.montecarlo_percent["value"] > 1
+            )
         ):
             raise ValueError('"Timeseries analysed percentage (montecarlo)" must be between 0 and 1')
         if self.length_export["value"] < 0:
@@ -518,6 +544,8 @@ class TimeSeries():
                 "merge_vessel": input_yaml["merge vessel"]["value"],
                 "metocean_ws_height": input_yaml["metocean ws height"]["value"],
                 "file_metocean_tow_number": input_yaml["metocean file tow number"]["value"],
+                "file_wake_losses": input_yaml["wake file losses"]["value"],
+                "file_electrical_losses": input_yaml["electric file losses"]["value"],
         }
 
         number_tow_file = input_yaml["metocean file tow number"]["value"]

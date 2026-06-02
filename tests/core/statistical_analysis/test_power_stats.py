@@ -7,6 +7,14 @@ from oriom.classes.Metocean import Metocean
 from oriom.core.timeseries_analysis.timestep_power import add_power_columns
 from oriom.core.statistical_analysis.power_stats import average_pwind, average_pwave
 
+
+class DummyPowerLosses:
+    def __init__(self, power_loss=False, wake_loss=None, electric_loss=None):
+        self.power_loss = power_loss
+        self.wake_loss = wake_loss if wake_loss is not None else pd.DataFrame()
+        self.electric_loss = electric_loss if electric_loss is not None else pd.DataFrame()
+
+
 class Testapower_stat(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -36,7 +44,14 @@ class Testapower_stat(unittest.TestCase):
         metocean.generateTe()
         metocean.add_wind_speed_h_hub_column()
 
+        power_losses = DummyPowerLosses(
+            power_loss=True,
+            wake_loss=pd.DataFrame(),
+            electric_loss=pd.DataFrame(),
+        )
+
         metocean_w_power_columns = add_power_columns(
+            power_losses = power_losses,
             df_metocean=metocean.df_timeseries,
             pcurve_wind=pcurve_wind,
             pmatrix_wave=pmatrix_wave,

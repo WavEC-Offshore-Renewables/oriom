@@ -39,3 +39,14 @@ ATTRIBUTE_LIST_REUSE_MINOR = [
     'duration_net', 'hs', 'tp', 'ws', 'ws_hub', 'cs', 'light', 
     'vessel1_id', 'vessel2_id', 'shutdown', 'technology', 'rov'
 ]
+power_conversion = {'_w': 1 / 1000, '_kw': 1.0, '_mw': 1000}
+UNIT_CONVERSION = {
+    'wind_speed': {
+        '_m/s': 1.0,
+        '_km/h': 1000 / 3600,
+        '_knots': 0.514444,
+        '_kn': 0.514444,
+    },
+    'p_wind': power_conversion,
+    'p_wave': power_conversion
+}

@@ -493,7 +493,8 @@ class Metocean():
         wtg=None,
         z0=None,
         tow_metocean=False,
-        port_metocean = False
+        port_metocean = False,
+        site_metocean = None
     ) -> tuple[object | dict, dict]:
         """
         Create or load a Metocean object from a run directory.
@@ -515,6 +516,8 @@ class Metocean():
             z0 (float, optional): Surface roughness length used for wind speed extrapolation.
             tow_metocean (bool, default=False): If True, use tow/metocean without processing wind speed.
             port_metocean (bool, default=False): If True, use metocean port without processing wind speed.
+            site_metocean (object, optional): Object of the class ``Metocean`` that represent the Site lcoation.
+                Considered only for Port metocean case, used if port metocean not defined. Default as ``None``
 
         Returns:
             object | dict | None:
@@ -567,9 +570,9 @@ class Metocean():
                 if tseries_inputs.file_metocean_port["value"]:
                     met = check_create_metocean(
                         run_dir = run_dir,
-                        file_name=f"timeseries_port.csv",
+                        file_name="timeseries_port.csv",
                         file = tseries_inputs.file_metocean_port["value"],
-                        loc = f"metocean file port"
+                        loc = "metocean file port"
                     )
                     if power_farm is not None and getattr(power_farm, "wtg_number_devices", None) is not None:
                         if wtg is None or z0 is None:
@@ -579,12 +582,13 @@ class Metocean():
                             met.add_wind_speed_h_hub_column(h_hub=wtg.hub_height, z0=z0)
                     else:
                         met.add_wind_speed_h_hub_column()
-
-                    met.df_timeseries['hs'] = 0
-                    met.df_timeseries['te'] = 10
-                    met.df_timeseries['cs'] = 0
+                # Consider site metocean forcing ocean variables as considering in protected areas
                 else:
-                    met = None
+                    met = site_metocean
+
+                met.df_timeseries['hs'] = 0
+                met.df_timeseries['te'] = 10
+                met.df_timeseries['cs'] = 0
         # TOW METOCEAN
         else:
             met = {}
@@ -599,11 +603,12 @@ class Metocean():
                 met_dist[int(i)] = tseries_inputs.file_metocean_tow_distance[i]["value"]
         return met, met_dist
 
-    def attach_power_columns(metocean, power_farm, out_dir):
+    def attach_power_columns(metocean: object, power_farm: object, out_dir: str):
         """Attach wind/wave power columns to metocean.df_timeseries in-place and return df_power slice."""
 
         timeseries_with_power = add_power_columns(
             df_metocean=metocean.df_timeseries,
+            power_losses=power_farm.power_losses,
             pcurve_wind=power_farm.wtg_pcurve,
             pmatrix_wave=power_farm.wec_pmatrix,
             ndevices_wind=power_farm.wtg_number_devices,

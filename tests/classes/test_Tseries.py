@@ -248,6 +248,18 @@ class TestInputsTimeSeries(unittest.TestCase):
             )
         self.assertRaises(ValueError, Inputs.TimeSeries, **args)
 
+        # Electric losses file missing
+        args = deepcopy(args_def)
+        args["file_metocean_tow_location_1"] = None
+        args["file_electrical_losses"] = 'some other directory'
+        self.assertRaises(FileNotFoundError, Inputs.TimeSeries, **args)
+
+        # Wake losses file missing
+        args = deepcopy(args_def)
+        args["file_metocean_tow_location_1"] = None
+        args["file_wake_losses"] = 'some other directory'
+        self.assertRaises(FileNotFoundError, Inputs.TimeSeries, **args)
+
 if __name__ == '__main__':
 
     test_dir = os.path.join(os.getcwd(), 'tmp', 'test')
