@@ -165,6 +165,26 @@ The installation process is modeled as follows:
         Example:
         Merge operation vessel: ctv, sov, juv
 
+- **Additional Metocean tow file**:
+
+    Addiational metocean tow file will be used in towing operation to consider more metocean location for the towing activities. Such metocean will only be used along the towin (not transit without the device) and it consider the time to reach the point assigned. It need to be coupled with the distance to the site, once the device it is at the middle of the towing from the point A to B, it will start to consider the point B metocean
+
+- **Additional metocean Port file**:
+    Addiational metocean port file will be used in port operation to consider the metocean location of the port. If such is not defined same metocean file of the site will be used, forcing Hs, Tp and current velocity as considering protected aread.
+
+- **Energy losses file location**:
+
+    These power losses will be evaluated and applied to the system without considering the operation of the farm under failures or operation activities. Losses are estimated on the full operation of the system. Shutdown of the are not then considered. 
+    
+    -    **Wake energy losses**:
+
+            This parameter should point to the csv file that define wake energy losses. Wind speed must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1. If not defined, no wake losses will be considered.
+
+    -    **Electric energy losses**:
+
+            This parameter should point to the csv file that define electric energy losses. Power production must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1. If not defined, no electric losses will be considered.
+
+
 ## SA_inputs
 
 
