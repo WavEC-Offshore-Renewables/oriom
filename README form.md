@@ -264,7 +264,7 @@ Example of not consider short_term: particular vessel charted that should not be
 the devisce at port and stored at port must be present (if not know = 0)
 
 ## Failure File
-
+Check the layout level of nodes and edges to know which failures and at which level must be defined
 
 - **op_trigger**: Each failure must be connected to a operation
 
