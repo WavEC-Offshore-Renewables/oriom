@@ -30,7 +30,6 @@ from oriom.classes.OperationsStat.OperationTowStat import OperationsTowStat
 from oriom.classes.DefineOperationTechs import Define_operation
 from oriom.classes.Failure import Failure
 from oriom.classes.Results import Results
-from oriom.classes.Scenario import Scenario
 from oriom.classes.Techs.Power import PVPower as PVPower
 from oriom.classes.FindElementClass import Find_Element
 from oriom.classes.Techs.Technologies import TechnologyBuilder
@@ -153,7 +152,11 @@ def run(config: ConfigRun | None = None):
         general = inputs_gen,
         stats = Inputs.Statistical(file_inputs = files.inputs_stats_file, out_dir = dirs.run_dir),
         cost = Inputs.Cost(file_inputs = files.inputs_costs_file, out_dir = dirs.run_dir),
-        tseries = Inputs.TimeSeries.from_run_dir(run_dir = dirs.run_dir, file_inputs = files.inputs_tseries_file),
+        tseries = Inputs.TimeSeries.from_run_dir(
+            run_dir = dirs.run_dir,
+            file_inputs = files.inputs_tseries_file,
+            scenarios_file = files.scenarios_file
+        ),
     )
 
     logging.info('--------------------\tINPUTS - TECHNOLOGIES - POWER PRODUCTION\t--------------------')
@@ -367,11 +370,6 @@ def run(config: ConfigRun | None = None):
 
     # Check if all the levels defined are associated to a component in the graph
     aux_operation.level_component_check(Gs = G_layouts, operations = failures, failure = True)
-
-    # Define scenario for failure event
-    inputs.tseries.scenario = Scenario.get_scenarios_from_yaml(
-            file_path = files.scenarios_file
-    )
 
     # Generate random timesteps to be analysed
     timesteps, _ = f_montecarlo(

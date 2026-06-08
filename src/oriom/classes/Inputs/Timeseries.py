@@ -3,6 +3,7 @@ import os
 import math as mt
 from ruamel.yaml import YAML
 from oriom.utils.yaml_manager import inputs_to_yaml
+from oriom.classes.Scenario import Scenario
 
 try:
     from oriom.core.functions.private.check_files import check_file_exists
@@ -118,6 +119,7 @@ class TimeSeries():
             file_metocean_tow_number (:obj:`int`): Number of Path location of the X metocean date timeseries from site to port.
             file_electric_loss (:obj:`str`): Path location of the electric losses file.
             file_wake_loss (:obj:`str`): Path location of the wake losses file.
+            scenarios_file (obj:`str`) Path location of the failure Scenarios file.
 
 
         Raises:
@@ -147,6 +149,7 @@ class TimeSeries():
         self.inputs["metocean file tow distance"] = {}
         self.inputs["electric file losses"] = {"value": None, "units": None}
         self.inputs["wake file losses"] = {"value": None, "units": None}
+        self.inputs["scenarios_file"] = {"value": None, "units": None}
 
         file_path = kwargs.get('file_inputs', None)
         if file_path is not None:
@@ -431,6 +434,13 @@ class TimeSeries():
             'owc': self.time_between_devices_wec["value"]
         }
 
+        # Define scenario for failure event
+        if kwargs.get('scenarios_file'):
+            self.scenario = Scenario.get_scenarios_from_yaml(file_path = kwargs['scenarios_file'])
+        else:
+            self.scenario = Scenario.create_equal_scenarios()
+        
+
         self._check_attributes()
 
         # Save inputs as a YAML file
@@ -493,6 +503,8 @@ class TimeSeries():
             raise ValueError('"Length of export cable" must not be negative')
         if self.failure_scenario["value"] < 0:
             raise ValueError('"failure scenario selection" must not be negative')
+        if self.failure_scenario["value"] not in self.scenario:
+            raise ValueError('"failure scenario selection" must not be negative')
         if self.shift_duration["value"] <= 0:
             raise ValueError('"Duration of a shift" must be greater than 0')
         if self.file_metocean_tow_number["value"] < 0:
@@ -515,7 +527,7 @@ class TimeSeries():
         logging.debug('Inputs.TimeSeries: attributes within ranges and valid.')
 
     @classmethod
-    def from_yaml(cls, dir: str, name: str):
+    def from_yaml(cls, dir: str, name: str, scenarios_file:str):
         """Recycle previous ~Inputs.TimeSeries from a YAML file.
 
         Args:
@@ -546,6 +558,7 @@ class TimeSeries():
                 "file_metocean_tow_number": input_yaml["metocean file tow number"]["value"],
                 "file_wake_losses": input_yaml["wake file losses"]["value"],
                 "file_electrical_losses": input_yaml["electric file losses"]["value"],
+                "scenarios_file": scenarios_file
         }
 
         number_tow_file = input_yaml["metocean file tow number"]["value"]
@@ -564,7 +577,7 @@ class TimeSeries():
 
 
     @classmethod
-    def from_run_dir(cls, run_dir, file_inputs):
+    def from_run_dir(cls, run_dir: str, file_inputs: str, scenarios_file: str):
         """
         Build a TimeSeries instance from a run directory.
 
@@ -574,13 +587,14 @@ class TimeSeries():
         Args:
             run_dir (str): Path to the simulation run directory.
             file_inputs (str): Path to the TimeSeries YAML file to use if not already present.
+            scenarios_file (str): Path to the Scenario YAML file to use.
 
         Returns:
             TimeSeries: A fully constructed instance.
         """
         if check_file_exists and check_file_exists(run_dir, file_name="inputs_tseries.yaml"):
-            return cls.from_yaml(dir=run_dir, name="inputs_tseries")
-        return cls(file_inputs=file_inputs, out_dir=run_dir)
+            return cls.from_yaml(dir=run_dir, name="inputs_tseries", scenarios_file = scenarios_file)
+        return cls(file_inputs=file_inputs, out_dir=run_dir, scenarios_file = scenarios_file)
 
 
     def get_inputs(self):

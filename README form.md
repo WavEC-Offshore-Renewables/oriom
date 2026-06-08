@@ -152,6 +152,10 @@ The installation process is modeled as follows:
 
 ## TSA_inputs
 
+- **Failure scenario selection**:
+
+    This parameter indicate which scenario probability to coniseder when creating failures 
+
 - **The Merge operation vessel**:
 
     This parameter will set the vessels that will be merged together along the immediate corrective operations that will occurs in the same day.
@@ -164,6 +168,7 @@ The installation process is modeled as follows:
 
         Example:
         Merge operation vessel: ctv, sov, juv
+
 
 - **Additional Metocean tow file**:
 
