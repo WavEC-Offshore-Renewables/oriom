@@ -81,11 +81,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="CETO_MEGAWAVE",
+    PROJECT_NAME="SeaPotential_MEGAWAVE_deferred",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Equipa WavEC - T8.1\CaseStudies\Case study",
+    EXCEL_FILE_PATH=r"C:\Users\rmeda\WavEC Offshore Renewables\Equipa WavEC - T8.1\CaseStudies\Case study\Sensitivities\SEAPOTENTIAL",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="ORIOM_CETO_MEGAWAVE.xlsx",
+    FORM_NAME="ORIOM_SeaPotential_MEGAWAVE_deferred.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

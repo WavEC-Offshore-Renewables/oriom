@@ -16,9 +16,9 @@ class TestaScenario(unittest.TestCase):
         )
 
     def std_asserts(self,scenario):
-        self.assertIsInstance(scenario[0].scenario, str)
-        self.assertEqual(scenario[0].scenario, 'scenario_0')
-        self.assertEqual(scenario[1].scenario, 'scenario_1')
+        self.assertIsInstance(scenario[0].scenario, int)
+        self.assertEqual(scenario[0].scenario, 0)
+        self.assertEqual(scenario[1].scenario, 1)
         self.assertIsInstance(scenario[0].percentage_month, list)
         self.assertEqual(sum(scenario[0].percentage_month), 1)
         self.assertEqual(sum(scenario[1].percentage_month), 1)

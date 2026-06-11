@@ -1,4 +1,4 @@
-- scenarios: Scenario_0
+- scenarios: 0
   january: 0.08333333333333333
   february: 0.08333333333333333
   march: 0.08333333333333333
@@ -12,7 +12,7 @@
   november: 0.08333333333333333
   december: 0.08333333333333333
 
-- scenarios: Scenario_1
+- scenarios: 1
   january: 0.15
   february: 0.15
   march: 0.09

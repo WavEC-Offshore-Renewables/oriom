@@ -20,7 +20,9 @@ def skipIfNotLocal():
         return wrapper
     return deco
 
-
+class Scenario:
+    def __init__(self):
+        sc
 class TestInputsTimeSeries(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -74,6 +76,12 @@ class TestInputsTimeSeries(unittest.TestCase):
         self.assertIsInstance(inputs.shift_duration["value"], (int, float))
         self.assertEqual(int(inputs.shift_duration["value"]), 12)
         self.assertEqual(inputs.shift_duration["units"], 'hours')
+
+        # Scenarios
+        self.assertIsInstance(inputs.scenario[0].scenario, int)
+        self.assertEqual(inputs.scenario[0].scenario, 0)
+        self.assertIsInstance(inputs.scenario[0].percentage_month, list)
+        self.assertEqual(sum(inputs.scenario[0].percentage_month), 1)
 
         # Merge vessel (string list -> list normalization acceptable)
         self.assertIn("merge_vessel", inputs.__dict__, "Missing 'merge_vessel' in Inputs.TimeSeries.")

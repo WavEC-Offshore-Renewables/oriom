@@ -65,7 +65,7 @@ except ImportError:
 
 warnings.simplefilter('ignore')
 logging.basicConfig(
-    level=logging.ERROR,       # Mostra solo ERROR e CRITICAL
+    level=logging.ERROR,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
@@ -81,11 +81,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="ORIOM_CETO_STANDARD",
+    PROJECT_NAME="SeaPotential_MEGAWAVE_f_0p5",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Equipa WavEC - T8.1\CaseStudies\Case study",
+    EXCEL_FILE_PATH=r"C:\Users\rmeda\WavEC Offshore Renewables\Equipa WavEC - T8.1\CaseStudies\Case study\Sensitivities\SEAPOTENTIAL",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="ORIOM_CETO_STANDARD.xlsx",
+    FORM_NAME="ORIOM_SeaPotential_MEGAWAVE_failures_decrease.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

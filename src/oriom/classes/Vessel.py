@@ -4,7 +4,23 @@ import pandas as pd
 import os
 import logging
 from ruamel.yaml import YAML
-from distutils.util import strtobool
+
+import math
+
+def strtobool(val):
+    if val is None:
+        return None
+    if isinstance(val, float) and math.isnan(val):
+        return None  # oppure False, dipende dalla logica
+
+    val = str(val).strip().lower()
+
+    if val in ("y", "yes", "t", "true", "on", "1"):
+        return True
+    if val in ("n", "no", "f", "false", "off", "0"):
+        return False
+
+    raise ValueError(f"invalid truth value {val!r}")
 
 
 class Vessel():

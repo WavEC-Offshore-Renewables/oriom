@@ -106,6 +106,20 @@ def results_block(
             dates_failures_OLD = dates_failures_OLD,
         )
 
+        # ADD SEAPOTENTIAL
+        if 'sea' in Config.FORM_NAME.lower() and 'final' not in Config.FORM_NAME.lower():
+            for y in range(2004,2021,2):
+                new_row = {
+                    'datetime': pd.Timestamp(f'{y}-06-01 00:00:00'),
+                    'id': 'owc_fail_dummy',
+                    'maintenance_strategy': 'immediately',
+                    'operation_triggered': 'owc_seap_mjcorport_2',
+                    'preferred_month': None
+                }
+
+                dates_failures = pd.concat([dates_failures, pd.DataFrame([new_row])], ignore_index=True)
+            dates_failures = dates_failures.sort_values(by='datetime')
+
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 
 
@@ -134,6 +148,18 @@ def results_block(
     if log_events.empty:
         raise Exception("Result Block: The log_events dataframe is empty. No operation have been created")
 
+    if 'sea' in Config.FORM_NAME.lower():
+        mask = (
+            log_events["comments"].fillna("").astype(str).str.contains("dummy", case=False, na=False)) & (log_events["event"].fillna("").astype(str).str.lower().eq("tow")
+        ) | (
+            log_events["id"].fillna("").astype(str).str.contains("mobi", case=False, na=False)) & (log_events["id"].fillna("").astype(str).str.contains("dummy", case=False, na=False)
+        )
+        
+        n_modified = mask.sum()
+
+        if n_modified > 0:
+            log_events.loc[mask, "vessel_1"] = "v003"
+
     aux_functions.save_file_csv(log_events, result_dir_r, 'log_events.csv')
     log_events = aux_functions.log_event_convert_stringtime(log_events)
 
@@ -142,6 +168,12 @@ def results_block(
         log_events_merged = pd.read_csv(log_events_dir_merged, sep=',')
         logging.info('Uploading Log events merged file from previous folder')
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
+        if 'sea' in Config.FORM_NAME.lower():
+            mask = (log_events_merged["comments"].fillna("").astype(str).str.contains("dummy", case=False, na=False)) & (log_events_merged["event"].fillna("").astype(str).str.lower().eq("tow"))
+            n_modified = mask.sum()
+
+            if n_modified > 0:
+                log_events_merged.loc[mask, "vessel_1"] = "v003"
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
         vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
         log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
@@ -168,6 +200,14 @@ def results_block(
                 list_idx_remove = index_overwrite_log_ev,
                 result_dir_r = result_dir_r
             )
+
+        if 'sea' in Config.FORM_NAME.lower():
+            mask = (log_events_merged["comments"].fillna("").astype(str).str.contains("dummy", case=False, na=False)) & (log_events_merged["event"].fillna("").astype(str).str.lower().eq("tow"))
+            n_modified = mask.sum()
+
+            if n_modified > 0:
+                log_events_merged.loc[mask, "vessel_1"] = "v003"
+
 
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
         vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)

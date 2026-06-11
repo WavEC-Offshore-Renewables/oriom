@@ -45,7 +45,7 @@ class Scenario():
         """Initializes :class:'Scenario' class.
 
         Args:
-            scenario(:obj:`str`): The scenario to be represented.
+            scenario(:obj:`int`): The scenario to be represented.
             jan (:obj:`float`): Probability of failure for January.
             feb (:obj:`float`): Probability of failure for February.
             mar (:obj:`float`): Probability of failure for March.
@@ -59,7 +59,7 @@ class Scenario():
             nov (:obj:`float`): Probability of failure for November.
             dec (:obj:`float`): Probability of failure for December.
         """
-        self.scenario = str(scenario).lower()
+        self.scenario = int(scenario)
         self.probability = {
                 "jan": float(jan),
                 "feb": float(feb),
@@ -104,12 +104,12 @@ class Scenario():
                 raise ValueError('Percentage of %s cannot be negative' % month)
             percentage_month += prob
 
-        if sum(self.percentage_month) != 1:
+        if round(sum(self.percentage_month),6) != 1:
             logging.error('The sum of the percentages must be equal to 1')
             raise ValueError('The sum of the percentages must be equal to 1')
 
-    def get_scenarios_from_yaml(file_path: str)-> list:
-        """Returns a list of :class:`Scenario` based on a YAML file.
+    def get_scenarios_from_yaml(file_path: str)-> dict:
+        """Returns a dict of :class:`Scenario` based on a YAML file.
 
        Args:
            file_path (:obj:`str`): YAML file path with scenarios.
@@ -119,7 +119,7 @@ class Scenario():
                 not provided.
 
         Returns:
-           :obj:`list`: :obj:`list` of :class:`Scenario`.
+           :obj:`dict`: :obj:`dict` of :class:`Scenario`.
         """
         # Gets scenarios from a YAML file
         f_yaml = open(os.path.join(file_path), 'r')
@@ -148,7 +148,7 @@ class Scenario():
                 'december'
         ]
 
-        scenarios_list = []
+        scenarios_dict = {}
         for scenario in scenarios_yaml:
             if any([
                     key not in scenario.keys()
@@ -160,7 +160,7 @@ class Scenario():
                 _e += 'keys.'
                 logging.error('Scenario: ' + _e)
                 raise KeyError(_e)
-            scenarios_list.append(Scenario(
+            scenarios_dict[scenario["scenarios"]] = (Scenario(
                     scenario=scenario["scenarios"],
                     jan=scenario["january"],
                     feb=scenario["february"],
@@ -177,8 +177,35 @@ class Scenario():
             ))
 
         logging.info('Scenario: scenarios read from file: "%s".' % file_path)
-        return scenarios_list
+        return scenarios_dict
 
+
+    def create_equal_scenarios()-> dict:
+        """Returns a dict of :class:`Scenario` based with equal probabilities.
+
+        Returns:
+           :obj:`dict`: :obj:`dict` of :class:`Scenario`.
+        """
+        scenarios_dict = {}
+        for scenario in range(1):
+
+            scenarios_dict[scenario] = (Scenario(
+                    scenario=0,
+                    jan=1/12,
+                    feb=1/12,
+                    mar=1/12,
+                    apr=1/12,
+                    may=1/12,
+                    jun=1/12,
+                    jul=1/12,
+                    aug=1/12,
+                    sep=1/12,
+                    oct=1/12,
+                    nov=1/12,
+                    dec=1/12
+            ))
+
+        return scenarios_dict
 
 if __name__ == '__main__':
 
