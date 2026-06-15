@@ -7,6 +7,12 @@ from oriom.core.functions.layout_power.aux_layout_power_func import choose_loc, 
 
 
 def check_previous_fix(G, op_add_tow, r, type_id = 'tow'):
+    """ 
+    Check if there is an additional operation that was connected to tow
+        If is a tow event reconnect the string
+        If is recommissioning event reactivate the device
+    Eliminate the failure connected from the dict
+    """
     id_r = r.get('id', None)
     failure_id_r = r.get('failure_id', None)
     key = f"{id_r}_{type_id}" if id_r is not None else None
@@ -245,11 +251,16 @@ def fix(
                     livello = 'string'
             elif tech == 'wind' or tech == 'wave':
                 if G.nodes[loc]['level'] == 'device':
+                    # Solve power if not tow
                     if event != 'tow':
-                        G.nodes[loc]['power'] = 1
+                        # Check if this op had a recommission open
+                        if not op_add_tow.get(r.get('id', None) + "_recom", False):
+                            G.nodes[loc]['power'] = 1
                     else:
+                        # If tow not require recommission solve power
                         if getattr(op_tow_, 'recommissioning_time', 0) == 0:
                             G.nodes[loc]['power'] = 1
+                        # If require recommission create op_add dict to solve it
                         else:
                             op_add_tow.setdefault(op_add.id + "_recom", {})[r['failure_id']] = loc
 
@@ -257,7 +268,7 @@ def fix(
             # Reconnect the string if the component is not power defined (hub/connector/other) or there is a reconnecting tow or electrical disconenction
             if (
                 livello in levels_component_no_power or 
-                getattr(G, 'graph', {}).get('tow_string_shutdown', False) and (
+                getattr(G, 'graph', {}).get('tow_string_shutdown', False) or (
                     event == 'tow' or op_add_tow.get(r.get('id', None), False)
                 )
             ):

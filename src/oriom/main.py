@@ -6,7 +6,6 @@ import warnings
 from copy import deepcopy
 import time
 from datetime import datetime
-import pandas as pd
 
 # Import oriom package
 from oriom.inputs.Configuration import ConfigRun, ProjectDirs
@@ -43,8 +42,7 @@ from oriom.core.timeseries_analysis.operation_managers.operations_minor_manager 
 from oriom.core.timeseries_analysis.montecarlo import f_montecarlo
 
 from oriom.core.statistical_analysis.statisticals_duration_manager import statistical_duration_manager
-from oriom.core.statistical_analysis.power_stats import average_pwind
-from oriom.core.statistical_analysis.power_stats import average_pwave
+from oriom.core.statistical_analysis.power_stats import average_pwind, average_pwave
 from oriom.core.statistical_analysis.final_run_statistics import return_statistics_runs
 from oriom.core.results_block_manager import results_block
 from oriom import test
@@ -81,11 +79,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="test_E2E",
+    PROJECT_NAME="test_NO_DISC",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"",
+    EXCEL_FILE_PATH=r"C:\Riccardo\ORIOM\oriom\src\oriom\tmp\test_CT_DOEA",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_test.xlsx",
+    FORM_NAME="CT tow operation BASE_WS.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 
@@ -219,6 +217,7 @@ def run(config: ConfigRun | None = None):
     for failure in failures:
         if getattr(failure, "fail_variation", False):
             failure.fail_rate *= inputs.stats.failure_ratio_sensitivity["value"]
+            logging.info(f'Failure {failure.id_} FR have been multiplied by {inputs.stats.failure_ratio_sensitivity["value"]}')
 
     logging.info('--------------------\tINPUTS - OPERATIONS\t--------------------')
     vessels = {}

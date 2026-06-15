@@ -185,6 +185,8 @@ def return_percentage(
             failure_id = r["failure_id"]
             r_id = r["id"]
 
+            # LOCATION SELECTION
+            # ------------------
             if r["loc"] is None:
                 # failure location
                 if event == "failure":
@@ -210,6 +212,8 @@ def return_percentage(
                     r["loc"] = loc
 
 
+            # ACTION SELECTION
+            # ------------------
             # Store the shutdown of the device and evaluate the power of the farm
             if shut_fix == 'shut':
                 # Analyze PV technology components below last component defined (inverter)
