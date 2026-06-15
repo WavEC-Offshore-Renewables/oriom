@@ -422,14 +422,35 @@ Check the layout level of nodes and edges to know which failures and at which le
     ```
 
 - Additional Operations: <br>
-    creates an operation required before the tow opearation (if removal) or after (if redeploy) to disconnect full string
-    Require String disconnection == True
+
+    creates an operation required before the tow operation (if removal) or after (if redeploy) to disconnect full string
 
 - String disconnection: <br>
-    If additional operations is present, shutdown the entire string of the device that is towed for the whole duration of the additional operation
+
+    If additional operations is present and disconnection = TRUE, shutdown the entire string of the device that is towed for the whole duration of the additional operation
 
 - Recommissioning: <br>
-    If additional operations is present that shutdown the entire string of the device a recommissioning period can be added. This must be int value and represent the hours of recommision to consider. In Additional Operations activity add recommissioning activity AFTER the TRANSIT to port as LOCATION == port
+
+    If additional operations is present that shutdown the entire string of the device a recommissioning period can be added. This must be int value and represent the hours of recommision to consider. In Additional Operations activity for TTS add recommissioning activity AFTER the TRANSIT to port as LOCATION == port.
+
+        Example "RECOMMISSION ACTIVITY" in last TTS additional operation:
+
+        id	OWT_MJ2_8
+        op_type	CorrectiveMajor
+        op	ofw_MJ2
+        name	Recommissioning
+        location	port
+        wtg_shutdown_dur	TRUE
+        duration	24
+        hs	3
+
+- Combination available for TTP string_disconnection-Recommissioning-Layout_string_disconnection-additional_operation:
+
+    IF add_operation
+        Layout_FARM_String disconnection must be True 
+        String_disconnection can be choosen
+        recommission can be choosen
+
 
 - The chart time for Towing operations works as:
     - For additional operation removal:
