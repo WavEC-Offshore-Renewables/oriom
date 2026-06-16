@@ -159,12 +159,16 @@ class OperationTow():
         if self.vessel2_id is not None:
             if self.vessel2_qt < 1:
                 raise ValueError('"vessel2_qt" must be positive if a "vessel2_id" is defined')
+        if self.string_disconnection and not self.addition_op_tow:
+            raise ValueError('"String_disconnection" must be False when "addition_op_tow" is False. '
+                'String disconnection operation are only allowed when an additional towing operation is present.'
+            )
         if self.recommissioning_time != 0 and not self.addition_op_tow:
             raise ValueError('"recommissioning_time" must be 0 when "addition_op_tow" is False. '
                 'Recommissioning operation are is only allowed when an additional towing operation is enabled.'
             )
-            if self.recommissioning_time < 0:
-                raise ValueError('"recommissioning_time" cannot be negative')
+        if self.recommissioning_time < 0:
+            raise ValueError('"recommissioning_time" cannot be negative')
         logging.debug('OperationTow: operation %s attributes within ranges and valid.' % self.id)
 
 

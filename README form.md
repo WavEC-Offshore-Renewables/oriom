@@ -444,12 +444,35 @@ Check the layout level of nodes and edges to know which failures and at which le
         duration	24
         hs	3
 
-- Combination available for TTP string_disconnection-Recommissioning-Layout_string_disconnection-additional_operation:
+- Combination available for TTP 
 
-    IF add_operation
-        Layout_FARM_String disconnection must be True 
-        String_disconnection can be choosen
-        recommission can be choosen
+    To use recommissioning or string disconnection it must be present an additional operation
+
+    additional_operation = A, string_disconnection = B,  Layout_string_disconnection = C, Recommissioning = D
+    
+    
+           A      B      C      D
+
+        (False, False, False, False),
+
+        (False, False, True,  False),
+
+        (True,  False, False, False)
+
+        (True,  True,  False, False)
+
+        (True,  True,  True,  False)
+
+        (True,  False, True,  True )
+
+        (True,  False, True,  False)
+
+        (True,  False, False, True )
+        
+        (True,  True,  False, True )
+
+        (True,  True,  True,  True )
+
 
 
 - The chart time for Towing operations works as:
