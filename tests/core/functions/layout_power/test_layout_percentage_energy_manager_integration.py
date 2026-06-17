@@ -1,7 +1,5 @@
 #test_layout_percentage_energy_manager_integration
 
-# tests/core/functions/layout_power/test_layout_percentage_energy_manager_integration.py
-
 import unittest
 from unittest.mock import patch
 from datetime import datetime
@@ -10,8 +8,9 @@ import pandas as pd
 import networkx as nx
 
 from oriom.core.functions.layout_power import layout_percentage
+import pytest
 
-
+#pytest.skip("Test temporaneamente disabilitato", allow_module_level=True)
 # ------------------------------------------------------------------
 # Minimal test doubles
 # ------------------------------------------------------------------
@@ -27,7 +26,6 @@ class DummyOp:
     def __init__(self, op_id, tow_to_port=False):
         self.id = op_id
         self.op_class = DummyOpClass(tow_to_port=tow_to_port)
-
 
 DUMMY_OPERATIONS_STATS = [DummyOp("op_corr_001", tow_to_port=False)]
 
@@ -394,6 +392,7 @@ class DummyFindElement:
 # ------------------------------------------------------------------
 # Tow-to-port helpers
 # ------------------------------------------------------------------
+from itertools import product
 
 def make_wind_string_graph(tow_string_shutdown=False):
     """
@@ -410,16 +409,17 @@ def make_wind_string_graph(tow_string_shutdown=False):
     G = nx.DiGraph()
     G.graph["tow_string_shutdown"] = tow_string_shutdown
 
-    G.add_node(0, level="SHORE", power=0)
-    G.add_node(1, level="device", power=1)
-    G.add_node(2, level="device", power=1)
-    G.add_node(3, level="device", power=2)
-    G.add_node(4, level="device", power=3)
+    G.add_node(0, level="SHORE", power=0, name="SHORE", coords=(0, 0))
+    G.add_node(1, level="device", power=1, name="D1", coords=(1, 0))
+    G.add_node(2, level="device", power=1, name="D2", coords=(2, 0))
+    G.add_node(3, level="device", power=1, name="D3", coords=(3, 0))
+    G.add_node(4, level="device", power=1, name="D4", coords=(4, 0))
 
-    G.add_edge(1, 0, visible=True)
-    G.add_edge(2, 1, visible=True)
-    G.add_edge(3, 2, visible=True)
-    G.add_edge(4, 3, visible=True)
+    # Edges
+    G.add_edge(1, 0, visible=True, name="1-0")
+    G.add_edge(2, 1, visible=True, name="2-1")
+    G.add_edge(3, 2, visible=True, name="3-2")
+    G.add_edge(4, 3, visible=True, name="4-3")
 
     return G
 
@@ -429,23 +429,26 @@ def make_tow_to_port_objects(
     string_disconnection,
     recommissioning,
 ):
-    tow_port_id = "tow_port_001"
-    tow_site_id = "tow_site_001"
+    tow_add_port_id = "ofw_add_tow_port_001"
+    tow_add_site_id = "ofw_add_tow_site_001"
+    tow_port_id = "ofw_redeploy_tow"
+    tow_site_id = "ofw_removal_tow"
 
-    add_op = AdditionalTowOperation(tow_site_id) if has_add_operation else False
+    add_op_port = AdditionalTowOperation(tow_add_port_id) if has_add_operation else None
+    add_op_site = AdditionalTowOperation(tow_add_site_id) if has_add_operation else None
 
     tow_port = TowOperation(
         op_id=tow_port_id,
-        addition_op_tow=add_op,
-        string_disconnection=string_disconnection if has_add_operation else False,
+        addition_op_tow=add_op_port,
+        string_disconnection=string_disconnection if string_disconnection else False,
         recommissioning_time=1 if recommissioning else 0,
     )
 
     tow_site = TowOperation(
         op_id=tow_site_id,
-        addition_op_tow=False,
-        string_disconnection=False,
-        recommissioning_time=0,
+        addition_op_tow=add_op_site,
+        string_disconnection=string_disconnection if string_disconnection else False,
+        recommissioning_time=1 if recommissioning else 0,
     )
 
     operations_corrective_stat = [
@@ -468,7 +471,7 @@ def make_tow_to_port_objects(
 
 def make_tow_to_port_events(
     has_add_operation,
-    recommissioning,
+    recommission,
 ):
     failure_id = "ofw_fail_001"
 
@@ -484,11 +487,10 @@ def make_tow_to_port_events(
         "shut_fix": "shut",
         "loc": 2,
     }
-    
     add_op_TTP = {
         "date": datetime(2025, 3, 2, 8, 0, 0),
         "event": "operation",
-        "id": "add_tow_port_001",
+        "id": "ofw_add_tow_port_001",
         "comments": "additional tow/site operation starts",
         "name": "Tow site additional operation",
         "failure_id": failure_id,
@@ -496,10 +498,11 @@ def make_tow_to_port_events(
         "shutdown": True,
         "shut_fix": "shut",
         "loc": 2,
-    },{
+    }
+    add_op_TTS = {
         "date": datetime(2025, 3, 2, 14, 0, 0),
         "event": "operation",
-        "id": "add_tow_port_001",
+        "id": "ofw_add_tow_port_001",
         "comments": "additional tow/site operation completed",
         "name": "Tow site additional operation",
         "failure_id": failure_id,
@@ -508,8 +511,7 @@ def make_tow_to_port_events(
         "shut_fix": "fix",
         "loc": 2,
     }
-        
-    tow = {
+    tow_port = {
         "date": datetime(2025, 3, 2, 15, 0, 0),
         "event": "tow",
         "id": "ofw_removal_tow",
@@ -520,7 +522,8 @@ def make_tow_to_port_events(
         "shutdown": True,
         "shut_fix": "shut",
         "loc": 2,
-    },{
+    }
+    tow_site = {
         "date": datetime(2025, 3, 4, 12, 0, 0),
         "event": "tow",
         "id": "ofw_redeploy_tow",
@@ -531,12 +534,11 @@ def make_tow_to_port_events(
         "shutdown": True,
         "shut_fix": "fix",
         "loc": 2,
-    },
-    
-    add_op_TTS = {
+    }
+    add_op_TTS_shut = {
         "date": datetime(2025, 3, 4, 13, 0, 0),
         "event": "operation",
-        "id": "add_tow_site_001",
+        "id": "ofw_add_tow_site_001",
         "comments": "additional tow/site operation starts",
         "name": "Tow site additional operation",
         "failure_id": failure_id,
@@ -544,10 +546,11 @@ def make_tow_to_port_events(
         "shutdown": True,
         "shut_fix": "shut",
         "loc": 2,
-    },{
+    }
+    add_op_TTS_fix = {
         "date": datetime(2025, 3, 4, 18, 0, 0),
         "event": "operation",
-        "id": "add_tow_site_001",
+        "id": "ofw_add_tow_site_001",
         "comments": "additional tow/site operation completed",
         "name": "Tow site additional operation",
         "failure_id": failure_id,
@@ -555,12 +558,11 @@ def make_tow_to_port_events(
         "shutdown": True,
         "shut_fix": "fix",
         "loc": 2,
-    },
-
+    }
     recommissioning = {
         "date": datetime(2025, 3, 4, 19, 0, 0),
         "event": "recommissioning",
-        "id": "tow_site_001",
+        "id": "ofw_add_tow_site_001",
         "comments": "recommissioning completed",
         "name": "Recommissioning",
         "failure_id": failure_id,
@@ -571,14 +573,16 @@ def make_tow_to_port_events(
     }
 
     # NORMAL TOW
-    if not has_add_operation:
-        events = [failure, tow]
+    if not has_add_operation and not recommission:
+        events = [failure, tow_port, tow_site]
+    elif not has_add_operation and recommission:
+        events = [failure, tow_port, tow_site, recommissioning]
     # TOW with additional operations
-    elif has_add_operation and not recommissioning:
-        events = [failure, add_op_TTP, tow, add_op_TTS]
+    elif has_add_operation and not recommission:
+        events = [failure, add_op_TTP, add_op_TTS, tow_port, tow_site, add_op_TTS_shut, add_op_TTS_fix]
     # TOW with additional operations and recommission
     else:
-        events = [failure, add_op_TTP, tow, add_op_TTS,recommissioning]
+        events = [failure, add_op_TTP, add_op_TTS, tow_port, tow_site, add_op_TTS_shut, add_op_TTS_fix, recommissioning]
 
     return events
 
@@ -586,6 +590,20 @@ def make_tow_to_port_events(
 # ------------------------------------------------------------------
 # Tow-to-port integration tests
 # ------------------------------------------------------------------
+
+EXPECTED_AVAILABILITY = {
+    # existing cases
+    (False, False, False, False): [75.0, 75.0, 100.0],
+    (False, False, True,  False): [75.0, 25.0, 100.0],
+    (True,  False, False, False): [75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 100.0],
+    (True,  True,  False, False): [75.0, 0.0, 75.0, 75.0, 75.0, 0.0, 100.0],
+    (True,  True,  True,  False): [75.0, 0.0, 25.0, 25.0, 25.0, 0.0, 100.0],
+    (True,  False, True,  True ): [75.0, 75.0, 25.0, 25.0, 25.0, 25.0, 75.0, 100.0],
+    (True,  True,  True,  True ): [75.0, 0.0, 25.0, 25.0, 25.0, 0.0, 75.0, 100.0],
+    (True,  False, True,  False): [75.0, 75.0, 25.0, 25.0, 25.0, 25.0, 100.0],
+    (True,  False, False, True ): [75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 100.0],
+    (True,  True,  False, True ): [75.0, 0.0, 75.0, 75.0, 75.0, 0.0, 75.0, 100.0],
+}
 
 class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
     """
@@ -630,7 +648,7 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
 
         generated_events = make_tow_to_port_events(
             has_add_operation=has_add_operation,
-            recommissioning=recommissioning,
+            recommission=recommissioning,
         )
 
         with patch(
@@ -647,7 +665,7 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
             side_effect=lambda df: df,
         ), patch(
             "oriom.core.functions.layout_power.layout_percentage.choose_spec_loc_string",
-            side_effect=lambda G, loc: (loc, 0) if isinstance(loc, int) else loc,
+            side_effect=lambda G, loc: (1, 0) if isinstance(loc, int) else loc,
         ):
             df = layout_percentage.return_percentage(
                 log_events=log_events,
@@ -658,99 +676,57 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
                 start_year=2025,
                 start_month=1,
                 n_lifetime=1,
-                n_devices=2,
+                n_devices=4,
                 tech="wind",
                 find_element_class=find_element_class,
             )
 
         return df, G
 
-    def test_tow_to_port_combinations(self):
-        """
-        Availability interpretation:
+    def test_tow_to_port_all_combinations(self):
+    
+        for (
+            has_add_operation,
+            string_disconnection,
+            tow_string_shutdown,
+            recommissioning,
+        ) in product(
+            [False, True],
+            [False, True],
+            [False, True],
+            [False, True],
+        ):
 
-        Graph has 2 devices.
+            if not has_add_operation and string_disconnection or not has_add_operation and recommissioning:
+                continue
 
-        100% -> both devices connected and powered
-         50% -> one powered device available
-          0% -> string disconnected from shore
-        """
-        cases = [
-            {
-                "name": "no_add_no_string_shutdown_no_recommissioning",
-                "has_add_operation": False,
-                "string_disconnection": False,
-                "tow_string_shutdown": False,
-                "recommissioning": False,
-                "expected_perc": [75.0, 75.0, 100.0],
-            },
-            {
-                "name": "no_add_with_string_shutdown_no_recommissioning",
-                "has_add_operation": False,
-                "string_disconnection": False,
-                "tow_string_shutdown": True,
-                "recommissioning": False,
-                "expected_perc": [75.0, 25.0, 100.0],
-            },
-            {
-                "name": "add_no_string_disconnection_no_layout_shutdown_no_recommissioning",
-                "has_add_operation": True,
-                "string_disconnection": False,
-                "tow_string_shutdown": False,
-                "recommissioning": False,
-                "expected_perc": [75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 100.0],
-            },
-            {
-                "name": "add_with_string_disconnection_no_layout_shutdown_no_recommissioning",
-                "has_add_operation": True,
-                "string_disconnection": True,
-                "tow_string_shutdown": False,
-                "recommissioning": False,
-                "expected_perc": [75.0, 0.0, 75.0, 75.0, 75.0, 0.0, 100.0],
-            },
-            {
-                "name": "add_with_string_disconnection_with_layout_shutdown_no_recommissioning",
-                "has_add_operation": True,
-                "string_disconnection": True,
-                "tow_string_shutdown": True,
-                "recommissioning": False,
-                "expected_perc": [75.0, 0.0, 25.0, 25.0, 25.0, 0.0, 100.0],
-            },
-            {
-                "name": "add_no_string_disconnection_with_layout_shutdown_with_recommissioning",
-                "has_add_operation": True,
-                "string_disconnection": False,
-                "tow_string_shutdown": True,
-                "recommissioning": True,
-                "expected_perc": [75.0, 75.0, 25.0, 25.0, 25.0, 25.0, 75.0, 100.0],
-            },
-            {
-                "name": "add_with_string_disconnection_with_layout_shutdown_with_recommissioning",
-                "has_add_operation": True,
-                "string_disconnection": True,
-                "tow_string_shutdown": True,
-                "recommissioning": True,
-                "expected_perc": [75.0, 0.0, 25.0, 25.0, 25.0, 0.0, 75.0, 100.0],
-            },
-        ]
+            case_key = (
+                has_add_operation,
+                string_disconnection,
+                tow_string_shutdown,
+                recommissioning,
+            )
 
-        for case in cases:
-            with self.subTest(case=case["name"]):
+            with self.subTest(case=case_key):
+
                 df, G = self.run_tow_to_port_case(
-                    has_add_operation=case["has_add_operation"],
-                    string_disconnection=case["string_disconnection"],
-                    tow_string_shutdown=case["tow_string_shutdown"],
-                    recommissioning=case["recommissioning"],
+                    has_add_operation=has_add_operation,
+                    string_disconnection=string_disconnection,
+                    tow_string_shutdown=tow_string_shutdown,
+                    recommissioning=recommissioning,
                 )
 
                 self.assertEqual(
                     df["Perc_availability"].tolist(),
-                    case["expected_perc"],
+                    EXPECTED_AVAILABILITY[case_key],
+                    msg=('\n',has_add_operation,string_disconnection,tow_string_shutdown,recommissioning),
                 )
+
 
                 self.assertEqual(G.nodes[1]["power"], 1)
                 self.assertTrue(G.edges[1, 0]["visible"])
 
+<<<<<<< HEAD
     def test_tow_to_port_without_add_operation_and_with_recommissioning_currently_raises(self):
         """
         Current implementation assumes that, if recommissioning_time > 0,
@@ -766,6 +742,8 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
                 tow_string_shutdown=True,
                 recommissioning=True,
             )
+=======
+>>>>>>> a702d700e4d067c03ae71ac54aa8366e5b6843ef
 
             
 if __name__ == "__main__":
