@@ -751,10 +751,6 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
                 self.assertEqual(G.nodes[1]["power"], 1)
                 self.assertTrue(G.edges[1, 0]["visible"])
 
-                for k, v in case.items():
-                    print(k,v)
-                df.to_csv(r'C:\Riccardo\tmp\aaa.csv')
-
     def test_tow_to_port_without_add_operation_and_with_recommissioning_currently_raises(self):
         """
         Current implementation assumes that, if recommissioning_time > 0,
