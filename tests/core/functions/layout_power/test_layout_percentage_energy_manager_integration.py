@@ -726,24 +726,6 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
                 self.assertEqual(G.nodes[1]["power"], 1)
                 self.assertTrue(G.edges[1, 0]["visible"])
 
-<<<<<<< HEAD
-    def test_tow_to_port_without_add_operation_and_with_recommissioning_currently_raises(self):
-        """
-        Current implementation assumes that, if recommissioning_time > 0,
-        the tow operation has addition_op_tow.
-
-        Without addition_op_tow, fix() tries to access op_add.id.
-        This test documents the current behaviour.
-        """
-        with self.assertRaises(AttributeError):
-            self.run_tow_to_port_case(
-                has_add_operation=False,
-                string_disconnection=False,
-                tow_string_shutdown=True,
-                recommissioning=True,
-            )
-=======
->>>>>>> a702d700e4d067c03ae71ac54aa8366e5b6843ef
 
             
 if __name__ == "__main__":
