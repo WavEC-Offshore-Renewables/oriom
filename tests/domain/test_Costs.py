@@ -70,7 +70,7 @@ class TestInputsCost(unittest.TestCase):
         self.assertEqual(inputs.electricity_price_wec["value"], 200.0)
         self.assertEqual(inputs.electricity_price_wt["value"], 185.0)
 
-    @patch("oriom.classes.Inputs.Costs.logging.getLogger")
+    @patch("oriom.domain.Inputs.Costs.logging.getLogger")
     @skipIfNotLocal()
     def test_from_file(self, mock_logger):
         inputs = Inputs.Cost(
@@ -80,7 +80,7 @@ class TestInputsCost(unittest.TestCase):
         inputs.get_inputs()
         self.std_asserts(inputs)
 
-    @patch("oriom.classes.Inputs.Costs.logging.getLogger")
+    @patch("oriom.domain.Inputs.Costs.logging.getLogger")
     def test_by_hand(self, mock_logger):
         inputs = Inputs.Cost(
             fuel_cost_HFO=450,
@@ -100,7 +100,7 @@ class TestInputsCost(unittest.TestCase):
         inputs.get_inputs()
         self.std_asserts(inputs)
 
-    @patch("oriom.classes.Inputs.Costs.logging.getLogger")
+    @patch("oriom.domain.Inputs.Costs.logging.getLogger")
     def test_errors(self, mock_logger):
         base = dict(out_dir=self.test_dir)
 
@@ -122,7 +122,7 @@ class TestInputsCost(unittest.TestCase):
             with self.assertRaises(ValueError):
                 Inputs.Cost(**base, **bad)
 
-    @patch("oriom.classes.Inputs.Costs.logging.getLogger")
+    @patch("oriom.domain.Inputs.Costs.logging.getLogger")
     def test_minimal_valid_set(self, mock_logger):
         inputs = Inputs.Cost(
             fuel_cost_HFO=0,

@@ -24,7 +24,7 @@ class Farm():
         self.farm_tech = farm_tech
         self.name = str('farm_name')
         self.farm_type = []
-        self.location = {'lat': inputs.tseries.site_lat, 'lon': inputs.tseries.site_lon}
+        self.location = {'lat': inputs.tseries.site_lat['value'], 'lon': inputs.tseries.site_lon['value']}
         self.layout = layouts
 
         self.fleet = {}

@@ -187,9 +187,9 @@ def run(config: ConfigRun | None = None):
     )
 
     port = Port(
-        inputs = inputs,
-        farm_tech = farm_technologies,
-        layouts = G_layouts
+        id_= 'port_id',
+        name = 'My_Port',
+        location = {'lat': inputs.tseries.site_lat["value"], 'lon': inputs.tseries.site_lon["value"]} 
     )
 
     logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')

@@ -8,9 +8,7 @@ import pandas as pd
 import networkx as nx
 
 from oriom.core.functions.layout_power import layout_percentage
-import pytest
 
-#pytest.skip("Test temporaneamente disabilitato", allow_module_level=True)
 # ------------------------------------------------------------------
 # Minimal test doubles
 # ------------------------------------------------------------------
