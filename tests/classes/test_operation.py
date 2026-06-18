@@ -10,7 +10,7 @@ from oriom.classes.Operations.InspectionPort import InspectionPort
 from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
 from oriom.classes.Operations.CorrectiveMinor import CorrectiveMinor
 from oriom.classes.Operations.OperationTow import OperationTow
-from oriom.classes.DefineOperationTechs import Define_operation
+from oriom.core.builders.DefineOperationTechs import Define_operation
 from oriom.classes.Vessel import Vessel
 from oriom.classes.RovDrone import RovDrone
 

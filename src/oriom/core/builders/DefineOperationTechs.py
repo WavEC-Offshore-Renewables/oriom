@@ -2,7 +2,9 @@ import logging
 from ruamel.yaml import YAML
 from copy import deepcopy
 
-from oriom.classes.Vessel import Vessel
+# Import classes
+from oriom.domain.Vessels.Vessel import Vessel
+
 
 class Define_operation():
 
@@ -214,7 +216,7 @@ class Define_operation():
             operation,
             rovs_drones: list
     ):
-        """For an :attr:`operation`, it defines :class:`~oriom.classes.RovDone.RovDrone`
+        """For an :attr:`operation`, it defines :class:`~oriom.domain.RovDrone.RovDrone`
         the respective :attr:`rov_drone`.
 
         Args:

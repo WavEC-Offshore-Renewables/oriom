@@ -4,7 +4,7 @@ import os
 import math
 import matplotlib.pyplot as plt
 
-from oriom.classes.Layouts.Layout_Auxiliary import Layout_Aux
+from oriom.domain.Layouts.Layout_Auxiliary import Layout_Aux
 
 
 class Layout_Wind():

@@ -6,7 +6,8 @@ from ruamel.yaml import YAML
 from copy import deepcopy
 
 # SUT
-from oriom.classes.DefineOperationTechs import Define_operation
+from oriom.core.builders.DefineOperationTechs import Define_operation
+
 
 
 # ----------------- Helpers & Dummies -----------------
@@ -109,7 +110,7 @@ class TestDefineOperationVessels(unittest.TestCase):
         ]
         self.file_vessels = write_vessels_yaml(self.base_dir, self.vessels_ok)
 
-    @patch("oriom.classes.DefineOperationTechs.Vessel")
+    @patch("oriom.core.builders.DefineOperationTechs.Vessel")
     def test_define_vessels_creates_vessel1_and_updates_dict(self, VesselMock):
         """Happy path: vessel1 found uniquely -> constructs Vessel and stores into dict."""
         op = DummyOperation(vessel1_id="CTV-01")
@@ -134,7 +135,7 @@ class TestDefineOperationVessels(unittest.TestCase):
         self.assertIs(vessels_dict["CTV-01"], created)
         VesselMock.assert_called_once()  # called for vessel1 only
 
-    @patch("oriom.classes.DefineOperationTechs.Vessel")
+    @patch("oriom.core.builders.DefineOperationTechs.Vessel")
     def test_define_vessels_creates_both_vessels(self, VesselMock):
         """When both IDs are present and unique, both Vessel objects are created."""
         op = DummyOperation(vessel1_id="CTV-01", vessel2_id="SOV-77")
@@ -161,7 +162,7 @@ class TestDefineOperationVessels(unittest.TestCase):
         self.assertIs(vessels_dict["SOV-77"], v2)
         self.assertEqual(VesselMock.call_count, 2)
 
-    @patch("oriom.classes.DefineOperationTechs.Vessel")
+    @patch("oriom.core.builders.DefineOperationTechs.Vessel")
     def test_existing_vessel_in_dict_is_not_overwritten(self, VesselMock):
         """
         If a vessel with same ID already exists in the dict, it should not be overwritten

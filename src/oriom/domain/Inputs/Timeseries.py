@@ -3,7 +3,7 @@ import os
 import math as mt
 from ruamel.yaml import YAML
 from oriom.utils.yaml_manager import inputs_to_yaml
-from oriom.classes.Scenario import Scenario
+from oriom.domain.Scenario import Scenario
 
 try:
     from oriom.core.functions.private.check_files import check_file_exists

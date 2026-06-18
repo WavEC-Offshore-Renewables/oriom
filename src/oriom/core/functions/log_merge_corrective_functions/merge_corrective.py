@@ -1,7 +1,7 @@
 import pandas as pd
 from copy import deepcopy
 
-from oriom.classes.TowData import TowData
+from oriom.domain.TowData import TowData
 from oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer import OperationDeferredPortCreation
 from oriom.core.functions.log_merge_corrective_functions import merged_deferred_aux
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred import merge_deferred_operations

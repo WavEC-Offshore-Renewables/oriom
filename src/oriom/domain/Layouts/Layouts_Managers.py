@@ -3,9 +3,9 @@ import logging
 from typing import Optional
 from networkx import DiGraph
 
-from oriom.classes.Layouts.Layouts_Wind import Layout_Wind
-from oriom.classes.Layouts.Layouts_Wave import Layout_Wave
-from oriom.classes.Layouts.Layouts_PV import Layout_PV
+from oriom.domain.Layouts.Layouts_Wind import Layout_Wind
+from oriom.domain.Layouts.Layouts_Wave import Layout_Wave
+from oriom.domain.Layouts.Layouts_PV import Layout_PV
 
 
 class LayoutManager:

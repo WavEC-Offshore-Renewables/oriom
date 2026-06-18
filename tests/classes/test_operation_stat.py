@@ -13,7 +13,7 @@ from oriom.classes.OperationsStat.InspectionPortStat import InspectionPortStat
 from oriom.classes.OperationsStat.CorrectiveStat import CorrectiveStat
 from oriom.classes.OperationsStat.OperationTowStat import OperationsTowStat
 from oriom.classes.Vessel import Vessel
-from oriom.classes.DefineOperationTechs import Define_operation
+from oriom.core.builders.DefineOperationTechs import Define_operation
 
 
 file_vessels=os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'vessels.yaml')

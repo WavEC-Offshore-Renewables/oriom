@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from oriom.utils import yaml_manager
 from oriom.common.constants import ATTRIBUTE_LIST_REUSE_INSPECTION
-from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
+from oriom.domain.OperationTimeSeriesData import OperationTimeSeriesData
 from oriom.core.timeseries_analysis.working_shifts import working_shifts
 from oriom.core.timeseries_analysis.workability import workability
 from oriom.core.functions.operation_scheduler.define_shift_operation import define_shift_operation_values

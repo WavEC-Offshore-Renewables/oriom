@@ -5,7 +5,7 @@ import networkx as nx
 from collections import Counter
 from ruamel.yaml import YAML
 
-from oriom.classes.Activity import Activity
+from oriom.domain.Activity import Activity
 
 
 def get_graph_levels(G: nx.Graph) -> set:

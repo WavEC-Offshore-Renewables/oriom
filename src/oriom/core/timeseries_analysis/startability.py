@@ -225,7 +225,7 @@ if __name__ == '__main__':
     df_workability['datetime'] = pd.to_datetime(df_workability['datetime'])
     df_workability.set_index('datetime', inplace=True)
 
-    from oriom.classes import Activity
+    from oriom.domain import Activity
     activities = Activity.get_activities_from_csv(file_activities)
 
     temp_dir = os.path.join(os.getcwd(), 'tmp')

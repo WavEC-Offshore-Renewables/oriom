@@ -430,7 +430,7 @@ if __name__ == '__main__':
     file_metocean = os.path.join(os.getcwd(), 'tests', 'test_files', 'metocean', 'metocean_dummy.csv')
     file_activities = os.path.join(os.getcwd(), 'tests', 'test_files', 'op_activities_dummy.csv')
 
-    from oriom.classes import Metocean
+    from oriom.domain import Metocean
     metocean = Metocean(
             file_=file_metocean,
             latitude=41.615065,
@@ -439,7 +439,7 @@ if __name__ == '__main__':
     metocean.interpolate()
     metocean.get_daylight_timesteps()       # TODO: Load a file with light instead of calling this
 
-    from oriom.classes import Activity
+    from oriom.domain import Activity
     activities = Activity.get_activities_from_csv(file_activities)
 
     temp_dir = os.path.join(os.getcwd(), 'tmp')

@@ -1,8 +1,8 @@
 # technology_builder
-from oriom.classes.Techs.WindTurbineGenerator import WindTurbineGenerator
-from oriom.classes.Techs.WaveEnergyConverter import  WaveEnergyConverter
-from oriom.classes.Techs.PVProduction import PVProduction
-from oriom.classes.Techs import Power
+from oriom.domain.Techs.WindTurbineGenerator import WindTurbineGenerator
+from oriom.domain.Techs.WaveEnergyConverter import  WaveEnergyConverter
+from oriom.domain.Techs.PVProduction import PVProduction
+from oriom.domain.Techs import Power
 
 from oriom.utils.aux_functions import save_file_csv
 

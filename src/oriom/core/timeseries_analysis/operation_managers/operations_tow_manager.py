@@ -4,7 +4,7 @@ import os
 
 from tqdm import tqdm
 
-from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
+from oriom.domain.OperationTimeSeriesData import OperationTimeSeriesData
 
 from oriom.core.timeseries_analysis import workability
 from oriom.core.timeseries_analysis.startability import startability

@@ -1,6 +1,6 @@
 import logging
 import networkx as nx
-from oriom.classes.Layouts.Layout_Auxiliary import Layout_Aux
+from oriom.domain.Layouts.Layout_Auxiliary import Layout_Aux
 
 COLOR = 'yellow'
 

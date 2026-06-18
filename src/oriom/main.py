@@ -14,26 +14,26 @@ from oriom.inputs.Input_manager import Input_Files, extract_input_from_excel, ha
 from oriom.utils import aux_functions
 from oriom.utils import aux_operation
 
-from oriom.classes.Inputs.Inputs import Inputs
-from oriom.classes.Metocean import Metocean
-from oriom.classes.RovDrone import RovDrone
-from oriom.classes.Operations.InspectionSite import InspectionSite
-from oriom.classes.Operations.InspectionPort import InspectionPort
-from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
-from oriom.classes.Operations.CorrectiveMinor import CorrectiveMinor
-from oriom.classes.Operations.OperationTow import OperationTow
-from oriom.classes.OperationsStat.CorrectiveStat import CorrectiveStat
-from oriom.classes.OperationsStat.InspectionPortStat import InspectionPortStat
-from oriom.classes.OperationsStat.InspectionSiteStat import InspectionSiteStat
-from oriom.classes.OperationsStat.OperationTowStat import OperationsTowStat
-from oriom.classes.DefineOperationTechs import Define_operation
-from oriom.classes.Failure import Failure
-from oriom.classes.Results import Results
-from oriom.classes.Techs.Power import PVPower as PVPower
-from oriom.classes.FindElementClass import Find_Element
-from oriom.classes.Techs.Technologies import TechnologyBuilder
+from oriom.domain.Inputs.Inputs import Inputs
+from oriom.domain.Metocean import Metocean
+from oriom.src.oriom.domain.Vessels.RovDrone import RovDrone
+from oriom.domain.Operations.InspectionSite import InspectionSite
+from oriom.domain.Operations.InspectionPort import InspectionPort
+from oriom.domain.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.domain.Operations.CorrectiveMinor import CorrectiveMinor
+from oriom.domain.Operations.OperationTow import OperationTow
+from oriom.domain.OperationsStat.CorrectiveStat import CorrectiveStat
+from oriom.domain.OperationsStat.InspectionPortStat import InspectionPortStat
+from oriom.domain.OperationsStat.InspectionSiteStat import InspectionSiteStat
+from oriom.domain.OperationsStat.OperationTowStat import OperationsTowStat
+from oriom.core.builders.DefineOperationTechs import Define_operation
+from oriom.domain.Failure import Failure
+from oriom.domain.Results import Results
+from oriom.domain.Techs.Power import PVPower as PVPower
+from oriom.domain.FindElementClass import Find_Element
+from oriom.domain.Techs.Technologies import TechnologyBuilder
 
-from oriom.classes.Layouts.Layouts_Managers import LayoutManager
+from oriom.domain.Layouts.Layouts_Managers import LayoutManager
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import inspect_site_manager
 from oriom.core.timeseries_analysis.operation_managers.operations_tow_manager import operation_tow_manager
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager import operation_inspect_port_manager
@@ -167,6 +167,21 @@ def run(config: ConfigRun | None = None):
         file_wake_loss = inputs.tseries.file_wake_loss['value']
     )
 
+    logging.info('--------------------\tLAYOUT\t--------------------')
+    G_layouts = LayoutManager.build_layouts(
+        power_farm=farm_technologies.power,
+        wtg=farm_technologies.wtg,
+        wec=farm_technologies.wec,
+        pv=farm_technologies.pv,
+        graph_dir=dirs.graph_dir,
+    )
+
+    logging.info('--------------------\tFARM\t--------------------')
+    farm = Farm(
+        inputs = inputs,
+        farm_techn = farm_technologies,
+        layouts = G_layouts
+    )
 
     logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')
     # Build or reuse Metocean in one call
