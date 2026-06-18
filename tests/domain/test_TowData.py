@@ -2,7 +2,7 @@
 import unittest
 import pandas as pd
 
-from oriom.classes.TowData import TowData
+from oriom.domain.TowData import TowData
 
 
 # ---------------------------

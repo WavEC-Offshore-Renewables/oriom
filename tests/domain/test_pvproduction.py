@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from oriom.classes.Techs.PVProduction import PVProduction
+from oriom.domain.Techs.PVProduction import PVProduction
 
 
 class TestPVProduction(unittest.TestCase):

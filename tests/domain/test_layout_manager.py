@@ -1,5 +1,5 @@
 import unittest
-from oriom.classes.Layouts.Layouts_Managers import LayoutManager
+from oriom.domain.Layouts.Layouts_Managers import LayoutManager
 
 
 class TestLayoutManager(unittest.TestCase):

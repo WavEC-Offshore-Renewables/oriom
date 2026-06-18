@@ -5,14 +5,14 @@ from copy import deepcopy
 from ruamel.yaml import YAML
 import tempfile
 
-from oriom.classes.Operations.InspectionSite import InspectionSite
-from oriom.classes.Operations.InspectionPort import InspectionPort
-from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
-from oriom.classes.Operations.CorrectiveMinor import CorrectiveMinor
-from oriom.classes.Operations.OperationTow import OperationTow
+from oriom.domain.Operations.InspectionSite import InspectionSite
+from oriom.domain.Operations.InspectionPort import InspectionPort
+from oriom.domain.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.domain.Operations.CorrectiveMinor import CorrectiveMinor
+from oriom.domain.Operations.OperationTow import OperationTow
 from oriom.core.builders.DefineOperationTechs import Define_operation
-from oriom.classes.Vessel import Vessel
-from oriom.classes.RovDrone import RovDrone
+from oriom.domain.Vessels.Vessel import Vessel
+from oriom.domain.Vessels.RovDrone import RovDrone
 
 
 class TestOperation(unittest.TestCase):

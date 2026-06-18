@@ -16,7 +16,7 @@ from oriom.utils import aux_operation
 
 from oriom.domain.Inputs.Inputs import Inputs
 from oriom.domain.Metocean import Metocean
-from oriom.src.oriom.domain.Vessels.RovDrone import RovDrone
+from oriom.domain.Vessels.RovDrone import RovDrone
 from oriom.domain.Operations.InspectionSite import InspectionSite
 from oriom.domain.Operations.InspectionPort import InspectionPort
 from oriom.domain.Operations.CorrectiveMajor import CorrectiveMajor
@@ -26,14 +26,17 @@ from oriom.domain.OperationsStat.CorrectiveStat import CorrectiveStat
 from oriom.domain.OperationsStat.InspectionPortStat import InspectionPortStat
 from oriom.domain.OperationsStat.InspectionSiteStat import InspectionSiteStat
 from oriom.domain.OperationsStat.OperationTowStat import OperationsTowStat
-from oriom.core.builders.DefineOperationTechs import Define_operation
 from oriom.domain.Failure import Failure
 from oriom.domain.Results import Results
 from oriom.domain.Techs.Power import PVPower as PVPower
 from oriom.domain.FindElementClass import Find_Element
 from oriom.domain.Techs.Technologies import TechnologyBuilder
-
 from oriom.domain.Layouts.Layouts_Managers import LayoutManager
+from oriom.domain.System.Farm import Farm
+from oriom.domain.System.Ports import Port
+from oriom.domain.System.Storages import Storage
+
+from oriom.core.builders.DefineOperationTechs import Define_operation
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import inspect_site_manager
 from oriom.core.timeseries_analysis.operation_managers.operations_tow_manager import operation_tow_manager
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_port_manager import operation_inspect_port_manager
@@ -179,7 +182,13 @@ def run(config: ConfigRun | None = None):
     logging.info('--------------------\tFARM\t--------------------')
     farm = Farm(
         inputs = inputs,
-        farm_techn = farm_technologies,
+        farm_tech = farm_technologies,
+        layouts = G_layouts
+    )
+
+    port = Port(
+        inputs = inputs,
+        farm_tech = farm_technologies,
         layouts = G_layouts
     )
 

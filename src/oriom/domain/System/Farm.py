@@ -1,6 +1,3 @@
-
-
-
 class Farm():
 
     """
@@ -27,10 +24,12 @@ class Farm():
         self.farm_tech = farm_tech
         self.name = str('farm_name')
         self.farm_type = []
-        self.location = {'lat': inputs.site_lat, 'lon': inputs.site_lon}
+        self.location = {'lat': inputs.tseries.site_lat, 'lon': inputs.tseries.site_lon}
         self.layout = layouts
 
         self.fleet = {}
+        self.device_list = []
+        self.device_list_unavailable = []
 
         self.farm_type.extend(
             farm_type for farm_type in ['wtg', 'wec', 'pv']
@@ -43,7 +42,7 @@ class Farm():
             f"using {', '.join(self.farm_type)} technologies."
         )
 
-        self.create_device()
+        self.device_list = self.create_device()
 
     def __str__(self):
         return f"Farm: {self.name}, Farm Type: {self.farm_type}, Location: {self.location}, Description: {self.description}"

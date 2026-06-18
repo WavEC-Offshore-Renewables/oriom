@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from unittest import skip
 
-from oriom.classes.RovDrone import RovDrone
+from oriom.domain.Vessels.RovDrone import RovDrone
 
 
 class TestRovDrone(unittest.TestCase):

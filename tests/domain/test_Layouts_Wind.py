@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 import networkx as nx
 
-from oriom.classes.Layouts.Layouts_Wind import Layout_Wind
+from oriom.domain.Layouts.Layouts_Wind import Layout_Wind
 
 
 # --------- helpers ---------
@@ -38,7 +38,7 @@ class TestCheckInputWind(unittest.TestCase):
 
 
 # Patch draw operations to avoid IO and GUI during tests
-@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout1Wind(unittest.TestCase):
@@ -66,7 +66,7 @@ class TestLayout1Wind(unittest.TestCase):
         self.assertIn("array_cable", edge_levels(G))
 
 
-@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout2Wind(unittest.TestCase):
@@ -92,7 +92,7 @@ class TestLayout2Wind(unittest.TestCase):
         self.assertIsNotNone(shore_n)
 
 
-@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout3Wind(unittest.TestCase):
@@ -111,7 +111,7 @@ class TestLayout3Wind(unittest.TestCase):
         self.assertEqual(levels.count("exp_cable_dummy"), 2)
 
 
-@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout4Wind(unittest.TestCase):
@@ -140,7 +140,7 @@ class TestLayout4Wind(unittest.TestCase):
                 n_turbines=9, n_strings=3, substation_node=1, string_list=[2, 3, 3], tow_string_shutdown = True, show_plot=False
             )
 
-@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout5Wind(unittest.TestCase):
@@ -157,7 +157,7 @@ class TestLayout5Wind(unittest.TestCase):
         self.assertIn("dyn_cable-sub", edge_levels(G))
 
 
-@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestLayout6Wind(unittest.TestCase):
@@ -173,7 +173,7 @@ class TestLayout6Wind(unittest.TestCase):
         self.assertEqual(count_nodes_by_level(G_, "hub"), 3)
         self.assertIn("dyn_cable-sub", edge_levels(G_))
 
-@patch("oriom.classes.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
+@patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
 @patch("matplotlib.pyplot.show")
 @patch("matplotlib.pyplot.savefig")
 class TestDispatcher(unittest.TestCase):

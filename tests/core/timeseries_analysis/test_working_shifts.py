@@ -1,7 +1,7 @@
 import unittest
 import os
-from oriom.classes.Operations.InspectionSite import InspectionSite
-from oriom.classes.Vessel import Vessel
+from oriom.domain.Operations.InspectionSite import InspectionSite
+from oriom.domain.Vessels.Vessel import Vessel
 
 from oriom.core.builders.DefineOperationTechs import Define_operation
 

@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from oriom.classes.Activity import Activity
+from oriom.domain.Activity import Activity
 
 
 class TestActivity(unittest.TestCase):

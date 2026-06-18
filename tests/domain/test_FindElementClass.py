@@ -1,5 +1,5 @@
 import unittest
-from oriom.classes.FindElementClass import Find_Element
+from oriom.domain.FindElementClass import Find_Element
 
 
 # --- Dummies --------------------------------------------------------------

@@ -4,7 +4,7 @@ import tempfile
 import shutil
 from unittest.mock import patch
 
-from oriom.classes.Inputs.Inputs import Inputs
+from oriom.domain.Inputs.Inputs import Inputs
 
 
 def skipIfNotLocal():

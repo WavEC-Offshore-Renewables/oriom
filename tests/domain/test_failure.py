@@ -2,7 +2,7 @@ from copy import deepcopy
 import unittest
 import os
 
-from oriom.classes.Failure import Failure
+from oriom.domain.Failure import Failure
 
 
 class TestaFailure(unittest.TestCase):

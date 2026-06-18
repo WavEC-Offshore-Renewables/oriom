@@ -4,9 +4,9 @@ import os
 from copy import deepcopy
 import tempfile
 
-from oriom.classes.Techs.Power import Curve
-from oriom.classes.Techs.Power import Matrix
-from oriom.classes.Techs.Power import Power_Losses
+from oriom.domain.Techs.Power import Curve
+from oriom.domain.Techs.Power import Matrix
+from oriom.domain.Techs.Power import Power_Losses
 
 
 class TestCurve(unittest.TestCase):

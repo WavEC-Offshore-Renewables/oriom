@@ -4,15 +4,15 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import timedelta
 
-from oriom.classes.Operations.InspectionSite import InspectionSite
-from oriom.classes.Operations.InspectionPort import InspectionPort
-from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
-from oriom.classes.Operations.OperationTow import OperationTow
-from oriom.classes.OperationsStat.InspectionSiteStat import InspectionSiteStat
-from oriom.classes.OperationsStat.InspectionPortStat import InspectionPortStat
-from oriom.classes.OperationsStat.CorrectiveStat import CorrectiveStat
-from oriom.classes.OperationsStat.OperationTowStat import OperationsTowStat
-from oriom.classes.Vessel import Vessel
+from oriom.domain.Operations.InspectionSite import InspectionSite
+from oriom.domain.Operations.InspectionPort import InspectionPort
+from oriom.domain.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.domain.Operations.OperationTow import OperationTow
+from oriom.domain.OperationsStat.InspectionSiteStat import InspectionSiteStat
+from oriom.domain.OperationsStat.InspectionPortStat import InspectionPortStat
+from oriom.domain.OperationsStat.CorrectiveStat import CorrectiveStat
+from oriom.domain.OperationsStat.OperationTowStat import OperationsTowStat
+from oriom.domain.Vessels.Vessel import Vessel
 from oriom.core.builders.DefineOperationTechs import Define_operation
 
 

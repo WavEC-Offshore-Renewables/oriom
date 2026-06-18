@@ -3,11 +3,11 @@
 import unittest
 from unittest.mock import Mock
 
-from oriom.classes.Inputs.Inputs import Inputs
-from oriom.classes.Inputs.Generals import General
-from oriom.classes.Inputs.Statisticals import Statistical
-from oriom.classes.Inputs.Costs import Cost
-from oriom.classes.Inputs.Timeseries import TimeSeries
+from oriom.domain.Inputs.Inputs import Inputs
+from oriom.domain.Inputs.Generals import General
+from oriom.domain.Inputs.Statisticals import Statistical
+from oriom.domain.Inputs.Costs import Cost
+from oriom.domain.Inputs.Timeseries import TimeSeries
 
 
 class TestInputs(unittest.TestCase):

@@ -2,7 +2,7 @@ from copy import deepcopy
 import unittest
 import os
 
-from oriom.classes.Scenario import Scenario
+from oriom.domain.Scenario import Scenario
 
 class TestaScenario(unittest.TestCase):
     @classmethod
