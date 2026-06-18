@@ -14,7 +14,7 @@ from oriom.inputs.Input_manager import Input_Files, extract_input_from_excel, ha
 from oriom.utils import aux_functions
 from oriom.utils import aux_operation
 
-from oriom.classes.Inputs import Inputs
+from oriom.classes.Inputs.Inputs import Inputs
 from oriom.classes.Metocean import Metocean
 from oriom.classes.RovDrone import RovDrone
 from oriom.classes.Operations.InspectionSite import InspectionSite
@@ -29,10 +29,9 @@ from oriom.classes.OperationsStat.OperationTowStat import OperationsTowStat
 from oriom.classes.DefineOperationTechs import Define_operation
 from oriom.classes.Failure import Failure
 from oriom.classes.Results import Results
-from oriom.classes.Scenario import Scenario
-from oriom.classes.Power import PVPower as PVPower
+from oriom.classes.Techs.Power import PVPower as PVPower
 from oriom.classes.FindElementClass import Find_Element
-from oriom.classes.Technologies import TechnologyBuilder
+from oriom.classes.Techs.Technologies import TechnologyBuilder
 
 from oriom.classes.Layouts.Layouts_Managers import LayoutManager
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import inspect_site_manager
@@ -43,8 +42,7 @@ from oriom.core.timeseries_analysis.operation_managers.operations_minor_manager 
 from oriom.core.timeseries_analysis.montecarlo import f_montecarlo
 
 from oriom.core.statistical_analysis.statisticals_duration_manager import statistical_duration_manager
-from oriom.core.statistical_analysis.power_stats import average_pwind
-from oriom.core.statistical_analysis.power_stats import average_pwave
+from oriom.core.statistical_analysis.power_stats import average_pwind, average_pwave
 from oriom.core.statistical_analysis.final_run_statistics import return_statistics_runs
 from oriom.core.results_block_manager import results_block
 from oriom import test
@@ -81,11 +79,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="test_E2E",
+    PROJECT_NAME="test_NO_DISC",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"",
+    EXCEL_FILE_PATH=r"C:\Riccardo\ORIOM\oriom\src\oriom\tmp\test_CT_DOEA",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_test.xlsx",
+    FORM_NAME="CT tow operation BASE_WS.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 
@@ -147,6 +145,17 @@ def run(config: ConfigRun | None = None):
     ### ---------- INPUTS ---------- ###
     files = Input_Files(dirs.base_dir)
 
+    logging.info('--------------------\tINPUTS\t--------------------')
+    inputs = Inputs(
+        general = inputs_gen,
+        stats = Inputs.Statistical(file_inputs = files.inputs_stats_file, out_dir = dirs.run_dir),
+        cost = Inputs.Cost(file_inputs = files.inputs_costs_file, out_dir = dirs.run_dir),
+        tseries = Inputs.TimeSeries.from_run_dir(
+            run_dir = dirs.run_dir,
+            file_inputs = files.inputs_tseries_file,
+            scenarios_file = files.scenarios_file
+        ),
+    )
 
     logging.info('--------------------\tINPUTS - TECHNOLOGIES - POWER PRODUCTION\t--------------------')
     farm_technologies = TechnologyBuilder.build_technologies(
@@ -154,29 +163,32 @@ def run(config: ConfigRun | None = None):
         wtg_file=files.wtg_file,
         wec_file=files.wec_file,
         pv_file=files.pv_file,
+        file_electrical_loss = inputs.tseries.file_wake_loss['value'],
+        file_wake_loss = inputs.tseries.file_wake_loss['value']
     )
 
-    logging.info('--------------------\tINPUTS\t--------------------')
-    inputs = Inputs(
-        general = inputs_gen,
-        stats = Inputs.Statistical(file_inputs = files.inputs_stats_file, out_dir = dirs.run_dir),
-        cost = Inputs.Cost(file_inputs = files.inputs_costs_file, out_dir = dirs.run_dir),
-        tseries = Inputs.TimeSeries.from_run_dir(run_dir = dirs.run_dir, file_inputs = files.inputs_tseries_file),
-    )
 
     logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')
     # Build or reuse Metocean in one call
-    metocean = Metocean.from_run_dir(
+    metocean, _ = Metocean.from_run_dir(
         run_dir=dirs.run_dir,
         tseries_inputs=inputs.tseries,
         power_farm=farm_technologies.power,
         wtg=farm_technologies.wtg,
         z0=inputs.tseries.surface_roughness["value"],
-        stat_inputs=inputs.stats
+        stat_inputs=inputs.stats,
+    )
+    
+    metocean_port, _ = Metocean.from_run_dir(
+        run_dir=dirs.run_dir,
+        tseries_inputs=inputs.tseries,
+        stat_inputs=inputs.stats,
+        port_metocean = True,
+        site_metocean = metocean
     )
 
     # Build Metocean tow in one call
-    metocean_tow = Metocean.from_run_dir(
+    metocean_tow, metocean_tow_distance = Metocean.from_run_dir(
         run_dir=dirs.run_dir,
         tseries_inputs=inputs.tseries,
         stat_inputs=inputs.stats,
@@ -184,7 +196,7 @@ def run(config: ConfigRun | None = None):
     )
 
     # Attach power columns and get power-only view
-    metocean = Metocean.attach_power_columns(metocean, farm_technologies.power, out_dir=dirs.run_dir)
+    metocean = Metocean.attach_power_columns(metocean = metocean, power_farm = farm_technologies.power, out_dir=dirs.run_dir)
 
 
     logging.info('--------------------\tLAYOUT\t--------------------')
@@ -205,6 +217,7 @@ def run(config: ConfigRun | None = None):
     for failure in failures:
         if getattr(failure, "fail_variation", False):
             failure.fail_rate *= inputs.stats.failure_ratio_sensitivity["value"]
+            logging.info(f'Failure {failure.id_} FR have been multiplied by {inputs.stats.failure_ratio_sensitivity["value"]}')
 
     logging.info('--------------------\tINPUTS - OPERATIONS\t--------------------')
     vessels = {}
@@ -357,11 +370,6 @@ def run(config: ConfigRun | None = None):
     # Check if all the levels defined are associated to a component in the graph
     aux_operation.level_component_check(Gs = G_layouts, operations = failures, failure = True)
 
-    # Define scenario for failure event
-    inputs.tseries.scenario = Scenario.get_scenarios_from_yaml(
-            file_path = files.scenarios_file
-    )
-
     # Generate random timesteps to be analysed
     timesteps, _ = f_montecarlo(
             data_panda=metocean.df_timeseries,
@@ -382,7 +390,8 @@ def run(config: ConfigRun | None = None):
         timesteps = timesteps,
         Config = Config,
         inputs_tseries = inputs.tseries,
-        metocean_tow = metocean_tow
+        metocean_tow = metocean_tow,
+        metocean_tow_distance = metocean_tow_distance
     )
 
     inspect_site_manager(
@@ -395,7 +404,7 @@ def run(config: ConfigRun | None = None):
 
     operation_inspect_port_manager(
         operation_dir = dirs.operation_dir,
-        df_metocean = metocean.df_timeseries,
+        df_metocean = metocean_port.df_timeseries,
         duration_shift = inputs.tseries.shift_duration["value"],
         operations_inspect_port = operations_inspect_port
     )
@@ -403,6 +412,7 @@ def run(config: ConfigRun | None = None):
     operation_major_manager(
         operation_dir = dirs.operation_dir,
         df_metocean = metocean.df_timeseries,
+        df_metocean_port = metocean_port.df_timeseries,
         operations_corr_major = operations_corr_major,
         inputs_tseries = inputs.tseries,
         Config = Config,

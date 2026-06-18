@@ -411,7 +411,7 @@ class TestLogsCorrectiveLocationsOperation(unittest.TestCase):
             find_element_class=finder,
             dict_locations={failure_id: None},
             op_corr_tow={operation_tow.id: operation_tow},
-            op_add_tow={operation_add.id: operation_add}
+            op_add_tow={operation_add.id: {'string': True, 'type': 'TTP'}}
         )
 
         self.assertEqual(len(events), 2)

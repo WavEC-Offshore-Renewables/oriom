@@ -4,7 +4,6 @@ import unittest
 import os
 from unittest.mock import patch
 from oriom.core.functions.log_merge_corrective_functions.group_merging_immediate import mergeble_operation
-from pprint import pprint
 
 class TestMergebleOperation(unittest.TestCase):
     @classmethod
@@ -38,9 +37,7 @@ class TestMergebleOperation(unittest.TestCase):
             "OpC": {"vess_1": "Vessel1", "duration": 1, "hs": 2, "cs": 3, "ws": 2, "ws_hub": 1, "tp": 1, "light": 1}
         }
         result = mergeble_operation(oper_dict, self.result_dir_r, self.OLC_LIST)
-        #pprint('\n\n')
-        #pprint('result 2')
-        #pprint(result)
+
         # OpA OpB and OpC same OLC → same group, OpC shorter → rank 1
         group = result["Vessel1"]["Group 1"]
         self.assertEqual(group["OpC"]["Rank"], 2)
@@ -173,10 +170,6 @@ class TestMergebleOperation(unittest.TestCase):
         self.assertEqual(result['VesselC']['Group 1']['Op16']['Rank'], 4)
         self.assertIn('Op11', result['VesselC']['Group 1'])
         self.assertEqual(result['VesselC']['Group 1']['Op11']['Rank'], 5)
-
-        #pprint('\n\n')
-        #pprint('result 3')
-        # #pprint(result)
 
         # Ensure rankings are set
         for vessel in result:

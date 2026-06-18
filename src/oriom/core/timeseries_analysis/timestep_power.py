@@ -6,12 +6,66 @@ import os
 
 # Import classes
 from oriom.classes import Metocean
-from oriom.classes.Power import Curve as PowerCurve
-from oriom.classes.Power import Matrix
+from oriom.classes.Techs.Power import Curve as PowerCurve
+from oriom.classes.Techs.Power import Matrix
+
+
+def apply_power_loss(
+    df_metocean: pd.DataFrame,
+    p_losses: pd.DataFrame,
+    affecting_variable: str,
+    power_column: str,
+) -> pd.DataFrame:
+    """
+    Apply a percentage power loss to a target column.
+
+    The loss percentage is interpolated using the same affecting variable
+    in df_metocean and p_losses.
+
+    Example:
+        affecting_variable = "ws"      for wake losses
+        affecting_variable = "p_wind"  for electric losses
+
+    Args:
+        df_metocean (pd.DataFrame): Site metocean dataframe.
+        p_losses (pd.DataFrame): Dataframe containing power losses
+        affecting_variable (str): Column used to interpolate the losses.
+        power_column (str): Column where the loss is applied directly.
+
+    Raise:
+        KeyError: if column of affecting_variable not present in dfs
+
+    Returns:
+        pd.DataFrame:
+            df_metocean with the target column modified.
+    """
+
+    if p_losses.empty:
+        return df_metocean
+
+    if affecting_variable not in df_metocean.columns or affecting_variable not in p_losses.columns:
+        raise KeyError(f"TimestepPower: Missing columns in df_metocean or power_losses: {affecting_variable}")
+
+    # Create array with losses column due to wake or electric loss
+    loss_percentage = np.interp(
+        df_metocean[affecting_variable].to_numpy(),
+        p_losses[affecting_variable].to_numpy(),
+        p_losses['power_loss'].to_numpy(),
+    )
+
+    # Save interpolated percentage loss
+    df_metocean['system_power_loss'] += loss_percentage
+    # Compute effective lost power/energy for total system
+    df_metocean[power_column[0]] = (df_metocean[power_column[0]] * (1 - loss_percentage))
+    # Compute effective lost power/energy for device
+    df_metocean[power_column[1]] = (df_metocean[power_column[1]] * (1 - loss_percentage))
+
+    return df_metocean
 
 
 def add_power_columns(
         df_metocean: pd.DataFrame,
+        power_losses: object,
         pcurve_wind: object,
         pmatrix_wave: object,
         ndevices_wind: int=0,
@@ -28,6 +82,7 @@ def add_power_columns(
             as timesteps and coluns as sea conditions. Must contain a column
             named "ws_hub" with the wind speed correct at the turbine's
             hub height.
+        power_losses (:obj:`PowerLosses`): object of the class ``PowerLosses`` for the farm
         pcurve_wind (:obj:`PowerCurve`, *optional*): Power curve for the WTGs.
             Defaults to ``None``.
         pmatrix_wave (:obj:`PowerMatrix`, *optional*): Power matrix for the
@@ -76,6 +131,8 @@ def add_power_columns(
     df_metocean["p_wind_per_device"] = 0
     df_metocean["p_wave"] = 0
     df_metocean["p_wave_per_device"] = 0
+    df_metocean['system_power_loss'] = 0
+    power_column = []
 
     # Evaluate inputs to ensure that add_power_columns can run
     if pcurve_wind is not None:
@@ -98,6 +155,7 @@ def add_power_columns(
 
     # Calculate Wind Turbines power per timestep
     if pcurve_wind is not None:
+        power_column.append('p_wind')
         array_wind_idx = np.linspace(0, len(pcurve_wind.array) - 1, len(pcurve_wind.array))
         df_metocean['p_wind_per_device'] = np.interp(df_metocean['ws_hub'], array_wind_idx, pcurve_wind.array)
         df_metocean[(df_metocean['ws_hub'] < pcurve_wind.c_in) | (df_metocean['ws_hub'] > pcurve_wind.c_off)]['p_wind_per_device'] = 0
@@ -107,8 +165,10 @@ def add_power_columns(
         df_metocean['p_wind'] = df_metocean['p_wind'].fillna(0)
         df_metocean['p_wind'] = df_metocean['p_wind'].round(4)
 
+
     # Calculate WECs power per timestep
     if pmatrix_wave is not None:
+        power_column.append('p_wave')
         for hss, tp_row in pmatrix_wave.matrix.iterrows():
             hs_min = hss[0]
             hs_max = hss[1]
@@ -130,6 +190,21 @@ def add_power_columns(
         df_metocean['p_wave'] = df_metocean['p_wave'].fillna(0)
         df_metocean['p_wave'] = df_metocean['p_wave'].round(4)
 
+    if power_losses.power_loss:
+        df_metocean = apply_power_loss(
+            df_metocean = df_metocean, 
+            p_losses = power_losses.wake_loss,
+            affecting_variable = 'ws',
+            power_column = ['p_wind', 'p_wind_per_device']
+        )
+        for power_tot, power_device in zip(power_column, ['p_wind_per_device', 'p_wave_per_device']):
+            df_metocean = apply_power_loss(
+                df_metocean = df_metocean,
+                p_losses = power_losses.electric_loss,
+                affecting_variable = power_tot,
+                power_column = [power_tot, power_device]
+                )
+
     # Save new timeseries as a CSV
     if out_dir is not None:
         df_metocean.to_csv(
@@ -139,6 +214,8 @@ def add_power_columns(
         logging.info('Metocean Power: timeseries with power per timestep saved as "%s".' % os.path.join(out_dir, timeseries_file_name))
 
     return df_metocean
+
+
 
 
 if __name__ == '__main__':

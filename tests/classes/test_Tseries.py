@@ -2,7 +2,7 @@ import unittest
 import os
 from copy import deepcopy
 
-from oriom.classes.Inputs import Inputs
+from oriom.classes.Inputs.Inputs import Inputs
 
 
 def skipIfNotLocal():
@@ -20,7 +20,9 @@ def skipIfNotLocal():
         return wrapper
     return deco
 
-
+class Scenario:
+    def __init__(self):
+        sc
 class TestInputsTimeSeries(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -74,6 +76,12 @@ class TestInputsTimeSeries(unittest.TestCase):
         self.assertIsInstance(inputs.shift_duration["value"], (int, float))
         self.assertEqual(int(inputs.shift_duration["value"]), 12)
         self.assertEqual(inputs.shift_duration["units"], 'hours')
+
+        # Scenarios
+        self.assertIsInstance(inputs.scenario[0].scenario, int)
+        self.assertEqual(inputs.scenario[0].scenario, 0)
+        self.assertIsInstance(inputs.scenario[0].percentage_month, list)
+        self.assertEqual(sum(inputs.scenario[0].percentage_month), 1)
 
         # Merge vessel (string list -> list normalization acceptable)
         self.assertIn("merge_vessel", inputs.__dict__, "Missing 'merge_vessel' in Inputs.TimeSeries.")
@@ -150,6 +158,7 @@ class TestInputsTimeSeries(unittest.TestCase):
                 os.getcwd(),
                 'tests', 'test_files', 'metocean', 'metocean_dummy.csv'
             ),
+            "file_metocean_tow_distance_1": 50
         }
 
         # Latitude out of range
@@ -233,6 +242,31 @@ class TestInputsTimeSeries(unittest.TestCase):
         args["failure_scenario"] = -1
         self.assertRaises(ValueError, Inputs.TimeSeries, **args)
 
+        # Distance to previous point negative (<=0)
+        args = deepcopy(args_def)
+        args["file_metocean_tow_distance_1"] = -1
+        self.assertRaises(ValueError, Inputs.TimeSeries, **args)
+
+        # Distance to previous point different from number of tow metocean file
+        args = deepcopy(args_def)
+        args["file_metocean_tow_number"] = 2
+        args["file_metocean_tow_location_2"] = os.path.join(
+                os.getcwd(),
+                'tests', 'test_files', 'metocean', 'metocean_dummy.csv'
+            )
+        self.assertRaises(ValueError, Inputs.TimeSeries, **args)
+
+        # Electric losses file missing
+        args = deepcopy(args_def)
+        args["file_metocean_tow_location_1"] = None
+        args["file_electrical_losses"] = 'some other directory'
+        self.assertRaises(FileNotFoundError, Inputs.TimeSeries, **args)
+
+        # Wake losses file missing
+        args = deepcopy(args_def)
+        args["file_metocean_tow_location_1"] = None
+        args["file_wake_losses"] = 'some other directory'
+        self.assertRaises(FileNotFoundError, Inputs.TimeSeries, **args)
 
 if __name__ == '__main__':
 

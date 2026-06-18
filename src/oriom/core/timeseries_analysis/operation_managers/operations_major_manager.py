@@ -22,20 +22,22 @@ except ImportError:
 def operation_major_manager(
     operation_dir: str,
     df_metocean: pd.DataFrame,
+    df_metocean_port: pd.DataFrame,
     operations_corr_major: list,
     Config: object,
     inputs_tseries: object,
     timesteps: pd.DataFrame
 ):
     """
-    Check if the operations_inspect_site is already existing
-    If it exist assign ts_data attribute to the InspectSite object and pass to other inp
-    If exist a similar inspection with all ATTRIBUTE_LIST_REUSE equal assign ts_data and pass to other inp
+    Check if the operations_major is already existing
+    If it exist assign ts_data attribute to the CorrectiveMajor object and pass to other inp
+    If exist a similar opeartion with
     If does not exist create the operation_schedule and assign it to the CorrectiveMajor object
 
     Args:
         operation_dir (string): Path of operation directory
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
+        df_metocean_port (pd.Dataframe): Dataframe of timeseries weather data at the port
         operations_corr_major (list): List of class `CorrectiveMajor`
         Config (object): Object class `Config_run`
         inputs_tseries (object): Object class `Input.TimeSeries`
@@ -65,10 +67,11 @@ def operation_major_manager(
         )
 
         df_workability = workability(
-                activities=operation.activities,
-                df_metocean=df_metocean,
-                out_dir=op_dir
+            activities=operation.activities,
+            df_metocean=(df_metocean_port if operation.tow_to_port and not df_metocean_port.empty else df_metocean),
+            out_dir=op_dir
         )
+
         df_startability = startability(
                 activities=operation.activities,
                 df_workability=df_workability,
@@ -87,7 +90,10 @@ def operation_major_manager(
         if file_exist:
             continue
 
-        op_timesteps = get_meaningful_timesteps(timeseries = df_metocean, timesteps = timesteps)
+        op_timesteps = get_meaningful_timesteps(
+            timeseries=(df_metocean_port if operation.tow_to_port and not df_metocean_port.empty else df_metocean),
+            timesteps = timesteps
+        )
 
         if len(op_timesteps) < 1 and len(operation.months) < 12:
             _w = 'The considered timeseries does not have timestamps '

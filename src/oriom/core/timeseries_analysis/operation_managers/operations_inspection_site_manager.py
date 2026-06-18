@@ -5,9 +5,8 @@ import os
 from tqdm import tqdm
 
 from oriom.utils import yaml_manager
-
+from oriom.common.constants import ATTRIBUTE_LIST_REUSE_INSPECTION
 from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
-
 from oriom.core.timeseries_analysis.working_shifts import working_shifts
 from oriom.core.timeseries_analysis.workability import workability
 from oriom.core.functions.operation_scheduler.define_shift_operation import define_shift_operation_values
@@ -46,11 +45,6 @@ def inspect_site_manager(
     """
 
     dict_insp_oper, hash_to_key_insp = {}, {}
-    ATTRIBUTE_LIST_REUSE = [
-        'dur_per_device', 'hs', 'tp', 'ws', 'ws_hub', 'cs', 'light', 'vessel1_id', 'rov_drone',
-        'technicians_per_device', 'vessel2_id', 'device_shutdown', 'intervened_wtg', 'intervened_wec',
-        'intervened_pv','rov', 'overnight', 'double_shift'
-    ]
 
     for operation in tqdm(operations_inspect_site, desc='Looping through Inspections at Site.', position=0):
         logging.info('InspectionSite: %s - %s.' % (operation.id, operation.name))
@@ -60,7 +54,7 @@ def inspect_site_manager(
             dict_insp_oper,
             hash_to_key_insp,
             operation,
-            ATTRIBUTE_LIST_REUSE
+            ATTRIBUTE_LIST_REUSE_INSPECTION
         )
 
         op_dir_other = os.path.join(operation_dir, similar_inspection_id)

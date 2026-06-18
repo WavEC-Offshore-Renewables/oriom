@@ -134,17 +134,21 @@ def return_percentage(
     device_shutted_string_level = {}
     device_string_level = {}
     dict_locations = {}
+    recommissioning = False
 
     for op in operations_corrective_stat:
         if getattr(op.op_class, "tow_to_port", None) or getattr(op.op_class, "op_tow_site", None):
             tow_port_op = getattr(op.op_class, "op_tow_port", None)
             tow_site_op = getattr(op.op_class, "op_tow_site", None)
 
-            for op_tow in [tow_port_op, tow_site_op]:
+            for op_tow, type_op in zip([tow_port_op, tow_site_op], ['TTP', 'TTS']):
                 found_op = find_element_class.find_operation(op_tow)
+                if type_op == 'TTS':
+                    recommissioning = True if found_op.recommissioning_time > 0 else False
+
                 op_corr_tow[found_op.id] = found_op
                 if found_op.addition_op_tow:
-                    op_add_tow[found_op.addition_op_tow.id] = found_op.string_disconnection
+                    op_add_tow[found_op.addition_op_tow.id] = {'string':found_op.string_disconnection, 'type': type_op}
 
     if tech == 'PV':
         string_inverter = set(range(1, n_strings_per_inv + 1))
@@ -184,8 +188,10 @@ def return_percentage(
             shut_fix = r["shut_fix"]
             failure_id = r["failure_id"]
             r_id = r["id"]
-
-            if r["loc"] is None:
+            shut_downstream_device = False
+            # LOCATION SELECTION
+            # ------------------
+            if loc is None:
                 # failure location
                 if event == "failure":
                     tech2 = 'PV' if prefix_list == ['opv', 'oce'] else None
@@ -210,6 +216,8 @@ def return_percentage(
                     r["loc"] = loc
 
 
+            # ACTION SELECTION
+            # ------------------
             # Store the shutdown of the device and evaluate the power of the farm
             if shut_fix == 'shut':
                 # Analyze PV technology components below last component defined (inverter)
@@ -241,8 +249,12 @@ def return_percentage(
 
                 # Shutdown the component if is a failure that requires it or the op require shutdown and was not already shutted
                 if loc not in device_shutted or event == 'tow' or r_id in op_add_tow.keys():
-                    if op_add_tow.get(r_id, False):
+                    if op_add_tow.get(r_id, {}).get('string', False):
                         loc = choose_spec_loc_string(G,loc)
+                        # Add to do electrical discontinuity
+                        if getattr(G, 'graph', {}).get('tow_string_shutdown', False):
+                            shut_downstream_device = r["loc"]
+
                     G, power_farm = shut(
                         loc,
                         shutdown if loc not in device_shutted else False, # Manage case device failed but need tow and create string disconn
@@ -257,9 +269,9 @@ def return_percentage(
                         list_failed = device_shutted,
                         string_inverter = string_inverter,
                         event = event,
-                        op_corr_tow = op_corr_tow,
                         op_add_tow = op_add_tow,
-                        r_id = r_id
+                        r_id = r_id,
+                        shut_downstream_device = shut_downstream_device
                     )
 
                     perc = power_farm / n_devices * 100
@@ -270,7 +282,7 @@ def return_percentage(
 
             # Store the fix of the device and evaluate the power of the farm
             elif shut_fix == 'fix':
-                if op_add_tow.get(r_id, False):
+                if op_add_tow.get(r_id, {}).get('string', False):
                     loc = choose_spec_loc_string(G,loc)
                 G, power_farm = fix(
                     loc,
@@ -283,7 +295,8 @@ def return_percentage(
                     event = event,
                     op_corr_tow = op_corr_tow,
                     op_add_tow = op_add_tow,
-                    r = r
+                    r = r,
+                    recommissioning = recommissioning
                 )
                 device_failed.discard(loc)
                 device_shutted.discard(loc)

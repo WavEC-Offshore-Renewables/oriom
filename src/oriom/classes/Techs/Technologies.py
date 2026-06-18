@@ -1,14 +1,9 @@
-# technology_builder.py
-import os
-import logging
+# technology_builder
+from oriom.classes.Techs.WindTurbineGenerator import WindTurbineGenerator
+from oriom.classes.Techs.WaveEnergyConverter import  WaveEnergyConverter
+from oriom.classes.Techs.PVProduction import PVProduction
+from oriom.classes.Techs import Power
 
-from oriom.classes.WindTurbineGenerator import WindTurbineGenerator
-from oriom.classes.WaveEnergyConverter import  WaveEnergyConverter
-from oriom.classes.PVProduction import  PVProduction
-from oriom.classes.Power import Curve as PowerCurve
-from oriom.classes.Power import Matrix as PowerMatrix
-from oriom.classes.Power import PVPower as PVPower
-from oriom.classes.Power import PVPower as PVPower
 from oriom.utils.aux_functions import save_file_csv
 
 try:
@@ -23,12 +18,13 @@ class PowerTechResult:
 
     def __init__(
         self,
+        power_losses,
         wtg_number_devices = None, wtg_pcurve = None,
         wec_number_devices = None, wec_pmatrix = None,
         pv_number_devices = None, pv_farm_prod = None,
-        degradation_rate = None, pv_max_failure_module = None
+        degradation_rate = None, pv_max_failure_module = None,
     ):
-
+        self.power_losses = power_losses
         self.wtg_number_devices = wtg_number_devices
         self.wtg_pcurve = wtg_pcurve
         self.wec_number_devices = wec_number_devices
@@ -59,7 +55,6 @@ class TechFarm:
         self.wec = wec
         self.pv = pv
         self.power = power
-
 
 class TechnologyBuilder:
 
@@ -113,7 +108,7 @@ class TechnologyBuilder:
 
 
     @staticmethod
-    def build_power_technologies(wtg, wec, pv, run_dir):
+    def build_power_technologies(wtg, wec, pv, run_dir: str, file_electrical_loss: str, file_wake_loss: str):
 
         """
         Build derived power-tech artifacts from domain objects.
@@ -121,10 +116,16 @@ class TechnologyBuilder:
         - save_pv_csv: toggle CSV saving
         """
 
+        # --- Power Loss ---
+        power_losses = Power.Power_Losses(
+            file_electric_loss = file_electrical_loss,
+            file_wake_loss  = file_wake_loss,
+        )
+
         # --- WTG ---
         if hasattr(wtg, "number_devices"):
             wtg_number_devices  =  wtg.number_devices
-            wtg_pcurve  =  PowerCurve(
+            wtg_pcurve = Power.Curve(
                 file_ = wtg.pcurve_file,
                 c_in = wtg.cut_in,
                 c_off = wtg.cut_off,
@@ -138,7 +139,7 @@ class TechnologyBuilder:
         # --- WEC ---
         if hasattr(wec, "number_devices"):
             wec_number_devices  =  wec.number_devices
-            wec_pmatrix  =  PowerMatrix(
+            wec_pmatrix = Power.Matrix(
                 file_ = wec.pmatrix_file,
                 rated = wec.rated_power,
             )
@@ -149,11 +150,11 @@ class TechnologyBuilder:
 
         # --- PV ---
         if hasattr(pv, "number_devices"):
-            pv_number_devices  =  pv.number_devices
-            pv_max_failure_module  =  pv.max_failure_module
-            degradation_rate  =  pv.degradation_rate
+            pv_number_devices = pv.number_devices
+            pv_max_failure_module = pv.max_failure_module
+            degradation_rate = pv.degradation_rate
 
-            pv_farm_prod  =  PVProduction.pv_farm_statistical_analysis(
+            pv_farm_prod = PVProduction.pv_farm_statistical_analysis(
                 pvprod_file = pv.pvprod_file,
                 number_devices = pv_number_devices,
             )
@@ -167,6 +168,7 @@ class TechnologyBuilder:
             pv_max_failure_module  =  None
 
         return PowerTechResult(
+            power_losses = power_losses,
             wtg_number_devices = wtg_number_devices,
             wtg_pcurve = wtg_pcurve,
             wec_number_devices = wec_number_devices,
@@ -177,6 +179,8 @@ class TechnologyBuilder:
             pv_max_failure_module = pv_max_failure_module,
         )
 
+    def build_power_losses(file_electrical_loss, file_wake_loss):
+        return 
 
     @classmethod
     def build_technologies(
@@ -184,7 +188,9 @@ class TechnologyBuilder:
         run_dir: str,
         wtg_file: str,
         wec_file: str,
-        pv_file: str
+        pv_file: str,
+        file_electrical_loss: str,
+        file_wake_loss: str
     ):
 
         """
@@ -198,12 +204,22 @@ class TechnologyBuilder:
             wtg_file (string): path of the wtg techology
             wec_file (string): path of the wec techology
             pv_file (string): path of the pv techology
+            file_electrical_loss (string): path of the electric losses file
+            file_wake_loss (string): path of the wake losses file
+
 
         Return:
             TechFarm
         """
 
         wtg, wec, pv = cls.create_technologies(run_dir, wtg_file, wec_file, pv_file)
-        power = cls.build_power_technologies(wtg = wtg, wec = wec, pv = pv, run_dir = run_dir)
+        power = cls.build_power_technologies(
+            wtg = wtg,
+            wec = wec,
+            pv = pv,
+            run_dir = run_dir,
+            file_electrical_loss = file_electrical_loss,
+            file_wake_loss = file_wake_loss
+        )
 
         return TechFarm(wtg = wtg, wec = wec, pv = pv, power = power)

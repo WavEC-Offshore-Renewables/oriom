@@ -215,6 +215,7 @@ class TestFix(unittest.TestCase):
             tech="wind",
             names_tech="device",
             n_pv_per_string=None,
+            r = pd.Series({'id': 'ofw_001'})
         )
 
         self.assertEqual(G_out.nodes[1]["power"], 1.0)
@@ -239,6 +240,7 @@ class TestFix(unittest.TestCase):
             tech="wind",
             names_tech="device",
             n_pv_per_string=None,
+            r = pd.Series({'id': 'ofw_001'})
         )
 
         self.assertTrue(G_out.edges[1, 0]["visible"])
@@ -445,32 +447,33 @@ class TestEnergyFunctions(unittest.TestCase):
         G.add_edge(1, 2, visible=False)
 
         op_add_tow = {
-            "10_tow": {
-                "f1": (1, 2)
+            "10_tow": 'dummy_value',
+            "tow": {
+                "f1": 2
             }
         }
 
-        r = {'id': 10, 'failure_id': 'f1'}
+        r = {'id': '10_tow', 'failure_id': 'f1'}
 
         lem.check_previous_fix(G, op_add_tow, r, type_id='tow')
 
         # edge must be visibile
         self.assertTrue(G.edges[1, 2]['visible'])
-        self.assertNotIn("10_tow", op_add_tow)
+        self.assertNotIn("tow", op_add_tow)
 
     def test_check_previous_fix_non_tow(self):
         G = nx.DiGraph()
         G.add_node(5, power=0)
 
         op_add_tow = {
-            "20_other": {
+            "oper_aaa": {
                 "f2": 5
             }
         }
 
-        r = {'id': 20, 'failure_id': 'f2'}
+        r = {'id': 'oper_aaa', 'failure_id': 'f2'}
 
-        lem.check_previous_fix(G, op_add_tow, r, type_id='other')
+        lem.check_previous_fix(G, op_add_tow, r, type_id='oper_aaa')
 
         # power restored
         self.assertEqual(G.nodes[5]['power'], 1)

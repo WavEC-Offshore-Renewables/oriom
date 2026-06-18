@@ -2,14 +2,12 @@ import logging
 import os
 import numpy as np
 import pandas as pd
-
 from tqdm import tqdm
 
 from oriom.utils import yaml_manager
 from oriom.utils import aux_functions
-
+from oriom.common.constants import ATTRIBUTE_LIST_REUSE_MINOR
 from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
-
 from oriom.core.timeseries_analysis.working_shifts import working_shifts
 from oriom.core.timeseries_analysis.workability import workability
 from oriom.core.functions.operation_scheduler.define_shift_operation import define_shift_operation_values
@@ -48,7 +46,6 @@ def opeartion_minor_manager(
     """
 
     dict_minor_oper, hash_to_key = {}, {}
-    ATTRIBUTE_LIST = ['duration_net', 'hs', 'tp', 'ws', 'ws_hub', 'cs', 'light', 'vessel1_id', 'vessel2_id', 'shutdown', 'technology', 'rov']
 
     for operation in tqdm(operations_corr_minor, desc='Looping through Minor Corrective Operations.', position=0):
         logging.info('CorrectiveMinor: %s - %s.' % (operation.id, operation.name))
@@ -58,7 +55,7 @@ def opeartion_minor_manager(
             minor_oper_dict = dict_minor_oper,
             hash_to_key = hash_to_key,
             operation = operation,
-            attribute_list = ATTRIBUTE_LIST
+            attribute_list = ATTRIBUTE_LIST_REUSE_MINOR
         )
 
         op_dir_other = os.path.join(operation_dir, similar_operation_id)

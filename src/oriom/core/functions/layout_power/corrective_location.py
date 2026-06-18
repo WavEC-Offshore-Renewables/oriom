@@ -50,7 +50,7 @@ def condition_shut_fix_evaluation(op_corr_tow: dict, fail_op: list, op_add_tow: 
     # if any tow operation is connected to the failure and is specific_tow op
     has_remove = any(specific_tow in f.name.lower() for f in fail_op)
     # If string disconnection
-    add_flag = op_add_tow.get(r, False)
+    add_flag = op_add_tow.get(r, {}).get('string', False)
 
     enter_condition = (
         not has_corr

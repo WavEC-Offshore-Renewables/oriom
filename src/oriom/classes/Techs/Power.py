@@ -1,8 +1,8 @@
-# Import packages
 import pandas as pd
 import numpy as np
 import logging
 
+from oriom.common.constants import UNIT_CONVERSION
 
 class Curve():
     """Based on a CSV file, fetched data related with the WTG power curve and
@@ -17,9 +17,6 @@ class Curve():
         array (:obj:`np.ndarray`): Generated power, in megawatts,
             per wind speed unit, in m/s.
 
-    Note:
-        When the class is initialized, :func:`_check_attributes`
-        and :func:`_read_file` are run.
 
     Example:
         >>> pcurve = Curve(
@@ -320,6 +317,159 @@ class PVPower():
 
         logging.info('PVPower: pv panels power defined based on file: "%s".' % self.file)
 
+class Power_Losses():
+    """Based on a CSV file, fetched data related with the power losses and
+    generates a :class:`Power_Losses` class.
+
+    Attributes:
+        power_loss (:obj:`bool`): Flag to define if any power losses are defined
+        electric_loss (:obj:`DataFrame`): Power electric loss in normalized %. Default to empty
+        wake_loss (:obj:`DataFrame`): Power wake loss for WTG technologies in normalized %. Default to empty
+
+    TODO: To implement wake losses for WEC technologies
+
+    NOTE:
+        Power_losses column must be with normalized value between 1 and 0, they represent unitary percentage of Power loss. 
+            1 = 100 % Energy loss; 
+
+            0.5 = 50% Energy loss; 
+            
+            0 = 0% Energy loss
+
+    Example:
+        >>> ploss = Power_Losses(
+        >>>         file_=curve_file_path,
+        >>> )
+        >>> ploss.array
+        [0, 0, 0, 0.0100, 0.02900, 0.04150, 0.05600, 0.0650, 0.07100]
+    """
+
+    def __init__(
+            self,
+            file_electric_loss: str = None,
+            file_wake_loss: str = None,
+    ):
+        """Initializes :class:`Curve` class.
+
+        Args:
+            file_electric_loss (:obj:`str`): CSV file path. Power electric loss in normalized %.
+            file_wake_loss (:obj:`str`): CSV file path. Power wake loss in normalized %.
+        """
+        self.power_loss = False
+        self.electric_loss = pd.DataFrame()
+        self.wake_loss = pd.DataFrame()
+
+        if file_electric_loss:
+            self.electric_loss = self._read_file(file_ = str(file_electric_loss))
+            self.power_loss = True
+            
+        if file_wake_loss:
+            self.wake_loss = self._read_file(file_ = str(file_wake_loss))
+            self.power_loss = True
+            self.wake_loss = self.wake_loss.rename(columns={self.wake_loss.columns[0]: 'ws'})
+
+
+
+    def _read_file(self, file_):
+        """Reads Power Losses CSV file and converts it into a :class:`np.ndarray`
+        with a speed interval of 1 unit per dependent variable.
+
+        Raises:
+            FileNotFoundError: if the :attr:`file` does not exist.
+            IndexError: if power curve file does not have 2 columns.
+            NameError: if the first column of the curve file is not the wind speed.
+            NameError: if the second column of the curve file is not the power.
+            NameError: if wind speed unit is not recognized.
+            NameError: if power unit is not recognized.
+        """
+        try:
+            df_ploss = pd.read_csv(file_, sep=';')
+        except FileNotFoundError:
+            logging.error('Power_Losses: file "%s" could not be found.' % file_)
+            raise FileNotFoundError('Power Loss file could not be found.')
+
+        df_ploss_cols = df_ploss.columns.str.lower().to_list()
+        if len(df_ploss_cols) < 2 or len(df_ploss_cols) > 2:
+            _e = 'Power_Losses: file "%s" must have 2 columns. Column 1: Independent variable; Column 2: Power loss' % file_
+            logging.error(_e)
+            raise IndexError(_e)
+        col_var = df_ploss_cols[0]
+        col_power_loss = df_ploss_cols[1]
+        cols_default = ['power_loss']
+
+        if col_power_loss != 'power_loss':
+            _e = (f'Invalid power loss column name: "{col_power_loss}". Expected column name: "{cols_default}".')
+            logging.error('Power_Losses: ' + _e)
+            raise ValueError(_e)
+
+        # Conversion factors to internal units: - wind speed -> m/s, - power -> kW
+        unit_found = False
+        conversion_factor = None
+
+        for candidate_var, units_dict in UNIT_CONVERSION.items():
+            for unit, factor in units_dict.items():
+                if col_var.endswith(unit):
+                    parsed_var_name = col_var.removesuffix(unit)
+                    if parsed_var_name == candidate_var:
+                        conversion_factor = factor
+                        unit_found = True
+                        break
+            if unit_found:
+                break
+        
+        self._check_attributes(df_ploss, col_power_loss, unit_found, col_var)
+
+        # Apply conversion to internal unit
+        df_ploss.iloc[:, 0] = df_ploss.iloc[:, 0] * conversion_factor
+
+        # Set the index eliminating NaN, averaging if equal values found and sorting
+        df_ploss = (
+            df_ploss
+            .dropna(subset=[col_var, col_power_loss])
+            .groupby(col_var, as_index=False)[col_power_loss]
+            .mean()
+            .sort_values(col_var)
+            .reset_index(drop=True)
+        )
+        logging.info('Power_Losses: losses defined based on file: "%s".' % file_)
+
+        return df_ploss
+
+
+    def _check_attributes(self, df_ploss, col_power_loss, unit_found, col_var):
+        """
+        This method validates the attributes of the `Power Losses` class to ensure they
+        have valid values and fall within specified ranges.
+
+        Raises errors if any attribute is outside the specified range.
+        """
+        # Validate first column variable/unit
+        if not unit_found:
+            valid_examples = [f'{var}{unit}' for var, units_dict in UNIT_CONVERSION.items() for unit in units_dict]
+
+            _e = (
+                f'Variable column "{col_var}" not recognised. Expected format: <variable>_<unit>. '
+                f'Valid variable names are: {list(UNIT_CONVERSION.keys())}. Valid examples are: {valid_examples}.'
+            )
+            logging.error('Power_Losses: ' + _e)
+            raise ValueError(_e)
+        
+        # Check values from power loss
+        power_loss = df_ploss.iloc[:, 1]
+
+        if not pd.api.types.is_numeric_dtype(power_loss):
+            _e = f'Column "{col_power_loss}" must contain numeric values.'
+            logging.error('Power_Losses: ' + _e)
+            raise TypeError(_e)
+
+        min_loss = power_loss.min()
+        max_loss = power_loss.max()
+
+        if min_loss < 0 or max_loss > 1:
+            _e = f'Column "{col_power_loss}" must contain values between 0 and 1'
+            logging.error('Power_Losses: ' + _e)
+            raise ValueError(_e)
+
 
 def interpolate(df: pd.DataFrame, new_index: list):
     """Return a new DataFrame with all columns values interpolated to the new_index values.
@@ -334,7 +484,7 @@ def interpolate(df: pd.DataFrame, new_index: list):
     for colname, col in df.items():
         df_out[colname] = np.interp(new_index, df.index, col)
 
-    logging.info('PowerCurve: curve interpolated.')
+    logging.info('Power_Losses: curve interpolated.')
     return df_out
 
 
@@ -355,3 +505,20 @@ if __name__ == '__main__':
     pvpower = PVPower(
             file_=os.path.join(os.getcwd(), 'tests', 'test_files', 'pv_prod_month_hour.csv')
     )
+
+    df = pd.DataFrame(
+        {'p_wind': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        'power_loss': [0, 0, 0, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.7, 0.6, 0.5]}
+    )
+
+    df.to_csv(
+        r'C:\Riccardo\tmp\electric_losses.csv',
+        sep=';',
+        index=False
+    )
+
+    plosses = Power_Losses(
+        file_electric_loss=(r'C:\Riccardo\tmp\prova_losses.csv')
+    )
+
+    print(plosses.electric_loss)

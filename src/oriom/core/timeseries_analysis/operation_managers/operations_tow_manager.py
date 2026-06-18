@@ -27,7 +27,8 @@ def operation_tow_manager(
         timesteps: pd.DataFrame,
         Config: object,
         inputs_tseries: object,
-        metocean_tow: dict = {}
+        metocean_tow: dict = {},
+        metocean_tow_distance: dict = {}
     ):
 
     """
@@ -45,7 +46,9 @@ def operation_tow_manager(
         inputs_tseries (object): Object class `Input.TimeSeries`
         metocean_tow (dictionary, *Optional*): dictionary with key int value and value Metocean object of
             weather data for towing operations (metocean data of point from site to port). Default to {}
-
+        metocean_tow (dictionary, *Optional*): dictionary with key int value and value Metocean distance 
+            to site in km. Default to {}
+        
     Raise:
         InterruptedError: 'The operation can never occur. OLCs may be to resctric.'
     """
@@ -75,9 +78,15 @@ def operation_tow_manager(
 
         # Create workability file considering various timestep
         if metocean_tow:
+            metocean_distance_lag = workability.workability_tow_distance_lag(
+                metocean_tow_distance = metocean_tow_distance,
+                operation = operation
+            )
+
             df_workability = workability.workability_tow(
                 df_metocean = df_metocean,
                 metocean_tow = metocean_tow,
+                metocean_distance_lag = metocean_distance_lag,
                 operation = operation,
                 op_dir = op_dir
             )

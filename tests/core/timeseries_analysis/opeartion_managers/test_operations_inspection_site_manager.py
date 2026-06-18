@@ -4,7 +4,7 @@ import os
 import unittest
 import tempfile
 from types import SimpleNamespace
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import importlib.util
 
 import pandas as pd

@@ -33,12 +33,13 @@ skip_if_check_files_present = unittest.skipIf(
 class DummyOperation:
     """Minimal CorrectiveMajor-like object for testing operation_major_manager."""
 
-    def __init__(self, op_id: str, name: str, months=None):
+    def __init__(self, op_id: str, name: str, months=None, tow_to_port=False):
         self.id = op_id
         self.name = name
         self.activities = ["A0", "A1"]  # content is not used because workability/startability are mocked
         self.months = months if months is not None else list(range(1, 13))
         self.ts_data = None  # will be set by the manager
+        self.tow_to_port = tow_to_port
 
 
 class DummyInputsTseries:
@@ -128,6 +129,7 @@ class TestOperationMajorManager(unittest.TestCase):
         operation_major_manager(
             operation_dir=self.operation_dir,
             df_metocean=self.df_metocean,
+            df_metocean_port=self.df_metocean,
             operations_corr_major=operations,
             Config=self.Config,
             inputs_tseries=self.inputs_tseries,
@@ -242,6 +244,7 @@ class TestOperationMajorManager(unittest.TestCase):
         operation_major_manager(
             operation_dir=self.operation_dir,
             df_metocean=self.df_metocean,
+            df_metocean_port=self.df_metocean,
             operations_corr_major=operations,
             Config=self.Config,
             inputs_tseries=self.inputs_tseries,
@@ -298,6 +301,157 @@ class TestOperationMajorManager(unittest.TestCase):
         # TS data creation and assignment
         m_create_tsdata.assert_called_once_with(op, oper_sched, op_dir)
         self.assertEqual(op.ts_data, "TS_DATA_NEW")
+
+    # ---------- 2 - bis) Full path: new schedule, not recycled, port operation ----------
+    @skip_if_no_check_files
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.tqdm"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.OperationTimeSeriesData.create_timeseries_data"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.define_operation_values"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.get_meaningful_timesteps"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.recycle_major_other_oper_scheduler"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.startability"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.workability"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.modify_distance"
+    )
+    @patch(
+        "oriom.core.timeseries_analysis.operation_managers.operations_major_manager.check_files.check_file_exists"
+    )
+    def test_create_schedule_when_not_existing_and_not_recycled_port_oper(
+        self,
+        m_check_exists,
+        m_modify_distance,
+        m_workability,
+        m_startability,
+        m_recycle,
+        m_get_ts,
+        m_define_op,
+        m_create_tsdata,
+        m_tqdm,
+    ):
+        """
+        When no schedule exists and nothing is recycled:
+        - distance, workability, startability, and meaningful timesteps are computed
+        - define_operation_values is called
+        - OperationTimeSeriesData.create_timeseries_data is called with the returned schedule
+        - ts_data is set on the operation.
+        """
+        m_tqdm.side_effect = lambda iterable, *a, **k: iterable
+
+        op = DummyOperation("ofw_corr_002", "Major op 2", months=[1, 2, 3], tow_to_port=True)
+        operations = [op]
+
+        # No existing file
+        m_check_exists.return_value = False
+
+        # modify_distance returns a fixed transit duration
+        m_modify_distance.return_value = 4.5
+
+        # workability / startability return simple dataframes
+        df_workability = pd.DataFrame(
+            {"ok": [True, True]},
+            index=self.df_metocean.index[:2],
+        )
+        m_workability.return_value = df_workability
+
+        df_startability = pd.DataFrame(
+            {"A0": [True, False], "A1": [True, True]},
+            index=self.df_metocean.index[:2],
+        )
+        m_startability.return_value = df_startability
+
+        # Nothing is recycled
+        m_recycle.return_value = False
+
+        # Meaningful timesteps
+        op_ts = [10, 11, 12]
+        m_get_ts.return_value = op_ts
+
+        # define_operation_values returns a schedule dataframe
+        oper_sched = pd.DataFrame(
+            {"dur_total": [1.0, 2.0, 3.0]},
+            index=self.df_metocean.index[:3],
+        )
+        m_define_op.return_value = oper_sched
+
+        # create_timeseries_data returns a sentinel
+        m_create_tsdata.return_value = "TS_DATA_NEW"
+
+        operation_major_manager(
+            operation_dir=self.operation_dir,
+            df_metocean=self.df_metocean,
+            df_metocean_port=self.df_metocean,
+            operations_corr_major=operations,
+            Config=self.Config,
+            inputs_tseries=self.inputs_tseries,
+            timesteps=self.timesteps,
+        )
+
+        op_dir = os.path.join(self.operation_dir, op.id)
+        # check_file_exists called
+        m_check_exists.assert_called_once_with(path=op_dir, file_name="operation_schedule.csv")
+
+        # distance computed
+        m_modify_distance.assert_called_once_with(
+            Config=self.Config,
+            operation=op,
+            default_distance=self.inputs_tseries.distance["value"],
+        )
+
+        # workability & startability computed
+        m_workability.assert_called_once_with(
+            activities=op.activities,
+            df_metocean=self.df_metocean,
+            out_dir=op_dir,
+        )
+        m_startability.assert_called_once_with(
+            activities=op.activities,
+            df_workability=df_workability,
+            out_dir=op_dir,
+        )
+
+        # recycler called with correct args
+        m_recycle.assert_called_once_with(
+            operations=operations,
+            actual_oper=op,
+            df_startability=df_startability,
+            counter_op=0,
+            operation_dir=self.operation_dir,
+        )
+
+        # meaningful timesteps computed
+        m_get_ts.assert_called_once_with(
+            timeseries=self.df_metocean,
+            timesteps=self.timesteps,
+        )
+
+        # define_operation_values called with expected args
+        m_define_op.assert_called_once()
+        _, kwargs_define = m_define_op.call_args
+        self.assertEqual(kwargs_define["ts_analyse"], op_ts)
+        self.assertIs(kwargs_define["operation"], op)
+        self.assertTrue(kwargs_define["df_startability"].equals(df_startability))
+        self.assertEqual(kwargs_define["MAX_WAIT"], self.inputs_tseries.max_wait["value"])
+        self.assertEqual(kwargs_define["out_dir"], os.path.join(op_dir, "operation_schedule.csv"))
+
+        # TS data creation and assignment
+        m_create_tsdata.assert_called_once_with(op, oper_sched, op_dir)
+        self.assertEqual(op.ts_data, "TS_DATA_NEW")
+
 
     # ---------- 3) Recycled schedule: skip define_operation_values ----------
     @skip_if_no_check_files
@@ -365,6 +519,7 @@ class TestOperationMajorManager(unittest.TestCase):
         operation_major_manager(
             operation_dir=self.operation_dir,
             df_metocean=self.df_metocean,
+            df_metocean_port=self.df_metocean,
             operations_corr_major=operations,
             Config=self.Config,
             inputs_tseries=self.inputs_tseries,
@@ -450,6 +605,7 @@ class TestOperationMajorManager(unittest.TestCase):
         operation_major_manager(
             operation_dir=self.operation_dir,
             df_metocean=self.df_metocean,
+            df_metocean_port=self.df_metocean,
             operations_corr_major=operations,
             Config=self.Config,
             inputs_tseries=self.inputs_tseries,
@@ -540,6 +696,7 @@ class TestOperationMajorManager(unittest.TestCase):
         operation_major_manager(
             operation_dir=self.operation_dir,
             df_metocean=self.df_metocean,
+            df_metocean_port=self.df_metocean,
             operations_corr_major=operations,
             Config=self.Config,
             inputs_tseries=self.inputs_tseries,
@@ -623,6 +780,7 @@ class TestOperationMajorManager(unittest.TestCase):
         operation_major_manager(
             operation_dir=self.operation_dir,
             df_metocean=self.df_metocean,
+            df_metocean_port=self.df_metocean,
             operations_corr_major=operations,
             Config=self.Config,
             inputs_tseries=self.inputs_tseries,

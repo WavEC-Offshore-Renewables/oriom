@@ -26,9 +26,17 @@ class Layout_Wind():
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_1.jpg
             :width: 8000px
-            :alt: esempio
+            :alt: example
 
             LAYOUT 1: SIMPLE LAYOUT, n_strings=2, n_turbines=6
+            
+            Levels: 
+                onshore substation = 'shore';
+                export cable = 'exp_cable';
+                offshore substation = 'substation'; 
+                array cable = 'array_cable';
+                interarray_cable = 'dyn_cable-sub';
+                wtg = 'device';
 
         Layout 1: One substation, one export cable to shore, uniform strings.
         """
@@ -57,6 +65,12 @@ class Layout_Wind():
             for s, string_turbines in enumerate(turbines_per_string):
                 h = 2
                 for i, t in enumerate(string_turbines):
+                    if t == string_turbines[0]:
+                        cable_name = 'array_cable'
+                        cable_level = 'array_cable'
+                    else:
+                        cable_name = 'inter_array_cable'
+                        cable_level = 'dyn_cable-sub'
                     node_counter += 1
                     G.add_node(node_counter)
                     nx.set_node_attributes(G, {node_counter: {
@@ -68,7 +82,7 @@ class Layout_Wind():
                     else:
                         G.add_edge(node_counter, node_counter - 1)
                     nx.set_edge_attributes(G, {(list(G.edges())[-1]): {
-                        'name': 'array_cable', 'level': 'array_cable',
+                        'name': cable_name, 'level': cable_level,
                         'visible': True, 'p_limit': None
                     }})
                     h += 3
@@ -83,9 +97,18 @@ class Layout_Wind():
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_2.jpg
             :width: 8000px
-            :alt: esempio
+            :alt: example
 
             LAYOUT 2: DOUBLE FARM REDUNDANT LAYOUT, n_substations=2, n_strings=2, n_turbines=8
+            
+            Levels: 
+                onshore substation = 'shore';
+                export cable = 'exp_cable';
+                redundant export cable = 'redundant_cable';
+                offshore substation = 'substation'; 
+                array cable = 'array_cable';
+                interarray_cable = 'dyn_cable-sub';
+                wtg = 'device';
 
         Layout 2: Multiple independent farms, each with one substation and one export cable.
             All substations connect to a single shore node. Redundancy cable between substations.
@@ -158,9 +181,18 @@ class Layout_Wind():
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_3.jpg
             :width: 8000px
-            :alt: esempio
+            :alt: example
 
             LAYOUT 3: REDUNDANT EXPORT CABLE LAYOUT, n_exports=3,, n_strings=2, n_turbines=6,
+            
+            Levels: 
+                onshore substation = 'shore';
+                export cable = 'exp_cable';
+                redundant export cable = 'exp_cable';
+                offshore substation = 'substation';
+                array cable = 'array_cable';
+                interarray_cable = 'dyn_cable-sub';
+                wtg = 'device';
 
         Layout 3: Layout 1 with multiple export cables to shore for redundancy.
         """
@@ -209,9 +241,17 @@ class Layout_Wind():
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_4.jpg
             :width: 8000px
-            :alt: esempio
+            :alt: example
 
             LAYOUT 4: CUSTOM STRINGS, string_list = [5, 8, 5, 8, 6, 8], n_strings=6, n_turbines=40
+            
+            Levels: 
+                onshore substation = 'shore';
+                export cable = 'exp_cable';
+                offshore substation = 'substation';
+                array cable = 'array_cable';
+                interarray_cable = 'dyn_cable-sub';
+                wtg = 'device';
 
         Layout 4: Custom non-uniform string configuration.
         """
@@ -237,6 +277,12 @@ class Layout_Wind():
         for s, string_turbines in enumerate(turbines_per_string):
             h = 2
             for i, t in enumerate(string_turbines):
+                if t == string_turbines[0]:
+                    cable_name = 'array_cable'
+                    cable_level = 'array_cable'
+                else:
+                    cable_name = 'inter_array_cable'
+                    cable_level = 'dyn_cable-sub'
                 node_counter += 1
                 G.add_node(node_counter)
                 nx.set_node_attributes(G, {node_counter: {
@@ -248,7 +294,7 @@ class Layout_Wind():
                 else:
                     G.add_edge(node_counter, node_counter - 1)
                 nx.set_edge_attributes(G, {(list(G.edges())[-1]): {
-                    'name': 'array_cable', 'level': 'array_cable',
+                    'name': cable_name, 'level': cable_level,
                     'visible': True, 'p_limit': None
                 }})
                 h += 3
@@ -273,9 +319,20 @@ class Layout_Wind():
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_5.jpg
             :width: 8000px
-            :alt: esempio
+            :alt: example
 
-            LAYOUT 5, FISHBONE: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=2, n_strings=4, n_turbines=6
+            LAYOUT 5, FISHBONE: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=2, n_strings=4, n_turbines=12
+            
+            Levels: 
+                onshore substation = 'shore';
+                export cable = 'exp_cable';
+                offshore substation = 'substation';
+                feeder cable = 'exp_cable_island' (offshore substation to main connector node);
+                Fishbone main connector = 'hub';
+                array cable = 'array_cable' (cable between connectors);
+                Fishbone connector = 'circuit_braker';
+                interarray cable = 'dyn_cable-sub' (cable between WTG and connectors);
+                wtg = 'device';
 
         FISHBONE layout
         Strings are connected to the same 66 kV feeder cable that bring power to offshore substation
@@ -355,7 +412,7 @@ class Layout_Wind():
                 }}
                 G.add_edge(count_nodes+1,count_nodes)
                 attr_ef = {(count_nodes+1,count_nodes):{
-                        'name' : "dyn_cable-sub",
+                        'name' : "inter_array_cable",
                         'level' : 'dyn_cable-sub',
                         'visible': True,
                         'p_limit': None
@@ -408,9 +465,18 @@ class Layout_Wind():
         """
         .. figure:: /_static/Layout_imgs/Wind_Layout_6.jpg
             :width: 800px
-            :alt: esempio
+            :alt: example
 
             LAYOUT 6 STAR LAYOUT: n_export_cables=1, substation_node=1, n_string_to_connector(hub)=5, n_turbines=15
+            
+            Levels: 
+                onshore substation = 'shore';
+                export cable = 'exp_cable';
+                offshore substation = 'substation';
+                array cable/feeder cable = 'array_cable' (offshore substation to main connector node);
+                Star connector = 'hub';
+                interarray cable = 'dyn_cable-sub' (cable between WTG and connectors);
+                wtg = 'device';
 
         Layout with 1 Substation, 1 Array Cable, hubs and string of 1 turbine connected to  connector
 
@@ -428,7 +494,7 @@ class Layout_Wind():
         attr_s = {0: {
                 'name' : 'SHORE',
                 'coords' : (n_turbines/2-0.5,-2),
-                'level' : '',
+                'level' : 'shore',
                 'power' : 0
         }}
         nx.set_node_attributes(G, values=attr_s)
@@ -500,7 +566,7 @@ class Layout_Wind():
 
                 G.add_edge(count_nodes, connector_node)
                 attr_es = {(count_nodes, connector_node):{
-                        'name' : "dyn_cable-sub",
+                        'name' : "inter_array_cable",
                         'level' : 'dyn_cable-sub',
                         'visible': True,
                         'p_limit': None
@@ -513,7 +579,85 @@ class Layout_Wind():
         Layout_Aux.draw_layout(G = G, save_dir = save_dir, show_plot = show_plot, title="Wind_Layout_6")
         return G
 
+    # ---------------------------------------------------------------------
+    # Layout 7
+    # ---------------------------------------------------------------------
+    def layout7_wind(self, n_turbines: int, n_strings: int, substation_node: int, tow_string_shutdown: bool,
+                     save_dir=None, show_plot=False):
+        """
+        .. figure:: /_static/Layout_imgs/Wind_Layout_7.jpg
+            :width: 8000px
+            :alt: example
 
+            LAYOUT 7: SIMPLE LAYOUT with RING array cables, n_strings=2, n_turbines=6
+
+            
+            Levels: 
+                onshore substation = 'shore';
+                export cable = 'exp_cable';
+                offshore substation = 'substation'; 
+                array cable = 'array_cable';
+                interarray_cable = 'dyn_cable-sub';
+                wtg = 'device';
+
+        Layout 7: One substation, one export cable to shore, Ring array cable uniform strings.
+        """
+        self.check_input_wind(n_turbines, n_strings)
+        G = nx.DiGraph()
+        G.graph['tow_string_shutdown'] = tow_string_shutdown
+        Layout_Aux.add_substation_and_shore(G, n_strings, substation_node)
+
+        if n_turbines == 1:
+            node = substation_node + 1
+            G.add_node(node)
+            nx.set_node_attributes(G, {node: {
+                'name': "Wtg_1", 'coords': ((n_strings - 1) / 2, 0),
+                'level': 'device', 'power': 1
+            }})
+            G.add_edge(node, substation_node)
+            nx.set_edge_attributes(G, {(node, substation_node): {
+                'name': 'array_cable', 'level': 'array_cable',
+                'visible': True, 'p_limit': None
+            }})
+        else:
+            turbines = list(range(1, n_turbines + 1))
+            turbines_per_string = Layout_Aux.interval_extract(turbines, n_strings)
+            node_counter = substation_node
+
+            for s, string_turbines in enumerate(turbines_per_string):
+                h = 2
+                for i, t in enumerate(string_turbines):
+                    if t == string_turbines[0]:
+                        cable_name = 'array_cable'
+                        cable_level = 'array_cable'
+                    else:
+                        cable_name = 'inter_array_cable'
+                        cable_level = 'dyn_cable-sub'
+                    node_counter += 1
+                    G.add_node(node_counter)
+                    nx.set_node_attributes(G, {node_counter: {
+                        'name': f"Wtg_{t}", 'coords': (s, h),
+                        'level': 'device', 'power': 1
+                    }})
+                    if i == 0:
+                        G.add_edge(node_counter, substation_node)
+                    else:
+                        G.add_edge(node_counter, node_counter - 1)
+                    nx.set_edge_attributes(G, {(list(G.edges())[-1]): {
+                        'name': cable_name, 'level': cable_level,
+                        'visible': True, 'p_limit': None
+                    }})
+                    # RING ARRAY creation
+                    if t == string_turbines[-1]:
+                        G.add_edge(node_counter, substation_node)
+                        nx.set_edge_attributes(G, {(list(G.edges())[-1]): {
+                            'name': 'array_cable', 'level': 'array_cable',
+                            'visible': True, 'p_limit': None
+                        }})
+
+                    h += 3
+        Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_7")
+        return G
     # ---------------------------------------------------------------------
     # Dispatcher
     # ---------------------------------------------------------------------
@@ -547,7 +691,8 @@ class Layout_Wind():
             if n_turbines % n_string_to_connector:
                 raise ValueError("Layout 6: n_turbines must be divisible by n_string_to_connector manually")
             return self.layout6_wind(n_turbines=n_turbines, n_strings=n_turbines, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
-
+        if n_layout == 7:
+            return self.layout7_wind(n_turbines, n_strings, substation_node = 1, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         else:
             _e = f'Layout selected :´{n_layout}´ for wind technology. The present scenario does not exists'
             logging.error(_e)
@@ -562,12 +707,13 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=6,
-        n_turbines=5,
-        n_strings=1,
+        n_layout=7,
+        n_turbines=6,
+        n_strings=2,
         n_substations=1,
         n_exports=1,
-        n_string_to_connector = 5,
+        n_string_to_connector = 1,
         tow_string_shutdown = True,
+        save_dir = None,
         show_plot=True
     )

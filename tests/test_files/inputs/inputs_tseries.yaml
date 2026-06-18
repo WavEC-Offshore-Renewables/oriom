@@ -40,3 +40,9 @@ length export cable:
 merge vessel:
     value: ['v001']
     units: '-'
+wake file losses:
+    value: .\tests\test_files\inputs\wake_losses.csv
+    units:
+electric file losses:
+    value: .\tests\test_files\inputs\electric_losses.csv
+    units:

@@ -291,6 +291,7 @@ def workability(
 def workability_tow(
         df_metocean: pd.DataFrame,
         metocean_tow: dict,
+        metocean_distance_lag: dict,
         operation: object,
         op_dir: str = None
 )->pd.DataFrame:
@@ -301,21 +302,24 @@ def workability_tow(
 
         df_metocean (:obj:`pandas.DataFrame`): metocean timeseries table of site location.
             Rows as timesteps and colums as sea conditions.
-        df_works (dict): Dictionary with key  of int and values Metocean object of point location
+        metocean_tow (dict): Dictionary with key of int and values Metocean object of point location
+        metocean_distance_lag (dict): Dictionary with key of int and values distance point to site in hours of transit along tow
         operation (:obj:`class`): operation of OperationTow class with
             Operation Limit Criteria defined as attributs.
         out_dir (:obj:`str`, *optional*): output directory folder path.
             Defaults to ``None``.
     """
 
-    def and_series_on_ref(df_works, act_name) ->pd.Series:
+    def and_series_on_ref(df_works:dict, dict_durations:dict, act_name:str, site:bool) ->pd.Series:
         """
         Function to evaluate the df_workability of all the df_metocean data for an activity
         In check if index are complient with site metocean, it join the values of the various df_metocean with AND logic
 
         Args:
             df_works (dict): Dictionary of workability for the various location
+            dict_durations (dict): Dictionary of durations to the various location
             act_name (str): Name of the activity under analysis
+            site (bool): Boolean to identify if TTP or TTS
 
         Return:
             (pd.Series) Series related to act_name with values True only if all are True, else False if df compliant
@@ -352,9 +356,27 @@ def workability_tow(
                 )
                 return ref_series.copy()
 
-            # cut df if longer than site metocean data
-            s = df[act_name].loc[ref_index]
-            # Concatenate all boolean with AND
+            # shift the series considering the duration to reach the new location considered
+            if i > 0:
+                lag_index = dict_durations[i]
+                # For the location closest to the site consider new metocean at half the trip
+                if i == 1:
+                    lag_index /=2
+
+                lag_index = int(np.ceil(lag_index))
+                # Take a negative lag if TTP, so the index is shifted above
+                if site:
+                    lag_index = -abs(lag_index)
+                # cut df if longer than site metocean data, shift the index by its lag of the transit
+                s = (
+                    df[act_name]
+                    .loc[ref_index]
+                    .shift(lag_index)
+                )
+            else:
+                # cut df if longer than site metocean data
+                s = df[act_name].loc[ref_index]
+            # Concatenate all boolean with AND of the metocean with the total series
             result_series &= s.fillna(False).astype(bool)
 
         return result_series
@@ -369,6 +391,7 @@ def workability_tow(
             out_dir=op_dir
         )
 
+    site = False
     # Overlap a unique workability depending by the activity
     df_workability = df_works[0].copy()
     for i, op_act in enumerate(operation.activities):
@@ -378,9 +401,29 @@ def workability_tow(
         elif op_act.location == "port":
             df_workability[op_act.id] = df_works[-1][op_act.id]
         elif op_act.towing:
-            df_workability[op_act.id] = and_series_on_ref(df_works = df_works, act_name = op_act.id)
+            df_workability[op_act.id] = and_series_on_ref(
+                df_works = df_works,
+                dict_durations = metocean_distance_lag,
+                act_name = op_act.id,
+                site = site
+            )
     return df_workability
 
+def workability_tow_distance_lag(
+    metocean_tow_distance: dict,
+    operation: object
+):
+    """ Evaluates the duration of transit during towing opeartion between the points of the metocean"""
+
+    dict_distance_duration = {}
+    vessel_1 = getattr(operation, 'vessel1', None)
+    total_distance = 0
+    for i, distance in metocean_tow_distance.items():
+        # calculate half of the distance to be covered to evaluate next point 
+        dict_distance_duration[i] = (((total_distance + distance/2) * 1000) / vessel_1.speed_tow) / 3600
+        total_distance += distance
+
+    return dict_distance_duration
 
 
 if __name__ == '__main__':
