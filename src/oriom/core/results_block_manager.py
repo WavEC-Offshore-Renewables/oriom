@@ -106,6 +106,7 @@ def results_block(
             dates_failures_OLD = dates_failures_OLD,
         )
 
+        results_dict.dfs_failures[r] = dates_failures
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 
 
@@ -147,7 +148,7 @@ def results_block(
         log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
 
     except (TypeError, FileNotFoundError) as e_:
-        log_events_merged, index_overwrite_log_ev, df_port_operation_def_log = create_logs_merge(
+        log_events_merged, index_overwrite_log_ev, df_port_operation_def_log, operation_vessel_percentiles_dict = create_logs_merge(
             log_events_original = log_events,
             failures = failures,
             operation_log_file_stats = operations_tow_stats['pmax'] + operations_corrective_stats['pmax'],
@@ -326,6 +327,10 @@ def results_block(
     if not dates_failures.empty:
         report_graphs.distribution_failures(df = dates_failures, save_dir = graph_dir_r)
 
+    for k, it in operation_vessel_percentiles_dict.items():
+        aux_functions.save_file_csv(pd.DataFrame.from_dict(it, orient='index'), result_dir_r, f'{k}.csv', True)
+
+    return 
 
 if __name__ == '__main__':
     pass

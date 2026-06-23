@@ -434,7 +434,7 @@ class TestManageChart(unittest.TestCase):
             side_effect=lambda df, vessels, percentile: df,
         ) as mock_stat_chart:
 
-            result = merged_deferred_aux.manage_chart(df.copy(), vessels=[v1], percentile=0.9)
+            result, _ = merged_deferred_aux.manage_chart(df.copy(), vessels=[v1], percentile=0.9)
             # mobilisation_merged should keep name
             self.assertIn("mobilisation_merged", result["event"].values)
             # other events renamed

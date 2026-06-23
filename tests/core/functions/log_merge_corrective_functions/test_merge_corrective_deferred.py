@@ -216,7 +216,7 @@ class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
         vessel = DummyVessel(vid="V1", n_vessels=1, mobilisation_time=0.0)
         finder = DummyFinder(vessel)
 
-        result = merge_corrective_deferred.merge_deferred_operations(
+        result, _ = merge_corrective_deferred.merge_deferred_operations(
             log_events_def=log_events_def,
             vessels=[vessel],
             time_between_devices={"opv": 1.0},
@@ -365,7 +365,7 @@ class TestMergeDeferredOperationsMultipleOps(unittest.TestCase):
         vessel = DummyVessel(vid="V1", n_vessels=1, mobilisation_time=0.0)
         finder = DummyFinder(vessel)
 
-        result = merge_corrective_deferred.merge_deferred_operations(
+        result, _ = merge_corrective_deferred.merge_deferred_operations(
             log_events_def=log_events_def,
             vessels=[vessel],
             time_between_devices={"opv": 1.0},
@@ -542,7 +542,7 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
         op_stat = DummyOperStat(15)
         finder = DummyFinder(vessel, op_stat)
 
-        result = merge_corrective_deferred.merge_deferred_operations(
+        result, _ = merge_corrective_deferred.merge_deferred_operations(
             log_events_def=log_events_def,
             vessels=[vessel],
             time_between_devices={"opv": 1.0},

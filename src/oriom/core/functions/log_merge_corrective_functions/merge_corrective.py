@@ -68,7 +68,7 @@ def create_logs_merge(
     vessel_to_merge: list,
     time_fail_op_immediately: float,
     duration_shift: float
-)->pd.DataFrame:
+)->tuple[pd.DataFrame, pd.Index, pd.DataFrame, dict]:
 
     """
     This function it runs after that the log_event file is created. It will merge only CORERCTIVE operations that can be conducted
@@ -98,7 +98,9 @@ def create_logs_merge(
 
     Returns:
         pd.DataFrame: dataframe with all the events of the farm with corrective operation merged.
-
+        index_overwrite_log_ev: Index of the log events to overwrite.
+        df_events_return: Dataframe with the events return.
+        operation_vessel_percentiles_dict: Dictionary with the percentiles for each operation and vessel.
     """
 
     def open_oper_schedule(oper, operation_scheduler_dict):
@@ -198,7 +200,7 @@ def create_logs_merge(
     df_port_operation_def_log, df_events_return = pd.DataFrame(),  pd.DataFrame()
     deferred_failures_correction, deferred_failures_correction_tow, failures_correction_tow, index_overwrite_log_ev = [], [], [], []
     oper_per_vessel, oper_dict, operation_scheduler_dict, oper_dict_tow = {}, {}, {}, {}
-
+    deferred_vessel_percentiles_dict, tow_vessel_percentiles_dict = {}, {}
 
     # ALL OTHER LOG
     #------------------
@@ -272,7 +274,7 @@ def create_logs_merge(
             df_port_operation_def_log.reset_index(drop=True, inplace=True)
             df_events_return = deepcopy(df_port_operation_def_log.drop(columns=['year_month']))
             df_port_operation_def_log = merged_deferred_aux.manage_recommissioning(df_port_operation_def_log, True)
-            df_port_operation_def_log = merged_deferred_aux.manage_chart(
+            df_port_operation_def_log, tow_vessel_percentiles_dict = merged_deferred_aux.manage_chart(
                 df = df_port_operation_def_log,
                 vessels = vessels,
                 percentile = percentile
@@ -297,7 +299,7 @@ def create_logs_merge(
     log_events_def = log_event_op[comments_failure_id.isin(deferred_failures_correction)]
 
     if not log_events_def.empty:
-        log_events_merged_def = merge_deferred_operations(
+        log_events_merged_def, deferred_vessel_percentiles_dict = merge_deferred_operations(
             log_events_def = log_events_def,
             vessels = vessels,
             time_between_devices = time_between_devices,
@@ -379,7 +381,12 @@ def create_logs_merge(
     log_events_merged = merged_deferred_aux.manage_recommissioning(log_events_merged)
     log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
 
-    return log_events_merged, index_overwrite_log_ev, df_events_return
+    operation_vessel_percentiles_dict = {
+        'tow_vessel_percentiles_dict': tow_vessel_percentiles_dict,
+        'deferred_vessel_percentiles_dict': deferred_vessel_percentiles_dict
+    }
+
+    return log_events_merged, index_overwrite_log_ev, df_events_return, operation_vessel_percentiles_dict
 
 
 if __name__ == '__main__':

@@ -2,6 +2,8 @@ class Results:
     """ Class container to contain all the results from the simulations"""
 
     def __init__(self):
+        self.dfs_failures = {}
+        self.operation_vessel_percentiles_dict = {}
         self.dfs_tot_cost_list = []
         self.dfs_tot_yearly_cost_list = []
         self.dfs_ctv_list = []

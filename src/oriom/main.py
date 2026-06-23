@@ -6,6 +6,7 @@ import warnings
 from copy import deepcopy
 import time
 from datetime import datetime
+import sys
 
 # Import oriom package
 from oriom.inputs.Configuration import ConfigRun, ProjectDirs
@@ -32,9 +33,6 @@ from oriom.domain.Techs.Power import PVPower as PVPower
 from oriom.domain.FindElementClass import Find_Element
 from oriom.domain.Techs.Technologies import TechnologyBuilder
 from oriom.domain.Layouts.Layouts_Managers import LayoutManager
-from oriom.domain.System.Farm import Farm
-from oriom.domain.System.Ports import Port
-from oriom.domain.System.Storages import Storage
 
 from oriom.core.builders.DefineOperationTechs import Define_operation
 from oriom.core.timeseries_analysis.operation_managers.operations_inspection_site_manager import inspect_site_manager
@@ -49,6 +47,8 @@ from oriom.core.statistical_analysis.power_stats import average_pwind, average_p
 from oriom.core.statistical_analysis.final_run_statistics import return_statistics_runs
 from oriom.core.results_block_manager import results_block
 from oriom import test
+
+ST_main = True
 
 print()
 test.test()
@@ -72,7 +72,7 @@ logging.basicConfig(
 
 ### ---------- INPUTS ---------- ###
 ### Parameters hard coded to define ###
-DEFAULT_CONFIG  = ConfigRun(
+DEFAULT_CONFIG = ConfigRun(
     STATISTICAL_CHART=True,
     DIFF_DISTANCE=False,
     DIFF_KM_DISTANCE=5,
@@ -82,11 +82,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="test_NO_DISC",
+    PROJECT_NAME="test_oriom",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Riccardo\ORIOM\oriom\src\oriom\tmp\test_CT_DOEA",
+    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\Project\oriom\tests\test_files\test_end_to_end",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="CT tow operation BASE_WS.xlsx",
+    FORM_NAME="form_test.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 
@@ -180,6 +180,8 @@ def run(config: ConfigRun | None = None):
     )
 
     logging.info('--------------------\tFARM\t--------------------')
+    #TODO oriom OOP
+    """     
     farm = Farm(
         inputs = inputs,
         farm_tech = farm_technologies,
@@ -190,7 +192,7 @@ def run(config: ConfigRun | None = None):
         id_= 'port_id',
         name = 'My_Port',
         location = {'lat': inputs.tseries.site_lat["value"], 'lon': inputs.tseries.site_lon["value"]} 
-    )
+    ) """
 
     logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')
     # Build or reuse Metocean in one call
@@ -574,8 +576,19 @@ def run(config: ConfigRun | None = None):
 
     logging.info('--------------------\tEND OF THE SIMULATION\t--------------------')
 
-    return dirs
-
+    if ST_main:
+        from oriom.export.st_package import export_st_package
+        export_st_package(
+            package_dir=r"C:\Users\RiccardoMeda\temp",
+            Config=Config,
+            operations_stats = {
+                'operations_tow_stats': operations_tow_stats,
+                'operations_corrective_stats': operations_corrective_stats,
+                'inspections_port_stats': inspections_port_stats,
+                'inspections_site_stats': inspections_site_stats,
+            },
+            overwrite = True
+        )
 
 if __name__ == "__main__":
     run()

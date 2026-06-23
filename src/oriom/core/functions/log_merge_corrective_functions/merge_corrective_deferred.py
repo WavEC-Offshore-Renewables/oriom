@@ -22,7 +22,8 @@ def merge_deferred_operations(
         COLS: list,
         find_element_class: object,
         duration_shift: float
-):
+) -> tuple[pd.DataFrame, dict]:
+
     """
     This function merge the deferred operations similarly as inspection at site are conducted.
     Merge only same deferred operations together, and consider the fact that more operations can be done consecutevely or
@@ -348,13 +349,13 @@ def merge_deferred_operations(
                 operation_number_analysed += 1
 
     # Add the statistical chart date for the merged deferred operations
-    row_merged_def = merged_deferred_aux.create_stat_chart_campaign_operation(
+    row_merged_def, vessel_month_percentiles_dict = merged_deferred_aux.create_stat_chart_campaign_operation(
         df = row_merged_def,
         vessels = vessels,
         percentile = percentile
     )
 
-    return row_merged_def
+    return row_merged_def, vessel_month_percentiles_dict
 
 
 if __name__ == '__main__':
