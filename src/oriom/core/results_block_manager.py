@@ -79,7 +79,7 @@ def results_block(
         """
 
     dates_failures_OLD = pd.DataFrame ()
-
+    operation_vessel_percentiles_dict = {}
     try:
         failure_dir = os.path.join(inputs.general.failureevent_file["value"], f"{'result_'}{r}", 'dates_failures.csv')
         dates_failures = pd.read_csv(failure_dir, sep=',')
@@ -106,9 +106,8 @@ def results_block(
             dates_failures_OLD = dates_failures_OLD,
         )
 
-        results_dict.dfs_failures[r] = dates_failures
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
-
+    results_dict.dfs_failures[r] = dates_failures
 
     # Creating logs directly in the main.py file
     logging.info('--------------------\tLog events and kpis\t----------------')

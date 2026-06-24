@@ -86,7 +86,7 @@ class TestCreateStatChartCampaignOperation(unittest.TestCase):
             columns=["d_trigger", "d_end_leadtime", "d_end", "event", "vessel_1", "d_end_stat_chart"],
         )
 
-        result = merged_deferred_aux.create_stat_chart_campaign_operation(
+        result, _ = merged_deferred_aux.create_stat_chart_campaign_operation(
             df=df.copy(), vessels=[v1, v2], percentile=0.9
         )
 
@@ -124,7 +124,7 @@ class TestCreateStatChartCampaignOperation(unittest.TestCase):
         )
 
         # Using percentile=90 should behave like 0.9 in this simple 1-row case
-        result = merged_deferred_aux.create_stat_chart_campaign_operation(
+        result, _ = merged_deferred_aux.create_stat_chart_campaign_operation(
             df=df.copy(), vessels=[v1], percentile=90
         )
 
@@ -431,7 +431,7 @@ class TestManageChart(unittest.TestCase):
         # Patch create_stat_chart_campaign_operation to just pass through
         with patch(
             "oriom.core.functions.log_merge_corrective_functions.merged_deferred_aux.create_stat_chart_campaign_operation",
-            side_effect=lambda df, vessels, percentile: df,
+            side_effect=lambda df, vessels, percentile: (df, {}),
         ) as mock_stat_chart:
 
             result, _ = merged_deferred_aux.manage_chart(df.copy(), vessels=[v1], percentile=0.9)

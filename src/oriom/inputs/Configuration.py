@@ -210,7 +210,7 @@ class ProjectDirs:
     def create(
             cls,
             project_name: str = "My_project",
-            tar: datetime = ''
+            time_prefix: datetime = ''
         ) -> "ProjectDirs":
 
         """Create all the directories needed for saving results."""

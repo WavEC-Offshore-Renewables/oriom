@@ -590,5 +590,7 @@ def run(config: ConfigRun | None = None):
             overwrite = True
         )
 
+    return dirs
+
 if __name__ == "__main__":
     run()

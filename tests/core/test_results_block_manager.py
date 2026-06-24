@@ -21,6 +21,7 @@ class DummyResults:
             "availability_year_wave": [],
             "availability_year_pv": [],
         }
+        self.dfs_failures = {}
         self.dfs_ctv_list = []
         self.dfs_tot_cost_list = []
         self.dfs_tot_yearly_cost_list = []
@@ -206,6 +207,7 @@ class TestResultsBlock(unittest.TestCase):
             merged_after_create,
             [0, 1],
             deferred_log_df,
+            {}
         )
 
         vessel_day_counter_instance = DummyVesselDayCounter(

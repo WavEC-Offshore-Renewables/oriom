@@ -98,7 +98,7 @@ class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
-        side_effect=lambda df, vessels, percentile: df,
+        side_effect=lambda df, vessels, percentile: (df, {}),
     )
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
@@ -246,7 +246,7 @@ class TestMergeDeferredOperationsMultipleOps(unittest.TestCase):
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
-        side_effect=lambda df, vessels, percentile: df,
+        side_effect=lambda df, vessels, percentile: (df, {}),
     )
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
@@ -402,7 +402,7 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
-        side_effect=lambda df, vessels, percentile: df,
+        side_effect=lambda df, vessels, percentile: (df, {}),
     )
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
