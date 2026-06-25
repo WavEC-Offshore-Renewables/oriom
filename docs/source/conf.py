@@ -37,6 +37,7 @@ extensions = [
     # 'sphinx.ext.doctest'
 ]
 
+napoleon_use_ivar = True
 add_module_names = False                 # Show short names without module prefixes
 modindex_common_prefix = ["oriom."]  # Trim common module prefix in modindex
 autosummary_generate = True              # Auto-generate summary stub pages
