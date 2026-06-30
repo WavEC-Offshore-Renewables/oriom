@@ -183,11 +183,11 @@ The installation process is modeled as follows:
     
     -    **Wake energy losses**:
 
-            This parameter should point to the csv file that define wake energy losses. Wind speed must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1. If not defined, no wake losses will be considered.
+            This parameter should point to the csv file that define wake energy losses. Wind speed must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1 and must define the amount of percentage of loss. If not defined, no wake losses will be considered.
 
     -    **Electric energy losses**:
 
-            This parameter should point to the csv file that define electric energy losses. Power production must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1. If not defined, no electric losses will be considered.
+            This parameter should point to the csv file that define electric energy losses. Power production must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1 and must define the amount of percentage of loss. If not defined, no electric losses will be considered.
 
 
 ## SA_inputs
@@ -213,6 +213,14 @@ The installation process is modeled as follows:
             .
 
     - The case on which a nÂº of pv module fail in the same string and cause a string shutdown is not considered in the energy availability. Anyway if it happens it is seen in the logging file. There it say how many time it happen in the lifetime of the farm
+
+## LAYOUT
+
+Create documentation to check which layout are availables
+
+- **Layout_string_disconnection**:
+Does not allow for electrical continuity on the array if a device is TOWED. If set to True, a tow device do disconnect all the consecutive devices.
+
 
 ## VESSEL
 
@@ -435,20 +443,21 @@ Check the layout level of nodes and edges to know which failures and at which le
 
         Example "RECOMMISSION ACTIVITY" in last TTS additional operation:
 
-        id	OWT_MJ2_8
-        op_type	CorrectiveMajor
-        op	ofw_MJ2
-        name	Recommissioning
-        location	port
+        DESCR             VALUES
+        id	            OWT_MJ2_8
+        op_type	        CorrectiveMajor
+        op	            ofw_MJ2
+        name	            Recommissioning
+        location	        port
         wtg_shutdown_dur	TRUE
-        duration	24
-        hs	3
+        duration	        24
+        hs	            3
 
 - Combination available for TTP 
 
     To use recommissioning or string disconnection it must be present an additional operation
 
-    additional_operation = A, string_disconnection = B,  Layout_string_disconnection = C, Recommissioning = D
+    additional_operation = A, string_disconnection = B,  Layout_string_disconnection = C (if a device TOWED no electrical continuity), Recommissioning = D
     
     
            A      B      C      D
@@ -489,7 +498,9 @@ Check the layout level of nodes and edges to know which failures and at which le
 - The tech_shutdown_dur (wtg_shutdown_dur	wec_shutdown_dur	pv_shutdown_dur) must be a boolean
 
 
-- If towing operation with redeply_removal_tow and the activity must define transit to one device and another in name must be contained "transit" and "next" i.e. ACT1 name: "Transit to next device"
+- If towing operation with redeploy_removal_tow and the activity must define transit to one device and another in name must be contained "transit" and "next" i.e. ACT1 name: "Transit to next device"
+
+- Avoid to add port activities at the end of the activities if they are not recommissioning.
 
 ## KPIs OUTPUT Overview
 
