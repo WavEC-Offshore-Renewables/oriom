@@ -137,6 +137,15 @@ The installation process is modeled as follows:
 
 
 - **Use previous run directory**: Insert the path of the previous directory to reuse
+    
+    If reuse a old simulation, remove from the reuse folder the file to integrate eventuale changes in the files:
+
+        inputs_gen
+        inputs_stats
+        inputs_tseries
+        inputs_cost
+        wtg
+        timeseries
 
 - **Use previous TimeSeries Analysis**: Clarify if reuse the past timeseries analysis (T/F)
 

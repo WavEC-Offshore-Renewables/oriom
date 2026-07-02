@@ -125,15 +125,15 @@ class TestDefineOperationValues(unittest.TestCase):
             out_dir=None,
         )
 
-        exp_dur_total = ([11, 10, 9, 9, 9] + [16, 15, 14, 13, 12] + [14, 13, 12, 11, 10] + [9] * 27)
+        exp_dur_total = ([24, 23, 22, 21, 20] + [19, 18, 17, 16, 15] + [14, 13, 12, 11, 10] + [9] * 17 + [np.nan] * 10)
 
-        exp_dur_net_port = [2] * 42
-        exp_dur_net_site = [5] * 42
-        exp_wait_start = [2, 1, 0, 0, 0] + [0] * 5 + [5, 4, 3, 2, 1] + [0] * 27
-        exp_wait_site = [0] * 5 + [7, 6, 5, 4, 3] + [0] * 32
-        exp_tr_site, exp_tr_port = ([1] * 42, [1] * 42)
-        exp_shut_wtg = [3] * 42
-        exp_wait_port, exp_shut_wec, exp_shut_pv = ([0] * 42, [0] * 42, [0] * 42)
+        exp_dur_net_port = ([2] * 32 + [np.nan] * 10)
+        exp_dur_net_site = ([5] * 32 + [np.nan] * 10)
+        exp_wait_start = ([15,14,13,12,11] + [10, 9, 8, 7, 6] + [5, 4, 3, 2, 1] + [0] * 17 + [np.nan] * 10)
+        exp_wait_site = ([0] * 32 + [np.nan] * 10)
+        exp_tr_site, exp_tr_port = ([1] * 32 + [np.nan] * 10, [1] * 32 + [np.nan] * 10)
+        exp_shut_wtg = ([3] * 32 + [np.nan] * 10)
+        exp_wait_port, exp_shut_wec, exp_shut_pv = ([0] * 32 + [np.nan] * 10, [0] * 32 + [np.nan] * 10, [0] * 32 + [np.nan] * 10)
 
         def assert_col(col, expected):
             pd.testing.assert_series_equal(
@@ -162,23 +162,35 @@ class TestDefineOperationValues(unittest.TestCase):
         # 2) base_no_wait consistency
         base_no_wait = 9.0  # 2 + 1 + 5 + 1
         net_no_wait = (
-            df.loc[:41, "dur_net_port"]
-            + df.loc[:41, "transit_to_site"]
-            + df.loc[:41, "dur_net_site"]
-            + df.loc[:41, "transit_to_port"]
+            df.loc[:31, "dur_net_port"]
+            + df.loc[:31, "transit_to_site"]
+            + df.loc[:31, "dur_net_site"]
+            + df.loc[:31, "transit_to_port"]
+        )
+        net_no_wait_2 = (
+            df.loc[32:42, "dur_net_port"]
+            + df.loc[32:42, "transit_to_site"]
+            + df.loc[32:42, "dur_net_site"]
+            + df.loc[32:42, "transit_to_port"]
         )
         self.assertTrue((abs(net_no_wait - base_no_wait) < 1e-9).all())
+        self.assertTrue(net_no_wait_2.isna().all().all())
 
-        lhs = df.loc[:41, "dur_total"]
-        rhs = base_no_wait + df.loc[:41, "wait_start"] + df.loc[:41, "wait_site"]
+        lhs = df.loc[:31, "dur_total"]
+        lhs_2 = df.loc[32:42, "dur_total"]
+        rhs = base_no_wait + df.loc[:31, "wait_start"] + df.loc[:31, "wait_site"]
+        rhs_2 = base_no_wait + df.loc[32:42, "wait_start"] + df.loc[32:42, "wait_site"]
         self.assertTrue((abs(lhs - rhs) < 1e-9).all())
+        self.assertTrue(lhs_2.isna().all().all())
+        self.assertTrue(rhs_2.isna().all().all())
+
 
         # 3) rows 42..49: all NaN except 'datetime'
         self.assertTrue(df.loc[42:, df.columns.difference(["datetime"])].isna().all().all())
 
         # 4) spot checks
-        self.assertEqual(df.loc[0:2, "wait_start"].astype(int).tolist(), [2, 1, 0])
-        self.assertEqual(df.loc[5:9, "wait_site"].astype(int).tolist(), [7, 6, 5, 4, 3])
+        self.assertEqual(df.loc[0:2, "wait_start"].astype(int).tolist(), [15, 14, 13])
+        self.assertEqual(df.loc[5:9, "wait_site"].astype(int).tolist(), [0, 0, 0, 0, 0])
         self.assertEqual(df.loc[10:14, "wait_start"].astype(int).tolist(), [5, 4, 3, 2, 1])
 
     # ---------- Impossible scenario: raise InterruptedError ----------
