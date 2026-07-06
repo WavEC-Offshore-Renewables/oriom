@@ -292,6 +292,15 @@ def run(config: ConfigRun | None = None):
     logging.info('---------------------------------------------------------------')
     logging.info('--------------------\tSTATISTICAL ANALYSIS\t----------------')
     logging.info('---------------------------------------------------------------')
+
+    statistical_duration_manager(
+        operation_dir = dirs.operation_dir,
+        total_operations = operations['total_operations'],
+        inputs_stats = inputs.stats
+    )
+
+    logging.info('--------------------\tOperations statistics\t----------------')
+    
     operations_stats, find_element = aux_operation_stats_builder(
         inputs = inputs,
         dirs = dirs,
