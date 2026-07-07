@@ -40,6 +40,7 @@ ATTRIBUTE_LIST_REUSE_MINOR = [
     'vessel1_id', 'vessel2_id', 'shutdown', 'technology', 'rov'
 ]
 power_conversion = {'_w': 1 / 1000, '_kw': 1.0, '_mw': 1000}
+
 UNIT_CONVERSION = {
     'wind_speed': {
         '_m/s': 1.0,
@@ -50,3 +51,5 @@ UNIT_CONVERSION = {
     'p_wind': power_conversion,
     'p_wave': power_conversion
 }
+
+TECH_TYPES = ['wtg', 'wec', 'pv']

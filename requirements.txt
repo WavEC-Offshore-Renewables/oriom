@@ -1,5 +1,6 @@
 astral==2.2
 cppy>=1.1.0
+geopy>=2.4.1
 kiwisolver==1.4.5
 matplotlib==3.6.0
 netCDF4==1.6.2
