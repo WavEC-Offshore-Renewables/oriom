@@ -32,6 +32,8 @@ class WindTurbineGenerator():
         wtg_layout (:obj:`int`): Type layout. Defaults to ``1``.
         tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
+        spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``1.650`` km.
+        
 
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
@@ -72,6 +74,7 @@ class WindTurbineGenerator():
             n_device_stored_at_port: int=None,
             tow_string_shutdown: bool = None,
             wtg_layout: int=1,
+            spacing: float=1.650,
             out_dir: str=None
     ):
         """Initializes :class:`WindTurbineGenerator` class.
@@ -94,6 +97,8 @@ class WindTurbineGenerator():
             n_device_stored_at_port (:obj:`int`): Number of device that can be stored when not in maintenance. Defaults to ``None``
             tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
+            spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``1.650`` km.
+            
         """
         if number_devices != 0 and number_devices is not None:
             self.number_devices = int(number_devices)
@@ -156,6 +161,10 @@ class WindTurbineGenerator():
           self.pcurve_file = str(pcurve_file)
         if tow_string_shutdown is not None:
             self.tow_string_shutdown = tow_string_shutdown
+        if spacing is not None:
+            self.spacing = float(spacing)
+        else:
+            self.spacing = 1.650
 
         self._check_attributes()
 
@@ -191,6 +200,8 @@ class WindTurbineGenerator():
             raise ValueError('"pcurve_file" must be a .csv file')
         if self.tow_string_shutdown is not None and not isinstance(self.tow_string_shutdown, bool):
             raise ValueError('"tow_string_shutdown" must be a boolean')
+        if self.spacing <= 0:
+            raise ValueError('"spacing" must be greater than 0')
 
         try:
             pd.read_csv(self.pcurve_file, sep=',')
@@ -245,6 +256,7 @@ class WindTurbineGenerator():
         n_device_stored_at_port = None
         wtg_layout = None
         tow_string_shutdown = None
+        spacing = None
 
         # Read YAML file
         f_yaml = open(os.path.join(file_path), 'r')
@@ -412,6 +424,14 @@ class WindTurbineGenerator():
             if 'tow' in key and 'string':
                 if tow_string_shutdown is None:
                     tow_string_shutdown = value
+            if 'spacing' in key:
+                if spacing is None:
+                    spacing = value
+                else:
+                    _e = '"spacing" already defined.'
+                    _e += 'Check if any of the other inputs have the words "spacing"'
+                    logging.error('WindTurbineGenerator: ' +_e)
+                    raise FileNotFoundError(_e)
 
         wtg_inputs = WindTurbineGenerator(
                 number_devices=number_devices,
@@ -428,6 +448,7 @@ class WindTurbineGenerator():
                 n_device_at_port=n_device_at_port,
                 n_device_stored_at_port=n_device_stored_at_port,
                 tow_string_shutdown = tow_string_shutdown,
+                spacing = spacing,
                 wtg_layout=wtg_layout,
                 out_dir=out_dir
         )
@@ -464,7 +485,8 @@ class WindTurbineGenerator():
                 "wtg number of n device at port": {"value": self.n_device_at_port, "units": "-"},
                 "wtg number of n device stored at port": {"value": self.n_device_stored_at_port, "units": "-"},
                 "wtg tow string shutdown": {"value": self.tow_string_shutdown, "units": "-"},
-                "wtg type of layout": {"value": self.wtg_layout, "units": "-"}
+                "wtg type of layout": {"value": self.wtg_layout, "units": "-"},
+                "wtg spacing": {"value": self.spacing, "units": "km"}
         }, f)
         f.close()
 
@@ -491,7 +513,8 @@ class WindTurbineGenerator():
                 "n_device_at_port": wtg_yaml["wtg number of n device at port"]["value"],
                 "n_device_stored_at_port": wtg_yaml["wtg number of n device stored at port"]["value"],
                 "tow_string_shutdown": wtg_yaml["wtg tow string shutdown"]["value"],
-                "wtg_layout": wtg_yaml["wtg type of layout"]["value"]
+                "wtg_layout": wtg_yaml["wtg type of layout"]["value"],
+                "spacing": wtg_yaml["wtg spacing"]["value"]
         }
 
         for key, value in list(wtg_args.items()):

@@ -32,6 +32,7 @@ class TestPVProduction(unittest.TestCase):
         self.assertEqual(pv.number_inverters, 2)
         self.assertEqual(pv.degradation_rate, 0)
         self.assertEqual(pv.number_mv_transformers, None)
+        self.assertEqual(pv.spacing, 0.150)
 
     def test_init2(self):
         pv = PVProduction(
@@ -60,6 +61,7 @@ class TestPVProduction(unittest.TestCase):
         self.assertEqual(pv.degradation_rate, 0.05)
         self.assertIsInstance(pv.number_mv_transformers, int)
         self.assertEqual(pv.number_mv_transformers, 1)
+        self.assertEqual(pv.spacing, 0.150)
 
     def test_errors(self):
         args_def = {
@@ -99,6 +101,9 @@ class TestPVProduction(unittest.TestCase):
         args = deepcopy(args_def)
         args["pvprod_file"] = 'other_file.csv'
         self.assertRaises(FileNotFoundError, PVProduction, **args)
+        args = deepcopy(args_def)
+        args["spacing"] = -10
+        self.assertRaises(ValueError, PVProduction, **args)
 
     def test_yaml(self):
         pv = PVProduction.get_pv_from_yaml(self.yaml_file)

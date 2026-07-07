@@ -30,6 +30,9 @@ class TestWaceEnergyConverter(unittest.TestCase):
         self.assertIsInstance(wec.pmatrix_file, str)
         self.assertIsInstance(wec.number_strings, int)
         self.assertEqual(wec.number_strings, 2)
+        self.assertIsInstance(wec.wec_layout, int)
+        self.assertEqual(wec.spacing, 0.150)
+
 
     def test_conversions(self):
         wec = WaveEnergyConverter(
@@ -54,6 +57,7 @@ class TestWaceEnergyConverter(unittest.TestCase):
         self.assertEqual(wec.wec_layout, 1)
         self.assertEqual(wec.number_substations,1)
         self.assertEqual(wec.number_exportcables,1)
+        self.assertEqual(wec.spacing, 0.150)
 
     def test_errors(self):
         args_def = {
@@ -88,6 +92,10 @@ class TestWaceEnergyConverter(unittest.TestCase):
         args["pmatrix_file"] = 'other_file.csv'
         self.assertRaises(FileNotFoundError, WaveEnergyConverter, **args)
 
+        args = deepcopy(args_def)
+        args["spacing"] = -10
+        self.assertRaises(ValueError, WaveEnergyConverter, **args)
+
     def test_yaml(self):
         wec = WaveEnergyConverter.get_wec_from_yaml(self.yaml_file)
         self.assertIsInstance(wec.number_devices, int)
@@ -97,6 +105,7 @@ class TestWaceEnergyConverter(unittest.TestCase):
         self.assertIsInstance(wec.number_substations, int)
         self.assertEqual(wec.number_substations, 1)
         self.assertEqual(wec.number_exportcables, 1)
+        self.assertEqual(wec.spacing, 0.150)
 
 
 if __name__ == '__main__':

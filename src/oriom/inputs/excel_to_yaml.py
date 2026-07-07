@@ -563,6 +563,19 @@ def excel_to_yaml(
                 value = bool(value)
                 wtg["tow string shutdown"] = {"value": value, "units": None}
 
+            elif 'distances' in name:
+                value = float(value)
+                if 'm' in units:
+                    value = round(value / 1000, 2)
+                elif 'km' in units:
+                    value = round(value, 2)
+                else:
+                    _e = 'Units of "spacing" not recognized. '
+                    _e += 'Please use "m" or "km".'
+                    logging.error('ExcelToYAML.WindTurbineGenerator: ' + _e)
+                    raise NameError(_e)
+                wtg["spacing"] = {"value": value, "units": 'km'}
+
             else:
                 _w = 'ExcelToYAML.WindTurbineGenerator: input "%s" not recognized. Ignored.' % row['input']
                 logging.warning(_w)
@@ -647,6 +660,19 @@ def excel_to_yaml(
             elif 'tow' in name and 'string' in name:
                 value = bool(value)
                 wec["tow string shutdown"] = {"value": value, "units": None}
+
+            elif 'distances' in name:
+                value = float(value)
+                if 'm' in units:
+                    value = round(value / 1000, 2)
+                elif 'km' in units:
+                    value = round(value, 2)
+                else:
+                    _e = 'Units of "spacing" not recognized. '
+                    _e += 'Please use "m" or "km".'
+                    logging.error('ExcelToYAML.WaveEnergyConverter: ' + _e)
+                    raise NameError(_e)
+                wec["spacing"] = {"value": value, "units": 'km'}
 
             else:
                 _w = 'ExcelToYAML.WaveEnergyConverter: input "%s" not recognized. Ignored.' % row['input']
@@ -746,6 +772,19 @@ def excel_to_yaml(
             elif 'tow' in name and 'string' in name:
                 value = bool(value)
                 pv["tow string shutdown"] = {"value": value, "units": None}
+
+            elif 'distances' in name:
+                value = float(value)
+                if 'm' in units:
+                    value = round(value / 1000, 2)
+                elif 'km' in units:
+                    value = round(value, 2)
+                else:
+                    _e = 'Units of "spacing" not recognized. '
+                    _e += 'Please use "m" or "km".'
+                    logging.error('ExcelToYAML.PVProduction: ' + _e)
+                    raise NameError(_e)
+                pv["spacing"] = {"value": value, "units": 'km'}
 
             else:
                 _w = 'ExcelToYAML.PVProduction: input "%s" not recognized. Ignored.' % row['input']

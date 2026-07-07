@@ -32,6 +32,8 @@ class PVProduction():
                 Defaults to ``None``
         pv_layout (:obj:`int`): Type layout. Defaults to ``1``.
         max_failure_module (:obj:`int`): Max failure module on a string that can occure. Defaults to ``0``.
+        spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``0.150`` km.
+
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
 
@@ -71,6 +73,7 @@ class PVProduction():
             tow_string_shutdown: bool = None,
             pv_layout: int=1,
             degradation_rate: float=None,
+            spacing: float=0.150,
             out_dir: str=None
     ):
         """Initializes :class:`PVProduction` class.
@@ -94,6 +97,7 @@ class PVProduction():
                 maintenance. Defaults to ``None``
             tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
+            spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``0.150`` km.
             out_dir (:obj:`str`): Directory to save the pv parameters. Defaults to `None`.
         """
         if number_devices != 0 and number_devices is not None:
@@ -158,6 +162,11 @@ class PVProduction():
         if tow_string_shutdown is not None:
             self.tow_string_shutdown = tow_string_shutdown
 
+        if spacing is not None:
+            self.spacing = float(spacing)
+        else:
+            self.spacing = 0.150
+
         self._check_attributes()
 
         self.device_power = float(device_power)
@@ -200,7 +209,8 @@ class PVProduction():
             raise ValueError('"number_mv_transformers" must be divisible by "number_substations"')
         if self.tow_string_shutdown is not None and not isinstance(self.tow_string_shutdown, bool):
             raise ValueError('"tow_string_shutdown" must be a boolean')
-
+        if self.spacing <= 0:
+            raise ValueError('"spacing" must be greater than 0')
         logging.debug('PVProduction: attributes within ranges and valid.')
 
     def get_pv_from_yaml(
@@ -237,6 +247,7 @@ class PVProduction():
         n_device_at_port = None
         n_device_stored_at_port = None
         tow_string_shutdown = None
+        spacing = None
 
         # Read YAML file
         f_yaml = open(os.path.join(file_path), 'r')
@@ -347,7 +358,7 @@ class PVProduction():
                 else:
                     _e = '"n_device_at_port" already defined.'
                     _e += 'Check if any of the other inputs have the words "device" and "port" and not "stored".'
-                    logging.error('WindTurbineGenerator: ' +_e)
+                    logging.error('PVProduction: ' +_e)
                     raise FileNotFoundError(_e)
             if 'device' in key and 'port' in key and 'stored' in key:
                 if n_device_stored_at_port is None:
@@ -355,7 +366,7 @@ class PVProduction():
                 else:
                     _e = '"n_device_stored_at_port" already defined.'
                     _e += 'Check if any of the other inputs have the words "device" and "port" and "stored".'
-                    logging.error('WindTurbineGenerator: ' +_e)
+                    logging.error('PVProduction: ' +_e)
                     raise FileNotFoundError(_e)
             if 'layout' in key:
                 if pv_layout is None:
@@ -370,6 +381,14 @@ class PVProduction():
                     _e = '"max failure module" alredy defined,'
                     _e += 'Check if any of the other inputs have the word "max failure module".'
                     max_failure_module = 10000
+            if 'spacing' in key:
+                if spacing is None:
+                    spacing = value
+                else:
+                    _e = '"spacing" already defined.'
+                    _e += 'Check if any of the other inputs have the words "spacing"'
+                    logging.error('PVProduction: ' +_e)
+                    raise FileNotFoundError(_e)
 
         pv_inputs = PVProduction(
                 number_devices=number_devices,
@@ -386,6 +405,7 @@ class PVProduction():
                 n_device_stored_at_port=n_device_stored_at_port,
                 tow_string_shutdown = tow_string_shutdown,
                 pv_layout=pv_layout,
+                spacing = spacing,
                 out_dir=out_dir,
                 max_failure_module = max_failure_module
         )
@@ -423,7 +443,8 @@ class PVProduction():
                 "pv number of n device stored at port": {"value": self.n_device_stored_at_port, "units": "-"},
                 "pv tow string shutdown": {"value": self.tow_string_shutdown, "units": "-"},
                 "pv type layout": {"value": self.pv_layout, "units": "-"},
-                "pv max failure module": {"value": self.max_failure_module, "units": "-"}
+                "pv max failure module": {"value": self.max_failure_module, "units": "-"},
+                "pv spacing": {"value": self.spacing, "units": "km"}
         }, f)
         f.close()
 
@@ -450,7 +471,8 @@ class PVProduction():
                 "n_device_stored_at_port": pv_yaml["pv number of n device stored at port"]["value"],
                 "tow_string_shutdown": pv_yaml["pv tow string shutdown"]["value"],
                 "pv_layout": pv_yaml["pv type layout"]["value"],
-                "max_failure_module": pv_yaml["pv max failure module"]["value"]
+                "max_failure_module": pv_yaml["pv max failure module"]["value"],
+                "spacing": pv_yaml["pv spacing"]["value"]
         }
         for key, value in list(pv_args.items()):
             if value is None:

@@ -46,6 +46,7 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 self.assertEqual(wtg.wtg_layout, 1)
                 self.assertEqual(wtg.number_substations, 1)
                 self.assertEqual(wtg.number_exportcables, 1)
+                self.assertEqual(wtg.spacing, 1.650)
 
         def test_conversions(self):
                 wtg = WindTurbineGenerator(
@@ -79,7 +80,7 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 self.assertEqual(wtg.wtg_layout, 1)
                 self.assertEqual(wtg.number_substations, 1)
                 self.assertEqual(wtg.number_exportcables, 1)
-
+                self.assertEqual(wtg.spacing, 1.650)
         def test_errors(self):
                 args_def = {
                         'number_devices': 10,
@@ -135,6 +136,10 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 args["number_strings"] = 3
                 self.assertRaises(ValueError, WindTurbineGenerator, **args)
 
+                args = deepcopy(args_def)
+                args["spacing"] = -10
+                self.assertRaises(ValueError, WindTurbineGenerator, **args)
+
         def test_default_values(self):
                 wtg = WindTurbineGenerator(
                         number_devices=10,
@@ -155,6 +160,7 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 self.assertEqual(wtg.number_exportcables, 1)
                 self.assertEqual(wtg.wtg_layout, 1)
                 self.assertEqual(wtg.moorings, 3)
+                self.assertEqual(wtg.spacing, 1.650)
 
         def test_yaml(self):
                 wtg = WindTurbineGenerator.get_wtg_from_yaml(self.yaml_file)
@@ -165,6 +171,7 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 self.assertIsInstance(wtg.cut_in, float)
                 self.assertEqual(wtg.hub_height, 200.0)
                 self.assertEqual(wtg.moorings, 3)
+                self.assertEqual(wtg.spacing, 1.650)
 
 if __name__ == '__main__':
         unittest.main()
