@@ -204,10 +204,11 @@ def define_operation_values(
                 ts_curr = int(time_curr)
 
                 ts_max = ts_curr
+
                 ts_min = max(int(time_curr - MAX_WAIT), metocean_ts)
                 act_startability = df_startability.iloc[ts_min:(ts_max+1), prev_act_idx].dropna()
 
-                if act_startability.sum() == 0:
+                if act_startability.sum() == 0 or (time_curr - MAX_WAIT) < 0:
                     # This activity cannot start anymore.
                     # Get out from this while loop and
                     # test most restrictive activity next possible timstep.
@@ -244,7 +245,7 @@ def define_operation_values(
 
                 act_startability = df_startability.iloc[ts_min:(ts_max+1), next_act_idx].dropna()
 
-                if act_startability.sum() == 0:
+                if act_startability.sum() == 0 or (time_curr + MAX_WAIT) >= df_startability.shape[0]:
                     # This activity cannot start anymore.
                     # Get out from this while loop and
                     # test most restrictive activity next possible timestep.

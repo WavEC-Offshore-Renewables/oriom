@@ -30,7 +30,7 @@ class Farm():
     
     """
 
-    def __init__(self, inputs: object, farm_tech: object, layouts, failures, id_ = None, name = None, ):
+    def __init__(self, inputs: object, farm_tech: object, layouts: dict, failures: list, id_ = None, name = None):
         """
         A class representing the phisical energy farm
         

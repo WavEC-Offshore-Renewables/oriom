@@ -584,7 +584,7 @@ class Metocean():
                         met.add_wind_speed_h_hub_column()
                 # Consider site metocean forcing ocean variables as considering in protected areas
                 else:
-                    met = site_metocean
+                    met = deepcopy(site_metocean)
 
                 met.df_timeseries['hs'] = 0
                 met.df_timeseries['te'] = 10

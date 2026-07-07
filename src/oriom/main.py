@@ -172,7 +172,8 @@ def run(config: ConfigRun | None = None):
     farm = Farm(
         inputs = inputs,
         farm_tech = farm_technologies,
-        layouts = G_layouts
+        layouts = G_layouts,
+        failures = failures
     )
 
     port = Port(
