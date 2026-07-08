@@ -166,7 +166,17 @@ class ConfigRun:
 
 
 class ProjectDirs:
-    """Container for all project directories."""
+    """Container for all project directories.
+    
+    Attributes:
+        project_name (str): Name of the simulation undergoing
+        tmp_dir (str): Path to the folder of the simulation undergoing
+        base_dir (str): Path to the ``input`` folder of the simulation undergoing
+        operation_dir (str): Path to the ``operations`` folder of the simulation undergoing
+        graph_dir (str): Path to the ``graph`` folder of the simulation undergoing
+        result_dir (str): Path to the ``results`` folder of the simulation undergoing
+        result_dir_avg (str): Path to the ``results averaged`` folder of the simulation undergoing
+    """
 
     def __init__(
             self,

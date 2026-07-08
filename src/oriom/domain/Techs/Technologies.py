@@ -14,7 +14,19 @@ except ImportError:
 
 class PowerTechResult:
 
-    """Bundle for power tech objects and metadata."""
+    """Bundle for power tech objects and metadata.
+
+    Attributes:
+        power_losses (object): Object of the class ``power_losses`` for Array and electrical losses.
+        wtg_number_devices (int): Number of Wind Turbines considered.
+        wtg_pcurve (object): Object of the class ``Curve`` for Wind power Curve.
+        wec_number_devices (int): Number of Wave device considered.
+        wec_pmatrix (object): Object of the class ``Matrix`` for Wave power Matrix.
+        pv_number_devices (int): Number of PV devices considered.
+        pv_farm_prod (pd.Dataframe): Dataframe of the statistical production of PV per month per hour of whole farm in kW.
+        degradation_rate (float): Degradation rate of PV efficiency per year in %.
+        pv_max_failure_module (int): Maximum number of PV that failing create a string shutdown for too low Voltage level.
+    """
 
     def __init__(
         self,
@@ -47,7 +59,14 @@ class PowerTechResult:
 
 class TechFarm:
 
-    """Bundle for technology domain objects (WTG, WEC, PV) and derived power tech."""
+    """Bundle for technology domain objects (WTG, WEC, PV) and derived power tech.
+    
+    Attributes:
+        wtg (object): Object of the class ``WindTurbineGenerator``.
+        wec (object): Object of the class ``WaveEnergyConverter``.
+        pv (object): Object of the class ``PVProduction``.
+        power (object): Object of the class ``PowerTechResult``.
+    """
 
     def __init__(self, wtg = None, wec = None, pv = None, power = None):
 

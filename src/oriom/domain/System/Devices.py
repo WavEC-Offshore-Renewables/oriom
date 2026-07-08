@@ -1,7 +1,6 @@
 import logging
 
 from oriom.common.constants import FAILURE_LEVEL_LIST
-from oriom.domain.System.Components import Component
 
 # TODO you need to take component list from technologies 
 # (define in wtg, wec, opv new attribute)
