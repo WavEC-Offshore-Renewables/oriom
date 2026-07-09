@@ -6,29 +6,22 @@ import warnings
 from copy import deepcopy
 import time
 from datetime import datetime
-import sys
 
 # Import oriom package
 from oriom.inputs.Configuration import ConfigRun, ProjectDirs
 from oriom.inputs.Input_manager import Input_Files, extract_input_from_excel, handle_overwrite_previous
-
-from oriom.utils import aux_functions
+from oriom.inputs.user_inputs import user_input_overwrite
 from oriom.utils import aux_operation
-
 from oriom.domain.Inputs.Inputs import Inputs
-from oriom.domain.Metocean import Metocean
-from oriom.domain.OperationsStat.CorrectiveStat import CorrectiveStat
-from oriom.domain.OperationsStat.InspectionPortStat import InspectionPortStat
-from oriom.domain.OperationsStat.InspectionSiteStat import InspectionSiteStat
-from oriom.domain.OperationsStat.OperationTowStat import OperationsTowStat
 from oriom.domain.Failure import Failure
 from oriom.domain.Results import Results
 from oriom.domain.Techs.Power import PVPower as PVPower
-from oriom.domain.FindElementClass import Find_Element
 from oriom.domain.Techs.Technologies import TechnologyBuilder
 from oriom.domain.Layouts.Layouts_Managers import LayoutManager
 from oriom.core.timeseries_analysis.montecarlo import f_montecarlo
-from oriom.core.builders.operation_builder import aux_operation_builder, aux_operation_stats_builder, operation_timeseries_builder
+from oriom.core.builders.operations_builder import aux_operation_builder, aux_operation_stats_builder, operation_timeseries_builder
+from oriom.core.builders.metoceans_builder import metocean_builder
+from oriom.core.builders.systems_builder import system_builder
 from oriom.core.statistical_analysis.statisticals_duration_manager import statistical_duration_manager
 from oriom.core.statistical_analysis.power_stats import average_pwind, average_pwave
 from oriom.core.statistical_analysis.final_run_statistics import return_statistics_runs
@@ -75,6 +68,8 @@ DEFAULT_CONFIG = ConfigRun(
     SOURCE_PATH_SHAREPOINT="",
     FORM_NAME="form_test.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
+    ST = False,
+    DIRS_OVERWRITE_PATH = r'C:\Users\RiccardoMeda\Project\oriom\tmp\user'
 )
 
 
@@ -84,13 +79,16 @@ DEFAULT_CONFIG = ConfigRun(
 
 def run(config: ConfigRun | None = None):
     """Run a full simulation and return the created ProjectDirs."""
-
     Config = config or DEFAULT_CONFIG
 
     time_prefix = datetime.now().strftime("_[%Y%m%d_%H%M%S]")
 
     # Temporary directory
-    dirs = ProjectDirs.create(project_name = Config.PROJECT_NAME, time_prefix = time_prefix)
+    dirs = ProjectDirs.create(
+        project_name = Config.PROJECT_NAME,
+        time_prefix = time_prefix,
+        data_overwrite_user_path = Config.DIRS_OVERWRITE_PATH
+    )
 
     ### ---------- CONVERT EXCEL FORM TO YAML BASE FILES ---------- ###
     extract_input_from_excel(
@@ -166,65 +164,11 @@ def run(config: ConfigRun | None = None):
         graph_dir=dirs.graph_dir,
     )
 
-    logging.info('--------------------\tFARM\t--------------------')
-    #TODO oriom OOP
-    """     
-    farm = Farm(
-        inputs = inputs,
-        farm_tech = farm_technologies,
-        layouts = G_layouts,
-        failures = failures
-    )
-
-    port = Port(
-        id_= 'port_id',
-        name = 'My_Port',
-        location = {'lat': inputs.tseries.site_lat["value"], 'lon': inputs.tseries.site_lon["value"]}
-    )
-
-    storage = Storage(
-        id_ = 'storage_id',
-        max_space = 5
-    )
-    
-    """
-
-    logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')
-    # Build or reuse Metocean in one call
-    metocean, _ = Metocean.from_run_dir(
-        run_dir=dirs.run_dir,
-        tseries_inputs=inputs.tseries,
-        power_farm=farm_technologies.power,
-        wtg=farm_technologies.wtg,
-        z0=inputs.tseries.surface_roughness["value"],
-        stat_inputs=inputs.stats,
-    )
-    
-    metocean_port, _ = Metocean.from_run_dir(
-        run_dir=dirs.run_dir,
-        tseries_inputs=inputs.tseries,
-        stat_inputs=inputs.stats,
-        port_metocean = True,
-        site_metocean = metocean
-    )
-
-    # Build Metocean tow in one call
-    metocean_tow, metocean_tow_distance = Metocean.from_run_dir(
-        run_dir=dirs.run_dir,
-        tseries_inputs=inputs.tseries,
-        stat_inputs=inputs.stats,
-        tow_metocean = True
-    )
-
-    # Attach power columns and get power-only view
-    metocean = Metocean.attach_power_columns(metocean = metocean, power_farm = farm_technologies.power, out_dir=dirs.run_dir)
-
 
     logging.info('--------------------\FAILURES\t--------------------')
     # Define failure events
-    failures = Failure.get_failures_from_yaml(
-            file_path = files.failures_file
-    )
+    failures = Failure.get_failures_from_yaml(file_path = files.failures_file)
+
     # Variate failure rate for sensitivity analysis
     for failure in failures:
         if getattr(failure, "fail_variation", False):
@@ -233,6 +177,17 @@ def run(config: ConfigRun | None = None):
 
     # Check if all the levels defined are associated to a component in the graph
     aux_operation.level_component_check(Gs = G_layouts, operations = failures, failure = True)
+
+
+    logging.info('--------------------\tSYSTEM\t--------------------')
+    #TODO oriom OOP
+    # farm, port, storage = system_builder(
+    #     inputs = inputs,
+    #     farm_technologies = farm_technologies,
+    #     G_layouts = G_layouts,
+    #     failures = failures
+    # )
+
 
     logging.info('--------------------\tINPUTS - OPERATIONS\t--------------------')
     operations = aux_operation_builder(
@@ -247,26 +202,43 @@ def run(config: ConfigRun | None = None):
 
     # Create list of vessels and mother_vessels
     vessels = list(operations['vessels'].values())
+
+    logging.info('--------------------\tINPUTS - USER DEFINITION\t--------------------')
+    if Config.DIRS_OVERWRITE_PATH:
+        failures, operations, vessels = user_input_overwrite.run_overwrite(
+            inputs=inputs, 
+            dirs=dirs, 
+            failures=failures, 
+            operations=operations,
+            vessels = vessels,
+            files_paths = dirs.overwrite_files_path,
+            ST = Config.ST
+        )
+
     mother_vessels = [v for v in vessels if v.mother_vessel]
 
+    logging.info('--------------------\tINPUTS - METOCEAN\t--------------------')    
+    metocean_dict = metocean_builder(        
+        dirs=dirs,
+        inputs=inputs,
+        farm_technologies=farm_technologies,
+    )
 
     logging.info('--------------------\tDERIVED INPUTS\t--------------------')
     # Statistical analysis of the power fro wtg and wec
     dict_power_wind = average_pwind(
-            timeseries_with_power=deepcopy(metocean.df_timeseries),
+            timeseries_with_power=deepcopy(metocean_dict['metocean'].df_timeseries),
             out_dir=os.path.join(os.getcwd(), dirs.run_dir)
     )
 
     dict_power_wave = average_pwave(
-            timeseries_with_power=deepcopy(metocean.df_timeseries),
+            timeseries_with_power=deepcopy(metocean_dict['metocean'].df_timeseries),
             out_dir=os.path.join(os.getcwd(), dirs.run_dir)
     )
 
-
-
     # Generate random timesteps to be analysed
     timesteps, _ = f_montecarlo(
-            data_panda=metocean.df_timeseries,
+            data_panda=metocean_dict['metocean'].df_timeseries,
             ts_percent_dec=inputs.tseries.montecarlo_percent["value"]
     )
 
@@ -280,10 +252,10 @@ def run(config: ConfigRun | None = None):
         inputs = inputs,
         dirs = dirs,
         operations = operations,
-        metocean = metocean,
-        metocean_port = metocean_port,
-        metocean_tow = metocean_tow,
-        metocean_tow_distance = metocean_tow_distance,
+        metocean = metocean_dict['metocean'],
+        metocean_port = metocean_dict['metocean_port'],
+        metocean_tow = metocean_dict['metocean_tow'],
+        metocean_tow_distance = metocean_dict['metocean_tow_distance'],
         timesteps = timesteps,
         Config = Config,
     )
@@ -343,7 +315,7 @@ def run(config: ConfigRun | None = None):
             G_layouts = G_layouts,
             dict_power_wind = dict_power_wind,
             dict_power_wave = dict_power_wave,
-            metocean_timeseries = metocean.df_timeseries
+            metocean_timeseries = metocean_dict['metocean'].df_timeseries
         )
 
         end = time.time()

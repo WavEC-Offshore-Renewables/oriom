@@ -32,27 +32,31 @@ class ConfigRun:
         FORM_NAME (str): Name of the excel input file to read. Default to None.,
         TIME_FAIL_OP_IMMEDIATELY(float): Reaction time of operation in consequence of failure.
             Default to 0.02.
+        ST (bool): Boolean that will manage switching to ST O&M. Default to ``False``
+        DIRS_OVERWRITE_PATH (str): Path were to find the overwrite file YAML. Default to ````
     """
 
     def __init__(
         self,
         # --- General ---
-        STATISTICAL_CHART=True,
-        DIFF_DISTANCE=False,
-        DIFF_KM_DISTANCE=30,
-        KM_MOTHER_VESSEL=5,
-        VESSEL_DIST_REDUCED_LIST=[],
-        FUEL_TO_ADD={},
-        MOBILISATION_TO_ADD={},
-        ENERGY_AVAILABILITY_CALCULATION=True,
-        ENERGY_STATISTICAL_CALCULATION=True,
-        SPECIAL_VARIABLE = {},
-        PROJECT_NAME=None,
-        BASEFILES_FROM_EXCEL=False,
-        EXCEL_FILE_PATH=None,
-        SOURCE_PATH_SHAREPOINT=None,
-        FORM_NAME=None,
-        TIME_FAIL_OP_IMMEDIATELY=0.02,
+        STATISTICAL_CHART: bool = True,
+        DIFF_DISTANCE: bool = False,
+        DIFF_KM_DISTANCE: float = 30,
+        KM_MOTHER_VESSEL: float = 5,
+        VESSEL_DIST_REDUCED_LIST: list = [],
+        FUEL_TO_ADD: dict = {},
+        MOBILISATION_TO_ADD: dict = {},
+        ENERGY_AVAILABILITY_CALCULATION: bool = True,
+        ENERGY_STATISTICAL_CALCULATION: bool = True,
+        SPECIAL_VARIABLE: dict = {},
+        PROJECT_NAME: str = None,
+        BASEFILES_FROM_EXCEL: bool = False,
+        EXCEL_FILE_PATH: str = None,
+        SOURCE_PATH_SHAREPOINT: str = None,
+        FORM_NAME: str = None,
+        TIME_FAIL_OP_IMMEDIATELY: float = 0.02,
+        ST: bool = False,
+        DIRS_OVERWRITE_PATH = ''
     ):
 
         # General
@@ -66,6 +70,7 @@ class ConfigRun:
         self.ENERGY_AVAILABILITY_CALCULATION = ENERGY_AVAILABILITY_CALCULATION
         self.ENERGY_STATISTICAL_CALCULATION = ENERGY_STATISTICAL_CALCULATION
         self.SPECIAL_VARIABLE = SPECIAL_VARIABLE
+        self.ST = ST
 
         # Project
         self.PROJECT_NAME = PROJECT_NAME
@@ -73,6 +78,7 @@ class ConfigRun:
         self.EXCEL_FILE_PATH = EXCEL_FILE_PATH
         self.SOURCE_PATH_SHAREPOINT = SOURCE_PATH_SHAREPOINT
         self.FORM_NAME = FORM_NAME
+        self.DIRS_OVERWRITE_PATH = DIRS_OVERWRITE_PATH
 
         # Simulation
         self.TIME_FAIL_OP_IMMEDIATELY = TIME_FAIL_OP_IMMEDIATELY
@@ -176,12 +182,15 @@ class ProjectDirs:
         graph_dir (str): Path to the ``graph`` folder of the simulation undergoing
         result_dir (str): Path to the ``results`` folder of the simulation undergoing
         result_dir_avg (str): Path to the ``results averaged`` folder of the simulation undergoing
+        data_overwrite_user_path (str): Path to the ``user overwrite data`` folder of the simulation undergoing
+        overwrite_files_path (dict): Dictionary with all the files selected by the users to overwrite
     """
 
     def __init__(
             self,
             project_name: str,
-            time_prefix: datetime = ''
+            time_prefix: datetime = '',
+            data_overwrite_user_path: str = ''
         ):
 
         self.project_name = project_name
@@ -197,6 +206,7 @@ class ProjectDirs:
         self.result_dir = os.path.join(self.run_dir, 'result_dir')
         self.result_dir_avg = os.path.join(self.run_dir, 'result_dir_avg')
         self.base_dir = os.path.join(self.run_dir, 'base_files')
+        self.data_overwrite_user_path = data_overwrite_user_path
 
         # creation of folders
         for d in [
@@ -209,6 +219,19 @@ class ProjectDirs:
         ]:
             os.makedirs(d, exist_ok=True)
 
+        if self.data_overwrite_user_path:
+            self.overwrite_files_path = {
+                'failure_path': os.path.join(self.data_overwrite_user_path, 'failures_user.yaml'),
+                'operations_path': {
+                    'operations_tow': os.path.join(self.data_overwrite_user_path, 'operations_corrective_tow_user.yaml'),
+                    'operations_corr_major': os.path.join(self.data_overwrite_user_path, 'operations_corrective_major_user.yaml'),
+                    'operations_minor': os.path.join(self.data_overwrite_user_path, 'operations_corrective_minor_user.yaml'),
+                    'operations_inspect_site': os.path.join(self.data_overwrite_user_path, 'operations_inspect_site_user.yaml'),
+                    'operations_inspect_port': os.path.join(self.data_overwrite_user_path, 'operations_inspect_port_user.yaml'),
+                },
+                'vessels_path': os.path.join(self.data_overwrite_user_path, 'vessels_user.yaml'),
+            }
+
     def __repr__(self):
         return (
             f"ProjectDirs(project_name={self.project_name!r}, "
@@ -220,9 +243,10 @@ class ProjectDirs:
     def create(
             cls,
             project_name: str = "My_project",
-            time_prefix: datetime = ''
+            time_prefix: datetime = '',
+            data_overwrite_user_path: str = ''
         ) -> "ProjectDirs":
 
         """Create all the directories needed for saving results."""
 
-        return cls(project_name, time_prefix)
+        return cls(project_name, time_prefix, data_overwrite_user_path)
