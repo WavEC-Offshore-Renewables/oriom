@@ -18,6 +18,9 @@ class Failure():
             - opv: Offshore PhotoVoltaic
             - oce: Offshore Common Events
 
+    Example:
+        >>> ofw_fail_001
+
         Individual failures can follow a bath tub trend.
 
     Attributes:
@@ -360,6 +363,8 @@ class Failure():
         logging.info('Failure: failures defined based on file "%s"' % file_path)
         return failures_list
 
+    def __str__(self):
+        return 'Failure'
 
 if __name__ == '__main__':
     file_path = os.path.join(os.getcwd(), 'tests', 'test_files', 'inputs', 'failures.yaml')

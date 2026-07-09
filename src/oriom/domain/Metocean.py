@@ -4,7 +4,6 @@ import numpy as np
 from astral import LocationInfo
 from astral.sun import sun
 import datetime
-from datetime import timedelta
 from copy import deepcopy
 from tqdm import tqdm
 import os
@@ -13,6 +12,7 @@ from ruamel.yaml import YAML
 
 from oriom.utils import aux_functions
 from oriom.core.timeseries_analysis.timestep_power import add_power_columns
+from oriom.common.constants import METOCEAN_COLUMNS
 
 try:
     from oriom.core.functions.private.check_files import check_file_exists
@@ -90,9 +90,8 @@ class Metocean():
             self.generateTe()
 
             if out_dir is not None:
-                self.df_timeseries.to_csv(out_dir+'.csv')
-                _i = 'TimeSeries file was sucessfully save at: '
-                _i += f'{out_dir}.csv'
+                aux_functions.save_file_csv(df_to_save = self.df_timeseries, save_dir = out_dir+'.csv', indexing = True)
+                _i = f'TimeSeries file was sucessfully save at: _i += {out_dir}.csv'
                 logging.info('Metocean: ' + _i)
 
     def _check_attributes(self):
@@ -125,15 +124,11 @@ class Metocean():
             logging.error('Metocean: file "%s" could not be found.' % self.file)
             raise FileNotFoundError('Metocean file could not be found.')
 
-        # Default columns
-        cols_default = ['datetime', 'hs', 'tp', 'te', 'ws', 'ws_hub', 'cs', 'si', 'light']
-
         # Check columns names
         df_timeseries.columns = df_timeseries.columns.str.lower()
         for col_name in df_timeseries.columns.to_list():
-            if col_name not in cols_default:
-                _e = '"%s" is not aceptable as a column name. ' % col_name
-                _e += 'Please use only "datetime", "hs", "tp", "te", "ws", "ws_hub", "cs", "si" and "light".'
+            if col_name not in METOCEAN_COLUMNS:
+                _e = f'{col_name} is not aceptable as a column name. Please use only {METOCEAN_COLUMNS}'
                 logging.error(_e)
                 raise ValueError(_e)
 
@@ -141,8 +136,8 @@ class Metocean():
         df_timeseries = aux_functions.convert_stringtime(df_timeseries)
 
         # Arrange columns
-        cols_final = deepcopy(cols_default)
-        for var in cols_default:
+        cols_final = deepcopy(METOCEAN_COLUMNS)
+        for var in METOCEAN_COLUMNS:
             if var not in df_timeseries.columns.to_list():
                 cols_final.remove(var)
         df_timeseries = df_timeseries[cols_final]
@@ -167,7 +162,7 @@ class Metocean():
             logging.error('Metocean: timeseries has some inconsitency with timesteps')
             raise ValueError('There is some inconsitency in timesteps')
 
-        if df_metocean_diff.mean() < timedelta(hours=1):
+        if df_metocean_diff.mean() < datetime.timedelta(hours=1):
             logging.error('Metocean: timeseries timestep is lower than 1 hour')
             raise ValueError('Metocean timestep is lower than 1 hour')
 
@@ -227,7 +222,7 @@ class Metocean():
 
         # Save new timeseries as a CSV
         if out_dir is not None:
-            self.df_timeseries.to_csv(out_dir+'_hourly.csv')
+            aux_functions.save_file_csv(df_to_save = self.df_timeseries, save_dir = out_dir+'_hourly.csv', indexing = True)
             logging.info(f'Metocean: timeseries saved as {out_dir}_hourly.csv')
 
     def get_daylight_timesteps(self, out_dir: str=None):
@@ -311,7 +306,7 @@ class Metocean():
 
         # Save new timeseries as a CSV
         if out_dir is not None:
-            self.df_timeseries.to_csv(path_or_buf=out_dir+timeseries_file_name)
+            aux_functions.save_file_csv(df_to_save = self.df_timeseries, save_dir = out_dir+timeseries_file_name, indexing = True)
             logging.info(f'Metocean: timeseries saved as "{out_dir+timeseries_file_name}".')
 
     def generateTe(self, overwrite: bool=False) -> pd.DataFrame:
@@ -406,14 +401,11 @@ class Metocean():
         z_wind_speed = self.h_ws_measurements
 
         # Check columns names
-        cols_default = ['datetime', 'hs', 'tp', 'ws', 'cs', 'te', 'light', 'ws_hub']
         df_timeseries.columns = df_timeseries.columns.str.lower()
 
         for col_name in df_timeseries.columns.to_list():
-            if col_name not in cols_default:
-                _e = '"%s" is not aceptable as a column name. ' % col_name
-                _e += 'Please use only "datetime", "hs", "tp", "ws", '
-                _e += '"cs", "te", "light" and "ws_hub"'
+            if col_name not in METOCEAN_COLUMNS:
+                _e = f'{col_name} is not aceptable as a column name. Please use only {METOCEAN_COLUMNS}'
                 logging.error('Metocean: correct_wind_speed: ' + _e)
                 raise ValueError(_e)
 
@@ -430,14 +422,11 @@ class Metocean():
 
         # Output into a different .csv if arguments were provided
         if all(arg is not None for arg in [output_dir, output_filename]):
-            filepath_to_save =  output_dir+output_filename+".csv"
-            df_timeseries.to_csv(filepath_to_save, sep=",")
-            _i = '.csv file was sucessfully save at:'
-            _i += '"%s"' % filepath_to_save
+            aux_functions.save_file_csv(df_to_save = self.df_timeseries, save_dir = output_dir+output_filename+".csv", indexing = True)
+            _i = f'.csv file was sucessfully save at:{output_dir+output_filename+".csv"}'
             logging.info('Metocean: correct_wind_speed: ' + _i)
         else:
-            _i = 'No arguments were provided to save the new DataFrame '
-            _i +='into a .csv file'
+            _i = 'No arguments were provided to save the new DataFrame into a .csv file'
             logging.info('Metocean: correct_wind_speed: ' + _i)
 
     @classmethod

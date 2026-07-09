@@ -236,9 +236,6 @@ class CorrectiveMinor():
             self.rov_drone = str(rov_drone).lower()
         if other_costs is not None:
             self.other_costs = float(other_costs)
-        if rov_drone is not None:
-            self.rov_drone = str(rov_drone).lower()
-
 
         self._check_attributes()
 
@@ -461,3 +458,6 @@ class CorrectiveMinor():
                 "failures": [failure.id for failure in getattr(self, 'failures', []) or []]
         }, f)
         f.close()
+
+    def __str__(self):
+        return 'CorrectiveMinor'

@@ -178,6 +178,16 @@ The installation process is modeled as follows:
         Example:
         Merge operation vessel: ctv, sov, juv
 
+- **Metocean files**:
+    Metocean files must have the following columns:
+
+            datetime: timestep in DD%MM%YYYY : HH:MM:SS
+            hs: Significant Wave variable of the timestep in [m]
+            tp: Peak Period variable of the timestep in [s]
+            ws: Wind speed variable of the timestep [m/s]
+            cs: Current speed variable of the timestep in [m/s]
+            
+
 
 - **Additional Metocean tow file**:
 

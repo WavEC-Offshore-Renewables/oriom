@@ -698,6 +698,10 @@ class Vessel():
         logging.info('Vessel: vessels read from file: "%s".' % file_path)
         return vessels_list
 
+    def __str__(self):
+        return 'Vessel'
+    
+    
 if __name__ == '__main__':
 
     vessel_min = Vessel(

@@ -668,3 +668,6 @@ class InspectionSite():
                 "double_shift": self.double_shift,
         }, f)
         f.close()
+
+    def __str__(self):
+        return 'InspectionSite'

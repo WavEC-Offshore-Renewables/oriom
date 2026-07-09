@@ -310,3 +310,6 @@ class OperationTow():
                 "activities": activities
         }, f)
         f.close()
+
+    def __str__(self):
+        return 'OperationTow'

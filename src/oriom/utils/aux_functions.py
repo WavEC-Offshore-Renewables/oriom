@@ -3,10 +3,10 @@ from ruamel.yaml import YAML
 import collections.abc
 import logging
 import pandas as pd
-from datetime import timedelta
 import shutil
 from copy import deepcopy
 
+from oriom.common.constants import FORMATS_DATETIME
 
 def update_dict(d, u):
     for k, v in u.items():
@@ -79,22 +79,10 @@ def convert_stringtime(
     if dt_column == 'd_end_stat_chart':
         mask_convert = df[dt_column] != 'reuse_vessel'
 
-    formats = [
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d %H:%M",
-        "%Y-%m-%dT%H:%M:%S",
-        "%d/%m/%Y %H:%M",
-        "%d/%m/%y %H:%M:%S",
-        "%d-%m-%y %H:%M:%S",
-        "%d-%m-%y %H:%M",
-        "%d-%m-%Y %H:%M",
-        "%Y/%m/%d %H:%M:%S",
-        "%Y/%m/%d %H:%M",
-        "%m/%d/%Y %H:%M"
-    ]
+
 
     i=0
-    for fmt in formats:
+    for fmt in FORMATS_DATETIME:
         i+=1
         try:
             if dt_column == 'd_end_stat_chart':
@@ -103,7 +91,7 @@ def convert_stringtime(
                 df[dt_column] = pd.to_datetime(df[dt_column], format=fmt)
             return df
         except ValueError as _e:
-            if i == len(formats):
+            if i == len(FORMATS_DATETIME):
                 logging.error(f'LogDates: {_e} for {df}')
                 raise ValueError(f'LogDates: {_e} for {df}')
             continue

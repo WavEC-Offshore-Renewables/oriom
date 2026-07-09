@@ -1,13 +1,5 @@
 """ Common fixed parameter for ORIOM """
 
-# Failure list level available to select
-FAILURE_LEVEL_LIST = [
-    None, 'shore', 'exp_cable', 'exp_cable_island', 'dyn_cable-sub',
-    'array_cable', 'cable_cb', 'cable_transf', 'cable_switch',
-    'cable_inv', 'string_cable', 'substation', 'mv_transformer',
-    'circuit_braker', 'switcher', 'inverter', 'device', 'hub'
-]
-
 FAILURE_NODE_LEVEL_LIST = [
     'shore', 'substation', 'mv_transformer', 'string', 'hub',
     'circuit_braker', 'switcher', 'inverter', 'device'
@@ -18,6 +10,8 @@ FAILURE_EDGE_LEVEL_LIST = [
     'array_cable', 'cable_cb', 'cable_transf', 'cable_switch',
     'cable_inv', 'string_cable'
 ]
+
+FAILURE_LEVEL_LIST = [None] + FAILURE_NODE_LEVEL_LIST + FAILURE_EDGE_LEVEL_LIST
 
 LIST_MONTHS_STR = [str(c) for c in range(1,13)]
 LIST_MONTHS = [c for c in range(1,13)]
@@ -53,3 +47,34 @@ UNIT_CONVERSION = {
 }
 
 TECH_TYPES = ['wtg', 'wec', 'pv']
+
+FORECAST_ARIA_COLUMNS = [
+    "year", "month", "day", "hour", "msl [hPa]", 
+    "prec [mm]", "swh [m]", "pp1d [s]", "mwd [°]", 
+    "mwp [s]", "wind [m/s]", "dwi [°]"
+]
+
+METOCEAN_COLUMNS = [
+    'datetime', 'hs', 'tp', 'te', 'ws', 
+    'ws_hub', 'cs', 'si', 'light'
+]
+
+METOCEAN_FORECAST_COLUMNS_CONVERSION = {
+    'swh [m]': 'hs',
+    'mwp [s]': 'tp',
+    'wind [m/s]': 'ws',
+}
+
+FORMATS_DATETIME = [
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%d %H:%M",
+    "%Y-%m-%dT%H:%M:%S",
+    "%d/%m/%Y %H:%M",
+    "%d/%m/%y %H:%M:%S",
+    "%d-%m-%y %H:%M:%S",
+    "%d-%m-%y %H:%M",
+    "%d-%m-%Y %H:%M",
+    "%Y/%m/%d %H:%M:%S",
+    "%Y/%m/%d %H:%M",
+    "%m/%d/%Y %H:%M"
+]

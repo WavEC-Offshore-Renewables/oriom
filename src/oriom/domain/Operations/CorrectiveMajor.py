@@ -370,3 +370,6 @@ class CorrectiveMajor():
                 "failures": [failure.id for failure in getattr(self, 'failures', []) or []]
         }, f)
         f.close()
+
+    def __str__(self):
+        return 'CorrectiveMajor'
