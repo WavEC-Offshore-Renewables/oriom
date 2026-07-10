@@ -1,11 +1,9 @@
 # tests/core/builders/test_user_input_overwrite.py
 
-import os
 import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
-from unittest.mock import patch, sentinel
+from unittest.mock import patch
 
 import oriom.inputs.user_inputs as user_input_overwrite_module
 
@@ -47,21 +45,11 @@ class DummyDataObject:
         return f"DummyDataObject({self.id})"
 
 
-class DummyForecast:
-    """Forecast test double that avoids calling the real forecast service."""
+class DummyForecastManager:
+    """Forecast_manager test double that avoids calling the real forecast service."""
 
-    def __init__(
-        self,
-        forecast_client,
-        forecast_password,
-        name_point,
-        addr,
-        save_dir,
-    ):
-        self.forecast_client = forecast_client
-        self.forecast_password = forecast_password
-        self.name_point = name_point
-        self.addr = addr
+    def __init__(self, forecast_user_data, save_dir):
+        self.forecast_user_data = forecast_user_data
         self.save_dir = save_dir
         self.timeseries_file = "forecast_timeseries.csv"
 
@@ -117,11 +105,36 @@ class TestReadUserData(unittest.TestCase):
             },
         )
 
+    def test_read_user_data_returns_forecast_user_data_when_yaml_has_no_id(self):
+        """YAML files without an id field should be returned as a plain dictionary."""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            file_path = write_yaml_file(
+                tmp_dir,
+                "forecast_user.yaml",
+                """
+                - type_forecast: IPMA
+                  name_point: AB
+                """,
+            )
+
+            manager = user_input_overwrite_module.user_input_overwrite()
+            result = manager.read_user_data(file_path)
+
+        self.assertEqual(
+            result,
+            {
+                "type_forecast": "IPMA",
+                "name_point": "AB",
+            },
+        )
+
     def test_read_user_data_returns_empty_dict_for_missing_file(self):
         """Missing user YAML files should be treated as empty overwrite data."""
-        manager = user_input_overwrite_module.user_input_overwrite()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            missing_file = str(Path(tmp_dir) / "missing_file.yaml")
 
-        result = manager.read_user_data("missing_file.yaml")
+            manager = user_input_overwrite_module.user_input_overwrite()
+            result = manager.read_user_data(missing_file)
 
         self.assertEqual(result, {})
 
@@ -265,15 +278,7 @@ class TestShortTermMode(unittest.TestCase):
 
         self.assertEqual([obj.id for obj in result], ["fail_003", "fail_001"])
 
-    @patch.object(user_input_overwrite_module, "Forecast", DummyForecast)
-    @patch.dict(
-        os.environ,
-        {
-            "IPMA_USERNAME": "test_user",
-            "IPMA_PASSWORD": "test_password",
-        },
-        clear=False,
-    )
+    @patch.object(user_input_overwrite_module, "Forecast_manager", DummyForecastManager)
     def test_st_switcher_filters_failures_and_operations_and_updates_metocean_file(self):
         """ST_switcher should filter selected objects and replace the metocean file."""
         inputs = DummyInputs()
@@ -315,6 +320,10 @@ class TestShortTermMode(unittest.TestCase):
                 dirs=dirs,
                 failures=failures,
                 operations=operations,
+                forecast_user_data={
+                    "type_forecast": "IPMA",
+                    "name_point": "AB",
+                },
             )
 
         self.assertEqual([failure.id for failure in filtered_failures], ["fail_002"])
@@ -328,7 +337,7 @@ class TestRunOverwrite(unittest.TestCase):
 
     def test_run_overwrite_updates_failures_operations_and_vessels_without_st(self):
         """
-        run_overwrite should reproduce the manual workflow:
+        run_overwrite should:
         - read user YAML files
         - update failures
         - update operation lists
@@ -488,13 +497,13 @@ class TestRunOverwrite(unittest.TestCase):
         self.assertEqual(vessels[0].fuel_type, "mgo")
         self.assertEqual(vessels[0].name, "updated vessel")
 
-    @patch.object(user_input_overwrite_module, "Forecast", DummyForecast)
+    @patch.object(user_input_overwrite_module, "Forecast_manager", DummyForecastManager)
     def test_run_overwrite_with_st_filters_objects_and_updates_forecast_file(self):
         """
         run_overwrite with ST=True should:
         - update objects from user YAML
         - keep only user-defined failures and operations
-        - update the metocean file using Forecast
+        - update the metocean file using Forecast_manager
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
             inputs = DummyInputs()
@@ -559,6 +568,15 @@ class TestRunOverwrite(unittest.TestCase):
                 """,
             )
 
+            forecast_path = write_yaml_file(
+                tmp_dir,
+                "forecast_user.yaml",
+                """
+                - type_forecast: IPMA
+                  name_point: AB
+                """,
+            )
+
             missing_inspection_path = str(Path(tmp_dir) / "missing_inspection_user.yaml")
 
             files_paths = {
@@ -569,6 +587,7 @@ class TestRunOverwrite(unittest.TestCase):
                     "operations_corr_major": operations_corr_major_path,
                 },
                 "vessels_path": vessels_path,
+                "forecast_path": forecast_path,
             }
 
             result_failures, result_operations, result_vessels = (
@@ -597,8 +616,8 @@ class TestRunOverwrite(unittest.TestCase):
         self.assertEqual(result_vessels[0].fuel_type, "mgo")
         self.assertEqual(inputs.tseries.file_metocean["value"], "forecast_timeseries.csv")
 
-    def test_run_overwrite_raises_key_error_for_missing_operation_user_path_key(self):
-        """run_overwrite should raise KeyError when an operation type has no user file path entry."""
+    def test_run_overwrite_treats_missing_operation_user_path_key_as_empty_data(self):
+        """Missing operation user path entries should be treated as empty overwrite data."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             inputs = DummyInputs()
             dirs = DummyDirs(run_dir=tmp_dir)
@@ -612,16 +631,17 @@ class TestRunOverwrite(unittest.TestCase):
 
             empty_failure_path = write_yaml_file(tmp_dir, "failures_user.yaml", "")
             empty_vessels_path = write_yaml_file(tmp_dir, "vessels_user.yaml", "")
+            operations_tow_path = write_yaml_file(tmp_dir, "operations_tow_user.yaml", "")
 
             files_paths = {
                 "failure_path": empty_failure_path,
                 "operations_path": {
-                    "operations_tow": write_yaml_file(tmp_dir, "operations_tow_user.yaml", ""),
+                    "operations_tow": operations_tow_path,
                 },
                 "vessels_path": empty_vessels_path,
             }
 
-            with self.assertRaises(KeyError):
+            result_failures, result_operations, result_vessels = (
                 user_input_overwrite_module.user_input_overwrite.run_overwrite(
                     inputs=inputs,
                     dirs=dirs,
@@ -631,27 +651,30 @@ class TestRunOverwrite(unittest.TestCase):
                     files_paths=files_paths,
                     ST=False,
                 )
+            )
+
+        self.assertEqual(result_failures, [])
+        self.assertEqual(result_operations["operations_tow"], [])
+        self.assertEqual(result_operations["operations_corr_major"], [])
+        self.assertEqual(result_vessels, [])
 
 
 class TestManualMainWorkflow(unittest.TestCase):
     """Tests reproducing the original manual workflow using temporary user YAML files."""
 
-    @patch.object(user_input_overwrite_module, "Forecast", DummyForecast)
+    @patch.object(user_input_overwrite_module, "Forecast_manager", DummyForecastManager)
     def test_manual_main_workflow_with_temporary_user_yaml_files(self):
         """
         This test reproduces the original manual workflow implemented after
         if __name__ == "__main__", but creates the user YAML files in a
         temporary directory instead of reading them from a fixed local folder.
 
-        Expected printed output:
+        Expected logging output:
         - Failure fail_rate is overwritten from 0.00576436 to 1
         - CorrectiveMajor name is overwritten from Cable Disconnection to cable disconnection
         - CorrectiveMajor tech_cost is overwritten from 300.0 to 10000
         - ST mode keeps only the user-defined failure and corrective major operation
         """
-        import io
-        from contextlib import redirect_stdout
-
         class ManualWorkflowObject:
             """Generic object used to reproduce the original manual workflow."""
 
@@ -673,7 +696,7 @@ class TestManualMainWorkflow(unittest.TestCase):
                 ManualWorkflowObject(
                     id_="ofw_cb_dyn_fail",
                     object_name="Failure",
-                    name="Dynamic cable",
+                    name="dynamic cable",
                     n_element=25,
                     fail_rate=0.00576436,
                     maintenance_strategy="immediately",
@@ -687,7 +710,7 @@ class TestManualMainWorkflow(unittest.TestCase):
                 ManualWorkflowObject(
                     id_="ofw_other_fail",
                     object_name="Failure",
-                    name="Other failure",
+                    name="other failure",
                     n_element=1,
                     fail_rate=0.2,
                     maintenance_strategy="immediately",
@@ -705,7 +728,7 @@ class TestManualMainWorkflow(unittest.TestCase):
                     ManualWorkflowObject(
                         id_="ofw_tow001",
                         object_name="OperationTow",
-                        name="Tow operation",
+                        name="tow operation",
                         duration_net=10,
                     )
                 ],
@@ -713,7 +736,7 @@ class TestManualMainWorkflow(unittest.TestCase):
                     ManualWorkflowObject(
                         id_="ofw_insp001",
                         object_name="InspectionSite",
-                        name="Inspection site",
+                        name="inspection site",
                         duration_net=5,
                     )
                 ],
@@ -732,7 +755,7 @@ class TestManualMainWorkflow(unittest.TestCase):
                     ManualWorkflowObject(
                         id_="ofw_mj2",
                         object_name="CorrectiveMajor",
-                        name="Other major operation",
+                        name="other major operation",
                         tow_to_port=False,
                         tech_required=10,
                         tech_cost=500.0,
@@ -747,13 +770,13 @@ class TestManualMainWorkflow(unittest.TestCase):
                 ManualWorkflowObject(
                     id_="vessel_001",
                     object_name="Vessel",
-                    name="Vessel 001",
+                    name="vessel 001",
                     fuel_type="diesel",
                 ),
                 ManualWorkflowObject(
                     id_="vessel_002",
                     object_name="Vessel",
-                    name="Vessel 002",
+                    name="vessel 002",
                     fuel_type="diesel",
                 ),
             ]
@@ -815,6 +838,15 @@ class TestManualMainWorkflow(unittest.TestCase):
                 """,
             )
 
+            forecast_path = write_yaml_file(
+                tmp_dir,
+                "forecast_user.yaml",
+                """
+                - type_forecast: IPMA
+                  name_point: AB
+                """,
+            )
+
             files_paths = {
                 "failure_path": failure_path,
                 "operations_path": {
@@ -823,22 +855,20 @@ class TestManualMainWorkflow(unittest.TestCase):
                     "operations_inspect_site": operations_inspect_site_path,
                 },
                 "vessels_path": vessels_path,
+                "forecast_path": forecast_path,
             }
 
-            stdout_buffer = io.StringIO()
-
-            with redirect_stdout(stdout_buffer):
-                result_failures, result_operations, result_vessels = (
-                    user_input_overwrite_module.user_input_overwrite.run_overwrite(
-                        inputs=inputs,
-                        dirs=dirs,
-                        failures=failures,
-                        operations=operations,
-                        vessels=vessels,
-                        files_paths=files_paths,
-                        ST=True,
-                    )
+            result_failures, result_operations, result_vessels = (
+                user_input_overwrite_module.user_input_overwrite.run_overwrite(
+                    inputs=inputs,
+                    dirs=dirs,
+                    failures=failures,
+                    operations=operations,
+                    vessels=vessels,
+                    files_paths=files_paths,
+                    ST=True,
                 )
+            )
 
         self.assertEqual(
             [failure.id for failure in result_failures],

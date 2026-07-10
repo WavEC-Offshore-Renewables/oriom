@@ -230,6 +230,7 @@ class ProjectDirs:
                     'operations_inspect_port': os.path.join(self.data_overwrite_user_path, 'operations_inspect_port_user.yaml'),
                 },
                 'vessels_path': os.path.join(self.data_overwrite_user_path, 'vessels_user.yaml'),
+                'forecast_path': os.path.join(self.data_overwrite_user_path, 'forecast_user.yaml'),
             }
 
     def __repr__(self):

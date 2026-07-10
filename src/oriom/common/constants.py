@@ -48,23 +48,6 @@ UNIT_CONVERSION = {
 
 TECH_TYPES = ['wtg', 'wec', 'pv']
 
-FORECAST_ARIA_COLUMNS = [
-    "year", "month", "day", "hour", "msl [hPa]", 
-    "prec [mm]", "swh [m]", "pp1d [s]", "mwd [°]", 
-    "mwp [s]", "wind [m/s]", "dwi [°]"
-]
-
-METOCEAN_COLUMNS = [
-    'datetime', 'hs', 'tp', 'te', 'ws', 
-    'ws_hub', 'cs', 'si', 'light'
-]
-
-METOCEAN_FORECAST_COLUMNS_CONVERSION = {
-    'swh [m]': 'hs',
-    'mwp [s]': 'tp',
-    'wind [m/s]': 'ws',
-}
-
 FORMATS_DATETIME = [
     "%Y-%m-%d %H:%M:%S",
     "%Y-%m-%d %H:%M",
@@ -79,15 +62,4 @@ FORMATS_DATETIME = [
     "%m/%d/%Y %H:%M"
 ]
 
-ENSAMBLE_ARIA_COLUMNS = [
-    'per10swh [m]',
-    'per50swh [m]',
-    'per90swh [m]',
-    'per10prec [mm]',
-    'per50prec [mm]',
-    'per90prec [mm]',
-]
-
-METOCEAN_ENSAMBLE_COLUMNS_CONVERSION = {
-
-}
+METOCEAN_COLUMNS = ['datetime', 'hs', 'tp', 'te', 'ws', 'ws_hub', 'cs', 'si', 'light']

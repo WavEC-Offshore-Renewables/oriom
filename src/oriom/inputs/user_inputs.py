@@ -2,7 +2,7 @@ import os
 import logging
 from ruamel.yaml import YAML
 
-from oriom.domain.Forecast import Forecast
+from oriom.domain.Forecasts.Forecast_manager import Forecast_manager
 
 
 ATTR_TO_LOWER = [
@@ -26,7 +26,10 @@ class user_input_overwrite():
         self.oper_dict_obj = {}
         self.vessels_dict_value = {}
         self.vessels_list_obj = []
-        pass
+        self.forecast_dict_value = {
+            'type_forecast': 'IPMA',
+            'name_point': 'AB'
+        }
 
 
     @classmethod
@@ -71,7 +74,14 @@ class user_input_overwrite():
         
         # Evaluate ST O&M mode
         if ST:
-            failures, operations = instance.ST_switcher(inputs = inputs, dirs = dirs, failures = failures, operations = operations)
+            instance.forecast_dict_value = instance.read_user_data(file_path=files_paths.get('forecast_path'))
+            failures, operations = instance.ST_switcher(
+                inputs = inputs,
+                dirs = dirs,
+                failures = failures,
+                operations = operations,
+                forecast_user_data = instance.forecast_dict_value
+            )
 
         # Returns value modified
         return (
@@ -106,7 +116,11 @@ class user_input_overwrite():
                     item[attr] = value.lower()
 
             # Store using the object ID as key
-            data_dict[item["id"]] = item
+            if item.get("id"):
+                data_dict[item["id"]] = item
+            else:
+                if data_yaml:
+                    data_dict = data_yaml[0]
 
         return data_dict
 
@@ -148,7 +162,7 @@ class user_input_overwrite():
                         raise KeyError(e_)
 
     
-    def ST_switcher(self, inputs: object, dirs: object, failures: list, operations: dict):
+    def ST_switcher(self, inputs: object, dirs: object, failures: list, operations: dict, forecast_user_data: str):
         """ Modify data to switch into Short Term O&M """
         failures = self.ST_data_object_overwrite(object_data_list = failures, dict_value = self.failure_dict_value)
         
@@ -167,13 +181,7 @@ class user_input_overwrite():
 
 
         # Withdrawn Forecast Data and substitue it with timeseries file
-        IPMA_forecast = Forecast(
-            forecast_client=os.getenv("IPMA_USERNAME"),
-            forecast_password=os.getenv("IPMA_PASSWORD"),
-            name_point='AB',
-            addr=r'https://api.ipma.pt/ARIA2/points/forecast',
-            save_dir = dirs.run_dir
-        )
+        IPMA_forecast = Forecast_manager(forecast_user_data = forecast_user_data, save_dir = dirs.run_dir)
         inputs.tseries.file_metocean["value"] = IPMA_forecast.timeseries_file
 
         return failures, operations
@@ -207,7 +215,7 @@ if __name__ == '__main__':
     class DUMMY():
         def __init__(self, id = 'ID_001'):
             self.tseries = DUMMY_2()
-            self.run_dir = r'C:\Users\RiccardoMeda\Project\oriom\tmp\user'
+            self.run_dir = r'C:\Users\RiccardoMeda\Project\oriomOOP\oriom\tmp\user'
             self.id = id
             self.ST = False
 
@@ -215,7 +223,7 @@ if __name__ == '__main__':
             return 'DUMMY'
 
 
-    path_modifier_user = r'C:\Users\RiccardoMeda\Project\oriom\tmp\user'
+    path_modifier_user = r'C:\Users\RiccardoMeda\Project\oriomOOP\oriom\tmp\user'
 
 
     failures = Failure.get_failures_from_yaml(file_path = os.path.join(path_modifier_user, 'failures.yaml'))
@@ -245,6 +253,7 @@ if __name__ == '__main__':
                 'operations_inspect_site': os.path.join(path_modifier_user, 'xx.yaml'),
             },
             'vessels_path': os.path.join(path_modifier_user, 'vessels_user.yaml'),
+            'forecast_path': os.path.join(path_modifier_user, 'forecast_user.yaml'),
         },
         ST = DUMMY()
     )
