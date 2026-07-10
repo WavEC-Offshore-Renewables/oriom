@@ -170,7 +170,7 @@ class user_input_overwrite():
         IPMA_forecast = Forecast(
             forecast_client=os.getenv("IPMA_USERNAME"),
             forecast_password=os.getenv("IPMA_PASSWORD"),
-            name_point='previsao_AB_',
+            name_point='AB',
             addr=r'https://api.ipma.pt/ARIA2/points/forecast',
             save_dir = dirs.run_dir
         )
@@ -206,8 +206,8 @@ if __name__ == '__main__':
 
     class DUMMY():
         def __init__(self, id = 'ID_001'):
-            self.tseries_inputs = DUMMY_2()
-            self.base_dir = r'C:\Users\RiccardoMeda\Project\oriom\tmp\user'
+            self.tseries = DUMMY_2()
+            self.run_dir = r'C:\Users\RiccardoMeda\Project\oriom\tmp\user'
             self.id = id
             self.ST = False
 

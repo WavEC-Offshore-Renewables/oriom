@@ -25,14 +25,14 @@ class DummyInputs:
     """Minimal inputs object used by run_overwrite and ST_switcher."""
 
     def __init__(self):
-        self.tseries_inputs = DummyTseriesInputs()
+        self.tseries = DummyTseriesInputs()
 
 
 class DummyDirs:
     """Minimal dirs object used by ST_switcher."""
 
-    def __init__(self, base_dir):
-        self.base_dir = base_dir
+    def __init__(self, run_dir):
+        self.run_dir = run_dir
 
 
 class DummyDataObject:
@@ -279,7 +279,7 @@ class TestShortTermMode(unittest.TestCase):
         inputs = DummyInputs()
 
         with tempfile.TemporaryDirectory() as tmp_dir:
-            dirs = DummyDirs(base_dir=tmp_dir)
+            dirs = DummyDirs(run_dir=tmp_dir)
 
             failures = [
                 DummyDataObject("fail_001"),
@@ -320,7 +320,7 @@ class TestShortTermMode(unittest.TestCase):
         self.assertEqual([failure.id for failure in filtered_failures], ["fail_002"])
         self.assertEqual([op.id for op in filtered_operations["operations_tow"]], ["tow_001"])
         self.assertEqual([op.id for op in filtered_operations["operations_corr_major"]], ["major_002"])
-        self.assertEqual(inputs.tseries_inputs.file_metocean["value"], "forecast_timeseries.csv")
+        self.assertEqual(inputs.tseries.file_metocean["value"], "forecast_timeseries.csv")
 
 
 class TestRunOverwrite(unittest.TestCase):
@@ -337,7 +337,7 @@ class TestRunOverwrite(unittest.TestCase):
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
             inputs = DummyInputs()
-            dirs = DummyDirs(base_dir=tmp_dir)
+            dirs = DummyDirs(run_dir=tmp_dir)
 
             failures = [
                 DummyDataObject(
@@ -498,7 +498,7 @@ class TestRunOverwrite(unittest.TestCase):
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
             inputs = DummyInputs()
-            dirs = DummyDirs(base_dir=tmp_dir)
+            dirs = DummyDirs(run_dir=tmp_dir)
 
             failures = [
                 DummyDataObject("fail_001", duration_net=10),
@@ -595,13 +595,13 @@ class TestRunOverwrite(unittest.TestCase):
         self.assertEqual(result_operations["operations_inspect_site"], [])
 
         self.assertEqual(result_vessels[0].fuel_type, "mgo")
-        self.assertEqual(inputs.tseries_inputs.file_metocean["value"], "forecast_timeseries.csv")
+        self.assertEqual(inputs.tseries.file_metocean["value"], "forecast_timeseries.csv")
 
     def test_run_overwrite_raises_key_error_for_missing_operation_user_path_key(self):
         """run_overwrite should raise KeyError when an operation type has no user file path entry."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             inputs = DummyInputs()
-            dirs = DummyDirs(base_dir=tmp_dir)
+            dirs = DummyDirs(run_dir=tmp_dir)
 
             failures = []
             operations = {
@@ -667,7 +667,7 @@ class TestManualMainWorkflow(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             inputs = DummyInputs()
-            dirs = DummyDirs(base_dir=tmp_dir)
+            dirs = DummyDirs(run_dir=tmp_dir)
 
             failures = [
                 ManualWorkflowObject(
@@ -869,7 +869,7 @@ class TestManualMainWorkflow(unittest.TestCase):
         self.assertIs(result_vessels, vessels)
 
         self.assertEqual(
-            inputs.tseries_inputs.file_metocean["value"],
+            inputs.tseries.file_metocean["value"],
             "forecast_timeseries.csv",
         )
 

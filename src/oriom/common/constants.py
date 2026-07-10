@@ -78,3 +78,16 @@ FORMATS_DATETIME = [
     "%Y/%m/%d %H:%M",
     "%m/%d/%Y %H:%M"
 ]
+
+ENSAMBLE_ARIA_COLUMNS = [
+    'per10swh [m]',
+    'per50swh [m]',
+    'per90swh [m]',
+    'per10prec [mm]',
+    'per50prec [mm]',
+    'per90prec [mm]',
+]
+
+METOCEAN_ENSAMBLE_COLUMNS_CONVERSION = {
+
+}
