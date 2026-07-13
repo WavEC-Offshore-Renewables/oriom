@@ -133,9 +133,20 @@ The installation process is modeled as follows:
 
     - **mobilisation to add**: Dictionary of vessel id and **YEARLT MOBILISATION COST** to add. The cost will be added only at the averaged results
 
+## PRIVATE FUNCTIONS
+To use Private functions:
+
+Copy and paste the folder with the private modules inside:
+
+        .\oriom\src\core\functions\private
+
+If private functions are not found it will not be possible:
+- Consider statistical chart duration of the vessels and recall-reuse mobilitated vessels
+- Reuse previous simulations. All data must be recalculated
+- Reduced KPI Vessels Insight
+- It will not be available to use ORIOM as ShortTerm O&M Simulator
+
 ## GEN_INPUTS
-
-
 - **Use previous run directory**: Insert the path of the previous directory to reuse
     
     If reuse a old simulation, remove from the reuse folder the file to integrate eventuale changes in the files:

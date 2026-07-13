@@ -4,8 +4,7 @@ import logging
 from distutils.util import strtobool
 from ruamel.yaml import YAML
 
-from oriom.common.constants import FAILURE_LEVEL_LIST
-from oriom.common.constants import DICT_DAYS
+from oriom.common.constants import FAILURE_LEVEL_LIST, DICT_DAYS
 
 class Failure():
     """Failure class.

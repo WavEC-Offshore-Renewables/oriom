@@ -333,7 +333,8 @@ def operation_timeseries_builder(
         operation_dir = dirs.operation_dir,
         df_metocean = metocean_port.df_timeseries,
         duration_shift = inputs.tseries.shift_duration["value"],
-        operations_inspect_port = operations['operations_inspect_port']
+        operations_inspect_port = operations['operations_inspect_port'],
+        inputs_tseries = inputs.tseries
     )
 
     operation_major_manager(

@@ -64,7 +64,7 @@ class TimeSeries():
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
         file_wake_loss (:obj:`dict`): Path location of the wake losses file.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-
+        ST_O_M (:obj:`bool`): Boolean to indicate if consider ST_O&M. Used to avoid recycle previous file. Default to ``False``.
     Note:
         When the class is initialized :func:`_check_attributes` is run.
 
@@ -433,6 +433,7 @@ class TimeSeries():
             'ofw': self.time_between_devices_wt["value"],
             'owc': self.time_between_devices_wec["value"]
         }
+        self.ST_O_M = False
 
         # Define scenario for failure event
         if kwargs.get('scenarios_file'):

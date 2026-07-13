@@ -61,7 +61,7 @@ def operation_tow_manager(
         # Check if there is already an operation_schedule file
         file_name_schedule = 'operation_schedule.csv'
 
-        if check_files:
+        if check_files and not inputs_tseries.ST_O_M:
             file_exist = check_files.reuse_file_exist(
                 op_dir = op_dir,
                 file_name_schedule = file_name_schedule,

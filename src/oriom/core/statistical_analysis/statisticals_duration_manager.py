@@ -9,7 +9,7 @@ from oriom.utils.aux_functions import safe_getattr
 
 def statistical_duration_manager(
     operation_dir: str,
-    total_operations :list,
+    total_operations: list,
     inputs_stats: object
 ):
     """

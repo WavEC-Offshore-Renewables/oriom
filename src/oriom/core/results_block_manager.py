@@ -10,7 +10,7 @@ from oriom.core.functions.graphs import report_graphs
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective import create_logs_merge
 from oriom.core.functions.layout_power.layout_power import energy_availability, config_energy_availability
 from oriom.core.functions.kpi_final.kpi_final_costs import kpi_final_total_cost
-from oriom.core.functions.logs_timeseries.failures import failures_event
+from oriom.core.functions.logs_timeseries.failures import failures_event, ST_failures_event
 from oriom.core.functions.logs_timeseries.create_logs_timeseries import create_logs_timeseries_file
 from oriom.core.functions.logs_timeseries.logs_corrective_aux import manage_def_to_log_events
 try:
@@ -82,11 +82,12 @@ def results_block(
     operation_vessel_percentiles_dict = {}
     try:
         failure_dir = os.path.join(inputs.general.failureevent_file["value"], f"{'result_'}{r}", 'dates_failures.csv')
+        if inputs.tseries.ST_O_M:
+            failure_dir = os.path.join(inputs.general.failureevent_file["value"], 'dates_failures.csv')
+            ST_failures_event(failures = failures, result_dir_r = failure_dir)
         dates_failures = pd.read_csv(failure_dir, sep=',')
         dates_failures = aux_functions.convert_stringtime(dates_failures)
-        dates_failures['preferred_month'] = pd.to_numeric(
-            dates_failures['preferred_month'], errors='coerce'
-        ).astype('Int64')
+        dates_failures['preferred_month'] = pd.to_numeric(dates_failures['preferred_month'], errors='coerce').astype('Int64')
         logging.info('Uploading Failure file from previous run %d folder', r)
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 

@@ -5,8 +5,10 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import logging
 import numpy as np
+import math
 
-DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
+from oriom.utils import aux_functions
+from oriom.common.constants import DICT_DAYS
 
 
 def find_month_available(month_check: int, dict_failures_variables_id: list):
@@ -283,6 +285,51 @@ def failures_event(
         dates_failures['operation_triggered'] = list_operation_triggered
         dates_failures['preferred_month'] = pd.Series(list_preferred_month, dtype='Int64')
         dates_failures = dates_failures.sort_values(by ='datetime').reset_index(drop=True)
+
+
+    return dates_failures
+
+
+def ST_failures_event(
+    failures: list,
+    result_dir_r: str
+):
+    """Create a table with failures throughtout the months for the lifetime.
+
+    NOTE:
+        The Short Term failure generation considers:
+            - if the math.ceil(FR*N_device) of total value of events for each type of failures defined
+        All failures are generated on the date of Short Term run. All operations are immediate corrected
+        Save directly the failure event file
+        
+    Args:
+        failures (:obj:`list`): List obtained from the class, failure rate for each component.
+        result_dir_r (:obj:`str`): string of the folder on which the results are stored
+    """
+
+    list_ids, list_operation_triggered = [], []
+    for fail in failures:
+        fail_events = math.ceil(fail.fail_rate * fail.n_element)
+        for _ in range(fail_events):
+            list_ids.append(fail.id)
+            list_operation_triggered.append(fail.operation_triggered)
+
+    dates_failures = pd.DataFrame(columns=[
+        'datetime',
+        'id',
+        'maintenance_strategy',
+        'operation_triggered',
+        'preferred_month'
+    ])
+
+    dates_failures['datetime'] = [datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)]*len(list_ids)
+    dates_failures['id'] = list_ids
+    dates_failures['maintenance_strategy'] = 'immediately'
+    dates_failures['operation_triggered'] = list_operation_triggered
+    dates_failures['preferred_month'] = pd.Series(None, dtype='Int64')
+    dates_failures = dates_failures.sort_values(by ='datetime').reset_index(drop=True)
+
+    aux_functions.save_file_csv(dates_failures, result_dir_r)
 
 
     return dates_failures

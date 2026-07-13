@@ -1,12 +1,17 @@
-# tests/core/builders/test_user_input_overwrite.py
+# tests/inputs/test_user_inputs.py
 
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-import oriom.inputs.user_inputs as user_input_overwrite_module
+import pandas as pd
 
+
+try:
+    import oriom.core.functions.private.user_inputs as user_input_overwrite_module
+except ImportError:
+    raise unittest.SkipTest("user_input_overwrite_module module not available, test skipped")
 
 # ------------------------------------------------------------------
 # Test doubles
@@ -16,7 +21,29 @@ class DummyTseriesInputs:
     """Minimal tseries inputs object used by ST_switcher."""
 
     def __init__(self):
-        self.file_metocean = {"value": "original_metocean.csv"}
+        self.file_metocean = {"value": "original_site_metocean.csv"}
+        self.file_metocean_port = {"value": "original_port_metocean.csv"}
+        self.file_metocean_tow_number = {"value": 5}
+        self.ST_O_M = False
+
+
+class DummyStatsInputs:
+    """Minimal stats inputs object used by overwrite_metocean_location."""
+
+    def __init__(self):
+        self.period_infant_mortality = {"value": 5}
+        self.period_wear_out = {"value": 5}
+        self.start_year = {"value": 2020}
+        self.lifetime = {"value": 20}
+
+
+class DummyGeneralInputs:
+    """Minimal general inputs object used by overwrite_metocean_location."""
+
+    def __init__(self):
+        self.powerevent_file = {"value": "power_events.csv"}
+        self.logevents_file = {"value": "log_events.csv"}
+        self.failureevent_file = {"value": "old_failure_events.csv"}
 
 
 class DummyInputs:
@@ -24,6 +51,8 @@ class DummyInputs:
 
     def __init__(self):
         self.tseries = DummyTseriesInputs()
+        self.stats = DummyStatsInputs()
+        self.general = DummyGeneralInputs()
 
 
 class DummyDirs:
@@ -52,6 +81,10 @@ class DummyForecastManager:
         self.forecast_user_data = forecast_user_data
         self.save_dir = save_dir
         self.timeseries_file = "forecast_timeseries.csv"
+        self.forecast_df = pd.DataFrame(
+            {"Hs": [1.0]},
+            index=pd.DatetimeIndex([pd.Timestamp("2026-07-10 00:00:00")]),
+        )
 
 
 # ------------------------------------------------------------------
@@ -63,6 +96,33 @@ def write_yaml_file(folder, file_name, content):
     file_path = Path(folder) / file_name
     file_path.write_text(content, encoding="utf-8")
     return str(file_path)
+
+
+def assert_short_term_input_overwrite(test_case, inputs, expected_run_dir):
+    """Assert all ST metocean and project input overwrites."""
+    test_case.assertTrue(inputs.tseries.ST_O_M)
+
+    test_case.assertEqual(
+        inputs.tseries.file_metocean["value"],
+        "forecast_timeseries.csv",
+    )
+    test_case.assertEqual(
+        inputs.tseries.file_metocean_port["value"],
+        "forecast_timeseries.csv",
+    )
+    test_case.assertEqual(
+        inputs.tseries.file_metocean_tow_number["value"],
+        0,
+    )
+
+    test_case.assertEqual(inputs.stats.period_infant_mortality["value"], 0)
+    test_case.assertEqual(inputs.stats.period_wear_out["value"], 0)
+    test_case.assertEqual(inputs.stats.start_year["value"], 2026)
+    test_case.assertEqual(inputs.stats.lifetime["value"], 1)
+
+    test_case.assertIsNone(inputs.general.powerevent_file["value"])
+    test_case.assertIsNone(inputs.general.logevents_file["value"])
+    test_case.assertEqual(inputs.general.failureevent_file["value"], expected_run_dir)
 
 
 # ------------------------------------------------------------------
@@ -279,8 +339,8 @@ class TestShortTermMode(unittest.TestCase):
         self.assertEqual([obj.id for obj in result], ["fail_003", "fail_001"])
 
     @patch.object(user_input_overwrite_module, "Forecast_manager", DummyForecastManager)
-    def test_st_switcher_filters_failures_and_operations_and_updates_metocean_file(self):
-        """ST_switcher should filter selected objects and replace the metocean file."""
+    def test_st_switcher_filters_failures_operations_and_overwrites_inputs(self):
+        """ST_switcher should filter selected objects, build total_operations and overwrite ST inputs."""
         inputs = DummyInputs()
 
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -326,10 +386,94 @@ class TestShortTermMode(unittest.TestCase):
                 },
             )
 
+            expected_run_dir = tmp_dir
+
         self.assertEqual([failure.id for failure in filtered_failures], ["fail_002"])
         self.assertEqual([op.id for op in filtered_operations["operations_tow"]], ["tow_001"])
         self.assertEqual([op.id for op in filtered_operations["operations_corr_major"]], ["major_002"])
-        self.assertEqual(inputs.tseries.file_metocean["value"], "forecast_timeseries.csv")
+        self.assertEqual(
+            [op.id for op in filtered_operations["total_operations"]],
+            ["tow_001", "major_002"],
+        )
+
+        assert_short_term_input_overwrite(self, inputs, expected_run_dir)
+
+    @patch.object(user_input_overwrite_module, "Forecast_manager", DummyForecastManager)
+    def test_st_switcher_raises_value_error_when_no_operations_remain(self):
+        """ST_switcher should raise ValueError when all operation lists are empty after filtering."""
+        inputs = DummyInputs()
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            dirs = DummyDirs(run_dir=tmp_dir)
+
+            failures = [
+                DummyDataObject("fail_001"),
+            ]
+
+            operations = {
+                "operations_tow": [
+                    DummyDataObject("tow_001"),
+                ],
+                "operations_corr_major": [
+                    DummyDataObject("major_001"),
+                ],
+            }
+
+            manager = user_input_overwrite_module.user_input_overwrite()
+            manager.failure_dict_value = {
+                "fail_001": {},
+            }
+            manager.oper_dict_value = {
+                "operations_tow": {},
+                "operations_corr_major": {},
+            }
+
+            with self.assertRaises(ValueError) as context:
+                manager.ST_switcher(
+                    inputs=inputs,
+                    dirs=dirs,
+                    failures=failures,
+                    operations=operations,
+                    forecast_user_data={
+                        "type_forecast": "IPMA",
+                        "name_point": "AB",
+                    },
+                )
+
+        self.assertIn(
+            "USER_INPUT_OVERWRITE: No operations are defined after switching into ST_O&M",
+            str(context.exception),
+        )
+
+    def test_overwrite_metocean_location_updates_short_term_inputs(self):
+        """overwrite_metocean_location should update metocean paths, stats and generated event paths."""
+        inputs = DummyInputs()
+        manager = user_input_overwrite_module.user_input_overwrite()
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            forecast_min_idx = pd.Timestamp("2027-04-15 00:00:00")
+
+            manager.overwrite_metocean_location(
+                inputs=inputs,
+                metocean_file_path_new="new_forecast.csv",
+                forecast_min_idx=forecast_min_idx,
+                dirs_run=tmp_dir,
+            )
+
+            expected_run_dir = tmp_dir
+
+        self.assertEqual(inputs.tseries.file_metocean["value"], "new_forecast.csv")
+        self.assertEqual(inputs.tseries.file_metocean_port["value"], "new_forecast.csv")
+        self.assertEqual(inputs.tseries.file_metocean_tow_number["value"], 0)
+
+        self.assertEqual(inputs.stats.period_infant_mortality["value"], 0)
+        self.assertEqual(inputs.stats.period_wear_out["value"], 0)
+        self.assertEqual(inputs.stats.start_year["value"], 2027)
+        self.assertEqual(inputs.stats.lifetime["value"], 1)
+
+        self.assertIsNone(inputs.general.powerevent_file["value"])
+        self.assertIsNone(inputs.general.logevents_file["value"])
+        self.assertEqual(inputs.general.failureevent_file["value"], expected_run_dir)
 
 
 class TestRunOverwrite(unittest.TestCase):
@@ -497,13 +641,17 @@ class TestRunOverwrite(unittest.TestCase):
         self.assertEqual(vessels[0].fuel_type, "mgo")
         self.assertEqual(vessels[0].name, "updated vessel")
 
+        self.assertFalse(inputs.tseries.ST_O_M)
+        self.assertEqual(inputs.tseries.file_metocean["value"], "original_site_metocean.csv")
+
     @patch.object(user_input_overwrite_module, "Forecast_manager", DummyForecastManager)
     def test_run_overwrite_with_st_filters_objects_and_updates_forecast_file(self):
         """
         run_overwrite with ST=True should:
         - update objects from user YAML
         - keep only user-defined failures and operations
-        - update the metocean file using Forecast_manager
+        - update ST metocean and project inputs
+        - remove vessel mobilisation cost and time
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
             inputs = DummyInputs()
@@ -529,7 +677,12 @@ class TestRunOverwrite(unittest.TestCase):
             }
 
             vessels = [
-                DummyDataObject("vessel_001", fuel_type="diesel"),
+                DummyDataObject(
+                    "vessel_001",
+                    fuel_type="diesel",
+                    mobilisation_time=12,
+                    mobilisation_cost=5000,
+                ),
             ]
 
             failure_path = write_yaml_file(
@@ -602,6 +755,8 @@ class TestRunOverwrite(unittest.TestCase):
                 )
             )
 
+            expected_run_dir = tmp_dir
+
         self.assertEqual([failure.id for failure in result_failures], ["fail_002"])
         self.assertEqual(result_failures[0].duration_net, 30)
 
@@ -612,9 +767,16 @@ class TestRunOverwrite(unittest.TestCase):
         self.assertEqual(result_operations["operations_corr_major"][0].duration_net, 12)
 
         self.assertEqual(result_operations["operations_inspect_site"], [])
+        self.assertEqual(
+            [op.id for op in result_operations["total_operations"]],
+            ["tow_002", "major_001"],
+        )
 
         self.assertEqual(result_vessels[0].fuel_type, "mgo")
-        self.assertEqual(inputs.tseries.file_metocean["value"], "forecast_timeseries.csv")
+        self.assertEqual(result_vessels[0].mobilisation_time, 0)
+        self.assertEqual(result_vessels[0].mobilisation_cost, 0)
+
+        assert_short_term_input_overwrite(self, inputs, expected_run_dir)
 
     def test_run_overwrite_treats_missing_operation_user_path_key_as_empty_data(self):
         """Missing operation user path entries should be treated as empty overwrite data."""
@@ -674,6 +836,7 @@ class TestManualMainWorkflow(unittest.TestCase):
         - CorrectiveMajor name is overwritten from Cable Disconnection to cable disconnection
         - CorrectiveMajor tech_cost is overwritten from 300.0 to 10000
         - ST mode keeps only the user-defined failure and corrective major operation
+        - Vessel mobilisation cost and time are removed in ST mode
         """
         class ManualWorkflowObject:
             """Generic object used to reproduce the original manual workflow."""
@@ -772,12 +935,16 @@ class TestManualMainWorkflow(unittest.TestCase):
                     object_name="Vessel",
                     name="vessel 001",
                     fuel_type="diesel",
+                    mobilisation_time=15,
+                    mobilisation_cost=5000,
                 ),
                 ManualWorkflowObject(
                     id_="vessel_002",
                     object_name="Vessel",
                     name="vessel 002",
                     fuel_type="diesel",
+                    mobilisation_time=20,
+                    mobilisation_cost=7000,
                 ),
             ]
 
@@ -870,6 +1037,8 @@ class TestManualMainWorkflow(unittest.TestCase):
                 )
             )
 
+            expected_run_dir = tmp_dir
+
         self.assertEqual(
             [failure.id for failure in result_failures],
             ["ofw_cb_dyn_fail"],
@@ -890,18 +1059,21 @@ class TestManualMainWorkflow(unittest.TestCase):
             [operation.id for operation in result_operations["operations_corr_major"]],
             ["ofw_mj1"],
         )
+        self.assertEqual(
+            [operation.id for operation in result_operations["total_operations"]],
+            ["ofw_mj1"],
+        )
 
         selected_major_operation = result_operations["operations_corr_major"][0]
 
         self.assertEqual(selected_major_operation.name, "cable disconnection")
         self.assertEqual(selected_major_operation.tech_cost, 10000)
 
-        self.assertIs(result_vessels, vessels)
+        for vessel in result_vessels:
+            self.assertEqual(vessel.mobilisation_time, 0)
+            self.assertEqual(vessel.mobilisation_cost, 0)
 
-        self.assertEqual(
-            inputs.tseries.file_metocean["value"],
-            "forecast_timeseries.csv",
-        )
+        assert_short_term_input_overwrite(self, inputs, expected_run_dir)
 
 
 if __name__ == "__main__":

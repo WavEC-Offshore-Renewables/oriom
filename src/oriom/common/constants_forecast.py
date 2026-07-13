@@ -22,9 +22,6 @@ IPMA = {
         },
         1 : {}
     },
-    'NAME_FILE' : [
-        f"{datetime.now().date().strftime('%Y%m%d')}.dat",
-        f"{datetime.now().date().strftime('%d%m%Y')}.dat"
-    ],
+    'NAME_FILE' : datetime.now().date(),
     'NAME_FILE_SAVE' : ['previsao', 'listagem_ens']
 }

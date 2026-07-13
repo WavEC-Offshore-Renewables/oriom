@@ -515,12 +515,13 @@ class Metocean():
         """
 
         def check_create_metocean(
-                run_dir,
-                file_name = "timeseries.csv",
-                file = tseries_inputs.file_metocean["value"],
-                loc = "metocean file location"
+                run_dir: str,
+                file_name: str = "timeseries.csv",
+                file: str = tseries_inputs.file_metocean["value"],
+                loc: str = "metocean file location",
+                ST: bool = False
             ):
-            if check_file_exists and check_file_exists(run_dir, file_name):
+            if check_file_exists and check_file_exists(run_dir, file_name) and not ST:
                 # Reuse previously defined Metocean
                 met = cls.from_yaml(dir=run_dir, loc = loc)
                 df_ts = cls._load_timeseries_csv(os.path.join(run_dir, file_name))
@@ -561,7 +562,8 @@ class Metocean():
                         run_dir = run_dir,
                         file_name="timeseries_port.csv",
                         file = tseries_inputs.file_metocean_port["value"],
-                        loc = "metocean file port"
+                        loc = "metocean file port",
+                        ST = tseries_inputs.ST_O_M
                     )
                     if power_farm is not None and getattr(power_farm, "wtg_number_devices", None) is not None:
                         if wtg is None or z0 is None:
@@ -587,7 +589,8 @@ class Metocean():
                     run_dir = run_dir,
                     file_name=f"timeseries_{i}.csv",
                     file = tseries_inputs.file_metocean_tow_location[i]["value"],
-                    loc = f"metocean file tow location {i}"
+                    loc = f"metocean file tow location {i}",
+                        ST = tseries_inputs.ST_O_M
                 )
                 met_dist[int(i)] = tseries_inputs.file_metocean_tow_distance[i]["value"]
         return met, met_dist

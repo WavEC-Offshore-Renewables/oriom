@@ -12,9 +12,6 @@ from oriom.utils.read_dataframe_value import approximate_hourly_data, get_inspec
 from oriom.core.functions.layout_power import aux_layout_power_func
 
 
-DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
-
-
 def find_highest_power_node(G):
 
     '''

@@ -625,6 +625,7 @@ class TestOperationTimeseriesBuilder(unittest.TestCase):
             df_metocean=self.metocean_port.df_timeseries,
             duration_shift=self.inputs.tseries.shift_duration["value"],
             operations_inspect_port=self.operations["operations_inspect_port"],
+            inputs_tseries=self.inputs.tseries,
         )
 
         mock_major_manager.assert_called_once_with(

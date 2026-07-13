@@ -59,6 +59,7 @@ class TestResultsBlock(unittest.TestCase):
                 merge_vessel={"value": ["ctv"]},
                 time_between_devices_dict={"device": 1.0},
                 shift_duration={"value": 12},
+                ST_O_M = False
             ),
             stats=SimpleNamespace(
                 lifetime={"value": 20},

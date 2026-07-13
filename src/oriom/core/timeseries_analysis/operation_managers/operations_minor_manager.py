@@ -61,7 +61,7 @@ def opeartion_minor_manager(
         op_dir_other = os.path.join(operation_dir, similar_operation_id)
         op_dir = os.path.join(operation_dir, operation.id)
 
-        if check_files:
+        if check_files and not inputs_tseries.ST_O_M:
             file_exist = check_files.reuse_file_exist(
                 op_dir = op_dir,
                 file_name_schedule = 'operation_schedule.csv',

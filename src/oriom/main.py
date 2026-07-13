@@ -10,7 +10,6 @@ from datetime import datetime
 # Import oriom package
 from oriom.inputs.Configuration import ConfigRun, ProjectDirs
 from oriom.inputs.Input_manager import Input_Files, extract_input_from_excel, handle_overwrite_previous
-from oriom.inputs.user_inputs import user_input_overwrite
 from oriom.utils import aux_operation
 from oriom.domain.Inputs.Inputs import Inputs
 from oriom.domain.Failure import Failure
@@ -37,11 +36,12 @@ print()
 
 
 try:
-    from oriom.core.functions.private import check_files
+    from oriom.core.functions.private import check_files, user_inputs
 except ImportError:
     check_files = None
-    e_ = 'The user is not authorized to use private function. "Check_files", '
-    e_ += '"KPI_Insight" and "VesselMobilisationScheduler" module are not available'
+    user_inputs = None
+    e_ = 'The user is not authorized to use private function. "Check_files", "user_inputs'
+    e_ += '"KPI_Insight" and "VesselMobilisationScheduler" modules are not available'
     logging.warning(e_)
 
 warnings.simplefilter('ignore')
@@ -68,8 +68,8 @@ DEFAULT_CONFIG = ConfigRun(
     SOURCE_PATH_SHAREPOINT="",
     FORM_NAME="form_test.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
-    ST = False,
-    DIRS_OVERWRITE_PATH = r'C:\Users\RiccardoMeda\Project\oriom\tmp\user'
+    ST = True,
+    DIRS_OVERWRITE_PATH = r'C:\Users\RiccardoMeda\Project\oriomOOP\oriom\tmp\user'
 )
 
 
@@ -204,8 +204,8 @@ def run(config: ConfigRun | None = None):
     vessels = list(operations['vessels'].values())
 
     logging.info('--------------------\tINPUTS - USER DEFINITION\t--------------------')
-    if Config.DIRS_OVERWRITE_PATH:
-        failures, operations, vessels = user_input_overwrite.run_overwrite(
+    if user_inputs and Config.DIRS_OVERWRITE_PATH:
+        failures, operations, vessels = user_inputs.user_input_overwrite.run_overwrite(
             inputs=inputs, 
             dirs=dirs, 
             failures=failures, 

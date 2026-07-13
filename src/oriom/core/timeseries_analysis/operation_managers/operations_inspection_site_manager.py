@@ -61,7 +61,7 @@ def inspect_site_manager(
         op_dir = os.path.join(operation_dir, operation.id)
         file_name_schedule = 'operation_schedule.csv'
 
-        if check_files:
+        if check_files and not inputs_tseries.ST_O_M:
             # Check if there is a file to reuse
             file_exist = check_files.reuse_file_exist(
                 op_dir = op_dir,
