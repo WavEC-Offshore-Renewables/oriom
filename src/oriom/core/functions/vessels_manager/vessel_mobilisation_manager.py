@@ -15,8 +15,9 @@ def create_yearly_mobilisation_mother_vessel(
     """
     Create for each year of the log_events_merged file a mobilisation of a mother vessel from the first use
 
-    NOTE This code is run as mother_vessel are defined as second vessels and second vessel do not generate a mobilisation
-    Generate 1 mobilisation per year. To add externaly more mobilisation if more call are made
+    NOTE:
+        This code is run as mother_vessel are defined as second vessels and second vessel do not generate a mobilisation
+        Generate 1 mobilisation per year. To add externaly more mobilisation if more call are made
 
     Args:
         log_events_merged (pd.DataFrame): dataframe of all log_events_merged,

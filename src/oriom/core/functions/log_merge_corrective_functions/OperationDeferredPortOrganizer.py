@@ -34,7 +34,8 @@ class OperationDeferredPortCreation():
         find_element_class (: object) callable used to find objects.
 
 
-        NOTE: The utilization of device to store at port (wet storage) must be implemented
+        NOTE:
+            The utilization of device to store at port (wet storage) must be implemented
     """
 
     def __init__(
@@ -68,8 +69,7 @@ class OperationDeferredPortCreation():
 
         self.operation_completed = True
         
-        min_val = min(v.n_vessels for v in self.vessels.values())
-        self.vessel_available = {v.id: min_val for v in self.vessels.values()}
+        self.vessel_available = {v.id: v.n_vessels for v in self.vessels.values()}
 
         # Building dict opeartions
         for oper_port in oper_port_dict.values():
@@ -508,7 +508,8 @@ class OperationDeferredPortCreation():
         All the operations are stored in dict tow_at_port_date, oper_at_port and tow_at_site_date with key the vessel and device number
         and value a tuple with the date of end of the operation and the date of start of the operation.
 
-        NOTE Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
+        NOTE: 
+            Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
 
         Args:
             time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.

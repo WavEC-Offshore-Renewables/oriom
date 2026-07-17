@@ -221,7 +221,8 @@ class Layout_PV:
                    n_substations: int, tow_string_shutdown: bool, save_dir=None, show_plot=False):
         """
         UPSALLA layout implemented
-        NOTE Layout not available
+        Note:
+             Layout not available
         """
         G = nx.DiGraph()
         G.graph['tow_string_shutdown'] = tow_string_shutdown

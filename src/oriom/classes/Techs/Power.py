@@ -170,6 +170,9 @@ class Matrix():
     PowerMatrix class for wave energy.
     It reads the power matrix in the CSV file and convert it to :obj:`pd.DataFrame`
 
+    NOTE: 
+        the current file is in kW
+
     Args:
         file_ (:obj:`str`): The path to the CSV file containing the power matrix data.
         rated (:obj:`float`): The rated power value in kW.
@@ -188,9 +191,6 @@ class Matrix():
         Raises:
             ValueError: If the rated power is negative.
             FileNotFoundError: If the specified file does not exist.
-
-        NOTE: the current file is in kW
-
         """
         self.file = str(file_)
         self.rated = float(rated)
@@ -326,7 +326,8 @@ class Power_Losses():
         electric_loss (:obj:`DataFrame`): Power electric loss in normalized %. Default to empty
         wake_loss (:obj:`DataFrame`): Power wake loss for WTG technologies in normalized %. Default to empty
 
-    TODO: To implement wake losses for WEC technologies
+    TODO: 
+        To implement wake losses for WEC technologies
 
     NOTE:
         Power_losses column must be with normalized value between 1 and 0, they represent unitary percentage of Power loss. 

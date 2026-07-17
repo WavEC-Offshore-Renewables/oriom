@@ -24,8 +24,11 @@ def operation_consecutive(
             - The leadtime of the next merged operations must be lower than the time of the operation
                 (compare index of wait to start with hours of work conducted, leadtime is higher merge cannot be done)
 
-        NOTE For now the max duration of the shift is 12 h
-        TODO vessel with overnight could stay longer wihout the need of return to port
+        NOTE:
+            For now the max duration of the shift is 12 h
+
+        TODO:
+            Vessel with overnight could stay longer wihout the need of return to port
 
     Args:
         duration_shift (:obj:`float`): The available duration of one working shift in hours taken into consideration.
@@ -97,9 +100,12 @@ def operation_consecutive_simultaneously(
         - The leadtime of the next merged operations are respected
         - The duration of the shift is not exceeded.
 
-        NOTE For now the max duration of the shift is 12 h,
-        TODO vessel with overnight could stay longer wihout the need of return to port
-        TODO Check as fix the case that the accumulation of transit between devices exceed the duration_inspection
+        NOTE: For now the max duration of the shift is 12 h,
+
+        TODO: 
+            - vessel with overnight could stay longer wihout the need of return to port
+            
+            - Check as fix the case that the accumulation of transit between devices exceed the duration_inspection
             In such case the first crew end the first inspection before that the vessel is ready to take
             them and bring them in a new device
 

@@ -84,7 +84,8 @@ def define_shift_operation_values(
     returns a timeseries dataframe with the operation total duration, waitings
     and transit times.
 
-    IMPORTANT NOTE: all the values obtained are the sum of all shifts of work at the device.
+    NOTE: 
+        all the values obtained are the sum of all shifts of work at the device.
 
     Args:
         df_metocean (:obj:`pandas.DataFrame`): metocean timeseries table.

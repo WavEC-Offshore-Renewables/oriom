@@ -154,7 +154,8 @@ def filter_df_events_per_vessel(
         vessel_id (str): The vessel ID to filter by.
         second_vessel (bool): If True, include events where the vessel is vessel_2 as well.
 
-    NOTE: Using n_vessel_1_effective as we are calculating the number of charting vessel, and they could
+    NOTE: 
+        Using n_vessel_1_effective as we are calculating the number of charting vessel, and they could
         be less than n_vessel_1 due to the reuse of the vessel
 
     Returns:

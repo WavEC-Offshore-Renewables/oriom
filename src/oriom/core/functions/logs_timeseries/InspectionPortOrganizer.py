@@ -30,7 +30,8 @@ class InspectionPortCreation():
         oper_schedule_tow_site_only (: pd.DataFrame): DataFrame containing the operation schedule for towing to site.
         oper_schedule_tow_site_port (: pd.DataFrame): DataFrame containing the operation schedule for towing to site and port.
 
-        NOTE: The utilization of device to store at port (wet storage) must be implemented
+        NOTE: 
+            The utilization of device to store at port (wet storage) must be implemented
     """
 
     def __init__(self, inspection, n_device_at_port, n_device_stored_at_port, find_element_class, shutdown_col):

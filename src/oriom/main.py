@@ -79,11 +79,11 @@ DEFAULT_CONFIG  = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="test_NO_DISC",
+    PROJECT_NAME="P1_Star",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Riccardo\ORIOM\oriom\src\oriom\tmp\test_CT_DOEA",
+    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="CT tow operation BASE_WS.xlsx",
+    FORM_NAME="P1_Star.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

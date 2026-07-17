@@ -181,7 +181,8 @@ def find_start_time(
 
     It looks for the first day different from the original on which the operation have wait at site equal to zero.
 
-    # NOTE if there is a wait at site the operation will be conducted alone
+    NOTE: 
+        if there is a wait at site the operation will be conducted alone
 
     Args:
         day_start_oper (pd.Timestamp): The date on which the operation should start.

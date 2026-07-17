@@ -132,7 +132,8 @@ def working_shifts(
         and number of technicians needed for a given inspection if the inspection time of each device is beyond
         the personnel shift.
 
-        IMPORTANT NOTE: This function is not used in the current version of the code. Anyway it could be taken into account
+        NOTE: 
+            This function is not used in the current version of the code. Anyway it could be taken into account
             the fact of using more crew on the vessel to conduct parallel inspections. Not mandatory as usually long inspection
             require high amout of personnel and the presence of the vessel itself along the operation
 

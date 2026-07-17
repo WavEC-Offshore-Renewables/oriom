@@ -29,6 +29,7 @@ def define_merged_operations_values(
         Based on the number of shifts and its duration, :func:`define_shift_values`
         returns a timeseries dataframe with the operation total duration, waitings
         and transit times.
+        
         IMPORTANT NOTE: the shutdown durations are the sum of all net durations
         of work at the device.
 
