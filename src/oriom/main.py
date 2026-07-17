@@ -27,8 +27,6 @@ from oriom.core.statistical_analysis.final_run_statistics import return_statisti
 from oriom.core.results_block_manager import results_block
 from oriom import test
 
-ST_main = True
-
 print()
 test.test()
 time.sleep(1)
@@ -64,12 +62,12 @@ DEFAULT_CONFIG = ConfigRun(
     ENERGY_STATISTICAL_CALCULATION=False,
     PROJECT_NAME="test_oriom",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\Project\oriom\tests\test_files\test_end_to_end",
+    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_test.xlsx",
+    FORM_NAME="P1_Radial.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
-    ST = True,
-    DIRS_OVERWRITE_PATH = r'C:\Users\RiccardoMeda\Project\oriomOOP\oriom\tmp\user'
+    ST = False,
+    DIRS_OVERWRITE_PATH = r''
 )
 
 
@@ -133,7 +131,9 @@ def run(config: ConfigRun | None = None):
     ### ---------- INPUTS ---------- ###
     files = Input_Files(dirs.base_dir)
 
-    logging.info('--------------------\tINPUTS\t--------------------')
+    logging.info('--------------------\tINPUTS GENERATION\t--------------------')
+    logging.info('--------------------\tINPUTS GENERATION\t--------------------')
+    logging.info('--------------------\tINPUTS GENERATION\t--------------------')
     inputs = Inputs(
         general = inputs_gen,
         stats = Inputs.Statistical(file_inputs = files.inputs_stats_file, out_dir = dirs.run_dir),
@@ -180,7 +180,7 @@ def run(config: ConfigRun | None = None):
 
 
     logging.info('--------------------\tSYSTEM\t--------------------')
-    #TODO oriom OOP
+    #TODO oriom OOP. Code not yet used and integrated
     # farm, port, storage = system_builder(
     #     inputs = inputs,
     #     farm_technologies = farm_technologies,
@@ -344,11 +344,10 @@ def run(config: ConfigRun | None = None):
 
     logging.info('--------------------\tEND OF THE SIMULATION\t--------------------')
 
-    if ST_main:
+    if not Config.ST:
         from oriom.export.st_package import export_st_package
         export_st_package(
             package_dir=r"C:\Users\RiccardoMeda\temp",
-            Config=Config,
             operations_stats = operations_stats,
             overwrite = True
         )

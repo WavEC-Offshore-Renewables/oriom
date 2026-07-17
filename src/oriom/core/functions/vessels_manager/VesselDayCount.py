@@ -117,6 +117,12 @@ class VesselDayCounter():
 
     def allocate_vessels(self,  log_events_merged: pd.DataFrame, ST = False, contract_evaluation = True):
         """
+        .. figure:: /_static/Flowchart/Vessel_Counter.png
+            :width: 8000px
+            :alt: example
+
+            Vessel Counter logic diagram
+
         Account the number of vessels type for each day and select the dates of the operation
 
         This function has various type of use:
@@ -124,7 +130,7 @@ class VesselDayCounter():
                 - Evaluate calendar the TOTAL amount of vessels used and modify the log_events_merged ST
             2) ST = False & contract_evaluation = True
                 - After the chart SA to evaluate in calendar the TOTAL amount of vessels used that do not
-                    account for vessels that have already been reused
+                    account for vessels that are reused for more operations
             3) ST = False & contract_evaluation = False
                 - After the chart SA to evaluate in calendar ONLY the ST amount vessels that do not
                     account for vessels that have already been reused

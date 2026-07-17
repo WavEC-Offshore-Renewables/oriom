@@ -17,6 +17,12 @@ class OperationDeferredPortCreation():
     """
     Class to generate and manage the Deferred Operation at Port considering towing, operations, WoW, n_vessels and port spaces
 
+    .. figure:: /_static/Flowchart/TTP_Deferred.png
+        :width: 8000px
+        :alt: example
+
+        TTP Operation deferred logic diagram
+
     Attributes:
         oper_port_dict (: dict): Dict of object of class ``OperationMajor`` that will be conducted at port
         oper_port (:object): Object of OperationMajor operations under specific analysis
@@ -68,8 +74,7 @@ class OperationDeferredPortCreation():
 
         self.operation_completed = True
         
-        min_val = min(v.n_vessels for v in self.vessels.values())
-        self.vessel_available = {v.id: min_val for v in self.vessels.values()}
+        self.vessel_available = {v.id: v.n_vessels for v in self.vessels.values()}
 
         # Building dict opeartions
         for oper_port in oper_port_dict.values():

@@ -21,6 +21,15 @@ def merge_operation(
     )->pd.DataFrame:
 
     """
+    .. figure:: /_static/Flowchart/Merge_Immediate_operations.png
+        :width: 8000px
+        :alt: example
+
+        Merge immediate operation logic diagram
+
+    NOTE: Only vessels that can do drop-off of personel (like CTV) can be merged for immediate corrections as usually the other operations require
+        the vessel present at the site on which the O&M is conducted, so no drop off is available.
+
     This function concatenate rows creating a dataframe of the corrective operations that can be merged.
     Exclude all the deferred operations from the analysis. Use the predifined groups of operations to merge the operations
     previously calculated in the function mergeble_operation. Returns the dataframe with the merged operations.
@@ -61,11 +70,6 @@ def merge_operation(
         restrictive operation is conducted all the other should be conducted, usually longer operations are the first to start)
         rows creating a dataframe of the corrective operations that can be merged.
 
-        NOTE: For now only operations that use CTV vessel can be merged for immediate corrections as usually the other operations require
-            the vessel present at the site on which the O&M is conducted, so no drop off is available
-
-        NOTE: merging of operations do not use more than 1 CTV vessel, do not use other type of vessel
-
         NOTE: If a vessel is full it will be called a new vessel to conduct the operation, the operation will be conducted in the same day
 
         TODO: For this analysis no optimization is done to try to distribute in an optimal way the number of crew members in the vessel.
@@ -75,7 +79,7 @@ def merge_operation(
         TODO: In this code if there are 10 operation in a group to conduct in the same day and the hours to add of this 10 op exceed the n amount of hour
             available to work it will not merged. Meanwhile it should divide the 10 op in smaller group in order that do not exceed the
             amount of workable hours available. So insthead of using only one vesse with 10 op regrouped it shoul count example 3 vessel
-            with 3 groups of operation merged insthead of 10 vessel. This do not happen many times.
+            with 3 groups of operation merged insthead of 10 vessel. This do not frequently.
         Args:
             log_events (:obj: `pd.DataFrame`): Dataframe with the log events.
             log_mobilisation (pd.DataFrame): Dataframe with the mobilisation log events.

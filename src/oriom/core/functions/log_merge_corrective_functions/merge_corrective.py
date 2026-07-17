@@ -71,6 +71,13 @@ def create_logs_merge(
 )->tuple[pd.DataFrame, pd.Index, pd.DataFrame, dict]:
 
     """
+    .. figure:: /_static/Flowchart/Merge_operations.png
+        :width: 8000px
+        :alt: example
+
+        Merge operations logic diagram
+
+
     This function it runs after that the log_event file is created. It will merge only CORERCTIVE operations that can be conducted
     together considering the OLC.
     Merge dividing the DEFERRED OPERATION and the IMMEDIATE OPERATION.

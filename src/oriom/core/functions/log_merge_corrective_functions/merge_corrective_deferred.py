@@ -25,6 +25,12 @@ def merge_deferred_operations(
 ) -> tuple[pd.DataFrame, dict]:
 
     """
+    .. figure:: /_static/Flowchart/Merge_Deferred_operations.png
+        :width: 8000px
+        :alt: example
+
+        Merge deferred operation logic diagram
+
     This function merge the deferred operations similarly as inspection at site are conducted.
     Merge only same deferred operations together, and consider the fact that more operations can be done consecutevely or
     even simultaneously (drop off personnel). To conduct the next shift must wait the vessel that return to port from the previous

@@ -43,6 +43,11 @@ def failures_event(
         dates_failures_OLD:  pd.DataFrame = None
 ) -> pd.DataFrame:
     """Create a table with failures throughtout the months for the lifetime.
+    .. figure:: /_static/Flowchart/Failure_Generation_Chart.png
+        :width: 8000px
+        :alt: example
+
+        Failure generation logic diagram
 
     Note:
         The failure generation considers:
