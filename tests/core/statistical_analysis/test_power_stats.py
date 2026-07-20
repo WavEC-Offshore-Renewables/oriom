@@ -2,8 +2,8 @@ import unittest
 import pandas as pd
 import os
 
-from oriom.classes.Techs.Power import Curve, Matrix
-from oriom.classes.Metocean import Metocean
+from oriom.domain.Techs.Power import Curve, Matrix
+from oriom.domain.Metocean import Metocean
 from oriom.core.timeseries_analysis.timestep_power import add_power_columns
 from oriom.core.statistical_analysis.power_stats import average_pwind, average_pwave
 

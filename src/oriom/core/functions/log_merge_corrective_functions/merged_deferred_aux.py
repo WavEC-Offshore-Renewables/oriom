@@ -25,7 +25,7 @@ def create_stat_chart_campaign_operation(
         df:pd.DataFrame,
         vessels: list,
         percentile: float = 0.9,
-    )->pd.DataFrame:
+    ) -> tuple[pd.DataFrame, dict]:
 
     """
     Create the statistic chart date for the 'operation_deferred_merged' or 'inspection_site'
@@ -40,8 +40,10 @@ def create_stat_chart_campaign_operation(
 
     Returns:
         pd.DataFrame: dataframe with all the failures.
+        dict: dictionary with monthly percentiles for each vessel.
     """
-
+    vessel_month_percentiles_dict = {}
+    
     if percentile > 1:
         percentile = percentile / 100
 
@@ -65,11 +67,13 @@ def create_stat_chart_campaign_operation(
 
         # Evaluate duration of deferred operations in days for each deferred month
         grouped['duration_days'] = (grouped['max_end'] - grouped['min_trigger']).dt.total_seconds() / 86400  # in days
+
         # monthly percentile calculation
         month_percentiles = np.ceil(grouped.groupby('month')['duration_days'].quantile(percentile)).reset_index()
 
         # Create dictionary with montlhy duration percentile
         month_percentiles_dict = {int(row['month']): int(np.ceil(row['duration_days'])) for _, row in month_percentiles.iterrows()}
+        vessel_month_percentiles_dict = {vessel.id: month_percentiles_dict}
 
         # Add the monthly percentiles to the d_trigger only for the deferred operations
         mask = (df['event'] != 'mobilisation_merged') & (df['vessel_1'] == vessel.id)
@@ -87,7 +91,7 @@ def create_stat_chart_campaign_operation(
             axis=1
         )
 
-    return df
+    return df, vessel_month_percentiles_dict
 
 
 def manage_chart(df: pd.DataFrame, vessels: list, percentile: float = 0.9):
@@ -109,13 +113,13 @@ def manage_chart(df: pd.DataFrame, vessels: list, percentile: float = 0.9):
     
     # Manage deferred chart for campaign tow
     df = df.drop(columns=['year_month'])
-    df = create_stat_chart_campaign_operation(
+    df, vessel_month_percentiles_dict = create_stat_chart_campaign_operation(
         df = df,
         vessels = vessels,
         percentile = percentile
     )
         
-    return df
+    return df, vessel_month_percentiles_dict
 
 
 def vessel_reuse(
@@ -289,8 +293,10 @@ def creation_oper_vessel_dict(
 def remove_single_mobilisation(log_mobilisation: pd.DataFrame, failures_list: list) -> pd.DataFrame:
     """ Remove single mobilisation operation from id_failure"""
     failure_suffixes = {f.split('_', 1)[1] for f in failures_list if '_' in f}
-    mask = ~log_mobilisation['_suffix'].isin(failure_suffixes)
-
+    try:
+        mask = ~log_mobilisation['_suffix'].isin(failure_suffixes)
+    except KeyError:
+        return log_mobilisation
     return log_mobilisation.loc[mask]
     
 

@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import timedelta, datetime
 import pandas as pd
 
-from oriom.classes.TowData import TowData
+from oriom.domain.TowData import TowData
 from oriom.utils.aux_functions import safe_getattr
 from oriom.utils.read_dataframe_value import approximate_hourly_data
 from oriom.core.functions.logs_timeseries import logs_timeseries_func

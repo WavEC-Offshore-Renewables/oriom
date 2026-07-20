@@ -7,7 +7,7 @@ from tqdm import tqdm
 from oriom.utils import yaml_manager
 from oriom.utils import aux_functions
 from oriom.common.constants import ATTRIBUTE_LIST_REUSE_MINOR
-from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
+from oriom.domain.OperationTimeSeriesData import OperationTimeSeriesData
 from oriom.core.timeseries_analysis.working_shifts import working_shifts
 from oriom.core.timeseries_analysis.workability import workability
 from oriom.core.functions.operation_scheduler.define_shift_operation import define_shift_operation_values
@@ -61,7 +61,7 @@ def opeartion_minor_manager(
         op_dir_other = os.path.join(operation_dir, similar_operation_id)
         op_dir = os.path.join(operation_dir, operation.id)
 
-        if check_files:
+        if check_files and not inputs_tseries.ST_O_M:
             file_exist = check_files.reuse_file_exist(
                 op_dir = op_dir,
                 file_name_schedule = 'operation_schedule.csv',

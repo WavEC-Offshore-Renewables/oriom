@@ -48,12 +48,10 @@ def update_yaml_each_attribute(
         attr_yaml = {}
         raise ValueError(f'UPDATE YAML: The file {file_dir}/{file_name} is empty')
 
-    attr_yaml.setdefault('working_shifts', {})
-
     # Update the file yaml for each key of the dict that is not olc
     if data:
         if operation_id and data.get('id_main') and data['id_main'] != operation_id:
-            data['id_main'] = operation_id
+            data.pop('id_main', None)
         for k, v in data.items():
             if 'olc' not in k:
                 if k == 'number_shifts_main':
@@ -68,7 +66,7 @@ def update_yaml_each_attribute(
                     k = 'n_vessel_main'
                 elif k == 'n_vessels_last':
                     k = 'n_vessel_last'
-                attr_yaml['working_shifts'][k] = v
+                attr_yaml[k] = v
 
     # Save the file YAML updated
     with open(file_path, 'w') as f:
@@ -95,11 +93,11 @@ def update_yaml(
     f.close()
     if operation_id and data.get('id_main') and data['id_main'] != operation_id:
         data['id_main'] = operation_id
-    if recursive:
-        new_yaml = update_dict(attr_yaml, data)
-    else:
-        new_yaml = attr_yaml
-        new_yaml[data_key] = data
+
+    new_yaml = attr_yaml
+    if data_key not in new_yaml:
+        new_yaml[data_key] = {}
+    new_yaml[data_key] = data
 
     f = open(os.path.join(file_dir, file_name), 'w')
     yaml=YAML()
@@ -141,10 +139,11 @@ def load_similar_op_yaml(file_dir: str, file_name: str, operation_id: str = None
     regarding the shifts and return them in two dictionaries
     """
 
-    data_working_shifts_key = [
-        "days_main", "duration_main", "rov_main", "n_crew_main", "n_crew_last",
-        "id_grouped", "days_grouped", "duration_grouped", "rov_grouped",
-        "n_vessels_main", "n_vessels_last",
+    working_shifts_key = [
+        'days_main', 'duration_main', 'days_last', 
+        'duration_last', 'n_vessel_main', 'n_vessel_last', 
+        'n_dev_inspected_main_shift', 'n_dev_inspected_last_shift', 
+        'n_crew_main', 'n_crew_last'
     ]
 
     # Upload the similar operation file YAML
@@ -158,9 +157,9 @@ def load_similar_op_yaml(file_dir: str, file_name: str, operation_id: str = None
 
     # take only the values from the allowed_keys
     section_data['id_main'] = operation_id
-    op_working_shifts = section_data
+    data_working_shifts = section_data
 
-    data_working_shifts = {k: data.get(k) for k in data_working_shifts_key if k in data}
+    op_working_shifts = {k: data.get(k) for k in working_shifts_key if k in data}
 
     return op_working_shifts, data_working_shifts
 

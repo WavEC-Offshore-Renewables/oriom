@@ -5,9 +5,9 @@ from oriom.core.functions.logs_timeseries import logs_timeseries_func
 from oriom.core.functions.logs_timeseries import create_logs_events_preventive
 from oriom.core.functions.logs_timeseries import create_logs_events_corrective
 from oriom.core.functions.vessels_manager.VesselChartInspCampaign import Stat_chart_inspection_campaign
+from oriom.common.constants import DICT_DAYS
 
 
-DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
 
 COLS =  [
     'd_trigger',

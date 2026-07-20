@@ -21,6 +21,7 @@ class DummyResults:
             "availability_year_wave": [],
             "availability_year_pv": [],
         }
+        self.dfs_failures = {}
         self.dfs_ctv_list = []
         self.dfs_tot_cost_list = []
         self.dfs_tot_yearly_cost_list = []
@@ -58,6 +59,7 @@ class TestResultsBlock(unittest.TestCase):
                 merge_vessel={"value": ["ctv"]},
                 time_between_devices_dict={"device": 1.0},
                 shift_duration={"value": 12},
+                ST_O_M = False
             ),
             stats=SimpleNamespace(
                 lifetime={"value": 20},
@@ -206,6 +208,7 @@ class TestResultsBlock(unittest.TestCase):
             merged_after_create,
             [0, 1],
             deferred_log_df,
+            {}
         )
 
         vessel_day_counter_instance = DummyVesselDayCounter(

@@ -1,9 +1,9 @@
 import unittest
 import os
-from oriom.classes.Operations.InspectionSite import InspectionSite
-from oriom.classes.Vessel import Vessel
+from oriom.domain.Operations.InspectionSite import InspectionSite
+from oriom.domain.Vessels.Vessel import Vessel
 
-from oriom.classes.DefineOperationTechs import Define_operation
+from oriom.core.builders.DefineOperationTechs import Define_operation
 
 from oriom.core.timeseries_analysis.working_shifts import working_shifts
 

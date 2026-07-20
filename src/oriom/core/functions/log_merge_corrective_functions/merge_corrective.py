@@ -1,7 +1,7 @@
 import pandas as pd
 from copy import deepcopy
 
-from oriom.classes.TowData import TowData
+from oriom.domain.TowData import TowData
 from oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer import OperationDeferredPortCreation
 from oriom.core.functions.log_merge_corrective_functions import merged_deferred_aux
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred import merge_deferred_operations
@@ -68,9 +68,16 @@ def create_logs_merge(
     vessel_to_merge: list,
     time_fail_op_immediately: float,
     duration_shift: float
-)->pd.DataFrame:
+)->tuple[pd.DataFrame, pd.Index, pd.DataFrame, dict]:
 
     """
+    .. figure:: /_static/Flowchart/Merge_operations.png
+        :width: 8000px
+        :alt: example
+
+        Merge operations logic diagram
+
+
     This function it runs after that the log_event file is created. It will merge only CORERCTIVE operations that can be conducted
     together considering the OLC.
     Merge dividing the DEFERRED OPERATION and the IMMEDIATE OPERATION.
@@ -98,7 +105,9 @@ def create_logs_merge(
 
     Returns:
         pd.DataFrame: dataframe with all the events of the farm with corrective operation merged.
-
+        index_overwrite_log_ev: Index of the log events to overwrite.
+        df_events_return: Dataframe with the events return.
+        operation_vessel_percentiles_dict: Dictionary with the percentiles for each operation and vessel.
     """
 
     def open_oper_schedule(oper, operation_scheduler_dict):
@@ -198,14 +207,13 @@ def create_logs_merge(
     df_port_operation_def_log, df_events_return = pd.DataFrame(),  pd.DataFrame()
     deferred_failures_correction, deferred_failures_correction_tow, failures_correction_tow, index_overwrite_log_ev = [], [], [], []
     oper_per_vessel, oper_dict, operation_scheduler_dict, oper_dict_tow = {}, {}, {}, {}
-
+    deferred_vessel_percentiles_dict, tow_vessel_percentiles_dict = {}, {}
 
     # ALL OTHER LOG
     #------------------
     # Copy all log_files that is not going to be merged
     log_mobilisation = log_events[log_events['event'] == 'mobilisation']
     log_event_filt = log_events.loc[log_events['event'].isin(FILTER_EVENT)]
-    FILTER_EVENT.append('mobilisation')
     log_event_to_merge = log_events.loc[~log_events['event'].isin(FILTER_EVENT)]
 
     log_events_merged = pd.concat([log_events_merged, log_event_filt],ignore_index=True)
@@ -273,7 +281,7 @@ def create_logs_merge(
             df_port_operation_def_log.reset_index(drop=True, inplace=True)
             df_events_return = deepcopy(df_port_operation_def_log.drop(columns=['year_month']))
             df_port_operation_def_log = merged_deferred_aux.manage_recommissioning(df_port_operation_def_log, True)
-            df_port_operation_def_log = merged_deferred_aux.manage_chart(
+            df_port_operation_def_log, tow_vessel_percentiles_dict = merged_deferred_aux.manage_chart(
                 df = df_port_operation_def_log,
                 vessels = vessels,
                 percentile = percentile
@@ -298,7 +306,7 @@ def create_logs_merge(
     log_events_def = log_event_op[comments_failure_id.isin(deferred_failures_correction)]
 
     if not log_events_def.empty:
-        log_events_merged_def = merge_deferred_operations(
+        log_events_merged_def, deferred_vessel_percentiles_dict = merge_deferred_operations(
             log_events_def = log_events_def,
             vessels = vessels,
             time_between_devices = time_between_devices,
@@ -380,7 +388,12 @@ def create_logs_merge(
     log_events_merged = merged_deferred_aux.manage_recommissioning(log_events_merged)
     log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
 
-    return log_events_merged, index_overwrite_log_ev, df_events_return
+    operation_vessel_percentiles_dict = {
+        'tow_vessel_percentiles_dict': tow_vessel_percentiles_dict,
+        'deferred_vessel_percentiles_dict': deferred_vessel_percentiles_dict
+    }
+
+    return log_events_merged, index_overwrite_log_ev, df_events_return, operation_vessel_percentiles_dict
 
 
 if __name__ == '__main__':

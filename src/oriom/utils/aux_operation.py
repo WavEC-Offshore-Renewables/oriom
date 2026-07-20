@@ -5,7 +5,7 @@ import networkx as nx
 from collections import Counter
 from ruamel.yaml import YAML
 
-from oriom.classes.Activity import Activity
+from oriom.domain.Activity import Activity
 
 
 def get_graph_levels(G: nx.Graph) -> set:
@@ -23,7 +23,7 @@ def level_component_check(Gs: dict, operations: list, failure: bool = False):
 
     Args:
         Gs (dict): Dictionary of tech graphs (networkx.Graph)
-        operations (list): List of objects to check (InspectionPort, InspectionSite, Failures)
+        operations (list): List of objects to check (InspectionPort, InspectionSite | Failures)
         failure (bool): If True, check 'level_failure'; else 'level'
     """
 

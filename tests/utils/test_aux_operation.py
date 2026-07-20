@@ -6,11 +6,11 @@ import networkx as nx
 from copy import deepcopy
 
 from oriom.utils import aux_operation
-from oriom.classes.DefineOperationTechs import Define_operation
-from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
-from oriom.classes.Operations.CorrectiveMinor import CorrectiveMinor
-from oriom.classes.Operations.OperationTow import OperationTow
-from oriom.classes.Vessel import Vessel
+from oriom.core.builders.DefineOperationTechs import Define_operation
+from oriom.domain.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.domain.Operations.CorrectiveMinor import CorrectiveMinor
+from oriom.domain.Operations.OperationTow import OperationTow
+from oriom.domain.Vessels.Vessel import Vessel
 
 # ---------------------------
 # Helpers / fakes for tests

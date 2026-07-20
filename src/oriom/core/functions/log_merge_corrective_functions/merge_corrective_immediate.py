@@ -21,6 +21,15 @@ def merge_operation(
     )->pd.DataFrame:
 
     """
+    .. figure:: /_static/Flowchart/Merge_Immediate_operations.png
+        :width: 8000px
+        :alt: example
+
+        Merge immediate operation logic diagram
+
+    NOTE: Only vessels that can do drop-off of personel (like CTV) can be merged for immediate corrections as usually the other operations require
+        the vessel present at the site on which the O&M is conducted, so no drop off is available.
+
     This function concatenate rows creating a dataframe of the corrective operations that can be merged.
     Exclude all the deferred operations from the analysis. Use the predifined groups of operations to merge the operations
     previously calculated in the function mergeble_operation. Returns the dataframe with the merged operations.
@@ -62,7 +71,7 @@ def merge_operation(
         rows creating a dataframe of the corrective operations that can be merged.
 
         NOTE: 
-            - For now only operations that use CTV vessel can be merged for immediate corrections as usually the other operations require
+            - Is adviced to consider only operations that use CTV vessel for immediate corrections merge as usually the other operations require
             the vessel present at the site on which the O&M is conducted, so no drop off is available
             
             - merging of operations do not use more than 1 CTV vessel, do not use other type of vessel
@@ -420,7 +429,7 @@ def merge_operation(
                                 event = 'mobilisation_merged',
                                 vessel = vess_group,
                                 oper_list = group,
-                                count_fail = oper_group_comments['failures'],
+                                count_fail = oper_group_comments['failures'][0],
                                 concat = True,
                                 n_vessel = n_vess
                                 )

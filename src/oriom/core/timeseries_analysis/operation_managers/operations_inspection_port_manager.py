@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from oriom.utils import yaml_manager
 
-from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
+from oriom.domain.OperationTimeSeriesData import OperationTimeSeriesData
 
 from oriom.core.timeseries_analysis.workability import workability
 from oriom.core.functions.operation_scheduler.define_shift_operation import define_shift_operation_values
@@ -58,6 +58,7 @@ def operation_inspect_port_manager(
     df_metocean: pd.DataFrame,
     duration_shift: float,
     operations_inspect_port: list,
+    inputs_tseries: object
 ):
     """
     Check if the operations_inspect_site is already existing
@@ -70,6 +71,7 @@ def operation_inspect_port_manager(
         df_metocean (pd.Dataframe): Dataframe of timeseries weather data
         duration_shift (float): Duration of one working shift
         operations_inspect_port (list): List of class `InspectionPort`
+        inputs_tseries (object): Object class `Input.TimeSeries`
 
     Raise:
         InterruptedError: 'The operation can never occur. OLCs may be to resctric.'
@@ -91,7 +93,7 @@ def operation_inspect_port_manager(
         # Check if there is already an operation_schedule file
         file_name_schedule = 'operation_schedule.csv'
 
-        if check_files:
+        if check_files and not inputs_tseries.ST_O_M:
             file_exist = check_files.reuse_file_exist(
                 op_dir = op_dir,
                 file_name_schedule = file_name_schedule,
