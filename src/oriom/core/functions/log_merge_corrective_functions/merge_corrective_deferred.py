@@ -22,7 +22,8 @@ def merge_deferred_operations(
         COLS: list,
         find_element_class: object,
         duration_shift: float
-):
+) -> tuple[pd.DataFrame, dict]:
+    
     """
     This function merge the deferred operations similarly as inspection at site are conducted.
     Merge only same deferred operations together, and consider the fact that more operations can be done consecutevely or
@@ -91,10 +92,13 @@ def merge_deferred_operations(
             mob_time = vessel.mobilisation_time
             vessel_available = vessel.n_vessels
             vessel_busy = 0
-
+            # Find order in which operation id occures. Order them temporarly then alfabetically
+            id_order = (df_ops.groupby("id", as_index=False)["d_trigger"].min().sort_values(["d_trigger", "id"])["id"].tolist())
             # Regroup for same operation and loop on them
-            for op_id, op_row in df_ops.groupby('id'):
-                op_row = op_row.sort_values(by='d_end_leadtime', ascending=True)
+            grouped = df_ops.groupby("id")
+
+            for op_id in id_order:
+                op_row = grouped.get_group(op_id).sort_values("d_end_leadtime")
 
                 # Take all the parameters of the operation
                 (oper_stat, oper, tech_cost, vessel_2,

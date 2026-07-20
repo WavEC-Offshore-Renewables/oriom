@@ -56,7 +56,8 @@ class TestLayout1Wave(unittest.TestCase):
 
     def test_multiple_wec_strings(self, _sf, _sh, _draw):
         G = self.w.layout1_wave(n_wec=6, n_strings=3, substation_node=1, tow_string_shutdown = False, show_plot=False)
-        self.assertEqual(count_nodes_by_level(G, "device"), 6)
+        self.assertEqual(count_nodes_by_level(G, "device"), 3)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 3)
         #Exiost connections array and connections substation
         levels = edge_levels(G)
         self.assertGreaterEqual(levels.count("array_cable"), 6 - 1)
@@ -81,7 +82,8 @@ class TestLayout2Wave(unittest.TestCase):
         # 2 substations
         self.assertEqual(count_nodes_by_level(G, "substation"), 2)
         # 12 device
-        self.assertEqual(count_nodes_by_level(G, "device"), 12)
+        self.assertEqual(count_nodes_by_level(G, "device"), 6)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 6)
         # Redundant cables between substation (2 directions)
         levels = edge_levels(G)
         self.assertGreaterEqual(levels.count("redundant_cable"), 2)
@@ -121,7 +123,8 @@ class TestLayout4Wave(unittest.TestCase):
         # n_strings=2 -> chunk 12 e 13 => n_wec=25 valid
         G = self.w.layout4_wave(n_wec=25, n_strings=2, substation_node=1, show_plot=False)
         # 25 device
-        self.assertEqual(count_nodes_by_level(G, "device"), 25)
+        self.assertEqual(count_nodes_by_level(G, "device"), 23)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 2)
         # Exist one feeder and one array_cable
         levels = edge_levels(G)
         self.assertIn("exp_cable_island", levels)  # feeder_cable level

@@ -415,7 +415,7 @@ class TestInspectionPort(unittest.TestCase):
     @patch("oriom.classes.Operations.InspectionPort.find_highest_power_node")
     def test_define_level_for_known_technology(self, mock_find):
         """define_level must use tech_finder and find_highest_power_node to set level."""
-        mock_find.return_value = "node_X"
+        mock_find.return_value = ["node_X"]
         op = InspectionPort(**make_base_kwargs(id_="ofw500"))
         # Reset level to None to force define_level to act
         op.level = None
@@ -440,8 +440,8 @@ class TestInspectionPort(unittest.TestCase):
         # First call raises AttributeError, second returns node
         mock_find.side_effect = [
             AttributeError("no graph"),  # for G_wind
-            "node_from_wave",            # for G_wave
-            "node_unused",               # (would be G_pv)
+            ["node_from_wave"],            # for G_wave
+            ["node_unused"],               # (would be G_pv)
         ]
 
         G_layouts = {

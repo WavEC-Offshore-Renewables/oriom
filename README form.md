@@ -1,18 +1,46 @@
 # READ ME
 
+**TO USE PRIVATE FUNCTION THE ``PRIVATE MODULES`` MUST BE LOCATED IN**
+
+        oriom\
+           |
+           domain\
+           core\
+              |
+              functions\
+                 |
+                 private\
+                    |
+                    private_module_1.py
+                    private_module_2.py
+            inputs\
+
+The ``Private modules`` will consent to:
+- Reuse old simulation
+- Evaluate Vessel statistical chart time, vessel reutilization and contract expiration
+- ST O&M with forecast API
+- Additional KPI of vessel available
+
+If no ``Private modules`` are available, the simulation will simply not take into consideration the above funcionalities
+
 ## Excel Input General informations
 
 This file give informations and assist the user to better understand how to compile the input excel form file for ORIOM.
 
 Informations are divided for each sheet of the excel form
+---------------------------------------
 
-
-# INSTALLATION MODE
+# ⚙️**INSTALLATION MODE**
 
 To use ORIOM in **Installation Mode**, the workflow is based on:
 
-- creation of pre-existing failures representing installation demand
-- execution through deferred corrective (installation) operations
+- creation of pre-existing failures representing installation demand and reuse such failure in the simulation
+
+        
+- execution through deferred corrective (installation) operations that creates installation campaign with same starting month
+- Manage order of installation using ``preferred_day`` in *Failure* attribute
+- Deactivate ``ENERGY_AVAILABILITY_CALCULATION`` from *Config* attribure
+
 
 Each failure corresponds to a **component to be installed** or an **installation campaign**, depending on the chosen configuration.
 
@@ -25,6 +53,24 @@ The installation process is modeled as follows:
    - Each failure represents a component that must be installed.
    - The number of failures corresponds to the number of devices to install (or grouped campaigns).
 
+    Example of failure creation:
+
+    Two years of campaign with 2 differed opeartion installation, 3 type of components to install (represented as failure)
+
+        datetime	    |id	                |maintenance_strategy	|operation_triggered	|preferred_month
+        1/1/2006 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+        1/1/2006 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+        1/1/2007 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+        1/1/2007 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2007 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2007 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2007 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+
 2. **Deferred operations**
    - Each failure is resolved through an installation operation.
    - The operation defines the installation activity and scheduling.
@@ -33,7 +79,9 @@ The installation process is modeled as follows:
    - Failures are deferred to specific months.
    - Installation is executed progressively according to the defined campaign strategy.
 
-## ⚙️ Installation Strategies
+   **SEE INSTALLATION STRATEGY**
+
+## Installation Strategies
 
 ### a) Example A — Single Device per Trip
 
@@ -111,10 +159,8 @@ The installation process is modeled as follows:
     - ensure sequential execution on consecutive days
     
     - complete the installation campaign without loss of remaining units
-
-
-# 🔧 O&M MODE
-
+---------------------------------------
+# 🔧 **O&M MODE**
 
 ## HARD CODED PARAMETERS
 

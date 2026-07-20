@@ -57,7 +57,7 @@ def shut(
     loc: int,
     shutdown: bool,
     G: nx.DiGraph,
-    component_level_power: str,
+    component_level_power: list,
     levels_component_no_power: set,
     tech: str,
     names_tech: str,
@@ -90,7 +90,7 @@ def shut(
         loc (:obj:`int or tuple`): location of the failure
         shutdown (:obj:`boolean`): define if failure bringst to a shutdown
         G (:obj:`nx.DiGraph`): DiGraph.
-        component_level_power (:obj:`str`): lower level of component with power implemented
+        component_level_power (:obj:`list`): list of string for level of component with power implemented
         levels_component_no_power (:obj:`set`): level of node with level without power characteristic
         tech (:obj:`str`): name of tech analyzed
         names_tech (:obj:`str`): level of the component analyzed
@@ -144,7 +144,7 @@ def shut(
                 #cable failure on tech not implemented, choose a random string and reduce the power
                 if loc == ('x', 'x'):
                     # Reassign the location of the array cable to an inverter
-                    level = component_level_power
+                    level = component_level_power[0] #NOTE PV tech only 1 power level is implemented
 
                     list_nG = [n for n, attr in G.nodes(data='level') if attr == level]
                     if list_failed is None:
@@ -199,7 +199,7 @@ def shut(
 def fix(
     loc,
     G: nx.DiGraph,
-    component_level_power: str,
+    component_level_power: list,
     levels_component_no_power: set,
     tech: str,
     names_tech: str,
@@ -220,7 +220,7 @@ def fix(
     Args:
         loc (:obj:`int or tuple`): location of the failure
         G (:obj:`nx.DiGraph`): DiGraph.
-        component_level_power (:obj:`str`): level of component with power characteristic
+        component_level_power (:obj:`list`): list of string for level of component with power implemented
         levels_component_no_power (:obj:`set`): level of node with level without power characteristic
         tech (:obj:`str`): name of tech analyzed
         names_tech (:obj:`str`): level of the component analyzed
@@ -260,7 +260,7 @@ def fix(
                     G.nodes[loc]['power'] += n_pv_per_string
                     livello = 'string'
             else:
-                if G.nodes[loc]['level'] == 'device':
+                if G.nodes[loc]['level'] == 'device' or G.nodes[loc]['level'] == 'last_string_device':
                     # Solve power if not tow
                     if event != 'tow':
                         # Check if this op had a recommission open or 
@@ -372,15 +372,15 @@ def count_nodes_power(G, component_level_power):
 
     Args:
         G (:obj:`nx.DiGraph`): DiGraph.
-        component_level_power (:obj:`str`): level of component with power characteristic
-        
-        Returns:
+        component_level_power (:obj:`list`): list of string for level of component with power implemented
+
+    Returns:
         n_list (:obj:`list`): list of node with power different from 0 on the lowest level of power component
     """
 
     n_list = []
     for node in G.nodes():
-        if G.nodes[node]['level'] == component_level_power:  # Consider only power nodes
+        if G.nodes[node]['level'] in component_level_power:  # Consider only power nodes
             for path in nx.all_simple_paths(G, source=node, target=0):
                 edges = list(zip(path[:-1], path[1:]))  # Convert the generator in a list
                 if all(G[u][v].get('visible', False) for u, v in edges):  # Verify the visibility of arch

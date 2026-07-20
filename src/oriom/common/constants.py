@@ -1,16 +1,10 @@
 """ Common fixed parameter for ORIOM """
 
 # Failure list level available to select
-FAILURE_LEVEL_LIST = [
-    None, 'shore', 'exp_cable', 'exp_cable_island', 'dyn_cable-sub',
-    'array_cable', 'cable_cb', 'cable_transf', 'cable_switch',
-    'cable_inv', 'string_cable', 'substation', 'mv_transformer',
-    'circuit_braker', 'switcher', 'inverter', 'device', 'hub'
-]
 
 FAILURE_NODE_LEVEL_LIST = [
     'shore', 'substation', 'mv_transformer', 'string', 'hub',
-    'circuit_braker', 'switcher', 'inverter', 'device'
+    'circuit_braker', 'switcher', 'inverter', 'device', 'last_string_device'
 ]
 
 FAILURE_EDGE_LEVEL_LIST = [
@@ -18,6 +12,8 @@ FAILURE_EDGE_LEVEL_LIST = [
     'array_cable', 'cable_cb', 'cable_transf', 'cable_switch',
     'cable_inv', 'string_cable'
 ]
+
+FAILURE_LEVEL_LIST = [None] + FAILURE_NODE_LEVEL_LIST + FAILURE_EDGE_LEVEL_LIST
 
 LIST_MONTHS_STR = [str(c) for c in range(1,13)]
 LIST_MONTHS = [c for c in range(1,13)]

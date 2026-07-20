@@ -12,27 +12,21 @@ from oriom.utils.read_dataframe_value import approximate_hourly_data, get_inspec
 from oriom.core.functions.layout_power import aux_layout_power_func
 
 
-DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
-
-
 def find_highest_power_node(G):
 
     '''
-    Take the Graph of the farm and give back as string the level of the component on which the power is implemented
+    Take the Graph of the farm and give back as list of string the levels of the component on which the power is implemented
 
     Args:
         G (:obj:`nx.DiGraph`): DiGraph.
 
     Return:
-        str: of the component level
+        list: list of string of the component level
     '''
-    max_power = float('-inf')  # Lowest value
-
+    component_level_power = []
     for node in G.nodes():
-        power = G.nodes[node].get('power', 0)  # Get power, 0 if not max
-        if power > max_power:
-            max_power = power
-            component_level_power = G.nodes[node]['level']
+        if G.nodes[node].get('power', 0) > 0 and G.nodes[node]['level'] not in component_level_power:
+            component_level_power.append(G.nodes[node]['level'])
 
     return component_level_power
 
@@ -89,7 +83,7 @@ def create_end_start_lifetime(
 def choose_loc(
     level: str,
     G: nx.DiGraph,
-    component_level_power: str,
+    component_level_power: list,
     date: datetime,
     list_failed: set = (),
     tech: str = None
@@ -103,7 +97,7 @@ def choose_loc(
     Args:
         level (:obj:`str`): Level of the failure (node/edge).
         G (:obj:`nx.DiGraph`): Graph of tech farm.
-        component_level_power (str): level where the power is implemented in the layout farm (usually lowest level implemented)
+        component_level_power (:obj:`list`): list of string for level of component with power implemented
         list_failed (:obj:`set`): set of already failed component
         tech (:obj:`str`): technology analyzed
 
@@ -118,7 +112,7 @@ def choose_loc(
     if level in FAILURE_NODE_LEVEL_LIST:
         if tech == 'PV':
             if any(keyword in level for keyword in ['device', 'string']):
-                level = component_level_power
+                level = component_level_power[0] #NOTE PV tech only 1 power level is implemented
 
         #list_nG = list(n for n, attr in G.nodes(data=True) if attr['level'] == level)
         list_nG = [n for n, attr in G.nodes(data='level') if attr == level]
@@ -543,10 +537,11 @@ def take_power_level_inspections(G_tech: nx.DiGraph, inspections_port_stat: list
     """
     power_level_dict = {}
     component_level_power = aux_layout_power_func.find_highest_power_node(G_tech)
-    power_level_dict[component_level_power] = aux_layout_power_func.find_power_at_node(G_tech = G_tech, level = component_level_power)
+    for comp_level_p in component_level_power:
+        power_level_dict[comp_level_p] = aux_layout_power_func.find_power_at_node(G_tech = G_tech, level = comp_level_p)
     for inspection in inspections_port_stat+inspections_site_stat:
         level = getattr(inspection.insp_class,'level',None)
-        if level and level != component_level_power and level not in power_level_dict:
+        if level and level not in component_level_power and level not in power_level_dict:
             power_level_dict[level] = aux_layout_power_func.find_power_at_node(G_tech = G_tech, level = level)
     return power_level_dict
 

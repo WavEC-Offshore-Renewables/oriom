@@ -77,13 +77,13 @@ DEFAULT_CONFIG  = ConfigRun(
     VESSEL_DIST_REDUCED_LIST=["ctv","sv"],
     FUEL_TO_ADD = {},
     MOBILISATION_TO_ADD={},
-    ENERGY_AVAILABILITY_CALCULATION=True,
+    ENERGY_AVAILABILITY_CALCULATION=False,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="P1_Star",
+    PROJECT_NAME="P1_Radial_installation",
     BASEFILES_FROM_EXCEL=False,
     EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="P1_Star.xlsx",
+    FORM_NAME="P1_Radial_installation.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=0.02,
 )
 

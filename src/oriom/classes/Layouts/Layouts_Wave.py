@@ -60,7 +60,8 @@ class Layout_Wave():
                     G.add_node(node_counter)
                     nx.set_node_attributes(G, {node_counter: {
                         'name': f"WEC_{t}", 'coords': (s, h),
-                        'level': 'device', 'power': 1
+                        'level': 'device' if t != string_wec[-1] else 'last_string_device',
+                        'power': 1
                     }})
                     if i == 0:
                         G.add_edge(node_counter, substation_node)
@@ -345,7 +346,7 @@ class Layout_Wave():
                     att_w1 = {count_nodes+1:{
                             'name' : "WEC_%i" %t_1,
                             'coords' : (s,h+offset),
-                            'level' : 'device',
+                            'level' : 'last_string_device',
                             'power' : 1
                     }}
                     nx.set_node_attributes(G,values=att_w1)
@@ -498,11 +499,13 @@ if '__main__' in __name__:
     lw = Layout_Wave()
     G = lw.layout_wave(
         n_layout = 4,
-        n_wec = 6,
-        n_strings = 3,
-        n_string_to_connector = 3,
+        n_wec = 150,
+        n_strings = 12,
+        n_string_to_connector = 6,
         n_substations = 2,
         n_exports = 1,
         tow_string_shutdown = False
     )
 
+    for node, attr in G.nodes(data=True):
+        print(node, attr)

@@ -330,12 +330,12 @@ class InspectionPort():
         if not self.level:
             tech = self.tech_finder()
             if tech:
-                self.level = find_highest_power_node(G_layouts[tech])
+                self.level = find_highest_power_node(G_layouts[tech])[0]
             else:
                 # oce common event case, take the level of the first  Graph that you find
                 for tech in ["G_wind","G_wave","G_pv"]:
                     try:
-                        self.level = find_highest_power_node(G_layouts[tech])
+                        self.level = find_highest_power_node(G_layouts[tech])[0]
                         break
                     except AttributeError:
                         continue

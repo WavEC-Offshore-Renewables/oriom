@@ -120,7 +120,8 @@ def return_percentage(
 
     COMPONENT_LEVEL_POWER = aux_layout_power_func.find_highest_power_node(G)
     LEVELS_NO_POWER = {data.get("level") for _, data in G.nodes(data=True)}
-    LEVELS_NO_POWER.discard(COMPONENT_LEVEL_POWER)
+    for x in COMPONENT_LEVEL_POWER:
+        LEVELS_NO_POWER.discard(x)
 
     # Create list of operations id to consider for shut down or fix strategy
     op_corr_excl_tow = [op.id for op in operations_corrective_stat if not getattr(op.op_class, "tow_to_port", None)]
