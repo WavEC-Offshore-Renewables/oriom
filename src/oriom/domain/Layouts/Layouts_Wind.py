@@ -1,7 +1,6 @@
 import networkx as nx
 import logging
 import os
-import math
 import matplotlib.pyplot as plt
 
 from oriom.domain.Layouts.Layout_Auxiliary import Layout_Aux
@@ -75,7 +74,8 @@ class Layout_Wind():
                     G.add_node(node_counter)
                     nx.set_node_attributes(G, {node_counter: {
                         'name': f"Wtg_{t}", 'coords': (s, h),
-                        'level': 'device', 'power': 1
+                        'level': 'device' if t != string_turbines[-1] else 'last_string_device',
+                        'power': 1
                     }})
                     if i == 0:
                         G.add_edge(node_counter, substation_node)
@@ -287,7 +287,8 @@ class Layout_Wind():
                 G.add_node(node_counter)
                 nx.set_node_attributes(G, {node_counter: {
                     'name': f"Wtg_{t}", 'coords': (s, h),
-                    'level': 'device', 'power': 1
+                    'level': 'device' if t != string_turbines[-1] else 'last_string_device',
+                    'power': 1
                 }})
                 if i == 0:
                     G.add_edge(node_counter, substation_node)

@@ -2,7 +2,7 @@
 
 FAILURE_NODE_LEVEL_LIST = [
     'shore', 'substation', 'mv_transformer', 'string', 'hub',
-    'circuit_braker', 'switcher', 'inverter', 'device'
+    'circuit_braker', 'switcher', 'inverter', 'device', 'last_string_device'
 ]
 
 FAILURE_EDGE_LEVEL_LIST = [
