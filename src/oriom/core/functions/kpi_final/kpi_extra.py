@@ -15,9 +15,9 @@ def data_ctv_long_term_strategy(
     different number of long term vessel are charted.
 
     Args:
-        v (object): object of class `~oriom.classes.Vessel.Vessel`
-        log_events_merged (:obj:`pd.DataFrame`): Dataframe of log_events_merged
-        n_lifetime (:obj:`int`): Lifetime of the project in years.
+        v (object): object of class `~oriom.domain.Vessel.Vessel`
+        log_events_merged (pd.DataFrame): Dataframe of log_events_merged
+        n_lifetime (int): Lifetime of the project in years.
 
     Returns:
         dict

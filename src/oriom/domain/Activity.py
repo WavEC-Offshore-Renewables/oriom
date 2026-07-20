@@ -16,18 +16,18 @@ class Activity():
         of the activity.
 
     Attributes:
-        id (:obj:`str`): Activity ID.
-        name (:obj:`str`): Activity description.
-        duration (:obj:`float`): The amount of time to preform this activity.
-        location (:obj:`str`): Where this activity takes place: port, site or transit.
+        id (str): Activity ID.
+        name (str): Activity description.
+        duration (float): The amount of time to preform this activity.
+        location (str): Where this activity takes place: port, site or transit.
         wtg_shutdown_dur (:obj:`bool`): Duration of the activity related with WTGs.
         wec_shutdown_dur (:obj:`bool`): Duration of the activity related with WECs.
         pv_shutdown_dur (:obj:`bool`): Duration of the activity related with PV panels.
-        hs (:obj:`float`): Limit wave height. Its value is None if there is no limit.
-        tp (:obj:`float`): Limit wave period. Its value is None if there is no limit.
-        ws (:obj:`float`): Limit wind speed. Its value is None if there is no limit.
-        ws_hub (:obj:`float`): Limit wind speed at hub height. Its value is None if there is no limit.
-        cs (:obj:`float`): Limit current speed. Its value is None if there is no limit.
+        hs (float): Limit wave height. Its value is None if there is no limit.
+        tp (float): Limit wave period. Its value is None if there is no limit.
+        ws (float): Limit wind speed. Its value is None if there is no limit.
+        ws_hub (float): Limit wind speed at hub height. Its value is None if there is no limit.
+        cs (float): Limit current speed. Its value is None if there is no limit.
         light (:obj:`bool`): The need of day light to preform the activity.
         towing (:obj:`bool`): Indicates if this activity is performing a towing operation.
 
@@ -63,10 +63,10 @@ class Activity():
         """Initializes :class:`Activity`.
 
         Args:
-            id_ (:obj:`str`): Activity ID.
-            name (:obj:`str`): Activity description.
-            duration (:obj:`float`): The amount of time to preform this activity.
-            location (:obj:`str`): Where the activity takes place (port, transit, site or mobilization).
+            id_ (str): Activity ID.
+            name (str): Activity description.
+            duration (float): The amount of time to preform this activity.
+            location (str): Where the activity takes place (port, transit, site or mobilization).
             wtg_shutdown_dur (:obj:`bool`, *optional*): Duration of the activity related with WTGs.. Defaults to ``False``.
             wec_shutdown_dur (:obj:`bool`, *optional*): Duration of the activity related with WECs.. Defaults to ``False``.
             pv_shutdown_dur (:obj:`bool`, *optional*): Duration of the activity related with PV panels.. Defaults to ``False``.
@@ -182,7 +182,7 @@ class Activity():
         """Returns a list of :class:`Activity` based on a CSV file.
 
         Args:
-            file_csv (:obj:`str`): CSV file path with activities.
+            file_csv (str): CSV file path with activities.
 
         Returns:
             :obj:`list`: :obj:`list` of :class:`Activity`.
@@ -229,11 +229,11 @@ class Activity():
     @staticmethod
     def save_activities_as_csv(operation, output_file: str):
         """
-        Saves set of :class:`~oriom.classes.Activity.Activity` as a
+        Saves set of :class:`~oriom.domain.Activity.Activity` as a
         CSV file.
 
         Args:
-            output_file (:obj:`str`): The file path to save the activities as a CSV file.
+            output_file (str): The file path to save the activities as a CSV file.
         """
         if operation.activities is None or operation.activities == []:
             _e = 'Operation activities not defined yet. Run OperationTow.define_activities first.'

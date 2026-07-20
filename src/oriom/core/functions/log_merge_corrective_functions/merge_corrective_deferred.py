@@ -50,14 +50,14 @@ def merge_deferred_operations(
 
     Args:
         log_events_def  (pd.DataFrame): Dataframe with the deferred corrective log events.
-        vessels (list): list of class `~oriom.classes.Vessel.Vessel`
+        vessels (list): list of class `~oriom.domain.Vessel.Vessel`
         time_between_devices (dict): Dictionary with the time between devices.
         oper_per_vessel (dict): Dictionary with the operations for each vessels.
-        time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
+        time_fail_op_immediately (float): Time between failure and immediate operations.
         percentile (:obj:`int`, *optional*): Percentile considered for campaign charting strategy
-        COLS (:obj:`list`): List of the column name for the log_events file.
+        COLS (list): List of the column name for the log_events file.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
-        duration_shift (:obj:`float`): Maximum hours of working shift.
+        duration_shift (float): Maximum hours of working shift.
 
     """
 

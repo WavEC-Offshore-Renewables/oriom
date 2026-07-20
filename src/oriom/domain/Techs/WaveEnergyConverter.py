@@ -13,19 +13,19 @@ class WaveEnergyConverter():
         To not include the technology --> "number_devices" = 0 or None
 
     Attributes:
-        number_devices (:obj:`int`): Number of WEC devices. Defaults to ``None``.
-        rated_power (:obj:`float`): Rated power of each WEC, in kW. Defaults to ``None``.
-        pmatrix_file (:obj:`str`): WEC power matrix file path. Defaults to ``None``.
-        number_strings (:obj:`int`): Number of strings of WEC devices. Defaults to ``None``.
-        number_substations (:obj:`int`): Number of substations of WEC farm. Defaults to ``1``.
-        number_exportcables (:obj:`int`): Number of export cables of WEC farm. Defaults to ``1``.
-        n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``1``
-        n_device_at_port (:obj:`int`): Number of device that can be mantained simultaneously at port. Defaults to ``1``
-        n_device_stored_at_port (:obj:`int`): Number of device that can be stored when not in maintenance. Defaults to ``0``
-        wec_layout (:obj:`int`): Type layout. Defaults to ``1``.
+        number_devices (int): Number of WEC devices. Defaults to ``None``.
+        rated_power (float): Rated power of each WEC, in kW. Defaults to ``None``.
+        pmatrix_file (str): WEC power matrix file path. Defaults to ``None``.
+        number_strings (int): Number of strings of WEC devices. Defaults to ``None``.
+        number_substations (int): Number of substations of WEC farm. Defaults to ``1``.
+        number_exportcables (int): Number of export cables of WEC farm. Defaults to ``1``.
+        n_string_to_connector (int): Number of strings for hub. Defaults to ``1``
+        n_device_at_port (int): Number of device that can be mantained simultaneously at port. Defaults to ``1``
+        n_device_stored_at_port (int): Number of device that can be stored when not in maintenance. Defaults to ``0``
+        wec_layout (int): Type layout. Defaults to ``1``.
         tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
             Defaults to ``None``
-        spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``0.150`` km.
+        spacing (float): Spacing between devices in meters. Defaults to ``0.150`` km.
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
 
@@ -62,21 +62,21 @@ class WaveEnergyConverter():
         """Initializes :class:`WaveEnergyConverter` class.
 
         Args:
-            number_devices (:obj:`int`): Number of WEC devices. Defaults to ``None``.
-            rated_power (:obj:`float`): Rated power of each WEC (in kW). Defaults to ``None``.
-            pmatrix_file (:obj:`str`): WEC power matrix file path. Defaults to ``None``.
-            out_dir (:obj:`str`): Directory to save the WEC parameters. Defaults to `None`.
-            number_strings (:obj:`int`): Number of strings of WEC devices. Defaults to ``None``.
-            n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``None``.
-            wec_layout (:obj:`int`): Type layout. Defaults to ``1``.
-            number_substations (:obj:`int`): Number of substations of WEC farm. Defaults to ``1``.
-            number_exportcables (:obj:`int`): Number of export cables of WEC farm. Defaults to ``1``.
-            n_device_at_port (:obj:`int`): Number of device that can be mantained simultaneously at port. Defaults to ``None``
-            n_device_stored_at_port (:obj:`int`): Number of device that can be stored when not in maintenance. Defaults to ``None``
+            number_devices (int): Number of WEC devices. Defaults to ``None``.
+            rated_power (float): Rated power of each WEC (in kW). Defaults to ``None``.
+            pmatrix_file (str): WEC power matrix file path. Defaults to ``None``.
+            out_dir (str): Directory to save the WEC parameters. Defaults to `None`.
+            number_strings (int): Number of strings of WEC devices. Defaults to ``None``.
+            n_string_to_connector (int): Number of strings for hub. Defaults to ``None``.
+            wec_layout (int): Type layout. Defaults to ``1``.
+            number_substations (int): Number of substations of WEC farm. Defaults to ``1``.
+            number_exportcables (int): Number of export cables of WEC farm. Defaults to ``1``.
+            n_device_at_port (int): Number of device that can be mantained simultaneously at port. Defaults to ``None``
+            n_device_stored_at_port (int): Number of device that can be stored when not in maintenance. Defaults to ``None``
             tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
-            spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``0.150`` km.
-            out_dir (:obj:`str`): Directory to save the WEC parameters. Defaults to `None`.
+            spacing (float): Spacing between devices in meters. Defaults to ``0.150`` km.
+            out_dir (str): Directory to save the WEC parameters. Defaults to `None`.
         """
         if number_devices != 0 and number_devices is not None:
             self.number_devices = int(number_devices)
@@ -193,8 +193,8 @@ class WaveEnergyConverter():
         a :class:`WaveEnergyConverter` item.
 
         Args:
-            file_path (:obj:`str`): YAML file location.
-            out_dir (:obj:`str`): Directory to save the WEC parameters. Defaults to `None`.
+            file_path (str): YAML file location.
+            out_dir (str): Directory to save the WEC parameters. Defaults to `None`.
 
         Raises:
             FileNotFoundError: if the keys in the YAML file are not expected.
@@ -360,7 +360,7 @@ class WaveEnergyConverter():
         Write the Wave system parameters to a YAML file.
 
         Args:
-            out_dir (:obj:`str`): The output directory where the YAML file will be saved.
+            out_dir (str): The output directory where the YAML file will be saved.
         """
         f = open(os.path.join(out_dir, 'wec.yaml'), 'w')
         yaml=YAML()

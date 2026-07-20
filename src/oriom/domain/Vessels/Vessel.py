@@ -11,44 +11,44 @@ class Vessel():
     """Vessel class.
 
     Attributes:
-        id (:obj:`str`): The vessel unique identifier.
-        type (:obj:`str`): Vessel type.
-        speed_transit (:obj:`float`): Vessel transit speed, in m/s.
-        charter (:obj:`float`): Vessel daily charter rate, in €/day.
+        id (str): The vessel unique identifier.
+        type (str): Vessel type.
+        speed_transit (float): Vessel transit speed, in m/s.
+        charter (float): Vessel daily charter rate, in €/day.
         mother_vessel (bool): boolean that define a mother vessel.
-        annual_contract (:obj:`float`): Long term contract cost.
+        annual_contract (float): Long term contract cost.
             Defaults to ``0``.
-        speed_tow (:obj:`float`): Vessel tow speed, in m/s. Defaults to ``0.0``.
-        crew_capacity (:obj:`int`): Maximum number of crew members.
+        speed_tow (float): Vessel tow speed, in m/s. Defaults to ``0.0``.
+        crew_capacity (int): Maximum number of crew members.
         overnight (:obj:`bool`): True if the vessel can stay overnight.
-        mobilisation_cost (:obj:`float`): Vessel mobilisation cost, in €.
+        mobilisation_cost (float): Vessel mobilisation cost, in €.
             Defaults to ``0``
-        mobilisation_time (:obj:`int`): Vessel mobilisation time, in h.
+        mobilisation_time (int): Vessel mobilisation time, in h.
             Defaults to ``0``.
-        n_vessels (:obj:`int`): Number of similar vessels considered available for 
+        n_vessels (int): Number of similar vessels considered available for 
             deferred campaign and for InspectionPort. Defaults to ``1``.
-        crew_berths (:obj:`int`): Maximum number of crew members overnight.
+        crew_berths (int): Maximum number of crew members overnight.
             Defaults to ``0``.
-        fuel_type (:obj:`str`): Vessel fuel type. Defaults to ``None``.
-        power (:obj:`float`): Vessel installed power (in kW).
+        fuel_type (str): Vessel fuel type. Defaults to ``None``.
+        power (float): Vessel installed power (in kW).
             Defaults to ``None``.
-        density (:obj:`int`): Density of the fuel type.
+        density (int): Density of the fuel type.
             Defaults to ``None``.
-        fuel_cons_transit (:obj:`float`): Vessel fuel
+        fuel_cons_transit (float): Vessel fuel
             consumption during transit. Defaults to ``None``.
-        fuel_cons_maneuver (:obj:`float`): Vessel fuel
+        fuel_cons_maneuver (float): Vessel fuel
             consumption during maneuver. Defaults to ``None``.
-        fuel_cons_standby (:obj:`float`): Vessel fuel
+        fuel_cons_standby (float): Vessel fuel
             consumption when standing-by. Defaults to ``None``.
-        file_vessels (:obj:`str`): Filepath to the YAML
+        file_vessels (str): Filepath to the YAML
             file containing the vessel data. Defaults to ``None``.
-        file_fuel_cons (:obj:`str`): Name of the YAML file containing
+        file_fuel_cons (str): Name of the YAML file containing
             vessel fuel consumption per vessel type. Defaults to ``None``.
-        file_load_factor (:obj:`str`): Name of the YAML file containing
+        file_load_factor (str): Name of the YAML file containing
             vessels load factor per operation. Defaults to ``None``.
-        file_fuel_density (:obj:`str`): Name of the YAML file containing
+        file_fuel_density (str): Name of the YAML file containing
             fuel densities per fuel type. Defaults to ``None``.
-        vessel_cost (:class:`~oriom.classes.Vessels_costs.Vessels_costs`): Cost
+        vessel_cost (:class:`~oriom.domain.Vessels_costs.Vessels_costs`): Cost
             associated to the vessel use. Defaults to ``None``.
 
 
@@ -106,11 +106,11 @@ class Vessel():
         """Initializes :class:`Vessel` class.
 
         Args:
-            id_ (:obj:`str`): The vessel unique identifier.
-            type_ (:obj:`str`): Vessel type.
-            speed_transit (:obj:`float`): Vessel transit speed (in m/s).
-            power (:obj:`float`): Vessel installed power (in kW).
-            crew_capacity (:obj:`int`): Maximum size of crew for daily operations.
+            id_ (str): The vessel unique identifier.
+            type_ (str): Vessel type.
+            speed_transit (float): Vessel transit speed (in m/s).
+            power (float): Vessel installed power (in kW).
+            crew_capacity (int): Maximum size of crew for daily operations.
             overnight (:obj:`bool`): True if the vessel can stay overnight.
             n_vessels (:obj:`int`,*optional*): Number of similar vessels.
                 Defaults to ``1``.
@@ -520,7 +520,7 @@ class Vessel():
         based on its fuel type and engine rated power.
 
         Args:
-            operation (:obj:`str`): ID of the operation
+            operation (str): ID of the operation
             sfoc: Bu default ``210``
         Returns:
             Fuel consumption :obj:`float`
@@ -607,7 +607,7 @@ class Vessel():
         :class:`Vessel` items.
 
         Args:
-            file_path (:obj:`str`): YAML file location.
+            file_path (str): YAML file location.
             file_fuel_cons (:obj:`str`, *optional*): name of the YAML file
                 with vessels fuel consumption. Defaults to ``None``.
             file_load_factor (:obj:`str`, *optional*): name of the YAML file

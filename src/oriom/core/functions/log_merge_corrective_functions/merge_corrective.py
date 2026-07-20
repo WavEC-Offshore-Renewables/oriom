@@ -87,17 +87,17 @@ def create_logs_merge(
     On id save the index and operation merged taken from the log_event file, on comment show the failure correted
 
     Args:
-        log_events (:obj:`pd.DataFrame`): Log of all the events (failure,operation, inspection_port, inspection_site).
-        failures (:obj:`list`): List of objects :class:`failures`
-        operation_log_file_stats (:obj:`list`): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
+        log_events (pd.DataFrame): Log of all the events (failure,operation, inspection_port, inspection_site).
+        failures (list): List of objects :class:`failures`
+        operation_log_file_stats (list): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
         result_dir_r (:obj;`str`): Directory of results files
-        vessels (:obj:`list`): List of objects :class:`Vessel`
+        vessels (list): List of objects :class:`Vessel`
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
-        time_between_devices (:obj:`dict`): Dictionary of time between devices for the various tech
+        time_between_devices (dict): Dictionary of time between devices for the various tech
         percentile (:obj:`float`, *optional*): Percentile value to calculate the statistic for inspection_port. Default to 0.9
         vessel_to_merge (:obj;`list`): list of vessel that are considered for the immediate merge
-        time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
-        duration_shift (:obj:`float`): Maximum hours of working shift.
+        time_fail_op_immediately (float): Time between failure and immediate operations.
+        duration_shift (float): Maximum hours of working shift.
 
     Raises:
         ValueError: "preferred_months" in a inspection of periodicity lower than 1 year
@@ -140,7 +140,7 @@ def create_logs_merge(
             Args:
                 op (:obj:`object`): The operation object to be analyzed.
                 activity (:obj:`object`): The activity object to be analyzed.
-                olc (:obj:`str`): The OLC to be analyzed.
+                olc (str): The OLC to be analyzed.
             Returns:
                 float: The value of the OLC, or 100 if it is None or 0.
             """

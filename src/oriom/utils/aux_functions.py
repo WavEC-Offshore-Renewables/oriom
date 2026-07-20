@@ -63,10 +63,10 @@ def convert_stringtime(
     """
     Convert column in datetime. It tries different format till it find one
     Args:
-        df (:obj:`pd.DataFrame`): The dataframe to convert
-        dt_column (:obj:`str`): The column to convert in datetime format
+        df (pd.DataFrame): The dataframe to convert
+        dt_column (str): The column to convert in datetime format
     Returns:
-        df (:obj:`pd.DataFrame`): The dataframe with the column converted in datetime format
+        df (pd.DataFrame): The dataframe with the column converted in datetime format
 
     Raises:
         ValueError: If the column is not in datetime format and no format is found
@@ -105,7 +105,7 @@ def log_event_convert_stringtime(
     """
     Convert the string time to datetime format for the log events
     Args:
-        df_log_event_ (:obj:`pd.DataFrame`): The dataframe of the log events
+        df_log_event_ (pd.DataFrame): The dataframe of the log events
     """
     # Convert string time to datetime format for the log events
     for i in df_log_event_.columns:
@@ -122,9 +122,9 @@ def take_attribute(op_id, find_element_class):
     """
     Auxiliary function to take the parameters of the operation
     Args:
-        op_id (:obj:`str`): The id of the operation to take the parameters
-        operation_log_file (:obj:`list`): The list of class that contains the operation to analyse
-        time_between_devices (:obj:`dict`): The dictionary that contains the time between devices for various technologies
+        op_id (str): The id of the operation to take the parameters
+        operation_log_file (list): The list of class that contains the operation to analyse
+        time_between_devices (dict): The dictionary that contains the time between devices for various technologies
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
 

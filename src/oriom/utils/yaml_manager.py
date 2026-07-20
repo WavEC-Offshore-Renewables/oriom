@@ -9,8 +9,8 @@ def inputs_to_yaml(inputs_object, out_dir: str, out_name: str):
     """Saves ~Inputs.X as a YAML file.
 
     Args:
-        out_dir (:obj:`str`): The path where the YAML file is saved.
-        out_name (:obj:`str`): The name of the YAML file.
+        out_dir (str): The path where the YAML file is saved.
+        out_name (str): The name of the YAML file.
 
     """
     input_file_name = str(out_name) + '.yaml'

@@ -15,71 +15,71 @@ class InspectionPort():
     A class representing a InspectionPort operation with various attributes and methods.
 
     Inspections at port are planned automatically in the
-    :class:`~oriom.classes.OperationsStat.InspectionPortStat.InspectionPortStat`.
+    :class:`~oriom.domain.OperationsStat.InspectionPortStat.InspectionPortStat`.
 
     Attributes:
-        id (:obj:`str`): The unique identifier of the :class:`InspectionPort`.
-        name (:obj:`str`): :class:`InspectionPort` short description.
-        periodicity (:obj:`float`): Time interval between inspection campaings.
-        months (:obj:`list`): Months when the inspection is preformed.
+        id (str): The unique identifier of the :class:`InspectionPort`.
+        name (str): :class:`InspectionPort` short description.
+        periodicity (float): Time interval between inspection campaings.
+        months (list): Months when the inspection is preformed.
         day_start (int): Day on which the inspection should start
-        tech_per_device (:obj:`int`): Number of technicians required to preform
+        tech_per_device (int): Number of technicians required to preform
             the inspection per device.
-        dur_per_device (:obj:`float`): Amount of time to inspect one device [hours].
-        op_tow_port (:obj:`str`): ID of the tow-to-port operation.
-        op_tow_site (:obj:`str`): ID of the tow-to-site operation.
-        op_tow_site_port (:obj:`str`): ID of the tow-to-site operation, connection of
+        dur_per_device (float): Amount of time to inspect one device [hours].
+        op_tow_port (str): ID of the tow-to-port operation.
+        op_tow_site (str): ID of the tow-to-site operation.
+        op_tow_site_port (str): ID of the tow-to-site operation, connection of
             device, disconnection of another device, tow-to-port.
             Its value is :obj:`0.0` if not defided.
-        intervened_devices (:obj:`int`): Number of devices that are intervened in case
+        intervened_devices (int): Number of devices that are intervened in case
             this inspection occurs.
-        tech_cost (:obj:`float`): The daily cost of each technician [€/day].
+        tech_cost (float): The daily cost of each technician [€/day].
             Its value is ``0`` if not defined.
-        ws (:obj:`float`): Limit wind speed. Its value is ``None`` if there is no limit.
+        ws (float): Limit wind speed. Its value is ``None`` if there is no limit.
         light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
-        level (:obj:`str`): Level at which the failure occurs for the graph.
-        vessel1_id (:obj:`str`): The ID of the main vessel. Its value is
+        level (str): Level at which the failure occurs for the graph.
+        vessel1_id (str): The ID of the main vessel. Its value is
             ``None`` if not defided.
-        vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
+        vessel2_id (str): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation. Its value is ``None`` if not defided.
-        vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary
+        vessel2 (:class:`~oriom.domain.Vessel.Vessel`): Auxiliary
             vessel used in this operation. Its value is ``None`` if not
             defided.
-        rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): The ID of the ROV/Drone.
+        rov_drone (:class:`~oriom.domain.RovDrone.RovDone`): The ID of the ROV/Drone.
             Its value is ``None`` if not defided.
-        parts_cost (:obj:`float`): Cost of replacement parts. Its value is
+        parts_cost (float): Cost of replacement parts. Its value is
             :obj:`0.0` if not defided.
-        other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
+        other_costs (float): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
-        port_costs (:obj:`float`): Daily port costs. Its value is :obj:`0.0` if not defided.
-        n_device_at_port(:obj:`int`): Number of devices that can be mantained
+        port_costs (float): Daily port costs. Its value is :obj:`0.0` if not defided.
+        n_device_at_port(int): Number of devices that can be mantained
             at port simultaneously
-        n_device_stored_at_port(:obj:`int`): Number of devices that can be
+        n_device_stored_at_port(int): Number of devices that can be
             stored at port
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
+        ts_data (:class:`~oriom.domain.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
-        towing_log (:obj:`pd.DataFrame`): Dataframe that log the towing to port and to site operation.
+        towing_log (pd.DataFrame): Dataframe that log the towing to port and to site operation.
             Default to empty dataframe.
-        insp_port_dir (:obj:`str`): Directory where the inspection port is stored.
+        insp_port_dir (str): Directory where the inspection port is stored.
             Default to None.
-        n_device_at_port(:obj:`int`): Number of devices that can be mantained
+        n_device_at_port(int): Number of devices that can be mantained
             at port simultaneously. Defaults to :obj:`1`
-        n_device_stored_at_port(:obj:`int`): Number of devices that can be
+        n_device_stored_at_port(int): Number of devices that can be
             stored at port when not in maintenance. Defaults to :obj:`0.0`
-        n_days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
+        n_days_main (int): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
-        duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
+        duration_main (int): Number of hours of duration_main days of main_shift.
             Defaults to ``0``
-        n_days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
+        n_days_last (int): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
-        duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
+        duration_last (int): Number of hours of duration_main days of main_shift.
             Defaults to ``0``
-        n_crew_main (:obj:`int`): Number of crew members needed for main shift.
+        n_crew_main (int): Number of crew members needed for main shift.
             Defaults to ``0``
-        n_crew_last (:obj:`int`): Number of crew members needed for last shift.
+        n_crew_last (int): Number of crew members needed for last shift.
             Defaults to ``0``
 
     Note:
@@ -112,16 +112,16 @@ class InspectionPort():
         """Initializes :class:`InspectionPort` with various attributes and optional parameters.
 
         Args:
-            id_ (:obj:`str`): The unique identifier of the InspectionPort.
-            name (:obj:`str`): InspectionPort short description.
+            id_ (str): The unique identifier of the InspectionPort.
+            name (str): InspectionPort short description.
             tow_to_port (:obj:`bool`): This operation requires the device removal
                 and redeploy.
-            periodicity (:obj:`float`): Time interval between inspection campains [years].
-            tech_per_device (:obj:`int`): Number of technicians required to
+            periodicity (float): Time interval between inspection campains [years].
+            tech_per_device (int): Number of technicians required to
                 preform the operation.
-            dur_per_device (:obj:`float`): Amount of time to inspect one device [hours].
-            towing_ops (:obj:`list`): List of all towing operations.
-            intervened_devices (:obj:`int`): Number of devices that are
+            dur_per_device (float): Amount of time to inspect one device [hours].
+            towing_ops (list): List of all towing operations.
+            intervened_devices (int): Number of devices that are
                 intervened in case this operation occurs.
             tech_cost (:obj:`float`,*optional*): The daily cost of each technician [€/day].
                 Defaults to ``0``.
@@ -132,7 +132,7 @@ class InspectionPort():
                 Default to ``None``.
             wind_speed (:obj:`float`, *optional*): Limit wind speed. Defaults to ``None``.
             light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
-            level (:obj:`str`): Level at which the failure occurs for the graph.
+            level (str): Level at which the failure occurs for the graph.
             rov_drone (:obj:`str`, *optional*): The ID of the ROV/Drone.
                 Defaults to ``None``.
             parts_cost (:obj:`float`, *optional*): Cost of replacement parts.
@@ -140,21 +140,21 @@ class InspectionPort():
             other_costs (:obj:`float`, *optional*): Other costs (port, cranes,
                 insurance, etc.). Defaults to :obj:`0.0`.
             port_costs (:obj:`float`, *optional*): Daily port costs. Defaults to :obj:`0.0`.
-            n_device_at_port(:obj:`int`): Number of devices that can be mantained
+            n_device_at_port(int): Number of devices that can be mantained
                 at port simultaneously. Defaults to :obj:`1`
-            n_device_stored_at_port(:obj:`int`): Number of devices that can be
+            n_device_stored_at_port(int): Number of devices that can be
                 stored at port when not in maintenance. Defaults to :obj:`0`
-            days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
+            days_main (int): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
+            duration_main (int): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
-            days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
+            days_last (int): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
+            duration_last (int): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
             double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
                 Default to True
-            towing_log (:obj:`pd.DataFrame`): Dataframe that log the towing to port and to site operation.
+            towing_log (pd.DataFrame): Dataframe that log the towing to port and to site operation.
                 Default to empty dataframe.
 
         Raises:
@@ -469,7 +469,7 @@ class InspectionPort():
         Write the object attributes to a YAML file in the specified output directory.
 
         Args:
-            out_dir (:obj:`str`): The directory where the YAML file will be saved.
+            out_dir (str): The directory where the YAML file will be saved.
         """
         vessel1 = self.vessel1
         if self.vessel1 is not None:

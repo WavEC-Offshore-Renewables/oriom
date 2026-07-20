@@ -33,8 +33,8 @@ def operation_stats(
         - duration shutdown pv
 
     Args:
-        df_operation_schedule (:obj:`str`): File the TimeSeries for a given operation.
-        percentile (:obj:`int`): Percentile choosen for the statistical analysis
+        df_operation_schedule (str): File the TimeSeries for a given operation.
+        percentile (int): Percentile choosen for the statistical analysis
             It comes from general inputs
         out_dir (:obj:`str`, *optional*): Folder directory to save the
             operation schedule. Defaults to ``None``.

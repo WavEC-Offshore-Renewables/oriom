@@ -144,10 +144,10 @@ class Layout_PV:
                     |  CB - dyn_cable_sub - Transf - cable_cb - Switch - cable_trans - invert -
 
         Args:
-            n_panels (: int): Total number of solar panels
-            n_strings (: int): Number of string per each inverter
-            n_inverters (: int): Total Number of inverter
-            n_mvtransformers (: int): Number of Transformer
+            n_panels (int): Total number of solar panels
+            n_strings (int): Number of string per each inverter
+            n_inverters (int): Total Number of inverter
+            n_mvtransformers (int): Number of Transformer
             n_substations (: int = 1): Total Number of solar Islands
             n_island_per_array_cable (int): Number of island that share the same array cable
                 Default value to ´´1´´
@@ -284,13 +284,13 @@ class Layout_PV:
         Function to select and create the layout
 
         Args:
-            n_layout (:obj:`int`): Type of layout.
-            n_panels (:obj:`int`): Total number of panels.
-            n_strings (:obj:`int`): Number of strings or number of strings per inverter.
-            n_inverters (:obj:`int`): Number of inverters.
-            n_substations (:obj:`int`): Number of substations. Defaults to `1`.
-            n_mvtransformers (:obj:`int`): Number of transformers. Defaults to `1`.
-            number_island_per_array_cable (:obj:`int`): Number of transformers. Defaults to `1`.
+            n_layout (int): Type of layout.
+            n_panels (int): Total number of panels.
+            n_strings (int): Number of strings or number of strings per inverter.
+            n_inverters (int): Number of inverters.
+            n_substations (int): Number of substations. Defaults to `1`.
+            n_mvtransformers (int): Number of transformers. Defaults to `1`.
+            number_island_per_array_cable (int): Number of transformers. Defaults to `1`.
             save_dir (:obj:`str`, *optional*): Path dir to save graph representation. Defaults to `None`.
         Returns:
             :obj:`nx.DiGraph`: a graph representing the PV system.

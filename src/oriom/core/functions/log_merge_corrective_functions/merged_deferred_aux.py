@@ -33,9 +33,9 @@ def create_stat_chart_campaign_operation(
         of the entire campaign operations insthead of single operations.
 
     Args:
-        df (:obj:`pd.DataFrame`): Dataframe of log_events_merged
-        vessels (list): list of class `~oriom.classes.Vessel.Vessel`
-        percentile (:obj:`float`): percentile value to calculate the statistic
+        df (pd.DataFrame): Dataframe of log_events_merged
+        vessels (list): list of class `~oriom.domain.Vessel.Vessel`
+        percentile (float): percentile value to calculate the statistic
         month_year_calculate (:obj:`bool`): boolean to evaluate
 
     Returns:

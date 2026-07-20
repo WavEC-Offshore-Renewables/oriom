@@ -33,12 +33,12 @@ def define_operation_values(
     function schedules a given operation and, for each timestep, calculates
     what are the operation durations and waitings.
     Args:
-        ts_analyse (:obj:`list`): Set of timesteps of the timeseries to be
+        ts_analyse (list): Set of timesteps of the timeseries to be
             analysed.
         operation: Operation to be analysed. it can be of type:
-            :class:`oriom.classes.OperationInspection`,
-            :class:`oriom.classes.OperationCorrective` or
-            :class:`oriom.classes.OperationTow`.
+            :class:`oriom.domain.OperationInspection`,
+            :class:`oriom.domain.OperationCorrective` or
+            :class:`oriom.domain.OperationTow`.
         df_startability (:obj:`pandas.DataFrame`): Startability of the
             operation activities.
         MAX_WAIT (:obj:`float`, *optional*): Maximum waiting time between
@@ -65,7 +65,7 @@ def define_operation_values(
     Example:
         Dummy operation considerign an intervation on a Wave Energy Converter
         device. The dummy operation is composed of 7
-        :class:`~oriom.classes.Activity.Activity`.
+        :class:`~oriom.domain.Activity.Activity`.
         >>> df_startability
                              A01_0  A02_0  A03_0  A04_0  A03_1  A05_0  A06_0
         datetime
@@ -132,15 +132,15 @@ def define_operation_values(
         for that operation.
 
         Args:
-            metocean_ts (:obj:`int`): Timestep to be evaluated.
-            activities (:obj:`list`): List of ~Activity of the operation.
+            metocean_ts (int): Timestep to be evaluated.
+            activities (list): List of ~Activity of the operation.
             df_startability (:obj:`pandas.DataFrame`): Startability of the
                 operation activities.
-            act_most_restrict_idx (:obj:`int`): Index of the first most
+            act_most_restrict_idx (int): Index of the first most
                 restrictive activity.
-            prev_duration (:obj:`float`): Operation duration between
+            prev_duration (float): Operation duration between
                 :attr:`metocean_ts` and :attr:`act_most_restrict_idx`.
-            MAX_WAIT (:obj:`float`): Maximum waiting on weather between two
+            MAX_WAIT (float): Maximum waiting on weather between two
                 activities.
 
         Returns:
@@ -148,18 +148,18 @@ def define_operation_values(
                 :attr:`metocean_ts`.
 
         Keyword Returns:
-            metocean_ts (:obj:`int`): timestep of the metocean table to be
+            metocean_ts (int): timestep of the metocean table to be
                 analysed.
-            ts_acts_start (:obj:`list`): list of timesteps where each activity
+            ts_acts_start (list): list of timesteps where each activity
                 from :attr:`activities` is starting, considering
                 :attr:`metocean_ts`.
-            op_dur (:obj:`float`): total duration of the operation.
-            duration (:obj:`float`): duration of the operation without wating
+            op_dur (float): total duration of the operation.
+            duration (float): duration of the operation without wating
                 to start time.
-            waitings (:obj:`dict`):
-                to_start (:obj:`float`): Waiting on weather time to start the
+            waitings (dict):
+                to_start (float): Waiting on weather time to start the
                     first activity.
-                site (:obj:`float`): Waiting on weather time between activities.
+                site (float): Waiting on weather time between activities.
         """
 
         # Initialize time steps for the activities to start and to end

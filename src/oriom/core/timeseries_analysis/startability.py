@@ -18,8 +18,8 @@ def startability(
     This is called only for those operations defined by activities.
 
     Args:
-        activities (:obj:`list`): List of objects where each object is an
-            :class:`~oriom.classes.Activity.Activity`.
+        activities (list): List of objects where each object is an
+            :class:`~oriom.domain.Activity.Activity`.
         df_workability (:obj:`pandas.DataFrame`): Boolean table with timesteps
             as rows and activity IDs as columns.
         out_dir (:obj:`str`, *optional*): Output directory folder path.

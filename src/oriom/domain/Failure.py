@@ -23,27 +23,27 @@ class Failure():
         Individual failures can follow a bath tub trend.
 
     Attributes:
-        id_(:obj:`str`): The unique identifier of the Failure.
-        name (:obj:`str`): Failure name.
-        n_element (:obj:`int`) : Number of element to refer the failure rate.
-        fail_rate (:obj:`float`): The operation failure rate per year per
+        id_(str): The unique identifier of the Failure.
+        name (str): Failure name.
+        n_element (int) : Number of element to refer the failure rate.
+        fail_rate (float): The operation failure rate per year per
             element, in failures per year.
-        maintenance_strategy (:obj:`str`): When the failure occurs it can
+        maintenance_strategy (str): When the failure occurs it can
             lead to the following strategies: never repair, specific month,
             immediately.
-        level_failure (:obj:`str`): Level at which the failure occurs for
+        level_failure (str): Level at which the failure occurs for
                 the graph.
         potential_shutdown (:obj:`bool`): If the failure could lead to potential
             shutdown it should be marked as True.
-        operation_triggered (:obj:`str`): Operation that is triggered
+        operation_triggered (str): Operation that is triggered
             when this failure happens. Its value is ``None`` if not defined.
-        preferred_month (:obj:`int`): In case the strategy is to schedule the
+        preferred_month (int): In case the strategy is to schedule the
             operation in a specific month. Its value is ``None`` if not defined.~
-        preferred_day (:obj:`int`): In case the strategy is to schedule the
+        preferred_day (int): In case the strategy is to schedule the
             operation in a specific day of the month. Its value is ``1`` if not defined.
         avoid_month_correction (:obj:`list`, *optional*): In case the strategy is
                 immediate but want to avoid some month to operate the Defaults to ``[]``.
-        lead_time (:obj:`int`): Defines lead time in h. Its value
+        lead_time (int): Defines lead time in h. Its value
             is 0 if not defined.
         parts_cost (:obj:`float`, *optional*): Cost of replacement parts.
                 Defaults to :obj:`0.0`.
@@ -52,7 +52,7 @@ class Failure():
                 is False if not defined.
         fail_variation (:obj:`bool`): True if the failure rate will variate in the
             sensitivity analysis. Its value is False if not defined.
-        perc_shutdown (:obj:`int`): Is the probability that the component shut
+        perc_shutdown (int): Is the probability that the component shut
             down, or the percentage reduction of power output due to the failure. Use int value between 0 and 100.
 
 
@@ -81,19 +81,19 @@ class Failure():
         """Initializes :class:`Failure` class.
 
         Args:
-            id_(:obj:`str`): The unique identifier of the Failure.
-            name (:obj:`str`): Failure name.
-            n_element (:obj:`int`) : Number of element to refer the failure rate.
-            fail_rate (:obj:`float`): The operation failure rate per year per element.
-            maintenance_strategy (:obj:`str`): When the failure occurs it can
+            id_(str): The unique identifier of the Failure.
+            name (str): Failure name.
+            n_element (int) : Number of element to refer the failure rate.
+            fail_rate (float): The operation failure rate per year per element.
+            maintenance_strategy (str): When the failure occurs it can
                 lead to the following strategies: never repair, specific month, immediately.
-            level_failure (:obj:`str`): Level at which the failure occurs for
+            level_failure (str): Level at which the failure occurs for
                 the graph.
             potential_shutdown (:obj:`bool`): If the failure could lead to potential
                 shutdown it should be marked as True.
             operation_triggered (:obj:`str`, *optional*): Operation that is
                 triggered when this failure happens. Defaults to ``None``.
-            parts_cost (:obj:`float`): Cost of replacement parts. Its value is
+            parts_cost (float): Cost of replacement parts. Its value is
                 :obj:`0.0` if not defided.
             preferred_month (:obj:`int`, *optional*): In case the strategy is
                 to schedule the operation in a specific month. Defaults to ``None``.
@@ -281,7 +281,7 @@ class Failure():
         """Returns a list of :class:`Failure` based on a YAML file.
 
         Args:
-            file_path (:obj:`str`): YAML file path with failures.
+            file_path (str): YAML file path with failures.
         Raises:
             KeyError: if some of the mandatory keys of the YAML are
                 not provided.

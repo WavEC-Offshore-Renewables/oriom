@@ -13,22 +13,22 @@ class InspectionPortCreation():
     Class to generate and manage the Inspection at Port considering towing, inspection, WoW, n_vessels and port spaces
 
     Attributes:
-        inspection (: object): object of class ``InspectionPort`` containing inspection metadata and schedules.
-        n_device_at_port (: int) Number of devices that can be handled at the port simultaneously.
-        n_device_stored_at_port (: int): Number of devices that can be stored at the port.
-        find_element_class (: object) callable used by logs_preventive_aux to find classes/elements in schedules.
-        shutdown_col (: str) or NoneColumn name in the schedule DataFrame containing shutdown durations to be accumulated,
+        inspection (object): object of class ``InspectionPort`` containing inspection metadata and schedules.
+        n_device_at_port (int) Number of devices that can be handled at the port simultaneously.
+        n_device_stored_at_port (int): Number of devices that can be stored at the port.
+        find_element_class (object) callable used by logs_preventive_aux to find classes/elements in schedules.
+        shutdown_col (str) or NoneColumn name in the schedule DataFrame containing shutdown durations to be accumulated,
             or None if no shutdown column should be considered.
-        tow_at_port (: dict): Dictionary storing towing to port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
-        tow_at_site (: dict): Dictionary storing towing to site operations; keys are device indices, values are tuples (end_datetime, start_datetime).
-        insp_at_port (: dict): Dictionary storing inspection at port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
+        tow_at_port (dict): Dictionary storing towing to port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
+        tow_at_site (dict): Dictionary storing towing to site operations; keys are device indices, values are tuples (end_datetime, start_datetime).
+        insp_at_port (dict): Dictionary storing inspection at port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
         operation_completed (: bool): Flag indicating whether the entire inspection operation was completed successfully.
-        tot_device (: int): Total number of devices to be inspected.
-        dev_idx_station_port (: int): Index for port stage of the current device being processed for port operations.
-        oper_schedule_insp (: pd.DataFrame): DataFrame containing the operation schedule for inspections at port.
-        oper_schedule_tow_port (: pd.DataFrame): DataFrame containing the operation schedule for towing to port.
-        oper_schedule_tow_site_only (: pd.DataFrame): DataFrame containing the operation schedule for towing to site.
-        oper_schedule_tow_site_port (: pd.DataFrame): DataFrame containing the operation schedule for towing to site and port.
+        tot_device (int): Total number of devices to be inspected.
+        dev_idx_station_port (int): Index for port stage of the current device being processed for port operations.
+        oper_schedule_insp (pd.DataFrame): DataFrame containing the operation schedule for inspections at port.
+        oper_schedule_tow_port (pd.DataFrame): DataFrame containing the operation schedule for towing to port.
+        oper_schedule_tow_site_only (pd.DataFrame): DataFrame containing the operation schedule for towing to site.
+        oper_schedule_tow_site_port (pd.DataFrame): DataFrame containing the operation schedule for towing to site and port.
 
         NOTE: 
             The utilization of device to store at port (wet storage) must be implemented
@@ -37,11 +37,11 @@ class InspectionPortCreation():
     def __init__(self, inspection, n_device_at_port, n_device_stored_at_port, find_element_class, shutdown_col):
         """
         Args:
-            inspection (: object): object of class ``InspectionPort`` containing inspection metadata and schedules.
-            n_device_at_port (: int) Number of devices that can be handled at the port simultaneously.
-            n_device_stored_at_port (: int): Number of devices that can be stored at the port.
-            find_element_class (: object) callable used by logs_preventive_aux to find classes/elements in schedules.
-            shutdown_col (: str) or NoneColumn name in the schedule DataFrame containing shutdown durations to be accumulated,
+            inspection (object): object of class ``InspectionPort`` containing inspection metadata and schedules.
+            n_device_at_port (int) Number of devices that can be handled at the port simultaneously.
+            n_device_stored_at_port (int): Number of devices that can be stored at the port.
+            find_element_class (object) callable used by logs_preventive_aux to find classes/elements in schedules.
+            shutdown_col (str) or NoneColumn name in the schedule DataFrame containing shutdown durations to be accumulated,
                 or None if no shutdown column should be considered.
         """
         self.tow_at_port = {}
@@ -73,7 +73,7 @@ class InspectionPortCreation():
         Args:
             oper_schedule_tow (: pandas.DataFrame): Operation schedule dataframe of the operation.
             d (: datetime): The datetime at which the operation is considered to start.
-            name_op (: str): Identifier/name of the operation used in warning messages.
+            name_op (str): Identifier/name of the operation used in warning messages.
 
         Returns:
             tuple:
@@ -115,11 +115,11 @@ class InspectionPortCreation():
 
         Args:
             overlap_date (: bool): Initial flag used to enter the overlap resolution loop.
-            tow_at_site (: dict): Dictionary of existing tow intervals; values are tuples (end_datetime, start_datetime).
+            tow_at_site (dict): Dictionary of existing tow intervals; values are tuples (end_datetime, start_datetime).
             d_insp (: datetime): Proposed end datetime for the new operation.
             d_tow_port_wait (: datetime): Proposed wait-to-start datetime for the new operation.
-            inspection (: object): Inspection object used to read attributes like id and number of vessels.
-            n_device_at_port (: int): Maximum number of devices that can be handled concurrently at port.
+            inspection (object): Inspection object used to read attributes like id and number of vessels.
+            n_device_at_port (int): Maximum number of devices that can be handled concurrently at port.
             d_start_tow (: datetime): Current start datetime candidate for the tow operation.
 
         Returns:
@@ -167,10 +167,10 @@ class InspectionPortCreation():
         into `duration_shutdown_month` for the given month index.
 
         Args:
-            device_n (: int): Index (1-based) of the device being processed.
+            device_n (int): Index (1-based) of the device being processed.
             date_continuous (: datetime): Candidate datetime for starting the sequence of operations (used for the first device).
-            duration_shutdown_month (: list): Mutable list that accumulates shutdown durations per month; this function may add to it.
-            month_insp (: int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
+            duration_shutdown_month (list): Mutable list that accumulates shutdown durations per month; this function may add to it.
+            month_insp (int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
 
         Returns
             datetime: corresponding to the end of the tow-to-port operation for the device
@@ -228,8 +228,8 @@ class InspectionPortCreation():
 
         Args:
             d_insp (: datetime): Candidate datetime for starting the sequence of operations (used for the first device).
-            duration_shutdown_month (: list): Mutable list that accumulates shutdown durations per month; this function may add to it.
-            month_insp (: int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
+            duration_shutdown_month (list): Mutable list that accumulates shutdown durations per month; this function may add to it.
+            month_insp (int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
         """
 
         d_tow, d_insp_wait, _ = self.tow_inspection_schedule(self.oper_schedule_insp, d_insp, self.inspection.id)
@@ -254,10 +254,10 @@ class InspectionPortCreation():
         Smilarly to tow_op_port method schedule the towing of a single device to port and return the computed end datetime.
 
         Args:
-            device_n (: int): Index (1-based) of the device being processed.
+            device_n (int): Index (1-based) of the device being processed.
             d_tow (: datetime): Candidate datetime for starting the sequence of operations (used for the first device).
-            duration_shutdown_month (: list): Mutable list that accumulates shutdown durations per month; this function may add to it.
-            month_insp (: int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
+            duration_shutdown_month (list): Mutable list that accumulates shutdown durations per month; this function may add to it.
+            month_insp (int): Index of the month in `duration_shutdown_month` to which shutdown durations should be added.
         """
 
         if device_n > self.tot_device - self.n_device_at_port:

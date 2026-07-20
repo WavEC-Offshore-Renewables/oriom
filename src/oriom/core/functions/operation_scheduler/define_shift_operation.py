@@ -91,18 +91,18 @@ def define_shift_operation_values(
         df_metocean (:obj:`pandas.DataFrame`): metocean timeseries table.
             Rows as timesteps and colums as sea conditions.
         operation (:obj:`~OperationInspection` or :obj:`~CorrectiveMinor`): Operation.
-        df_workability (:obj:`pd.DataFrame`): Workability of the inspection.
-        shift_data (:obj:`dict`): Information about the shift with the
+        df_workability (pd.DataFrame): Workability of the inspection.
+        shift_data (dict): Information about the shift with the
         following format:
-            number_shifts_main (:obj:`int`): Number of shifts required for doing two operations in parallel.
-            duration_shift_main (:obj:`float`): Duration of the shifts for doing the operations in parallel.
-            number_shifts_last (:obj:`int`): Number of shifts required for the operation that lasts longer when done solo.
-            duration_shift_last (:obj:`float`): Duration of the shift for the operation that lasts longer when done solo.
-        transit_duration (:obj:`float`): Duration of the transit btween the port
+            number_shifts_main (int): Number of shifts required for doing two operations in parallel.
+            duration_shift_main (float): Duration of the shifts for doing the operations in parallel.
+            number_shifts_last (int): Number of shifts required for the operation that lasts longer when done solo.
+            duration_shift_last (float): Duration of the shift for the operation that lasts longer when done solo.
+        transit_duration (float): Duration of the transit btween the port
             and the site.
-        shutdown_wtg (:obj:`float`): For how long the WTGs are disconnected.
-        shutdown_wec (:obj:`float`): For how long the WECs are disconnected.
-        shutdown_pv (:obj:`float`): For how long the PVs are disconnected.
+        shutdown_wtg (float): For how long the WTGs are disconnected.
+        shutdown_wec (float): For how long the WECs are disconnected.
+        shutdown_pv (float): For how long the PVs are disconnected.
         out_dir (:obj:`str`, *optional*): Path for the out directory.
             Defaults to ``None``.
 

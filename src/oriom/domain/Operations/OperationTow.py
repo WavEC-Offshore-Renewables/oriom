@@ -19,37 +19,37 @@ class OperationTow():
             - Tow the device to site to redeploy and remove another device to tow it back to port
 
     Attributes:
-        id (:obj:`str`): The unique identifier of the :class:`OperationTow`.
-        name (:obj:`str`): :class:`OperationTow` short description.
-        tech_required (:obj:`int`): Number of technicians required to preform
+        id (str): The unique identifier of the :class:`OperationTow`.
+        name (str): :class:`OperationTow` short description.
+        tech_required (int): Number of technicians required to preform
             the operation.
-        tech_cost (:obj:`float`): The daily cost of each technician [€/day].
+        tech_cost (float): The daily cost of each technician [€/day].
             Its value is ``0`` if not defined.
-        vessel1_id (:obj:`str`): The ID of the main vessel.
-        vessel1_qt (:obj:`int`): Number of main vessels required. Its value is
+        vessel1_id (str): The ID of the main vessel.
+        vessel1_qt (int): Number of main vessels required. Its value is
             ``1`` if not defined.
-        vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
+        vessel2_id (str): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
-        vessel2_qt (:obj:`int`): Number of secondary vessels required. Its value is
+        vessel2_qt (int): Number of secondary vessels required. Its value is
             ``1`` if not defined.
-        other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
+        other_costs (float): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
         addition_op_tow (:obj: CorrectiveMajor): Major operation object to conduct
             before or after the towing operation. Its value is ``None`` if not defided
-        activities (:obj:`list`): List of
-            :class:`~oriom.classes.Activity.Activity` preformed during
+        activities (list): List of
+            :class:`~oriom.domain.Activity.Activity` preformed during
             the logistic operation.
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation. Its value is ``None`` if not defided.
-        vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary
+        vessel2 (:class:`~oriom.domain.Vessel.Vessel`): Auxiliary
             vessel used in this operation. Its value is ``None`` if not
             defided.
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
+        ts_data (:class:`~oriom.domain.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         tow_operation (:obj:`bool`): Define if is a towing opreation. Default to ``True``.
         string_disconnection (:obj:`bool`): Define if is a string disconnection is required
             during towing opreation. Default to ``False``.
-        recommissioning_time (:obj:`int`): Define the time required to re-commission a device 
+        recommissioning_time (int): Define the time required to re-commission a device 
             after towing operation. Default to ``0``.
 
 
@@ -74,24 +74,24 @@ class OperationTow():
         """Initializes :class:`OperationTow` with various attributes and optional parameters.
 
         Args:
-            id_ (:obj:`str`): The unique identifier of the OperationTow.
-            name (:obj:`str`): OperationTow short description.
-            tech_required (:obj:`int`): Number of technicians required to
+            id_ (str): The unique identifier of the OperationTow.
+            name (str): OperationTow short description.
+            tech_required (int): Number of technicians required to
                 preform the operation.
-            vessel1_id (:obj:`str`): The ID of the main vessel.
+            vessel1_id (str): The ID of the main vessel.
             tech_cost (:obj:`float`,*optional*): The daily cost of each technician[€/day].
                 Defaults to ``0``.
             addition_op_tow (:obj:`str`, *optional*): Major_operation.id object to conduct
                 before the towing opeartion. Default to ``None``.
             string_disconnection: Define if is a string disconnection is required
                 during towing opreation. Default to ``False``.
-            recommissioning_time (:obj:`int`): Define the time required to re-commission a device 
+            recommissioning_time (int): Define the time required to re-commission a device 
                 after towing operation. Default to ``0``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
-            vessel1_qt (:obj:`int`): Number of main vessels required.
+            vessel1_qt (int): Number of main vessels required.
                 Defaults to ``1``.
-            vessel2_qt (:obj:`int`): Number of second vessels required.
+            vessel2_qt (int): Number of second vessels required.
                 Defaults to ``1`` if vesse_id not ´´None´´.
             other_costs (:obj:`float`, *optional*): Other costs (port, cranes,
                 insurance, etc.). Defaults to :obj:`0.0`.
@@ -277,7 +277,7 @@ class OperationTow():
         Write the object attributes to a YAML file in the specified output directory.
 
         Args:
-            out_dir (:obj:`str`): The directory where the YAML file will be saved.
+            out_dir (str): The directory where the YAML file will be saved.
         """
         activities = [activity.id for activity in self.activities]
         vessel1 = self.vessel1_id

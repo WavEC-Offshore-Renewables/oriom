@@ -24,11 +24,11 @@ class Define_operation():
         Args:
             operation: Operation argument. It can be: :class:`OperationInspection`,
                 :class:`OperationCorrective` or :class:`OperationTow`
-            file_vessels (:obj:`str`): Vessels YAML file location.
-            file_fuel_cons (:obj:`str`): YAML file path where vessels consumptions are defined.
-            file_load_factor (:obj:`str`): YAML file path where load factors per operation are defined.
-            file_fuel_density (:obj:`str`): YAML file path where fuel density per fuel type are defined.
-            vessels (:obj:`dict`): Dictionary of vessel_id and Vessel object created
+            file_vessels (str): Vessels YAML file location.
+            file_fuel_cons (str): YAML file path where vessels consumptions are defined.
+            file_load_factor (str): YAML file path where load factors per operation are defined.
+            file_fuel_density (str): YAML file path where fuel density per fuel type are defined.
+            vessels (dict): Dictionary of vessel_id and Vessel object created
 
         Raises:
             IndexError: if :attr:`vessel1_id` is not found in
@@ -222,7 +222,7 @@ class Define_operation():
         Args:
             operation: Operation argument. It can be: :class:`OperationInspectionSite`,
                 :class:`OperationCorrectiveMajor` or :class:`OperationCorrectiveMinor`
-            rovs_drones (:obj:`list`): List of :class:`RovDrone`.
+            rovs_drones (list): List of :class:`RovDrone`.
         Raises:
             NameError: if operation :attr:`rov_drone` is not found in
                 :attr:`rovs_drones` list of rovs and drones.

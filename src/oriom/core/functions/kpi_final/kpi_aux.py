@@ -62,7 +62,7 @@ def count_day(
     This function create a new column on the dataframe indicating for each row the nº days that a ROV is used
 
     Args:
-    df (:obj:`pd.DataFrame`): Log of events file
+    df (pd.DataFrame): Log of events file
     ves (:obj:`object`): object of class `Vessel`
 
     Returns:
@@ -217,11 +217,11 @@ def define_fuel_cost(
     Calculate the cost of fuel based on the vessel's fuel type, density, and fuel costs.
 
     Args:
-        vessel1_id (:class:`~oriom.classes.Vessels`):
+        vessel1_id (:class:`~oriom.domain.Vessels`):
             Vessel class object.
-        fuel_cost_hfo (:obj:`int`): Fuel cost €/ton.
-        fuel_cost_mdo (:obj:`int`): Fuel cost €/ton.
-        fuel_cost_mgo (:obj:`int`): Fuel cost €/ton.
+        fuel_cost_hfo (int): Fuel cost €/ton.
+        fuel_cost_mdo (int): Fuel cost €/ton.
+        fuel_cost_mgo (int): Fuel cost €/ton.
 
     Returns:
         :obj:`float`: Density time cost -> €/l
@@ -262,9 +262,9 @@ def tech_rov_cost(
 
     Args:
         df (pd.DataFrame): Dataframe of Log_events for the operation type analysed
-        rov_cost_dict (:obj:`dict`): Dict of rov per operations
+        rov_cost_dict (dict): Dict of rov per operations
         duration_shift (float):
-        oper_dict_tech (:obj:`dict`): Dict of technicians costs per operations
+        oper_dict_tech (dict): Dict of technicians costs per operations
 
     Returns:
         float: Total cost of technician for the operation type analysed

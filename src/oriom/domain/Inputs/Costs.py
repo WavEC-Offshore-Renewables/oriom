@@ -19,34 +19,34 @@ class Cost():
             as one offshore interventation.
 
     Attributes:
-        fuel_cost_HFO (:obj:`dict`): Heavy Fuel Oil cost, in euros/ton.
+        fuel_cost_HFO (dict): Heavy Fuel Oil cost, in euros/ton.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        fuel_cost_MGO (:obj:`dict`): Marine Gas Oil cost, in euros/ton.
+        fuel_cost_MGO (dict): Marine Gas Oil cost, in euros/ton.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        fuel_cost_MDO (:obj:`dict`): Marine Diesel Oil cost, in euros/ton.
+        fuel_cost_MDO (dict): Marine Diesel Oil cost, in euros/ton.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        electricity_selling_price (:obj:`dict`): Electricity selling price in euros/Mwh.
+        electricity_selling_price (dict): Electricity selling price in euros/Mwh.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        port_cost_year (:obj:`dict`): Cost of a dedicated port terminal per year.
+        port_cost_year (dict): Cost of a dedicated port terminal per year.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        merge (:obj:`dict`): Boolean, if True the log_dates will look for operation to merge.
+        merge (dict): Boolean, if True the log_dates will look for operation to merge.
             **keys**: *value*: :obj:`bool` ; *units*: : obj:``
-        time_between_merge (:obj:`dict`): Number of days within which the operation can be merged. Its value is ``None`` if not defined.
-        insurance_annual (:obj:`dict`): Cost of Insurance per year.
+        time_between_merge (dict): Number of days within which the operation can be merged. Its value is ``None`` if not defined.
+        insurance_annual (dict): Cost of Insurance per year.
             **keys**: *value*: :obj:`float` ; *units*: : obj:``
-        electricity_price (:obj:`dict`): Electricity selling price.
+        electricity_price (dict): Electricity selling price.
             **keys**: *value*: :obj:`float` ; *units*: : obj:``
-        electricity_price pv (:obj:`dict`): Electricity selling price per pv tech.
+        electricity_price pv (dict): Electricity selling price per pv tech.
             **keys**: *value*: :obj:`float` ; *units*: : obj:``
-        electricity_price wt (:obj:`dict`): Electricity selling priceper wt tech.
+        electricity_price wt (dict): Electricity selling priceper wt tech.
             **keys**: *value*: :obj:`float` ; *units*: : obj:``
-        electricity_price wec (:obj:`dict`): Electricity selling price per wec tech.
+        electricity_price wec (dict): Electricity selling price per wec tech.
             **keys**: *value*: :obj:`float` ; *units*: : obj:``
-        technicians_year (:obj:`dict`): Cost of Technicians per year.
+        technicians_year (dict): Cost of Technicians per year.
             **keys**: *value*: :obj:`float` ; *units*: : obj:``
-        file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs.
+        file_inputs (str): Path for the file with all previous mandatory inputs.
             Its value is ``None`` if not defined.
-        electricity_price_dict (:obj:`dict`): Electricity price per each tech
+        electricity_price_dict (dict): Electricity price per each tech
 
     Note:
         When the class is initialized :func:`_check_attributes` is run.
@@ -68,10 +68,10 @@ class Cost():
             **kwargs: Arbitrary keyword arguments.
 
         Keyword Args:
-            electricity_selling_price (:obj:`float`): Electricity selling price in euros/Mwh.
-            fuel_cost_HFO (:obj:`float`): Heavy Fuel Oil cost, in euros/ton.
-            fuel_cost_MGO (:obj:`float`): Marine Gas Oil cost, in euros/ton.
-            fuel_cost_MDO (:obj:`float`): Marine Diesel Oil cost, in euros/ton.
+            electricity_selling_price (float): Electricity selling price in euros/Mwh.
+            fuel_cost_HFO (float): Heavy Fuel Oil cost, in euros/ton.
+            fuel_cost_MGO (float): Marine Gas Oil cost, in euros/ton.
+            fuel_cost_MDO (float): Marine Diesel Oil cost, in euros/ton.
             port_cost_year (:obj:`float`,*optional*): Cost of a dedicated port terminal per year, in euros. Defaults to ``0.0``.
             merge (:obj:`dict`,*optional*): Boolean, if True the log_dates will look for operation to merge. Defaults to ``False``.
             time_between_merge (:obj:`int`,*optional*): Number of days within which the operation can be merged. Defaults to ``None``.

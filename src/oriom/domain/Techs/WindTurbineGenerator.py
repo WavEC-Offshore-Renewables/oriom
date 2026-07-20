@@ -13,26 +13,26 @@ class WindTurbineGenerator():
         To not include the technology --> "number_devices" = 0 or None
 
     Attributes:
-        number_devices (:obj:`int`): Number of WTG devices. Defaults to ``None``.
-        rated_power (:obj:`float`): Rated power of each WTG, in MW. Defaults to ``None``.
-        cut_in (:obj:`float`): WTG cut-in speed, in m/s. Defaults to ``None``.
-        cut_off (:obj:`float`): WTG cut-off speed, in m/s. Defaults to ``None``.
-        hub_height (:obj:`float`): WTG hub height, in m. Defaults to ``None``.
-        pcurve_file (:obj:`str`): WTG power curve file path. Defaults to ``None``.
-        moorings (:obj:`int`): Number of mooring systems per WTG. Defaults to ``0``.
-        number_strings (:obj:`int`): Number of strings of WTG devices. Defaults to ``1``.
-        n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``1``
-        number_substations (:obj:`int`): Number of substations of WTG farm. Defaults to ``1``.
-        number_exportcables (:obj:`int`): Number of export cables of WTG farm. Defaults to ``1``.
-        wtg_layout (:obj:`int`): Type layout. Defaults to ``1``.
-        n_device_at_port (:obj:`int`): Number of device that can be mantained simultaneously at port.
+        number_devices (int): Number of WTG devices. Defaults to ``None``.
+        rated_power (float): Rated power of each WTG, in MW. Defaults to ``None``.
+        cut_in (float): WTG cut-in speed, in m/s. Defaults to ``None``.
+        cut_off (float): WTG cut-off speed, in m/s. Defaults to ``None``.
+        hub_height (float): WTG hub height, in m. Defaults to ``None``.
+        pcurve_file (str): WTG power curve file path. Defaults to ``None``.
+        moorings (int): Number of mooring systems per WTG. Defaults to ``0``.
+        number_strings (int): Number of strings of WTG devices. Defaults to ``1``.
+        n_string_to_connector (int): Number of strings for hub. Defaults to ``1``
+        number_substations (int): Number of substations of WTG farm. Defaults to ``1``.
+        number_exportcables (int): Number of export cables of WTG farm. Defaults to ``1``.
+        wtg_layout (int): Type layout. Defaults to ``1``.
+        n_device_at_port (int): Number of device that can be mantained simultaneously at port.
             Defaults to ``1``
-        n_device_stored_at_port (:obj:`int`): Number of device that can be stored when not in
+        n_device_stored_at_port (int): Number of device that can be stored when not in
             maintenance. Defaults to ``0``
-        wtg_layout (:obj:`int`): Type layout. Defaults to ``1``.
+        wtg_layout (int): Type layout. Defaults to ``1``.
         tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
-        spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``1.650`` km.
+        spacing (float): Spacing between devices in meters. Defaults to ``1.650`` km.
         
 
     Note:
@@ -80,24 +80,24 @@ class WindTurbineGenerator():
         """Initializes :class:`WindTurbineGenerator` class.
 
         Args:
-            number_devices (:obj:`int`): Number of WTG devices. Defaults to ``None``.
-            rated_power (:obj:`float`): Rated power of each WTG (in MW). Defaults to ``None``.
-            cut_in (:obj:`float`): WTG cut-in speed (in m/s). Defaults to ``None``.
-            cut_off (:obj:`float`): WTG cut-off speed (in m/s). Defaults to ``None``.
-            hub_height (:obj:`float`): WTG hub height (in m). Defaults to ``None``.
-            pcurve_file (:obj:`str`): WTG power curve file path. Defaults to ``None``.
-            moorings (:obj:`int`): Number of mooring systems per WTG. Defaults to ``0``.
-            number_strings (:obj:`int`): Number of strings of WTG devices. Defaults to ``None``.
-            n_string_to_connector (:obj:`int`): Number of strings for hub. Defaults to ``None``.
-            wtg_layout (:obj:`int`): Type layout. Defaults to ``1``.
-            number_substations (:obj:`int`): Number of substations of WTG farm. Defaults to ``1``.
-            number_exportcables (:obj:`int`): Number of export cables of WTG farm. Defaults to ``1``.
-            out_dir (:obj:`str`): Directory to save the WTG parameters. Defaults to `None`.
-            n_device_at_port (:obj:`int`): Number of device that can be mantained simultaneously at port. Defaults to ``None``
-            n_device_stored_at_port (:obj:`int`): Number of device that can be stored when not in maintenance. Defaults to ``None``
+            number_devices (int): Number of WTG devices. Defaults to ``None``.
+            rated_power (float): Rated power of each WTG (in MW). Defaults to ``None``.
+            cut_in (float): WTG cut-in speed (in m/s). Defaults to ``None``.
+            cut_off (float): WTG cut-off speed (in m/s). Defaults to ``None``.
+            hub_height (float): WTG hub height (in m). Defaults to ``None``.
+            pcurve_file (str): WTG power curve file path. Defaults to ``None``.
+            moorings (int): Number of mooring systems per WTG. Defaults to ``0``.
+            number_strings (int): Number of strings of WTG devices. Defaults to ``None``.
+            n_string_to_connector (int): Number of strings for hub. Defaults to ``None``.
+            wtg_layout (int): Type layout. Defaults to ``1``.
+            number_substations (int): Number of substations of WTG farm. Defaults to ``1``.
+            number_exportcables (int): Number of export cables of WTG farm. Defaults to ``1``.
+            out_dir (str): Directory to save the WTG parameters. Defaults to `None`.
+            n_device_at_port (int): Number of device that can be mantained simultaneously at port. Defaults to ``None``
+            n_device_stored_at_port (int): Number of device that can be stored when not in maintenance. Defaults to ``None``
             tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
-            spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``1.650`` km.
+            spacing (float): Spacing between devices in meters. Defaults to ``1.650`` km.
             
         """
         if number_devices != 0 and number_devices is not None:
@@ -228,8 +228,8 @@ class WindTurbineGenerator():
         a :class:`WindTurbineGenerator` item.
 
         Args:
-            file_path (:obj:`str`): YAML file location.
-            out_dir (:obj:`str`): directory to save the WTG parameters.
+            file_path (str): YAML file location.
+            out_dir (str): directory to save the WTG parameters.
                 Defaults to `None`.
 
         Raises:
@@ -465,7 +465,7 @@ class WindTurbineGenerator():
         Write the Wave system parameters to a YAML file.
 
         Args:
-            out_dir (:obj:`str`): The output directory where the YAML file will be saved.
+            out_dir (str): The output directory where the YAML file will be saved.
         """
         f = open(os.path.join(out_dir, 'wtg.yaml'), 'w')
         yaml=YAML()

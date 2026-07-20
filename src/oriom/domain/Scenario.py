@@ -14,7 +14,7 @@ class Scenario():
         failure events are occurring.
 
     Attributes:
-        scenario(:obj:`str`): The scenario to be represented.
+        scenario(str): The scenario to be represented.
             Six scenarios available:
 
                 - Scenario 0: Every month has the same percentages of occurence of failures;
@@ -23,7 +23,7 @@ class Scenario():
                 - Scenario 3: Based on the report from Evolve Consortium, the percentages are obtained based on proportions of the wind speed peaks;
                 - Scenario 4: Scenario to be tested;
                 - Scenario 5:Scenario to be tested
-        probability(:obj:`dict`): The probability of failure per month.
+        probability(dict): The probability of failure per month.
             **keys**: *months*: :obj:`float`
     """
     def __init__(
@@ -45,19 +45,19 @@ class Scenario():
         """Initializes :class:'Scenario' class.
 
         Args:
-            scenario(:obj:`int`): The scenario to be represented.
-            jan (:obj:`float`): Probability of failure for January.
-            feb (:obj:`float`): Probability of failure for February.
-            mar (:obj:`float`): Probability of failure for March.
-            apr (:obj:`float`): Probability of failure for April.
-            mai (:obj:`float`): Probability of failure for Mai.
-            jun (:obj:`float`): Probability of failure for June.
-            jul (:obj:`float`): Probability of failure for July.
-            aug (:obj:`float`): Probability of failure for August.
-            sep (:obj:`float`): Probability of failure for September.
-            oct (:obj:`float`): Probability of failure for October.
-            nov (:obj:`float`): Probability of failure for November.
-            dec (:obj:`float`): Probability of failure for December.
+            scenario(int): The scenario to be represented.
+            jan (float): Probability of failure for January.
+            feb (float): Probability of failure for February.
+            mar (float): Probability of failure for March.
+            apr (float): Probability of failure for April.
+            mai (float): Probability of failure for Mai.
+            jun (float): Probability of failure for June.
+            jul (float): Probability of failure for July.
+            aug (float): Probability of failure for August.
+            sep (float): Probability of failure for September.
+            oct (float): Probability of failure for October.
+            nov (float): Probability of failure for November.
+            dec (float): Probability of failure for December.
         """
         self.scenario = int(scenario)
         self.probability = {
@@ -112,7 +112,7 @@ class Scenario():
         """Returns a dict of :class:`Scenario` based on a YAML file.
 
        Args:
-           file_path (:obj:`str`): YAML file path with scenarios.
+           file_path (str): YAML file path with scenarios.
 
         Raises:
             KeyError: if some of the mandatory keys of YAML are

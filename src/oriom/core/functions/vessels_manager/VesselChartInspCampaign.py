@@ -33,7 +33,7 @@ class Stat_chart_inspection_campaign():
         """
         Initialize the class and build the dictionaries of inspection campaign
         Args:
-            inspections_site_stat (:obj:`list`): List of object :class:`InspectionsSiteStat`.
+            inspections_site_stat (list): List of object :class:`InspectionsSiteStat`.
         """
         self.inspections_site_stat = inspections_site_stat
         self.campaign_inspection_dict = {}
@@ -125,9 +125,9 @@ class Stat_chart_inspection_campaign():
             - Mask the df with the stat_end of the block
 
         Args:
-            df (:obj:`pd.DataFrame`): Dataframe of log_events_merged
-            vessels (list): list of class `~oriom.classes.Vessel.Vessel`
-            percentile (:obj:`float`): percentile value to calculate the statistic
+            df (pd.DataFrame): Dataframe of log_events_merged
+            vessels (list): list of class `~oriom.domain.Vessel.Vessel`
+            percentile (float): percentile value to calculate the statistic
 
         Returns:
             pd.DataFrame: dataframe with all the failures.

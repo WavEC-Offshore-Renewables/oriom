@@ -10,7 +10,7 @@ def inspection_data(insp):
     Extrapolate data of inspection from insp class
 
     Args:
-        insp (:obj:`list`): List of objects :class:`InspectionsSiteStat` or :class:`InspectionsPortStat`.
+        insp (list): List of objects :class:`InspectionsSiteStat` or :class:`InspectionsPortStat`.
     Returns:
         data of the inspections
     """
@@ -106,13 +106,13 @@ def find_time_log_events_insp(
     Function to calculate time and cost for inspections
 
     Args:
-    log_events_merged_insp (:obj:`pd.DataFrame`): Log of inspections events from log_events_merged
-    operations_inspect_site(:obj:`list`): list of objects :class:`InspectionsSiteStat`
-    operations_inspect_port(:obj:`list`): list of objects :class:`InspectionsTowStat`
-    duration_shift(:obj:`int`): duration of the shift
+    log_events_merged_insp (pd.DataFrame): Log of inspections events from log_events_merged
+    operations_inspect_site(list): list of objects :class:`InspectionsSiteStat`
+    operations_inspect_port(list): list of objects :class:`InspectionsTowStat`
+    duration_shift(int): duration of the shift
     ves (:obj:`object`): object of class `Vessel`
-    insp_port_data (:obj:`dict`): Dict with first key tech InspectionsPort.id, values with class with `OperationTow` or `InspectionsPort`
-    rov_tech_vessel_count(:obj:`dict`): Dictionary of Vessels and operation that already account for ROV and tech cost
+    insp_port_data (dict): Dict with first key tech InspectionsPort.id, values with class with `OperationTow` or `InspectionsPort`
+    rov_tech_vessel_count(dict): Dictionary of Vessels and operation that already account for ROV and tech cost
 
     Returns:
         :obj:`float`:floats that represents the transit_time_insp, standby_time_insp,

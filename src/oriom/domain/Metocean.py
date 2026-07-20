@@ -24,9 +24,9 @@ class Metocean():
     """Metocean timeseries class.
 
     Attributes:
-        file (:obj:`str`): Timeseries file location.
-        latitude (:obj:`float`): Latitude for the location of the timeseries.
-        longitude (:obj:`float`): Longitude for the location of the timeseries.
+        file (str): Timeseries file location.
+        latitude (float): Latitude for the location of the timeseries.
+        longitude (float): Longitude for the location of the timeseries.
         df_timeseries (:obj:`pandas.DataFrame`): Timeseries with metocean data and hourly
             power column of entire farm and for device divided by tech [kW]
 
@@ -57,10 +57,10 @@ class Metocean():
         """Initializes :class:`Metocean` class.
 
         Args:
-            file_ (:obj:`str`): Timeseries file path location.
-            latitude (:obj:`float`): Latitude for the location of the timeseries.
-            longitude (:obj:`float`): Longitude for the location of the timeseries.
-            stat_inputs (:obj:`float`): Object of class Input.Statistical.
+            file_ (str): Timeseries file path location.
+            latitude (float): Latitude for the location of the timeseries.
+            longitude (float): Longitude for the location of the timeseries.
+            stat_inputs (float): Object of class Input.Statistical.
             h_ws_measurements (:obj:`float`,*optional*): Wind speed measurement height. Defaults to ``None``.
             run_funcs (:obj:`bool`,*optional*): Run inbuilt functions when created. Defaults to ``True``.
             out_dir (:obj:`str`,*optional*): Directory to save the Metocean parameters. Defaults to `None`.
@@ -179,7 +179,7 @@ class Metocean():
         :attr:`df_timeseries` with a timestep of 1 hour.
 
         Args:
-            out_dir (:obj:`str`): Path to save the timeseries file.
+            out_dir (str): Path to save the timeseries file.
         Example:
             >>> metocean.df_timeseries
                                   hs    tp    ws    cs
@@ -231,7 +231,7 @@ class Metocean():
         if there is sun light for each timeseries timestep.
 
         Args:
-            out_dir (:obj:`str`): Path to save the timeseries file.
+            out_dir (str): Path to save the timeseries file.
         Note:
             It uses :meth:`astral.sun.sun` and :class:`astral.LocationInfo`.
 
@@ -382,8 +382,8 @@ class Metocean():
 
         Args:
             h_hub (:obj:`int` or `float`): Wind turbine hub height. Defaults to ``150.0``.
-            z_wind_speed (:obj:`float`): Wind speed measurements height. Defaults to ``10.0``.
-            z0 (:obj:`float`): Surface for roughness. Defaults to ``0.0002``.
+            z_wind_speed (float): Wind speed measurements height. Defaults to ``10.0``.
+            z0 (float): Surface for roughness. Defaults to ``0.0002``.
             output_dir (:obj:`str`, *optional*): Folder path location to save the output .csv file. Defaults to ``None``.
             output_filename (:obj:`str`, *optional*): Name of the output .csv file. Defaults to ``None``.
 
@@ -436,7 +436,7 @@ class Metocean():
         It does not generate a metocena timeseries, df_timeseries e det to `None`.
 
         Args:
-            dir (:obj:`str`): Directory where there is the file to reuse.
+            dir (str): Directory where there is the file to reuse.
         """
         input_file_path = os.path.join(dir, 'inputs_tseries.yaml')
         with open(input_file_path, "r") as f:

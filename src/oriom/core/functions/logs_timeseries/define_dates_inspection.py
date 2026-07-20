@@ -31,8 +31,8 @@ def define_dates(
 
     Args:
         COLS (list): List of columns of the log dataframe
-        inspections (:class:`~oriom.classes.Operations.InspectionPort/Site`)
-        event (:obj:`str`): String of the type of event.
+        inspections (:class:`~oriom.domain.Operations.InspectionPort/Site`)
+        event (str): String of the type of event.
         start_year (int): Year of the start of the simulation
         start_month (int): Month of the start of the simulation
         n_lifetime (int): Number of years of the lifetime of the farm

@@ -21,48 +21,48 @@ class TimeSeries():
         cannot be scheduled and gets postponed.
 
     Attributes:
-        site_lat (:obj:`dict`): Site latitude, in degrees.
+        site_lat (dict): Site latitude, in degrees.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        site_lon (:obj:`dict`): Site longitude, in degrees.
+        site_lon (dict): Site longitude, in degrees.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        file_metocean (:obj:`dict`): Path location of the site metocean date timeseries.
+        file_metocean (dict): Path location of the site metocean date timeseries.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-        file_metocean_port (:obj:`dict`): Path location of the port metocean date timeseries.
+        file_metocean_port (dict): Path location of the port metocean date timeseries.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-        metocean_ws_height (:obj:`dict`): Wind speed at measurement height, in meters.
+        metocean_ws_height (dict): Wind speed at measurement height, in meters.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        surface_roughness (:obj:`dict`): Sea surface roughness, in meters.
+        surface_roughness (dict): Sea surface roughness, in meters.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        distance (:obj:`dict`): Marine distance from site to port, in killometers.
+        distance (dict): Marine distance from site to port, in killometers.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        time_between_devices_PV (:obj:`dict`): Transit time to move from one PV device to anorther, in hours.
+        time_between_devices_PV (dict): Transit time to move from one PV device to anorther, in hours.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        time_between_devices_WT (:obj:`dict`): Transit time to move from one WT device to anorther, in hours.
+        time_between_devices_WT (dict): Transit time to move from one WT device to anorther, in hours.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        time_between_devices_WEC (:obj:`dict`): Transit time to move from one WEC device to anorther, in hours.
+        time_between_devices_WEC (dict): Transit time to move from one WEC device to anorther, in hours.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        max_wait (:obj:`dict`): Maximum waiting on weather time between activities, in hours. Its value is :obj:`8.0` hours if not defined.
+        max_wait (dict): Maximum waiting on weather time between activities, in hours. Its value is :obj:`8.0` hours if not defined.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        montecarlo_percent (:obj:`dict`): Ratio of metocean timesteps to be analyzed. Its value is :obj:`0.3` if not defined.
+        montecarlo_percent (dict): Ratio of metocean timesteps to be analyzed. Its value is :obj:`0.3` if not defined.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`.
-        failure_scenario (:obj:`dict`): Selection of failure scenario. Its value is :obj:`0` if not defined.
+        failure_scenario (dict): Selection of failure scenario. Its value is :obj:`0` if not defined.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
-        shift_duration (:obj:`dict`): Duration of a working shift, in hours.
+        shift_duration (dict): Duration of a working shift, in hours.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
-        merge_vessel (:obj:`list`): Vessel type that can be merged in corrective operation
+        merge_vessel (list): Vessel type that can be merged in corrective operation
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-        file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs.
+        file_inputs (str): Path for the file with all previous mandatory inputs.
             Its value is ``None`` if not defined.
-        time_between_devices_dict (:obj:`dict`): Time between device per each tech
-        file_metocean_tow_location (:obj:`dict`): Dictionary of X Path location of the metocean date timeseries X  file between site and port.
+        time_between_devices_dict (dict): Time between device per each tech
+        file_metocean_tow_location (dict): Dictionary of X Path location of the metocean date timeseries X  file between site and port.
             **keys**: dict(X :obj:`int`: *value*: :obj:`str` ; *units*: :obj:`str`.)
-        file_metocean_tow_distance (:obj:`dict`): Dictionary of X distance from site of the metocean date timeseries X file between site and port.
+        file_metocean_tow_distance (dict): Dictionary of X distance from site of the metocean date timeseries X file between site and port.
             **keys**: dict(X :obj:`int`: *value*: :obj:`flaot` ; *units*: :obj:`str`.)
-        file_metocean_tow_number (:obj:`dict`): Path location of the metocean date timeseries.
+        file_metocean_tow_number (dict): Path location of the metocean date timeseries.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
-        file_electric_loss (:obj:`dict`): Path location of the electric losses file.
+        file_electric_loss (dict): Path location of the electric losses file.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-        file_wake_loss (:obj:`dict`): Path location of the wake losses file.
+        file_wake_loss (dict): Path location of the wake losses file.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
         ST_O_M (:obj:`bool`): Boolean to indicate if consider ST_O&M. Used to avoid recycle previous file. Default to ``False``.
     Note:
@@ -98,14 +98,14 @@ class TimeSeries():
             **kwargs: Arbitrary keyword arguments.
 
         Keyword Args:
-            site_latitude (:obj:`float`): Site latitude, in degrees.
-            site_longitude (:obj:`float`): Site longitude, in degrees.
-            file_metocean (:obj:`str`): Path location of the site metocean date timeseries.
-            file_metocean_port (:obj:`str`): Path location of the port metocean date timeseries.
-            dist_port (:obj:`float`): Marine distance from site to port, in killometers.
-            time_between_devices_PV (:obj:`float`): Transit time to move from one PV device to anorther, in hours.
-            time_between_devices_WT (:obj:`float`): Transit time to move from one WT device to anorther, in hours.
-            time_between_devices_WEC (:obj:`float`): Transit time to move from one WEC device to anorther, in hours.
+            site_latitude (float): Site latitude, in degrees.
+            site_longitude (float): Site longitude, in degrees.
+            file_metocean (str): Path location of the site metocean date timeseries.
+            file_metocean_port (str): Path location of the port metocean date timeseries.
+            dist_port (float): Marine distance from site to port, in killometers.
+            time_between_devices_PV (float): Transit time to move from one PV device to anorther, in hours.
+            time_between_devices_WT (float): Transit time to move from one WT device to anorther, in hours.
+            time_between_devices_WEC (float): Transit time to move from one WEC device to anorther, in hours.
             surface_roughness (:obj:`float`,*optional*): Surface roughness of sea. Defaults to ``0.0002``.
             metocean_ws_height (:obj:`float`,*optional*): Wind speed measurement height. Defaults to ``10.0``.
             max_wait (:obj:`float`,*optional*): Maximum waiting on weather time between activities, in hours. Defaults to ``8.0``.
@@ -114,11 +114,11 @@ class TimeSeries():
             shift_duration (:obj:`int`,*optional*): Duration of a working shift. Defaults to ``12``.
             merge_vessel (:obj:`list`,*optional*): Vessel type that can be merged in corrective operation.
             file_inputs (:obj:`str`,*optional*): Path for the file with all previous mandatory inputs. Defaults to ``None``.
-            file_metocean_tow_location (:obj:`dict`): Dictionary of Path location of the X metocean date timeseries from site to port.
-            file_metocean_tow_distance (:obj:`dict`): Dictionary of X distance in km from site of the metocean timeseries X file.
-            file_metocean_tow_number (:obj:`int`): Number of Path location of the X metocean date timeseries from site to port.
-            file_electric_loss (:obj:`str`): Path location of the electric losses file.
-            file_wake_loss (:obj:`str`): Path location of the wake losses file.
+            file_metocean_tow_location (dict): Dictionary of Path location of the X metocean date timeseries from site to port.
+            file_metocean_tow_distance (dict): Dictionary of X distance in km from site of the metocean timeseries X file.
+            file_metocean_tow_number (int): Number of Path location of the X metocean date timeseries from site to port.
+            file_electric_loss (str): Path location of the electric losses file.
+            file_wake_loss (str): Path location of the wake losses file.
             scenarios_file (obj:`str`) Path location of the failure Scenarios file.
 
 
@@ -532,7 +532,7 @@ class TimeSeries():
         """Recycle previous ~Inputs.TimeSeries from a YAML file.
 
         Args:
-            name (:obj:`str`): Name of the YAML file.
+            name (str): Name of the YAML file.
         """
         input_file_path = os.path.join(dir, str(name) + '.yaml')
         with open(input_file_path, "r") as f:

@@ -87,14 +87,14 @@ def define_activities(
         """
         Define activities for :class:`CorrectiveMajor` or :class:`OperationTow` based on a YAML file path :attr:`file_activities` if
         the operation ID of the activity matches the ID of this CorrectiveMajor, that
-        :class:`~oriom.classes.Activity.Activity` is assumed as part
+        :class:`~oriom.domain.Activity.Activity` is assumed as part
         of the :class:`CorrectiveMajor` or :class:`OperationTow`.
 
         Args:
             operation (:obj: `object`): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
-            file_activities (:obj:`str`): The path to the YAML file containing activities.
-            distance_to_site (:obj:`float`): The distance from port to site in kilometers.
-            transit_between_devices (:obj:`float`): Time between two devices in hours.
+            file_activities (str): The path to the YAML file containing activities.
+            distance_to_site (float): The distance from port to site in kilometers.
+            transit_between_devices (float): Time between two devices in hours.
             tow_op (:obj: `bool`): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
         Raises:
             KeyError: if the operation is not found in the :attr:`file_activities`.
@@ -220,8 +220,8 @@ def recycle_activities(operation: object, dir: str, file_name: str, tow_op: bool
 
     Args:
         operation (:obj: `object`): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
-        dir (:obj:`str`): The directory where the CSV file is located.
-        file_name (:obj:`str`): The name of the CSV file to recycle activities from.
+        dir (str): The directory where the CSV file is located.
+        file_name (str): The name of the CSV file to recycle activities from.
         tow_op (:obj: `bool`): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
     """
     operation_type = "OperationTow" if tow_op else "CorrectiveMajor"
@@ -241,8 +241,8 @@ def get_failures(
 
     Args:
         operation (:obj: object) Object of CorrectiveMajor or CorrectiveMinor
-        failures_list (:class:`~oriom.classes.Failure.Failure`): List of
-            :class:`~oriom.classes.Failure.Failure`.
+        failures_list (:class:`~oriom.domain.Failure.Failure`): List of
+            :class:`~oriom.domain.Failure.Failure`.
     Raises:
         TypeError: if the operation is not corrective.
     """
@@ -264,8 +264,8 @@ def define_tow_operations(oper: object, towing_ops:list, op_type: str):
 
     Args:
         oper (:obj: `object`): Operation Object of class `CorrectiveMajor` or `InspectionPort`
-        towing_ops (:obj:`list`): List of object :class:`OperationTow`.
-        op_type (:obj:`str`): Type of class `CorrectiveMajor` or `InspectionPort`
+        towing_ops (list): List of object :class:`OperationTow`.
+        op_type (str): Type of class `CorrectiveMajor` or `InspectionPort`
     """
     
     if 'ofw' in oper.id:

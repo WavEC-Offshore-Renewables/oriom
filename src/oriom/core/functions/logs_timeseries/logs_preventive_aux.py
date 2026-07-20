@@ -81,7 +81,7 @@ def start_date_inspection(
     preventive maintenances of the lifetime will starts
 
     Args:
-        inspections (:class:`~oriom.classes.Operations.InspectionPort/Site`)
+        inspections (:class:`~oriom.domain.Operations.InspectionPort/Site`)
         start_year (int): Year of the start of the simulation
         start_month (int): Month of the start of the simulation
         n_lifetime (int): Number of years of the lifetime of the farm

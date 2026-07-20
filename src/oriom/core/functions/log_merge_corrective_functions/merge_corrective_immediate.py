@@ -93,12 +93,12 @@ def merge_operation(
             log_mobilisation (pd.DataFrame): Dataframe with the mobilisation log events.
             day_oper (:obj:`pd.Series`): Row of days_vessel DataFrame that show how many vessel are used and which are the ops on the day under
                 analysis.
-            vessels (:obj:`list`):List of objectts :class:`Vessel`.
-            time_between_devices (:obj:`dict`): Dictionary with the time between devices.
-            grouped_operations (:obj:`dict`): Dictionary with the mergeble operations divided by vessel and group. Ranked by less restrictive
+            vessels (list):List of objectts :class:`Vessel`.
+            time_between_devices (dict): Dictionary with the time between devices.
+            grouped_operations (dict): Dictionary with the mergeble operations divided by vessel and group. Ranked by less restrictive
                 to most restrictive
-            oper_dict (:obj:`dict`): Dictionary with the operations.
-            COLS (:obj:`list`): List of columns to be used in the dataframe.
+            oper_dict (dict): Dictionary with the operations.
+            COLS (list): List of columns to be used in the dataframe.
             operation_already_merged (set): set of index of operation already merged or passed
 
         Returns:

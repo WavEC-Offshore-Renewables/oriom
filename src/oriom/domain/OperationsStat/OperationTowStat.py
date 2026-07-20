@@ -6,34 +6,34 @@ class OperationsTowStat():
     '''OperationsTowStat class.
 
     Attributes:
-        id (:obj:`str`): ID of the towing operation.
-        op_class (:class:`~oriom.classes.Operations.OperationTow`):
+        id (str): ID of the towing operation.
+        op_class (:class:`~oriom.domain.Operations.OperationTow`):
            Towing operation class.
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation. Its value is ``None`` if not defided.
-        vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary vessel
+        vessel2 (:class:`~oriom.domain.Vessel.Vessel`): Auxiliary vessel
             used in this operation. Its value is ``None`` if not defided.
-        dur_total_dict (:obj:`dict`): Dict statistical analysis of "dur_total".
+        dur_total_dict (dict): Dict statistical analysis of "dur_total".
             Defaults to ``None``.
-        wait_start_dict (:obj:`dict`): Dict statistical analysis of "wait_start".
+        wait_start_dict (dict): Dict statistical analysis of "wait_start".
             Defaults to ``None``.
-        dur_net_port_dict (:obj:`dict`): Dict statistical analysis of "dur_net_port".
+        dur_net_port_dict (dict): Dict statistical analysis of "dur_net_port".
             Defaults to ``None``.
-        transit_to_site_dict (:obj:`dict`): Dict statistical analysis of "transit_ts".
+        transit_to_site_dict (dict): Dict statistical analysis of "transit_ts".
             Defaults to ``None``.
-        wait_site_dict (:obj:`dict`): Dict statistical analysis of "wait_site".
+        wait_site_dict (dict): Dict statistical analysis of "wait_site".
             Defaults to ``None``.
-        dur_net_site_dict (:obj:`dict`): Dict statistical analysis of "dur_net_site".
+        dur_net_site_dict (dict): Dict statistical analysis of "dur_net_site".
             Defaults to ``None``.
-        transit_to_port_dict (:obj:`dict`): Dict statistical analysis of "transit_tp".
+        transit_to_port_dict (dict): Dict statistical analysis of "transit_tp".
             Defaults to ``None``.
-        wait_port_dict (:obj:`dict`): Dict statistical analysis of "wait_port".
+        wait_port_dict (dict): Dict statistical analysis of "wait_port".
             Defaults to ``None``.
-        wtg_shutdown_dict (:obj:`dict`): Dict statistical analysis of "wtg_shutdown".
+        wtg_shutdown_dict (dict): Dict statistical analysis of "wtg_shutdown".
             Defaults to ``None``.
-        wec_shutdown_dict (:obj:`dict`): Dict statistical analysis of "wec_shutdown".
+        wec_shutdown_dict (dict): Dict statistical analysis of "wec_shutdown".
             Defaults to ``None``.
-        pv_shutdown_dict (:obj:`dict`): Dict statistical analysis of "pv_shutdown".
+        pv_shutdown_dict (dict): Dict statistical analysis of "pv_shutdown".
             Defaults to ``None``.
 
     '''
@@ -46,10 +46,10 @@ class OperationsTowStat():
     ):
         '''
         Args:
-            operation (:class:`~oriom.classes.Operations.OperationTow`):
+            operation (:class:`~oriom.domain.Operations.OperationTow`):
                 Towing operation class.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
-            run_dur (:obj:`str`): Folder in which there is the statistical analysis.
+            PERCENTILE (int): Percentile for the statistical analysis.
+            run_dur (str): Folder in which there is the statistical analysis.
 
         '''
         self.id = str(operation.id).lower()
@@ -112,8 +112,8 @@ class OperationsTowStat():
     ):
         '''
         Args:
-            run_dur (:obj:`str`): Folder in which there is the statistical analysis.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
+            run_dur (str): Folder in which there is the statistical analysis.
+            PERCENTILE (int): Percentile for the statistical analysis.
         '''
 
         op_path = os.path.join(run_dir, self.id, 'statistical_analysis_P' + str(PERCENTILE) + '.csv')
@@ -186,10 +186,10 @@ class OperationsTowStat():
     ):
         '''
         Args:
-            operations (:obj:`list`):
-                list of :class:`~oriom.classes.Operations.OperationTow`.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
-            run_dur (:obj:`str`): Folder in which there is the statistical analysis.
+            operations (list):
+                list of :class:`~oriom.domain.Operations.OperationTow`.
+            PERCENTILE (int): Percentile for the statistical analysis.
+            run_dur (str): Folder in which there is the statistical analysis.
         '''
         operations_tow_stat = []
         for op in operations:

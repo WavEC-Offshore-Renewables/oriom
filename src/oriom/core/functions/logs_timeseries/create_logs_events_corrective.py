@@ -61,10 +61,10 @@ def create_logs_corrective_file(
     Args:
         COLS (list): List of columns of the log dataframe
         CUTOFF_DATE (datetime): last date of possible creation for log corrective on last month
-        dates_failures (:obj:`pd.DataFrame`): Log of all the events (failure,
+        dates_failures (pd.DataFrame): Log of all the events (failure,
             operation, inspection_port, inspection_site).
-        operation_log_file_stats (:obj:`list`): List of objects :class:`OperationsCorrectiveStat` with max percentile.
-        time_fail_op_immediately (:obj:`float`): Time between failure and
+        operation_log_file_stats (list): List of objects :class:`OperationsCorrectiveStat` with max percentile.
+        time_fail_op_immediately (float): Time between failure and
             immediate operations.
         vessel_to_merge (list): List of vessel that op can be merged when is possible to merge operations
         find_element_class (object): Object from class :class:`FindElementClass`

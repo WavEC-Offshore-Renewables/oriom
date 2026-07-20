@@ -11,7 +11,7 @@ def average_pwind(
 )->dict:
     """
     Args:
-        timeseries_with_power (:obj:`pd.DataFrame`): DataFrame with
+        timeseries_with_power (pd.DataFrame): DataFrame with
         the timeseries of the power of the entire wind farm. Data in kW
         out_dir (:obj:`str`*optional*): Output directory to save the
         	power averaged per month.
@@ -66,7 +66,7 @@ def average_pwave(
 ):
     """
     Args:
-        timeseries_with_power (:obj:`pd.DataFrame`): DataFrame with
+        timeseries_with_power (pd.DataFrame): DataFrame with
         the timeseries of the power of the wave farm. Data in kW
         out_dir (:obj:`str`*optional*): Output directory to save the hourly
         power averaged per month.

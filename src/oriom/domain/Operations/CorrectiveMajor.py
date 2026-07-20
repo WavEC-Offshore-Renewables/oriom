@@ -17,50 +17,50 @@ class CorrectiveMajor():
 
     Attributes:
 
-        id (:obj:`str`): The unique identifier of the :class:`CorrectiveMajor`.
-        name (:obj:`str`): :class:`CorrectiveMajor` short description.
+        id (str): The unique identifier of the :class:`CorrectiveMajor`.
+        name (str): :class:`CorrectiveMajor` short description.
         tow_to_port (:obj:`bool`): This operation requires the device removal
             and redeploy.
-        months (:obj:`list`): Months when the operation is preformed.
-        tech_required (:obj:`int`): Number of technicians required to preform
+        months (list): Months when the operation is preformed.
+        tech_required (int): Number of technicians required to preform
             the operation.
-        tech_cost (:obj:`float`): The daily cost of each technician [€/day]. Its value
+        tech_cost (float): The daily cost of each technician [€/day]. Its value
             is ``0`` if not defined.
-        op_tow_port (:obj:`str`): ID of the tow-to-port operation. Its value is
+        op_tow_port (str): ID of the tow-to-port operation. Its value is
             ``None`` if not defined.
-        op_tow_site (:obj:`str`): ID of the tow-to-site operation. Its value is
+        op_tow_site (str): ID of the tow-to-site operation. Its value is
             ``None`` if not defined.
-        op_tow_site_port (:obj:`str`): ID of the tow-to-site-port operation. Its value is
+        op_tow_site_port (str): ID of the tow-to-site-port operation. Its value is
             ``None`` if not defined.
-        vessel1_id (:obj:`str`): The ID of the main vessel. Its value is
+        vessel1_id (str): The ID of the main vessel. Its value is
             ``None`` if not defided.
-        vessel1_qt (:obj:`int`): The number of the main vessel required. Its value si
+        vessel1_qt (int): The number of the main vessel required. Its value si
             ``None`` if not defined.
-        vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
+        vessel2_id (str): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
-        vessel2_qt (:obj:`int`): The number of the secondary vessel required. Its value si
+        vessel2_qt (int): The number of the secondary vessel required. Its value si
             ``None`` if not defined.
-        other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
+        other_costs (float): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
-        port_costs (:obj:`float`): Daily port costs. Its value is :obj:`0.0` if not defided.
-        activities (:class:`~oriom.classes.Activity.Activity`): List of
-            :class:`~oriom.classes.Activity.Activity` preformed during
+        port_costs (float): Daily port costs. Its value is :obj:`0.0` if not defided.
+        activities (:class:`~oriom.domain.Activity.Activity`): List of
+            :class:`~oriom.domain.Activity.Activity` preformed during
             the logistic operation.
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation. Its value is ``None`` if not defided.
-        vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary
+        vessel2 (:class:`~oriom.domain.Vessel.Vessel`): Auxiliary
             vessel used in this operation. Its value is ``None`` if not
             defided.
-        failures (:class:`~oriom.classes.Failure.Failure`): List of
-            :class:`~oriom.classes.Failure.Failure`.
-        rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): Rov/Drone
+        failures (:class:`~oriom.domain.Failure.Failure`): List of
+            :class:`~oriom.domain.Failure.Failure`.
+        rov_drone (:class:`~oriom.domain.RovDrone.RovDone`): Rov/Drone
             used in this operation. Its value is ``None`` if not
             defided.
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
+        ts_data (:class:`~oriom.domain.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
-        n_device_at_port(:obj:`int`): Number of devices that can be mantained
+        n_device_at_port(int): Number of devices that can be mantained
             at port simultaneously. Defaults to `None`
-        n_device_stored_at_port(:obj:`int`): Number of devices that can be
+        n_device_stored_at_port(int): Number of devices that can be
                 stored at port when not in maintenance. Defaults to `None`
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
@@ -86,24 +86,24 @@ class CorrectiveMajor():
         Initialize the :class:`CorrectiveMajor` with various attributes and optional parameters.
 
         Args:
-            id_ (:obj:`str`): The unique identifier of the CorrectiveMajor.
-            name (:obj:`str`): CorrectiveMajor short description.
+            id_ (str): The unique identifier of the CorrectiveMajor.
+            name (str): CorrectiveMajor short description.
             tow_to_port (:obj:`bool`): Indicates if the operation requires device
                 removal and redeployment.
-            tech_required (:obj:`int`): Number of technicians required to
+            tech_required (int): Number of technicians required to
                 preform the operation.
             tech_cost (:obj:`float`,*optional*): The daily cost of each technician[€/day].
                 Defaults to ``0``.
             months (:obj:`str`, *optional*): Months when the operation is preformed.
                 Defaults to an empty list for corrective operations and to
                 [1,2,3,4,5,6,7,8,9,10,11,12] for preventive if not defined.
-            vessel1_id (:obj:`str`): The ID of the main vessel.
+            vessel1_id (str): The ID of the main vessel.
                 Defaults to ``None``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
-            vessel1_qt (:obj:`int`): Number of main vessel required.
+            vessel1_qt (int): Number of main vessel required.
                 Defaults to ``None``.
-            vessel2_qt (:obj:`int`): Number of second vessel required.
+            vessel2_qt (int): Number of second vessel required.
                 Defaults to ``1`` if vesse_id not ´´None´´.
             other_costs (:obj:`float`, *optional*): Other costs (port, cranes,
                 insurance, etc.). Defaults to :obj:`0.0`.
@@ -330,7 +330,7 @@ class CorrectiveMajor():
         Write the object attributes to a YAML file in the specified output directory.
 
         Args:
-            out_dir (:obj:`str`): The directory where the YAML file will be saved.
+            out_dir (str): The directory where the YAML file will be saved.
         """
         activities = [activity.id for activity in self.activities]
         vessel1 = self.vessel1_id

@@ -29,13 +29,13 @@ def merge_shift_deferred(
     will be conducted cronologically one after the other and not all together simultaneously.
 
     Args:
-        duration_shift (:obj:`float`): The total duration of one working shift in hours taken into consideration.
+        duration_shift (float): The total duration of one working shift in hours taken into consideration.
             TODO implement different lengh duration for overnight stay
-        duration_inspection (:obj:`float`): The time required to perform an inspection on a single device (in hours).
-        transit_between_devices (:obj:`float`): The transit time needed to move between devices (in hours).
-        operation_total_duration (:obj:`float`): Time of inspection duration + transit_to_site + transit_to port (in hours).
-        n_vessel (:obj:`int`): The number of vessels for that type of vessel.
-        n_oper (:obj:`int`): The total number of operations to be performed.
+        duration_inspection (float): The time required to perform an inspection on a single device (in hours).
+        transit_between_devices (float): The transit time needed to move between devices (in hours).
+        operation_total_duration (float): Time of inspection duration + transit_to_site + transit_to port (in hours).
+        n_vessel (int): The number of vessels for that type of vessel.
+        n_oper (int): The total number of operations to be performed.
         operation_concluded (:obj:`int`, optional): The number of operations already completed previously (for MERGE DEFERRED).
             Defaults to None.
         end_wait_start_list_idx (:obj:`list`, optional): List of indices marking the end of waiting and start of operations
@@ -142,16 +142,16 @@ def output_working_shifts(
     It takes into account if more crew can be brought on the vessels and if each crew can conduct more than one inspection along the shift
 
     Args:
-        N_devices (:obj:`int`): Number of devices to inspect
-        duration_shift (:obj:`float`): Maximum hours of working shift.
-        duration_inspection (:obj:`float`): Duration of each inspection
+        N_devices (int): Number of devices to inspect
+        duration_shift (float): Maximum hours of working shift.
+        duration_inspection (float): Duration of each inspection
         rov (:obj:`bool`): Boolean indicating if ROV is used
-        transit (:obj:`float`): Hours for the transit to site.
-        transit_between_devices (:obj:`float`): Hours for transit between devices.
-        vessel_type (:obj:`str`): Type of vessel used for the operation.
-        N_technicians_on_vessel (:obj:`int`): Maximum number of technicians on the vessel.
-        N_technicians_per_inspection (:obj:`int`): Number of technicians per inspection.
-        N_vessels (:obj:`int`): Number of vessels available/considered.
+        transit (float): Hours for the transit to site.
+        transit_between_devices (float): Hours for transit between devices.
+        vessel_type (str): Type of vessel used for the operation.
+        N_technicians_on_vessel (int): Maximum number of technicians on the vessel.
+        N_technicians_per_inspection (int): Number of technicians per inspection.
+        N_vessels (int): Number of vessels available/considered.
 
     Returns:
         :obj:`dict`: Dictionary containing information about the main and last working shifts,

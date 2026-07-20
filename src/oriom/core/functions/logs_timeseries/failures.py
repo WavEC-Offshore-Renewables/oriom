@@ -60,16 +60,16 @@ def failures_event(
         failure are more concentrated in the initial year (as many as the ``infant_mortality``) and lasts years (as many as ``wear_out``).
 
     Args:
-        s (:obj:`int`): Choose between the 6 (s: [0,5]) available scenarios
-        scenarios (:obj:`list`): List obtained from the class, percentages of probability
+        s (int): Choose between the 6 (s: [0,5]) available scenarios
+        scenarios (list): List obtained from the class, percentages of probability
             for each month
-        failures (:obj:`list`): List obtained from the class, failure rate for each component
-        N_LIFETIME (:obj:`int`): Lifetime of the project
-        START_YEAR (:obj:`int`): Starting year of the project
-        START_MONTH (:obj:`int`): starting month of the project
-        infant_mortality (:obj:`int`): Number of years at the start of the project with a higher probability of having failures
-        wear_out (:obj:`int`): Number of years of the end of the project with a higher probability of having failures
-        fail_ratio (:obj:`float`): Probability of failure during infant mortality and wear out with reference with normal life
+        failures (list): List obtained from the class, failure rate for each component
+        N_LIFETIME (int): Lifetime of the project
+        START_YEAR (int): Starting year of the project
+        START_MONTH (int): starting month of the project
+        infant_mortality (int): Number of years at the start of the project with a higher probability of having failures
+        wear_out (int): Number of years of the end of the project with a higher probability of having failures
+        fail_ratio (float): Probability of failure during infant mortality and wear out with reference with normal life
         fixed_seed (:obj:`bool`): Fixed seed True or False for repeatibility
         dates_failures_OLD (:obj: `pd.DataFrame`): Failure dataframe imported from previous failure file if present
             Defaults to ``pd.DataFrame.empty``.
@@ -308,8 +308,8 @@ def ST_failures_event(
         Save directly the failure event file
         
     Args:
-        failures (:obj:`list`): List obtained from the class, failure rate for each component.
-        result_dir_r (:obj:`str`): string of the folder on which the results are stored
+        failures (list): List obtained from the class, failure rate for each component.
+        result_dir_r (str): string of the folder on which the results are stored
     """
 
     list_ids, list_operation_triggered = [], []

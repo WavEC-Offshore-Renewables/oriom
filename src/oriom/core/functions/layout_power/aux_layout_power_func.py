@@ -95,11 +95,11 @@ def choose_loc(
     Take component that is not already failed (not present in list_failed) if the list is not empty
 
     Args:
-        level (:obj:`str`): Level of the failure (node/edge).
+        level (str): Level of the failure (node/edge).
         G (:obj:`nx.DiGraph`): Graph of tech farm.
-        component_level_power (:obj:`list`): list of string for level of component with power implemented
-        list_failed (:obj:`set`): set of already failed component
-        tech (:obj:`str`): technology analyzed
+        component_level_power (list): list of string for level of component with power implemented
+        list_failed (set): set of already failed component
+        tech (str): technology analyzed
 
 
     Raises:
@@ -351,9 +351,9 @@ def timeseries_power_preventive_evaluation(
     Args:
         insp (:obj:`Inspection`): Inspection object.
         inspection_dates (list): List of inspection dates.
-        metocean_timeseries (:obj:`pd.DataFrame`): DataFrame with metocean timeseries data and power ORE production.
-        power_level (:obj:`float`): Power level percentage during the inspection.
-        tech1 (:obj:`str`): Technology type (e.g., 'pV', 'wind', 'wave').
+        metocean_timeseries (pd.DataFrame): DataFrame with metocean timeseries data and power ORE production.
+        power_level (float): Power level percentage during the inspection.
+        tech1 (str): Technology type (e.g., 'pV', 'wind', 'wave').
 
     Returns:
         tuple[list[list[float]], list[list[float]]]: Energy loss and shutdown hours lists.
@@ -457,7 +457,7 @@ def create_list_date_port(towing_log: pd.DataFrame,)->tuple[list[list[pd.Timesta
     """Take start and end of each towing of the device for preventive inspection at port.
 
     Args:
-        towing_log (:obj:`pd.DataFrame`): DataFrame with metocean timeseries data and power ORE production.
+        towing_log (pd.DataFrame): DataFrame with metocean timeseries data and power ORE production.
 
     Returns:
         tuple[list[list[float]], list[list[float]]]: Energy loss and shutdown hours lists.
@@ -494,8 +494,8 @@ def statistical_power_preventive_evaluation(
             per h shutted
 
     Args:
-        dict_power (:obj:`dict`): Dictionary of monthly power.
-        shutdown_hours_dict (:obj:`float`): Tot hours of shutdown for start month inspection
+        dict_power (dict): Dictionary of monthly power.
+        shutdown_hours_dict (float): Tot hours of shutdown for start month inspection
         n_device_tot (:obj:´int´): Number of devices total.
         power_level (:obj:´float´): nº Power of devices at the component level.
         degradation_rate (:obj:`float`, optional): Degradation rate of the PV power,

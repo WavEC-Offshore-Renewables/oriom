@@ -36,29 +36,29 @@ class General():
             of runs is set automatically to 1.
 
     Attributes:
-        previous_run_dir (:obj:`dict`): Path to a previous run directory
+        previous_run_dir (dict): Path to a previous run directory
             to be considered. Its value is ``None`` if not defined.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-        number_runs (:obj:`int`): Number of times running for the same
+        number_runs (int): Number of times running for the same
             statistical analysis. Its values is ``1`` if not defined.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
-        overwrite_previous (:obj:`dict`): True if results want to be
+        overwrite_previous (dict): True if results want to be
             saved in the previous run path.
             **keys**: *value*: :obj:`bool` ; *units*: :obj:`str`.
-        consider_tseries (:obj:`dict`): Path to a previous TimeSeries
+        consider_tseries (dict): Path to a previous TimeSeries
             to be considered. Its value is ``None`` if not defined.
             **keys**: *value*: :obj:`bool` ; *units*: :obj:`str`.
         shift_doube (:obj:`bool`): If True the timeseries analysis is not
             constrained to a shift duration for scheduling the operations.
             **keys**: *value*: :obj:`bool ; *units*: :obj:`bool`.
-        logevents_file (:obj:`dict`): Path to a log_events.csv and
+        logevents_file (dict): Path to a log_events.csv and
             log_events_merged.csv file.
             Its value is ``None`` if not defined.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-        failureevent_file (:obj:`dict`): Path to a failure_events.csv file.
+        failureevent_file (dict): Path to a failure_events.csv file.
             Its value is ``None`` if not defined.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.
-        powerevent_file (:obj:`dict`): Path to wave_corrective_energy.csv 
+        powerevent_file (dict): Path to wave_corrective_energy.csv 
             and wave_preventive_energy file.
             Its value is ``None`` if not defined.
             **keys**: *value*: :obj:`str` ; *units*: :obj:`str`.

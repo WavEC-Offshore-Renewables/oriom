@@ -22,14 +22,14 @@ def create_mobilisation(
     Create mobilisation row to add to log_events_merged
 
     Args:
-        df (:obj:`pd.DataFrame`): Is the dataframe on which the mobilisation needs to be added
-        mobilisation_date (:obj:`pd.datetime`): The start date of the mobilisation.
-        end_mobi (:obj:`pd.datetime`): The date on wich start effectively the operation related to the mobilisation.
+        df (pd.DataFrame): Is the dataframe on which the mobilisation needs to be added
+        mobilisation_date (pd.datetime): The start date of the mobilisation.
+        end_mobi (pd.datetime): The date on wich start effectively the operation related to the mobilisation.
             This date will be used to evaluate in KPI_FINAL_COSTS.PY to evaluate how many vessels are used while mobilise the vessel
-        event (:obj:`str`): The event description.
+        event (str): The event description.
         vessel (:obj:`class`): The vessel class that needs to be mobilitate
-        oper_list (:obj:`list`): List of operations that called the mobilisation
-        count_fail (:obj:`str`): The counter of the failure mobilized. Defaul to ``None``
+        oper_list (list): List of operations that called the mobilisation
+        count_fail (str): The counter of the failure mobilized. Defaul to ``None``
         concat (:obj:`bool`): Boolean to return the concatenated dataframe or the single row. Defaul to ``True``
         n_vessel (:obj:`bool`): Number of vessel to mobilise. Defaul to ``1``
     Returns:
@@ -116,8 +116,8 @@ def failure_df_to_logevent_df(
     Use count_failures function to count the failures
 
     Args:
-        dates_failures (:obj:`pd.DataFrame`): Dataframe of failure occurred.
-        cols (:obj:`list`): List of column of log_dates_event
+        dates_failures (pd.DataFrame): Dataframe of failure occurred.
+        cols (list): List of column of log_dates_event
 
     Returns:
         pd.DataFrame: dataframe with all the failures.
@@ -141,8 +141,8 @@ def create_stat_chart_inspection_port(df, percentile = 0.9):
     Create the statistic chart for the inspection port
 
     Args:
-        df (:obj:`pd.DataFrame`): Dataframe of log_events_merged
-        df (:obj:`float`): percentile value to calculate the statistic
+        df (pd.DataFrame): Dataframe of log_events_merged
+        df (float): percentile value to calculate the statistic
 
     Returns:
         pd.DataFrame: dataframe with all the failures.
@@ -211,12 +211,12 @@ def shutdown_evaluation(
     Add the shutdown parameter to the dataframe due to failures and operations
 
     Args:
-        log_events (:obj:`pd.DataFrame`): Log of all the events
+        log_events (pd.DataFrame): Log of all the events
             (failure,operation, inspection_port, inspection_site, mobilisation).
-        failures (:obj:`list`): List of objects :class:`failures`
-        operation_log_file_stats (:obj:`list`): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
-        inspections_port_stat (:obj:`list`): List of object :class:`InspectionsPortStat`.
-        inspections_site_stat (:obj:`list`): List of object :class:`InspectionsSiteStat`.
+        failures (list): List of objects :class:`failures`
+        operation_log_file_stats (list): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
+        inspections_port_stat (list): List of object :class:`InspectionsPortStat`.
+        inspections_site_stat (list): List of object :class:`InspectionsSiteStat`.
 
     Return:
         pd.DataFrame: log_events with shutdown parameters modified

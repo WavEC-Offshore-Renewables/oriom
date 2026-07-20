@@ -31,17 +31,17 @@ def operation_consecutive(
             Vessel with overnight could stay longer wihout the need of return to port
 
     Args:
-        duration_shift (:obj:`float`): The available duration of one working shift in hours taken into consideration.
+        duration_shift (float): The available duration of one working shift in hours taken into consideration.
             For shifts creation use = The total duration of one working shift
             For deferred merging use = The hours of delay of the op scheduled on which op can start
                 (Ex: scheduled at 8.00, op can start till 11, duration_shift = 3 hours of delay)
         TODO implement different lengh duration for overnight stay
-        duration_inspection (:obj:`float`): The time required to perform an inspection on a single device (in hours).
-        transit_between_devices (:obj:`float`): The transit time needed to move between devices (in hours).
-        hours (:obj:`float`): Time of duration for single operation shift (in hours).
+        duration_inspection (float): The time required to perform an inspection on a single device (in hours).
+        transit_between_devices (float): The transit time needed to move between devices (in hours).
+        hours (float): Time of duration for single operation shift (in hours).
             For shifts creation use (inspections and minor correction) = inspection duration + transit_to_site + transit_to port
             For deferred merging use = 0 as the shift duration is the extra time available (hours of delay on which op can start)
-        n_oper (:obj:`int`): The total number of operations to be performed.
+        n_oper (int): The total number of operations to be performed.
         operation_concluded (:obj:`int`, optional): The number of operations already completed (for MERGE DEFERRED).
             Defaults to None.
         end_wait_start_list_idx (:obj:`list`, optional): List of indices marking the end of waiting and start of operations
@@ -112,26 +112,26 @@ def operation_consecutive_simultaneously(
     It returns the hours of the operations, the number of device inspected and the crew list on the vessel
 
     Args:
-        duration_shift (:obj:`float`): The available duration of one working shift in hours taken into consideration.
+        duration_shift (float): The available duration of one working shift in hours taken into consideration.
             For shifts creation use = The total duration of one working shift
             For deferred merging use = The hours of delay of the op scheduled on which op can start
                 (Ex: scheduled at 8.00, op can start till 11, duration_shift = 3 hours of delay)
             TODO implement different lengh duration for overnight stay
-        duration_inspection (:obj:`float`): The time required to perform an inspection on a single device (in hours).
-        crew (:obj:`int`): Number of crew group that can be present on the vessel for the specific maintenance
+        duration_inspection (float): The time required to perform an inspection on a single device (in hours).
+        crew (int): Number of crew group that can be present on the vessel for the specific maintenance
             operation under analysis. Example if tech_per_dev = 2 and vessel.tech_capacity = 12, crew = 6
-        transit_between_devices (:obj:`float`): The transit time needed to move between devices (in hours).
-        hours (:obj:`float`): Time of duration for single operation shift (in hours).
+        transit_between_devices (float): The transit time needed to move between devices (in hours).
+        hours (float): Time of duration for single operation shift (in hours).
             For shifts creation use (inspections and minor correction) = inspection duration + transit_to_site + transit_to port
             For deferred merging use = 0 as the shift duration is the extra time available (hours of delay on which op can start)
-        n_oper (:obj:`int`): The total number of operations to be performed. Defaults to None
+        n_oper (int): The total number of operations to be performed. Defaults to None
         operation_concluded (:obj:`int`, optional): The number of operations already completed previously (for MERGE DEFERRED).
             Defaults to None.
-        end_wait_start_list_idx (:obj:`list`) List of index of oper_schedule on which end the leadtime of the
+        end_wait_start_list_idx (list) List of index of oper_schedule on which end the leadtime of the
             components for the deferred operations
             TODO implement it only for component leadtime, remove vessel leadtime in case the vessel was already called for
             the deferred maintenance. Default to None
-        day_start_idx (:obj:`int`): Index of oper_schedule on which the O&M are taking place (temporal line of the
+        day_start_idx (int): Index of oper_schedule on which the O&M are taking place (temporal line of the
             deferred maintenance operations). Default to None.
 
     Returns:
@@ -220,16 +220,16 @@ def last_oper(
     the number of normal shift conducted
 
     Args:
-        n_vessel (:obj:`int`): The number of vessels for that type of vessel.
-        dev_left (:obj:`int`): The number of total devices left to correct.
-        n_device_shift (:obj:`int`): The numebr of devices done each main shift of work
-        duration_inspection (:obj:`float`): The time required to perform an inspection on a single device (in hours).
-        operation_total_duration (:obj:`float`): Time of inspection duration + transit_to_site + transit_to port (in hours).
-        transit_between_devices (:obj:`float`): The transit time needed to move between devices (in hours).
-        n_oper (:obj:`int`): The total number of operations to be performed.
-        max_crew (:obj:`int`): The total number of crew on the vessels, if not passed as argument we are analyzing consecutive op.
+        n_vessel (int): The number of vessels for that type of vessel.
+        dev_left (int): The number of total devices left to correct.
+        n_device_shift (int): The numebr of devices done each main shift of work
+        duration_inspection (float): The time required to perform an inspection on a single device (in hours).
+        operation_total_duration (float): Time of inspection duration + transit_to_site + transit_to port (in hours).
+        transit_between_devices (float): The transit time needed to move between devices (in hours).
+        n_oper (int): The total number of operations to be performed.
+        max_crew (int): The total number of crew on the vessels, if not passed as argument we are analyzing consecutive op.
             Default to 1.
-        n_shifts (:obj:`int`): The number of shift simultaneously (n_vessel) that are made on a day of operation. If not passed as argument
+        n_shifts (int): The number of shift simultaneously (n_vessel) that are made on a day of operation. If not passed as argument
             is an inspection working shift. Default to None.
 
 
@@ -288,15 +288,15 @@ def results_data(
     Function to evaluate results and return them
 
     Args:
-        n_device_shift (:obj:`int`): The number of devices done in the shift.
-        dev_left (:obj:`int`): The number of devices left to correct.
-        n_shifts (:obj:`int`): The number of shifts conducted in the day.
-        last_shift (:obj:`int`): The number of last shifts needed to conclude the operations.
-        operation_concluded (:obj:`int`): The number of operations already completed previously (for MERGE DEFERRED).
-        N_technicians_per_inspection (:obj:`int`): Number of technicians required for each inspection.
-        hours (:obj:`float`): Hours worked in the shift.
-        left_hours (:obj:`float`): Hours left for the last shift.
-        day_start_idx (:obj:`int`): The index indicating the start of the current day in the timeline (for MERGE DEFERRED).
+        n_device_shift (int): The number of devices done in the shift.
+        dev_left (int): The number of devices left to correct.
+        n_shifts (int): The number of shifts conducted in the day.
+        last_shift (int): The number of last shifts needed to conclude the operations.
+        operation_concluded (int): The number of operations already completed previously (for MERGE DEFERRED).
+        N_technicians_per_inspection (int): Number of technicians required for each inspection.
+        hours (float): Hours worked in the shift.
+        left_hours (float): Hours left for the last shift.
+        day_start_idx (int): The index indicating the start of the current day in the timeline (for MERGE DEFERRED).
         day_start_oper (:obj:`datetime`): Start time of the operation. Defaults to None.
         max_crew (:obj:`int`, optional): Maximum crew on board. If not passed is consecutive operation. Defaults to None.
         last_max_crew (:obj:`int`, optional): Maximum crew on board for the last shift. Defaults to 1.

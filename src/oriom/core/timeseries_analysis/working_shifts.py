@@ -30,12 +30,12 @@ def working_shifts(
                 the "main" and "last" may refer to two inspections with different olcs to be studied in the timseseries.
 
     Args:
-        operation (:class:`~oriom.classes.InspectionSite.InspectionSite`): Operation to be studied
-        duration_shift (:obj:`float`): Maximum hours of working shift.
-        transit (:obj:`float`): Hours for the transit to site.
-        transit_between_devices (:obj:`float`): Hours for transit between
+        operation (:class:`~oriom.domain.InspectionSite.InspectionSite`): Operation to be studied
+        duration_shift (float): Maximum hours of working shift.
+        transit (float): Hours for the transit to site.
+        transit_between_devices (float): Hours for transit between
                 devices.
-        operation_to_group_with (:class:`~oriom.classes.InspectionSite.InspectionSite`):
+        operation_to_group_with (:class:`~oriom.domain.InspectionSite.InspectionSite`):
             Default to ``None``.
         minor_op (:obj:`bool`): Flag to indicate minor correction operation. Default to ``False``.
 
@@ -53,7 +53,7 @@ def working_shifts(
         In case of two grouped inspections with different olcs, this function chooses the strictest set of olcs.
 
         Args:
-            x1 (:obj:`float`): The first weather limit
+            x1 (float): The first weather limit
             x2 (:obj: `float`) the second weather limit
         """
         if x1==None and x2!=None:
@@ -82,12 +82,12 @@ def working_shifts(
         if the inspection time of each device is within the personnel shift.
 
         Args:
-            id_ (:obj:`str`): Identifier for the inspection scenario.
-            N_devices_to_inspect (:obj:`int`): Number of devices to inspect.
-            N_technicians_per_inspection (:obj:`int`): Number of technicians per inspection.
-            duration_shift (:obj:`float`): Maximum hours of working shift.
-            duration_inspection (:obj:`float`): Duration of each inspection.
-            N_vessels (:obj:`int`): Number of vessels available.
+            id_ (str): Identifier for the inspection scenario.
+            N_devices_to_inspect (int): Number of devices to inspect.
+            N_technicians_per_inspection (int): Number of technicians per inspection.
+            duration_shift (float): Maximum hours of working shift.
+            duration_inspection (float): Duration of each inspection.
+            N_vessels (int): Number of vessels available.
             rov (:obj:`bool`): Boolean indicating whether ROV is used.
             minor_op (:obj:`bool`): Flag to indicate minor correction operation. Default to ``False``.
 
@@ -139,10 +139,10 @@ def working_shifts(
 
         Args:
             op_ (:obj:`Inspection_Site`): Class of inspection `Inspection_Site`.
-            N_devices_to_inspect (:obj:`int`): Number of devices to inspect.
-            N_technicians_per_inspection (:obj:`int`): Number of technicians per inspection.
-            duration_inspection (:obj:`float`): Duration of each inspection.
-            N_vessels (:obj:`int`): Number of vessels available.
+            N_devices_to_inspect (int): Number of devices to inspect.
+            N_technicians_per_inspection (int): Number of technicians per inspection.
+            duration_inspection (float): Duration of each inspection.
+            N_vessels (int): Number of vessels available.
         Returns:
             :obj:`dict`: A dictionary containing the working shifts and durations.
             :obj:`int`: Number of vessels used.
@@ -160,8 +160,8 @@ def working_shifts(
             parameter has been taken into consideration before the call of the function.
 
             Args:
-                N_devices (:obj:`int`): Number of devices to inspect
-                duration_inspection (:obj:`float`): Duration of each inspection
+                N_devices (int): Number of devices to inspect
+                duration_inspection (float): Duration of each inspection
                 op_ (:obj:`Inspection_Site`): Class of inspection `Inspection_Site`.
 
             Returns:

@@ -43,11 +43,11 @@ def preventive_energy(
     instant and returns the relative power farm (power averaged among the month).
 
     Args:
-        log_events (:obj:`pd.DataFrame`): Log of all the events (failure,
+        log_events (pd.DataFrame): Log of all the events (failure,
             operation, inspection_port, inspection_site).
-        inspections_site_stat (:obj:`list`): List of object :class:`InspectionsSiteStat`.
-        inspections_port_stat (:obj:`list`): List of object :class:`InspectionsPortStat`.
-        start_year (:obj:`int`): start year of the project.
+        inspections_site_stat (list): List of object :class:`InspectionsSiteStat`.
+        inspections_port_stat (list): List of object :class:`InspectionsPortStat`.
+        start_year (int): start year of the project.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         n_device_wtg (:obj:`int`, optional): Number of devices of WTG.
         n_device_wec (:obj:`int`, optional):  Number of devices of WEC.
@@ -55,10 +55,10 @@ def preventive_energy(
         G_wind (:obj:`nx.DiGraph`, optional): Graph of WTG farm. Defalut as None
         G_wave (:obj:`nx.DiGraph`, optional): Graph of WEC farm. Defalut as None
         G_pv (:obj:`nx.DiGraph`, optional): Graph of PV farm. Defalut as None
-        power_wind (:obj:`dict`): Statistical power wind.
-        power_wave (:obj:`dict`): statistical power wave.
-        power_pv (:obj:`dict`): statistical power pv.
-        degradation_rate (:obj:`float`): yearly degradation rate for PV farm in %.
+        power_wind (dict): Statistical power wind.
+        power_wave (dict): statistical power wave.
+        power_pv (dict): statistical power pv.
+        degradation_rate (float): yearly degradation rate for PV farm in %.
         metocean_timeseries (:obj:`pd.DataFrame`, *optional*): DataFrame with metocean timeseries data and power ORE production.
         STATISTIC_ENERGY (bool): Boolean to choose if corrective operation losses are calculated with power averaged
 
@@ -97,18 +97,18 @@ def preventive_energy(
         """For every inspection it returns the energy loss in kWh.
 
         Args:
-            log_events (:obj:`pd.DataFrame`): Log of all the events (failure,
+            log_events (pd.DataFrame): Log of all the events (failure,
                 operation, inspection_port, inspection_site).
-            prefix_list: (:obj:`list`): Contains the prefix to study the log_events
+            prefix_list: (list): Contains the prefix to study the log_events
                 for each technolog y['opv','oce'] or ['ofw', 'oce'] or ['owc', 'oce'].
-            inspections_site_stat (:obj:`list`): List of object :class:`InspectionsSiteStat`.
-            inspections_port_stat (:obj:`list`): List of object :class:`InspectionsPortStat`.
+            inspections_site_stat (list): List of object :class:`InspectionsSiteStat`.
+            inspections_port_stat (list): List of object :class:`InspectionsPortStat`.
             find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
             n_device_tot (:obj:´int´): Number of devices total.
-            shut_attribute (:obj:`str`): str related to the technology.
-            start_year (:obj:`int`): Start year of the project.
+            shut_attribute (str): str related to the technology.
+            start_year (int): Start year of the project.
             G_wind (:obj:`nx.DiGraph`): Graph of tech farm.
-            dict_power (:obj:`dict`): Dictionary of monthly power.
+            dict_power (dict): Dictionary of monthly power.
             degradation_rate (:obj:`float`, optional): Degradation rate of the PV power,
             metocean_timeseries (:obj:`pd.DataFrame`, *optional*): DataFrame with metocean timeseries data and power ORE production.
             STATISTIC_ENERGY (bool): Boolean to choose if corrective operation losses are calculated with power averaged

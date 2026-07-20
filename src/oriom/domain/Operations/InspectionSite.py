@@ -29,77 +29,77 @@ class InspectionSite():
             devices declared in the technologies classess (wtg, wec, pv)
 
     Attributes:
-        id (:obj:`str`): The unique identifier of the :class:`InspectionSite`.
-        name (:obj:`str`): :class:`InspectionSite` short description.
+        id (str): The unique identifier of the :class:`InspectionSite`.
+        name (str): :class:`InspectionSite` short description.
         overnight (:obj:`bool`): Consider that the crew stays on the vessel
             over the nigth. **NOT USED**
-        periodicity (:obj:`float`): Time interval between inspection campaings.
-        months (:obj:`list`): Months when the inspection is preformed.
+        periodicity (float): Time interval between inspection campaings.
+        months (list): Months when the inspection is preformed.
         day_start (int): Day on which the inspection should start
-        tech_per_device (:obj:`int`): Number of technicians required to preform
+        tech_per_device (int): Number of technicians required to preform
             the inspection.
-        tech_cost (:obj:`float`): The daily cost of each technician [€/day].
-        dur_per_device (:obj:`float`): Amount of time to inspect one device [hours].
+        tech_cost (float): The daily cost of each technician [€/day].
+        dur_per_device (float): Amount of time to inspect one device [hours].
         device_shutdown (:obj:`bool`): If the inspection requires to shutdown the device.
-        level (:obj:`str`): Level for the electrical layout (device, array_cable, string_cable,
+        level (str): Level for the electrical layout (device, array_cable, string_cable,
             exp_cable or dyn_cable-sub).
-        vessel1_id (:obj:`str`): The ID of the main vessel.
-        vessel1_qt (:obj:`int`): Number of main vessels available along the inspection.
+        vessel1_id (str): The ID of the main vessel.
+        vessel1_qt (int): Number of main vessels available along the inspection.
             Its value is ``1`` if not defined.
-        vessel2_id (:obj:`str`): The ID of the auxiliary vessel. Its value is
+        vessel2_id (str): The ID of the auxiliary vessel. Its value is
             ``None`` if not defided.
-        vessel2_qt (:obj:`int`): Number of secondary vessels available along the inspection .
+        vessel2_qt (int): Number of secondary vessels available along the inspection .
             Its value is ``None`` if not defined.
-        intervened_wtg (:obj:`int`): Number of WTG that are intervened in case
+        intervened_wtg (int): Number of WTG that are intervened in case
             this inspection occurs. Its value is ``None`` if not defided.
-        intervened_wec (:obj:`int`): Number of WEC that are intervened in case
+        intervened_wec (int): Number of WEC that are intervened in case
             this inspection occurs. Its value is ``None`` if not defided.
-        intervened_pv (:obj:`int`): Number of PV panels that are intervened in
+        intervened_pv (int): Number of PV panels that are intervened in
             case this inspection occurs. Its value is ``None`` if not defided.
-        hs (:obj:`float`): Limit wave height. Its value is ``None`` if there is no limit.
-        tp (:obj:`float`): Limit wave period. Its value is ``None`` if there is no limit.
-        ws (:obj:`float`): Limit wind speed. Its value is ``None`` if there is no limit.
-        ws_height (:obj:`float`): Limit wind speed at hub height. Its value is ``None`` if there is no limit.
-        cs (:obj:`float`): Limit current speed. Its value is ``None`` if there is no limit.
+        hs (float): Limit wave height. Its value is ``None`` if there is no limit.
+        tp (float): Limit wave period. Its value is ``None`` if there is no limit.
+        ws (float): Limit wind speed. Its value is ``None`` if there is no limit.
+        ws_height (float): Limit wind speed at hub height. Its value is ``None`` if there is no limit.
+        cs (float): Limit current speed. Its value is ``None`` if there is no limit.
         light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this inspection. Its value is ``None`` if not defided.
-        vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary
+        vessel2 (:class:`~oriom.domain.Vessel.Vessel`): Auxiliary
             vessel used in this inspection. Its value is ``None`` if not
             defided.
-        rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): Rov/Drone
+        rov_drone (:class:`~oriom.domain.RovDrone.RovDone`): Rov/Drone
             used in this operation. Its value is ``None`` if not
             defided.
-        parts_cost (:obj:`float`): Cost of replacement parts. Its value is
+        parts_cost (float): Cost of replacement parts. Its value is
             :obj:`0.0` if not defided.
-        other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
+        other_costs (float): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
         to_be_grouped (:obj:`bool`): True or False weather the inspection can be
             grouped. Its value is ``False`` if not defined.
         to_group_with : Inspection at site id that can be performed with. It can be a string or a
-            :class:`~oriom.classes.Operations.InspectionSite`
+            :class:`~oriom.domain.Operations.InspectionSite`
             Its value is ``None`` if not defined.
-        n_vessel_main (:obj:`int`): Number of vessels used for the main part of the
+        n_vessel_main (int): Number of vessels used for the main part of the
             inspections. Its values is ``None`` if not defined.
-        n_vessel_last (:obj:`int`): Number of vessels used for the last part of the
+        n_vessel_last (int): Number of vessels used for the last part of the
             inspections. Its values is ``None`` if not defined.
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
+        ts_data (:class:`~oriom.domain.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
             Default to True
-        days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
+        days_main (int): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
-        duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
+        duration_main (int): Number of hours of duration_main days of main_shift.
             Defaults to ``0``
-        days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
+        days_last (int): Number of total days of shift needed to conclude the insp.
             Defaults to ``0``
-        duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
+        duration_last (int): Number of hours of duration_main days of main_shift.
             Defaults to ``0``
-        crew_main (:obj:`int`): Number of crew members for main shift. Defaults to ``0``
-        crew_last (:obj:`int`): Number of crew members for last shift. Defaults to ``0``
-        n_dev_done_main_shift (:obj:`int`): Number of devices inspected during main shift
+        crew_main (int): Number of crew members for main shift. Defaults to ``0``
+        crew_last (int): Number of crew members for last shift. Defaults to ``0``
+        n_dev_done_main_shift (int): Number of devices inspected during main shift
             Defaults to ``0``
-        n_dev_done_last_shift (:obj:`int`): Number of devices inspected during last shift
+        n_dev_done_last_shift (int): Number of devices inspected during last shift
             Defaults to ``0``
 
 
@@ -145,15 +145,15 @@ class InspectionSite():
         """Initializes :class:`InspectionSite` with various attributes and optional parameters.
 
         Args:
-            id_ (:obj:`str`): The unique identifier of the InspectionSite.
-            name (:obj:`str`): InspectionSite short description.
+            id_ (str): The unique identifier of the InspectionSite.
+            name (str): InspectionSite short description.
             overnight_stay (:obj:`bool`): Consider that the crew stays on the vessel
                 over the nigth. Two shifts of 12 hours are considered.
-            periodicity (:obj:`float`): Time interval between inspection campains [years].
-            tech_per_device (:obj:`int`): Number of technicians required to
+            periodicity (float): Time interval between inspection campains [years].
+            tech_per_device (int): Number of technicians required to
                 preform the inspection.
-            dur_per_device (:obj:`float`): Amount of time to inspect one device [hours].
-            level (:obj:`str`): Level for the electrical layout (device, array_cable, string_cable, exp_cable or dyn_cable-sub).
+            dur_per_device (float): Amount of time to inspect one device [hours].
+            level (str): Level for the electrical layout (device, array_cable, string_cable, exp_cable or dyn_cable-sub).
             device_shutdown (:obj:`bool`): If the inspection requires to shutdown the device.
             tech_cost (:obj:`float`, *optional*): The daily cost of each technician[€/day].
                 Defaults to ``0``.
@@ -177,12 +177,12 @@ class InspectionSite():
             wind_speed_hub (:obj:`float`, *optional*): Limit wind speed at hub height. Defaults to ``None``.
             current_speed (:obj:`float`, *optional*): Limit current speed. Defaults to ``None``.
             light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
-            vessel1_id (:obj:`str`): The ID of the main vessel.
-            vessel1_qt (:obj:`int`): Number of main vessels available for the inspection.
+            vessel1_id (str): The ID of the main vessel.
+            vessel1_qt (int): Number of main vessels available for the inspection.
                 Defaults to ``1``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
-            vessel2_qt (:obj:`int`): Number of second vessels available for the inspection.
+            vessel2_qt (int): Number of second vessels available for the inspection.
                 Defaults to ``1`` if vesse_id not ´´None´´.
             rov_drone (:obj:`str`, *optional*): The ID of the ROV/Drone.
                 Defaults to ``None``.
@@ -194,17 +194,17 @@ class InspectionSite():
                 Its value is ``None`` if not defined.
             to_be_grouped (:obj:`False`): True or False if the inspection can be grouped.
                 Its value is ``False`` if not defined.
-            n_vessel_main (:obj:`int`): Number of vessels used for the main part of the
+            n_vessel_main (int): Number of vessels used for the main part of the
                 inspections. Its values is ``0`` if not defined.
-            n_vessel_last (:obj:`int`): Number of vessels used for the last part of the
+            n_vessel_last (int): Number of vessels used for the last part of the
                 inspections. Its values is ``0`` if not defined.
-            days_main (:obj:`int`): Number of total days of shift needed to conclude the insp.
+            days_main (int): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_main (:obj:`int`): Number of hours of duration_main days of main_shift.
+            duration_main (int): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
-            days_last (:obj:`int`): Number of total days of shift needed to conclude the insp.
+            days_last (int): Number of total days of shift needed to conclude the insp.
                 Defaults to ``0``
-            duration_last (:obj:`int`): Number of hours of duration_main days of main_shift.
+            duration_last (int): Number of hours of duration_main days of main_shift.
                 Defaults to ``0``
             double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
                 Default to True
@@ -596,7 +596,7 @@ class InspectionSite():
         Write the object attributes to a YAML file in the specified output directory.
 
         Args:
-            out_dir (:obj:`str`): The directory where the YAML file will be saved.
+            out_dir (str): The directory where the YAML file will be saved.
         """
         vessel1 = self.vessel1_id
         if self.vessel1 is not None:

@@ -26,27 +26,27 @@ class Statistical():
             "period_infant_mortality" and "period_wear_out").
 
     Attributes:
-        lifetime (:obj:`dict`): Project lifetime, in years.
+        lifetime (dict): Project lifetime, in years.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`.
-        start_year (:obj:`int`): Start year of the project.
+        start_year (int): Start year of the project.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`int`
-        start_month (:obj:`int`): Start month of the project.
+        start_month (int): Start month of the project.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`int`
-        last_day_operation (:obj:`int`): Last day of the month for scheduling an operation.
+        last_day_operation (int): Last day of the month for scheduling an operation.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`int`
-        percentile_main (:obj:`list`): Main percentile to perform a statistical analysis with. Its value is ``[50]`` if not defined.
+        percentile_main (list): Main percentile to perform a statistical analysis with. Its value is ``[50]`` if not defined.
             **keys**: *value*: :obj:`list` ; *units*: :obj:`str`
-        percentiles (:obj:`list`): List of percentiles to perform a statistical analysis with. Its value is ``[50]`` if not defined.
+        percentiles (list): List of percentiles to perform a statistical analysis with. Its value is ``[50]`` if not defined.
             **keys**: *value*: :obj:`list` ; *units*: :obj:`str`
-        period_infant_mortality (:obj:`int`): Number of years in the begining of the project with a higher probability of failure. Its value is ``0`` if not defined.
+        period_infant_mortality (int): Number of years in the begining of the project with a higher probability of failure. Its value is ``0`` if not defined.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`
-        period_wear_out (:obj:`int`): Number of years in the end of the project with a higher probability of failure. Its value is ``0`` if not defined.
+        period_wear_out (int): Number of years in the end of the project with a higher probability of failure. Its value is ``0`` if not defined.
             **keys**: *value*: :obj:`int` ; *units*: :obj:`str`
-        failure_ratio (:obj:`float`): Failure ratio for the above periods. Its value is ``None`` if not defined.
+        failure_ratio (float): Failure ratio for the above periods. Its value is ``None`` if not defined.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`
-        failure_ratio_sensitivity (:obj:`float`): Failure ratio sentitivity factor. Its value is ``1`` if not defined.
+        failure_ratio_sensitivity (float): Failure ratio sentitivity factor. Its value is ``1`` if not defined.
             **keys**: *value*: :obj:`float` ; *units*: :obj:`str`
-        file_inputs (:obj:`str`): Path for the file with all previous mandatory inputs. Its value is ``None`` if not defined.
+        file_inputs (str): Path for the file with all previous mandatory inputs. Its value is ``None`` if not defined.
 
     Note:
         When the class is initialized :func:`_check_attributes` is run.
@@ -75,11 +75,11 @@ class Statistical():
             **kwargs: Arbitrary keyword arguments.
 
         Keyword Args:
-            project_lifetime (:obj:`int`): Project lifetime, in years.
-            start_year (:obj:`int`): Start year of the project.
-            start_month (:obj:`int`): Start month of the project.
-            percentile_main (:obj:`int`): Main percentile for the statistical analysis.
-            last_day_operation (:obj:`int`): Last day for scheduling operation.
+            project_lifetime (int): Project lifetime, in years.
+            start_year (int): Start year of the project.
+            start_month (int): Start month of the project.
+            percentile_main (int): Main percentile for the statistical analysis.
+            last_day_operation (int): Last day for scheduling operation.
             percentile_1 (:obj:`int`,*optional*): First optional percentile for the statistical analysis. Defaults to ``None``.
             percentile_2 (:obj:`int`,,*optional*): Second optional percentile for the statistical analysis. Defaults to ``None``.
             period_infant_mortality (:obj:`int`,*optional*): Number of years in the begining of the project with a higher

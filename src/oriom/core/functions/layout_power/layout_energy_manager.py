@@ -90,10 +90,10 @@ def shut(
         loc (:obj:`int or tuple`): location of the failure
         shutdown (:obj:`boolean`): define if failure bringst to a shutdown
         G (:obj:`nx.DiGraph`): DiGraph.
-        component_level_power (:obj:`list`): list of string for level of component with power implemented
-        levels_component_no_power (:obj:`set`): level of node with level without power characteristic
-        tech (:obj:`str`): name of tech analyzed
-        names_tech (:obj:`str`): level of the component analyzed
+        component_level_power (list): list of string for level of component with power implemented
+        levels_component_no_power (set): level of node with level without power characteristic
+        tech (str): name of tech analyzed
+        names_tech (str): level of the component analyzed
         n_pv_per_strings (:obj:`int`, *optional*): number of modules each string
         max_failure_module (:obj:`int`, *optional*): number of failed module allowed each string
         device_shutted_string_level (:obj:`dict`, *optional*): Dictionary of string power layout
@@ -220,11 +220,11 @@ def fix(
     Args:
         loc (:obj:`int or tuple`): location of the failure
         G (:obj:`nx.DiGraph`): DiGraph.
-        component_level_power (:obj:`list`): list of string for level of component with power implemented
-        levels_component_no_power (:obj:`set`): level of node with level without power characteristic
-        tech (:obj:`str`): name of tech analyzed
-        names_tech (:obj:`str`): level of the component analyzed
-        n_pv_per_string (:obj:`str`): number of pv modules per string
+        component_level_power (list): list of string for level of component with power implemented
+        levels_component_no_power (set): level of node with level without power characteristic
+        tech (str): name of tech analyzed
+        names_tech (str): level of the component analyzed
+        n_pv_per_string (str): number of pv modules per string
         event (:obj:`str`, *optional*): Type of event
         op_add_tow (:obj:`dict`, *optional*): Dictionary with operation id as key and boolean as value to identify 
             if the operation is an addition op tow
@@ -335,12 +335,12 @@ def reassign_loc(
 
     Args:
         row (:obj:`pd.Series`): row of df dataframe
-        df (:obj:`pd.DataFrame`): Dataframe of corrective shutdown
+        df (pd.DataFrame): Dataframe of corrective shutdown
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         G (:obj:`nx.DiGraph`): DiGraph.
-        device_shutted (:obj:`list`): list of devices shutted
-        indice (:obj:`str`): index of the failure analyzed
-        tech (:obj:`str`): name of tech analyzed
+        device_shutted (list): list of devices shutted
+        indice (str): index of the failure analyzed
+        tech (str): name of tech analyzed
 
     Returns:
         G graph and percentage farm available.
@@ -372,10 +372,10 @@ def count_nodes_power(G, component_level_power):
 
     Args:
         G (:obj:`nx.DiGraph`): DiGraph.
-        component_level_power (:obj:`list`): list of string for level of component with power implemented
+        component_level_power (list): list of string for level of component with power implemented
 
     Returns:
-        n_list (:obj:`list`): list of node with power different from 0 on the lowest level of power component
+        n_list (list): list of node with power different from 0 on the lowest level of power component
     """
 
     n_list = []

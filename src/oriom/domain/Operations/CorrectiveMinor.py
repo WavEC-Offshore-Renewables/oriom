@@ -17,45 +17,45 @@ class CorrectiveMinor():
 
     Attributes:
 
-        id (:obj:`str`): The unique identifier of the :class:`CorrectiveMinor`.
-        name (:obj:`str`): :class:`CorrectiveMinor` short description.
-        duration_net (:obj:`float`): Total net duration of the operation.
+        id (str): The unique identifier of the :class:`CorrectiveMinor`.
+        name (str): :class:`CorrectiveMinor` short description.
+        duration_net (float): Total net duration of the operation.
         device_shutdown (:obj:`bool`): If the inspection requires to shutdown the device
             while the operation is undergoing.
         level (:obj;`str`): Level for the electrical layout (device, string_cable, array_cable,
             exp_cable or dyn_cable-sub).
-        months (:obj:`list`): Months when the operation is preformed.
-        technology (:obj:`str`): Type of technology (wtg, wec or pv)
-        tech_required (:obj:`int`): Number of technicians required to preform
+        months (list): Months when the operation is preformed.
+        technology (str): Type of technology (wtg, wec or pv)
+        tech_required (int): Number of technicians required to preform
             the operation.
-        tech_cost (:obj:`float`): The daily cost of each technician [€/day]. Its value
+        tech_cost (float): The daily cost of each technician [€/day]. Its value
             is ``0`` if not defined.
-        hs (:obj:`float`): Limit wave height. Its value is ``None`` if there is no limit.
-        tp (:obj:`float`): Limit wave period. Its value is ``None`` if there is no limit.
-        ws (:obj:`float`): Limit wind speed. Its value is ``None`` if there is no limit.
-        ws_hub (:obj:`float`): Limit wind speed at hub height. Its value is ``None`` if there is no limit.
-        cs (:obj:`float`): Limit current speed. Its value is ``None`` if there is no limit.
+        hs (float): Limit wave height. Its value is ``None`` if there is no limit.
+        tp (float): Limit wave period. Its value is ``None`` if there is no limit.
+        ws (float): Limit wind speed. Its value is ``None`` if there is no limit.
+        ws_hub (float): Limit wind speed at hub height. Its value is ``None`` if there is no limit.
+        cs (float): Limit current speed. Its value is ``None`` if there is no limit.
         light (:obj:`bool`, *optional*): If the operation is light. Default to ``False``
-        vessel1_id (:obj:`str`): The ID of the main vessel.
-        vessel1_qt (:obj:`int`): Number of main vessels required.
+        vessel1_id (str): The ID of the main vessel.
+        vessel1_qt (int): Number of main vessels required.
             Its value is ``1`` if not defined.
-        vessel2_id (:obj:`str`): The ID of the auxiliary vessel.
+        vessel2_id (str): The ID of the auxiliary vessel.
             Its value is ``None`` if not defided.
-        vessel2_qt (:obj:`int`): Number of secondary vessels required.
+        vessel2_qt (int): Number of secondary vessels required.
             Its value is ``None`` if not defined.
-        other_costs (:obj:`float`): Other costs (port, cranes, insurance, etc.).
+        other_costs (float): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation.
-        vessel2 (:class:`~oriom.classes.Vessel.Vessel`): Auxiliary
+        vessel2 (:class:`~oriom.domain.Vessel.Vessel`): Auxiliary
             vessel used in this operation. Its value is ``None`` if not
             defided.
-        failures (:class:`~oriom.classes.Failure.Failure`): List of
-            :class:`~oriom.classes.Failure.Failure`.
-        rov_drone (:class:`~oriom.classes.RovDrone.RovDone`): Rov/Drone
+        failures (:class:`~oriom.domain.Failure.Failure`): List of
+            :class:`~oriom.domain.Failure.Failure`.
+        rov_drone (:class:`~oriom.domain.RovDrone.RovDone`): Rov/Drone
             used in this operation. Its value is ``None`` if not
             defided.
-        ts_data (:class:`~oriom.classes.OperationTimeSeriesData.OperationTimeSeriesData`):
+        ts_data (:class:`~oriom.domain.OperationTimeSeriesData.OperationTimeSeriesData`):
             Timeseries data of the operation. Its value is ``None`` if not defided
         double_shift (bool): Boolean to specify if it can hold double shift inspection (day&night)
 
@@ -94,14 +94,14 @@ class CorrectiveMinor():
         Initialize the :class:`CorrectiveMinor` with various attributes and parameters.
 
         Args:
-            id_ (:obj:`str`): The unique identifier of the CorrectiveMinor.
-            name (:obj:`str`): Short description of the CorrectiveMinor.
-            duration_net (:obj:`float`): Total net duration of the operation.
+            id_ (str): The unique identifier of the CorrectiveMinor.
+            name (str): Short description of the CorrectiveMinor.
+            duration_net (float): Total net duration of the operation.
             device_shutdown (:obj:`bool`): If the operation requires to shutdown the device.
             level (:obj;`str`): Level for the electrical layout (device, array_cable, exp_cable, or dyn_cable-sub, string_cable).
-            tech_required (:obj:`int`): Number of technicians required to perform the operation.
-            vessel1_id (:obj:`str`): The ID of the main vessel.
-            vessel1_qt (:obj:`int`): Number of main vessels required.
+            tech_required (int): Number of technicians required to perform the operation.
+            vessel1_id (str): The ID of the main vessel.
+            vessel1_qt (int): Number of main vessels required.
                 Defaults to ``1``.
             tech_cost (:obj:`float`,*optional*): The daily cost of each technician [€/day].
                 Defaults to ``0``.
@@ -130,7 +130,7 @@ class CorrectiveMinor():
                 Defaults to ``None``.
             vessel2_id (:obj:`str`, *optional*): The ID of the auxiliary vessel.
                 Defaults to ``None``.
-            vessel2_qt (:obj:`int`): Number of second vessels required.
+            vessel2_qt (int): Number of second vessels required.
                 Defaults to ``1`` if vesse_id not ´´None´´.
             other_costs (:obj:`float`, *optional*): Other costs (port, cranes,
                 insurance, etc.). Defaults to :obj:`0.0`.
@@ -411,7 +411,7 @@ class CorrectiveMinor():
         Write the object attributes to a YAML file in the specified output directory.
 
         Args:
-            out_dir (:obj:`str`): The directory where the YAML file will be saved.
+            out_dir (str): The directory where the YAML file will be saved.
         """
         vessel1 = self.vessel1_id
         if self.vessel1 is not None:

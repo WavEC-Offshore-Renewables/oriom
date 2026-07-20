@@ -14,25 +14,25 @@ class PVProduction():
         If "max_failure_module" not defined is set to 10000 and will not influence the code
 
     Attributes:
-        number_devices (:obj:`int`): Number of PV devices. Defaults to ``None``.
-        number_strings (:obj:`int`): Number of PV strings. Defaults to ``None``.
-        number_inverters (:obj:`int`): Number of PV island. Defaults to ``None``.
-        number_mv_transformers (:obj:`int`): Number of MV transformer. Defaults to ``None``.
-        number_substations (:obj:`int`): Number of substations. Defaults to ``1``.
-        number_export_cable (:obj:`int`): Number of number export cable. Defaults to ``1``.
-        number_island_per_array_cable (:obj:`int`): Number of n_island_per_array_cable cable. Defaults to ``1``.
-        device_power (:obj:`float`): Device power of each PV, in kW. Defaults to ``None``.
-        pvprod_file (:obj:`str`): PV power matrix file path. Defaults to ``None``.
-        degradation_rate (:obj:`float`): Yearly degradation rate of the panel. Defaults to ``0``.
-        n_device_at_port (:obj:`int`): Number of island that can be mantained simultaneously at port.
+        number_devices (int): Number of PV devices. Defaults to ``None``.
+        number_strings (int): Number of PV strings. Defaults to ``None``.
+        number_inverters (int): Number of PV island. Defaults to ``None``.
+        number_mv_transformers (int): Number of MV transformer. Defaults to ``None``.
+        number_substations (int): Number of substations. Defaults to ``1``.
+        number_export_cable (int): Number of number export cable. Defaults to ``1``.
+        number_island_per_array_cable (int): Number of n_island_per_array_cable cable. Defaults to ``1``.
+        device_power (float): Device power of each PV, in kW. Defaults to ``None``.
+        pvprod_file (str): PV power matrix file path. Defaults to ``None``.
+        degradation_rate (float): Yearly degradation rate of the panel. Defaults to ``0``.
+        n_device_at_port (int): Number of island that can be mantained simultaneously at port.
             Defaults to ``1``
-        n_device_stored_at_port (:obj:`int`): Number of island that can be stored when not in
+        n_device_stored_at_port (int): Number of island that can be stored when not in
             maintenance. Defaults to ``0``
         tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
-        pv_layout (:obj:`int`): Type layout. Defaults to ``1``.
-        max_failure_module (:obj:`int`): Max failure module on a string that can occure. Defaults to ``0``.
-        spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``0.150`` km.
+        pv_layout (int): Type layout. Defaults to ``1``.
+        max_failure_module (int): Max failure module on a string that can occure. Defaults to ``0``.
+        spacing (float): Spacing between devices in meters. Defaults to ``0.150`` km.
 
     Note:
         When the class is initialized, :func:`_check_attributes` is run.
@@ -79,26 +79,26 @@ class PVProduction():
         """Initializes :class:`PVProduction` class.
 
         Args:
-            number_devices (:obj:`int`): Number of PV devices. Defaults to ``None``.
-            number_strings (:obj:`int`): Number of PV strings. Defaults to ``None``.
-            number_inverters (:obj:`int`): Number of PV island. Defaults to ``None``.
-            number_mv_transformers (:obj:`int`): Number of MV transformer. Defaults to ``None``.
-            number_substations (:obj:`int`): Number of substations. Defaults to ``1``.
-            number_export_cables (:obj:`int`): number of export cables. Defaults to ``1``.
-            number_island_per_array_cable (:obj:`int`): Number of n_island_per_array_cable cable. Defaults to ``1``.
-            max_failure_module (:obj:`int`): Max failure module on a string that can occure. Defaults to ``0``.
-            device_power (:obj:`float`): Device power of each PV (in kW). Defaults to ``None``.
-            pvprod_file (:obj:`str`): PV power matrix file path. Defaults to ``None``.            out_dir (:obj:`str`): directory to save the pv parameters. Defaults to `None`.
-            pv_layout (:obj:`int`): Type layout. Defaults to ``1``.
-            degradation_rate (:obj:`float`): Yearly degradation rate of the panel. Defaults to ``0``.
-            n_device_at_port (:obj:`int`): Number of island that can be mantained simultaneously at port.
+            number_devices (int): Number of PV devices. Defaults to ``None``.
+            number_strings (int): Number of PV strings. Defaults to ``None``.
+            number_inverters (int): Number of PV island. Defaults to ``None``.
+            number_mv_transformers (int): Number of MV transformer. Defaults to ``None``.
+            number_substations (int): Number of substations. Defaults to ``1``.
+            number_export_cables (int): number of export cables. Defaults to ``1``.
+            number_island_per_array_cable (int): Number of n_island_per_array_cable cable. Defaults to ``1``.
+            max_failure_module (int): Max failure module on a string that can occure. Defaults to ``0``.
+            device_power (float): Device power of each PV (in kW). Defaults to ``None``.
+            pvprod_file (str): PV power matrix file path. Defaults to ``None``.            out_dir (str): directory to save the pv parameters. Defaults to `None`.
+            pv_layout (int): Type layout. Defaults to ``1``.
+            degradation_rate (float): Yearly degradation rate of the panel. Defaults to ``0``.
+            n_device_at_port (int): Number of island that can be mantained simultaneously at port.
                 Defaults to ``None``
-            n_device_stored_at_port (:obj:`int`): Number of island that can be stored when not in
+            n_device_stored_at_port (int): Number of island that can be stored when not in
                 maintenance. Defaults to ``None``
             tow_string_shutdown (:obj:`bool`): Define if the electrical layout can sustain a tow without disconnect the string.
                 Defaults to ``None``
-            spacing (:obj:`float`): Spacing between devices in meters. Defaults to ``0.150`` km.
-            out_dir (:obj:`str`): Directory to save the pv parameters. Defaults to `None`.
+            spacing (float): Spacing between devices in meters. Defaults to ``0.150`` km.
+            out_dir (str): Directory to save the pv parameters. Defaults to `None`.
         """
         if number_devices != 0 and number_devices is not None:
             self.number_devices = int(number_devices)
@@ -221,8 +221,8 @@ class PVProduction():
         a :class:`PVProduction` item.
 
         Args:
-            file_path (:obj:`str`): YAML file location.
-            out_dir (:obj:`str`): Directory to save the PV parameters. Defaults to `None`.
+            file_path (str): YAML file location.
+            out_dir (str): Directory to save the PV parameters. Defaults to `None`.
 
         Raises:
             KeyError: if one of the YAML keys is input.
@@ -423,7 +423,7 @@ class PVProduction():
         Write the PV system parameters to a YAML file.
 
         Args:
-            out_dir (:obj:`str`): The output directory where the YAML file will be saved.
+            out_dir (str): The output directory where the YAML file will be saved.
         """
         f = open(os.path.join(out_dir, 'pv.yaml'), 'w')
         yaml=YAML()
@@ -490,8 +490,8 @@ class PVProduction():
     ):
         '''
         Args:
-            pvprod_file (:obj:`str`): File path of the production per month per hour for one device in W.
-            number_devices (:obj:`int`): Total number of devices in the PV farm.
+            pvprod_file (str): File path of the production per month per hour for one device in W.
+            number_devices (int): Total number of devices in the PV farm.
         Returns:
             :obj:`pd.DataFrame` production per month per hour of whole farm in kw
         '''

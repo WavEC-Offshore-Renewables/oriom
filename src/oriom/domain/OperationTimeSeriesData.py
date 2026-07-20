@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-import logging
 
 from oriom.utils.aux_functions import convert_stringtime
 
@@ -12,15 +11,15 @@ class OperationTimeSeriesData:
     the transits and the duration_net as these are constant values.
 
     Attributes:
-        id (:obj:`str`): The unique identifier of the :class:`CorrectiveMinor`, :class:`CorrectiveMajor`,
+        id (str): The unique identifier of the :class:`CorrectiveMinor`, :class:`CorrectiveMajor`,
             :class:`OperationTow`, :class:`InspectionPort`, :class:`InspectionSite`, :class:`CorrectiveMinor`.
-        oper_sched (:obj:`pd.DataFrame`): DataFrame of the corrispective operation_schedule of the operation id
-        startability (:obj:`pd.DataFrame`): DataFrame of the corrispective startability of the operation id
-        dur_net_site (:obj:`float`): Total net duration of the operation at site
-        dur_net_port (:obj:`float`): Total net duration of the operation at port
-        transit_tp (:obj:`float`): Total transit duration to port
-        transit_ts (:obj:`float`): Total transit duration to site
-        last_valid_index (:obj:`int`): Last index valid to conduct op of oper_sched
+        oper_sched (pd.DataFrame): DataFrame of the corrispective operation_schedule of the operation id
+        startability (pd.DataFrame): DataFrame of the corrispective startability of the operation id
+        dur_net_site (float): Total net duration of the operation at site
+        dur_net_port (float): Total net duration of the operation at port
+        transit_tp (float): Total transit duration to port
+        transit_ts (float): Total transit duration to site
+        last_valid_index (int): Last index valid to conduct op of oper_sched
         act_port_order (:obj:`bool`): Bool to specify if port operation is before or after site operation
 
     Note:

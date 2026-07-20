@@ -26,7 +26,7 @@ def workability(
         df_metocean (:obj:`pandas.DataFrame`): metocean timeseries table.
             Rows as timesteps and colums as sea conditions.
         activities (:obj:`list`, *optional*): list of objects where each object
-            is an :class:`~oriom.classes.Activity.Activity`.
+            is an :class:`~oriom.domain.Activity.Activity`.
         operation (:obj:`class`,*optional*): operation with
             Operation Limit Criteria defined as attributs.
         out_dir (:obj:`str`, *optional*): output directory folder path.

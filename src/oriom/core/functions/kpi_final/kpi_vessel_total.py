@@ -32,7 +32,7 @@ def create_lifetime_cost(df):
     """
     This function creates the lifetime cost of the operations and inspections.
     Args:
-        df (:obj:`pd.DataFrame`): Dataframe with the costs of the operations and inspections.
+        df (pd.DataFrame): Dataframe with the costs of the operations and inspections.
     Returns:
         :obj:`pd.DataFrame`: Dataframe with the added cols of lifetime cost of the operations and inspections.
     """
@@ -81,31 +81,31 @@ def kpi_cost_vessel_internal(
     (single operations, merged operations, deferred merged operations, site inspections and tow inspections)
 
     Args:
-        log_events_op_orig (:obj:`pd.DataFrame`): Log of all operations events not merged used for other costs and parts costs
-        log_events_op_merged_orig (:obj:`pd.DataFrame`): Log of all operations events merged used for immediate merged
-        log_events_op_def_merged_orig (:obj:`pd.DataFrame`): Log of all operations events deferred merged used for deferred merged
-        log_events_op_merged_oper_orig (:obj:`pd.DataFrame`): Log of all operations events that cannot be merged used for not merged ops costs
-        log_events_insp_merged_orig (:obj:`pd.DataFrame`): Log of all inspections events used for inspections costs
-        log_events_mobi_merged_orig (:obj:`pd.DataFrame`): Log of all mobilisations events used for mobilisation costs
-        log_events_tow_orig (:obj:`pd.DataFrame`): Log of all tow events for corrective operations
-        log_events_op_port_orig (:obj:`pd.DataFrame`): Log of all corrective operations at port
+        log_events_op_orig (pd.DataFrame): Log of all operations events not merged used for other costs and parts costs
+        log_events_op_merged_orig (pd.DataFrame): Log of all operations events merged used for immediate merged
+        log_events_op_def_merged_orig (pd.DataFrame): Log of all operations events deferred merged used for deferred merged
+        log_events_op_merged_oper_orig (pd.DataFrame): Log of all operations events that cannot be merged used for not merged ops costs
+        log_events_insp_merged_orig (pd.DataFrame): Log of all inspections events used for inspections costs
+        log_events_mobi_merged_orig (pd.DataFrame): Log of all mobilisations events used for mobilisation costs
+        log_events_tow_orig (pd.DataFrame): Log of all tow events for corrective operations
+        log_events_op_port_orig (pd.DataFrame): Log of all corrective operations at port
         vessel_day_count (obj ´VesselDayCounter´): object of class ´VesselDayCounter´
         vessel_day_count_ST (obj ´VesselDayCounter´): object of class ´VesselDayCounter´ for only ST vessel
-        tech_per_oper_dict (:obj:`dict`): Dict of technicians per operations
-        rov_cost_dict (:obj:`dict`): Dict of rov per operations
-        insp_port_data (:obj:`dict`): Dict with first key tech InspectionsPort.id, values with class with `OperationTow` or `InspectionsPort`
-        vessels (:obj:`list`): List of objects :class:`Vessel`
+        tech_per_oper_dict (dict): Dict of technicians per operations
+        rov_cost_dict (dict): Dict of rov per operations
+        insp_port_data (dict): Dict with first key tech InspectionsPort.id, values with class with `OperationTow` or `InspectionsPort`
+        vessels (list): List of objects :class:`Vessel`
         duration_shift(:obj: float): Number of hours of duration of the working shift by law
-        total_operations (:obj:`list`): List of objects that comprehend the whole oeprations and inspections
-        operations_tow_stat (:obj:`list`): List of objects :class:`OperationsTowStat`.
-        inspections_site_stat(:obj:`list`): list of objects :class:`InspectionsSiteStat`
-        inspections_port_stat(:obj:`list`): list of objects :class:`InspectionsTowStat`
-        fuel_cost_hfo (:obj:`int`): Fuel cost €/ton.
-        fuel_cost_mdo (:obj:`int`): Fuel cost €/ton.
-        fuel_cost_mgo (:obj:`int`): Fuel cost €/ton.
+        total_operations (list): List of objects that comprehend the whole oeprations and inspections
+        operations_tow_stat (list): List of objects :class:`OperationsTowStat`.
+        inspections_site_stat(list): list of objects :class:`InspectionsSiteStat`
+        inspections_port_stat(list): list of objects :class:`InspectionsTowStat`
+        fuel_cost_hfo (int): Fuel cost €/ton.
+        fuel_cost_mdo (int): Fuel cost €/ton.
+        fuel_cost_mgo (int): Fuel cost €/ton.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
-        years (:obj:`int`): lifetime of the project. Default = 1
+        years (int): lifetime of the project. Default = 1
 
     Returns:
         :obj:`pd.DataFrame`: dataframe directs costs for all the operations divided by vessels .

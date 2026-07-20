@@ -24,20 +24,20 @@ class OperationDeferredPortCreation():
         TTP Operation deferred logic diagram
 
     Attributes:
-        oper_port_dict (: dict): Dict of object of class ``OperationMajor`` that will be conducted at port
-        oper_port (:object): Object of OperationMajor operations under specific analysis
-        oper_dict_tow (:dict): Dict of operation that must be deferred with tow op
-        tow_at_port_date (: dict): Dictionary storing towing to port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
-        tow_at_site_date (: dict): Dictionary storing towing to site operations; keys are device indices, values are tuples (end_datetime, start_datetime).
-        oper_at_port_date (: dict): Dictionary storing oper_port at port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
-        operation_completed (: bool): Flag indicating whether the entire oper_port operation was completed successfully.
-        tot_device (: int): Total number of devices to be inspected.
-        dev_idx_station_port (: int): Index for port stage of the current device being processed for port operations.
-        dict_oper_sched: Dictionary containing oper_sched for towing op
-        dict_oper_last_idx: Dictionary containing last_valid_index for towing op
-        actual_df_port_inspection_log (: pd.DataFrame): log_events created of deferred tow
-        vessel_available (: dict): Dictionary of vessels number available
-        find_element_class (: object) callable used to find objects.
+        oper_port_dict (dict): Dict of object of class ``OperationMajor`` that will be conducted at port
+        oper_port (dict): Object of OperationMajor operations under specific analysis
+        oper_dict_tow (dict): Dict of operation that must be deferred with tow op
+        tow_at_port_date (dict): Dictionary storing towing to port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
+        tow_at_site_date (dict): Dictionary storing towing to site operations; keys are device indices, values are tuples (end_datetime, start_datetime).
+        oper_at_port_date (dict): Dictionary storing oper_port at port operations; keys are device indices, values are tuples (end_datetime, start_datetime).
+        operation_completed (bool): Flag indicating whether the entire oper_port operation was completed successfully.
+        tot_device (int): Total number of devices to be inspected.
+        dev_idx_station_port (int): Index for port stage of the current device being processed for port operations.
+        dict_oper_sched (dict): Dictionary containing oper_sched for towing op
+        dict_oper_last_idx(dict): Dictionary containing last_valid_index for towing op
+        actual_df_port_inspection_log (pd.DataFrame): log_events created of deferred tow
+        vessel_available (dict): Dictionary of vessels number available
+        find_element_class (object) callable used to find objects.
 
 
         NOTE:
@@ -53,10 +53,10 @@ class OperationDeferredPortCreation():
         ):
         """
         Args:
-            log_events_tow_def (: pd.DataFrame): Events related to deferred towing corrective op
-            oper_port_dict (: dict): Dict of object of class ``OperationMajor`` that will be conducted at port
-            oper_dict_tow (:dict): Dict of operation that must be deferred with tow op
-            find_element_class (: object) callable used callable used to find objects.
+            log_events_tow_def (pd.DataFrame): Events related to deferred towing corrective op
+            oper_port_dict (dict): Dict of object of class ``OperationMajor`` that will be conducted at port
+            oper_dict_tow (dict): Dict of operation that must be deferred with tow op
+            find_element_class (object) callable used callable used to find objects.
         """
         self.dict_oper_sched, self.dict_oper_last_idx, self.dict_oper_stat = {}, {}, {}
 
@@ -137,12 +137,12 @@ class OperationDeferredPortCreation():
 
         Args:
             overlap_date (: bool): Initial flag used to enter the overlap resolution loop.
-            tow_at_site_date (: dict): Dictionary of existing tow intervals; values are tuples (end_datetime, start_datetime).
-            n_vess_row (: int): Number of vessel used in this operation.
-            oper_schedule (:pd.DataFrame): Dataframe of the operation schedule of the operation.
-            row_dates (: dict): Dict with all dates.
-            idx_oper_sched(: int): Index of the datetime at wich op start for oper_schedule.
-            last_valid_idx (: int): Int of the last valid index of oper_schedule simbolizing last op possible.
+            tow_at_site_date (dict): Dictionary of existing tow intervals; values are tuples (end_datetime, start_datetime).
+            n_vess_row (int): Number of vessel used in this operation.
+            oper_schedule (pd.DataFrame): Dataframe of the operation schedule of the operation.
+            row_dates (dict): Dict with all dates.
+            idx_oper_sched(int): Index of the datetime at wich op start for oper_schedule.
+            last_valid_idx (int): Int of the last valid index of oper_schedule simbolizing last op possible.
             row (: pd.Series): row of the df_log original.
             period (: pd.Period): Period of the deferred campaign
 
@@ -220,7 +220,7 @@ class OperationDeferredPortCreation():
 
         Args:
             row (: pd.Series): row of the df_log simbolizing an operation
-            device_n (: int): Index (1-based) of the device being processed.
+            device_n (int): Index (1-based) of the device being processed.
             period (: pd.Period): Period of the deferred campaign
             date_start_op (:datetime): Candidate datetime for starting the operations.
                 (*optional*) Default to None
@@ -309,7 +309,7 @@ class OperationDeferredPortCreation():
 
         Args:
             row (: pd.Series): row of the df_log.
-            device_n (: int): Index (1-based) of the device being processed.
+            device_n (int): Index (1-based) of the device being processed.
             date_start_op (:datetime): Candidate datetime for starting the operations.
             period (: pd.Period): Period of the deferred campaign
 
@@ -383,7 +383,7 @@ class OperationDeferredPortCreation():
 
         Args:
             row (: pd.Series): row of the df_log simbolizing an operation
-            device_n (: int): Index (1-based) of the device being processed.
+            device_n (int): Index (1-based) of the device being processed.
             tts (: bool): Boolean that flag if is additional op or TTS operation
             date_start_op (:datetime): Candidate datetime for starting the operations.
             period (: pd.Period): Period of the deferred campaign
@@ -518,7 +518,7 @@ class OperationDeferredPortCreation():
             Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
 
         Args:
-            time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
+            time_fail_op_immediately (float): Time between failure and immediate operations.
 
         Return:
             pd.DataFrame: log_events_tow_deferred with mobilisation

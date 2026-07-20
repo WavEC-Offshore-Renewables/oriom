@@ -19,7 +19,7 @@ class Device():
         ore_type (str): The type of ORE being present
         locations (dict): The location of the device with x,y coordinates
         distances (dict): The distance of the device with x,y in km
-        node (:obj:`dict`): Dictionary of attribute node of the graph
+        node (dict): Dictionary of attribute node of the graph
         edge (bool): Boolean to indicate if the device is an edge device or not
         failure_list (list): A list of failure events for this device
 

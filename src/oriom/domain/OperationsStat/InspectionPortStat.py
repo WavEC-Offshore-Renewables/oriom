@@ -12,20 +12,20 @@ class InspectionPortStat():
     At this stage the TTP campaign is planned and total durations is calculated.
 
     Attributes:
-        id (:obj:`str`): ID of the inspection at site.
-        insp_class (:class:`~oriom.classes.Operations.InspectionPort`):
+        id (str): ID of the inspection at site.
+        insp_class (:class:`~oriom.domain.Operations.InspectionPort`):
                 Inspection at port.
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation.
-        n_vessel_1 (:obj:`int`): Number of main vessel.
-        n_vessel_2 (:obj:`int`): Number of auxialiary vessel.
-        dur_total_dict (:obj:`dict`): Total duration in days.
+        n_vessel_1 (int): Number of main vessel.
+        n_vessel_2 (int): Number of auxialiary vessel.
+        dur_total_dict (dict): Total duration in days.
             Defaults to ``None.
-        transit_time_dict (:obj:`dict`): Number of transit trips per inspection scheduled.
+        transit_time_dict (dict): Number of transit trips per inspection scheduled.
             Defaults to ``None``.
-        standby_time_dict (:obj:`dict`): Number of towing trips per inspection scheduled.
+        standby_time_dict (dict): Number of towing trips per inspection scheduled.
             Defaults to ``None``.
-        shutdown (:obj:`dict`): Total shutdown per inspection scheduled.
+        shutdown (dict): Total shutdown per inspection scheduled.
             Defaults to ``None``.
     '''
 
@@ -40,14 +40,14 @@ class InspectionPortStat():
     ):
         '''
         Args:
-            inspection (:class:`~oriom.classes.Operations.InspectionPort`):
+            inspection (:class:`~oriom.domain.Operations.InspectionPort`):
                 Inspection with its attributes.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
-            run_dir (:obj:`str`): Current working folder.
-            n_port_inspection (:obj:`dict`): Number of devices to be inspected
+            PERCENTILE (int): Percentile for the statistical analysis.
+            run_dir (str): Current working folder.
+            n_port_inspection (dict): Number of devices to be inspected
                 simultaneously at port per each device.
-            operations_tow_stat (:obj:`list`): List of statistical operations tow.
-            shift (:obj:`int`): Working shift in hours.
+            operations_tow_stat (list): List of statistical operations tow.
+            shift (int): Working shift in hours.
                 Defaults to ``None``.
         '''
 
@@ -111,14 +111,14 @@ class InspectionPortStat():
     ):
         '''
         Args:
-            inspection inspection (:class:`~oriom.classes.Operations.InspectionPort`):
+            inspection inspection (:class:`~oriom.domain.Operations.InspectionPort`):
                 Inspection at port.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
-            run_dir (:obj:`str`): Current working folder.
-            operations_tow_stat (:obj:`list`): List of statistical operations tow.
-            n_port_inspection (:obj:`int`): Number of devices to be inspected
+            PERCENTILE (int): Percentile for the statistical analysis.
+            run_dir (str): Current working folder.
+            operations_tow_stat (list): List of statistical operations tow.
+            n_port_inspection (int): Number of devices to be inspected
                 simultaneously at port.
-            shift (:obj:`int`): Working shift in hours.
+            shift (int): Working shift in hours.
                 Defaults to ``None``.
         '''
         def op_in_sequence(
@@ -140,16 +140,16 @@ class InspectionPortStat():
         ):
             '''
             Args:
-                n_devices_to_inspect (:obj:`int`): Total numer of devices to inspect.
-                n_vessels (:obj:`int`): Number of vessels available to perform the inspection.
-                dur_op1 (:obj:`float`): Statistical value of "total_duration" for the towing op to port.
-                dur_op2 (:obj:`float`): Statistical value of "total_duration" for the towing op to site.
-                dur_op3 (:obj:`float`): Statistical value of "total_duration" for the towing to site,
+                n_devices_to_inspect (int): Total numer of devices to inspect.
+                n_vessels (int): Number of vessels available to perform the inspection.
+                dur_op1 (float): Statistical value of "total_duration" for the towing op to port.
+                dur_op2 (float): Statistical value of "total_duration" for the towing op to site.
+                dur_op3 (float): Statistical value of "total_duration" for the towing to site,
                     transiting to another device and tow back to port.
-                duration_inspection_port (:obj:`float`): Duration of one device port inspection in hours.
-                shutdown_op1 (:obj:`float`): Shutdown duration for op1
-                shutdown_op2 (:obj:`float`): Shutdown duration for op2
-                shutdown_op3 (:obj:`float`): Shutdown duration for op3
+                duration_inspection_port (float): Duration of one device port inspection in hours.
+                shutdown_op1 (float): Shutdown duration for op1
+                shutdown_op2 (float): Shutdown duration for op2
+                shutdown_op3 (float): Shutdown duration for op3
             '''
             d=0
             transit_time=0
@@ -229,9 +229,9 @@ class InspectionPortStat():
         ):
             '''
             Args:
-                operation_tow  (:class:`~oriom.classes.OperationStat.OperationTowStat`):
+                operation_tow  (:class:`~oriom.domain.OperationStat.OperationTowStat`):
                     Towing operation statistical.
-                month (:obj:`int`): Month of the event.
+                month (int): Month of the event.
             '''
             dict_dur_total = operation_tow.dur_total_dict
             wait_start = operation_tow.wait_start_dict

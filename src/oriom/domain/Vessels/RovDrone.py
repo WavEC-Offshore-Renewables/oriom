@@ -9,41 +9,41 @@ class RovDrone():
     """RovDrone class.
 
     Attributes:
-        id (:obj:`str`): The rov/drone unique identifier.
-        name (:obj:`str`): The rov/drone name.
-        type (:obj:`str`): Rov/drone type.
-        daily_charter (:obj:`float`): Rov/drone daily charter rate, in €/day.
-        weight (:obj:`float`): Rov/drone weight in kg.
+        id (str): The rov/drone unique identifier.
+        name (str): The rov/drone name.
+        type (str): Rov/drone type.
+        daily_charter (float): Rov/drone daily charter rate, in €/day.
+        weight (float): Rov/drone weight in kg.
             Defaults to ``None``.
-        dimensions (:obj:`float`): Rov/drone dimensions in m.
+        dimensions (float): Rov/drone dimensions in m.
             Defaults to ``None``.
-        useful_capacity (:obj:`float`): Rov/drone useful capacity in kg.
+        useful_capacity (float): Rov/drone useful capacity in kg.
             Defaults to ``None``.
-        speed_transit (:obj:`float`): Vessel transit speed, in km/h.
+        speed_transit (float): Vessel transit speed, in km/h.
             Defaults to ``None``.
-        battery_capacity (:obj:`float`): Rov/drone battery capacity in kWh.
+        battery_capacity (float): Rov/drone battery capacity in kWh.
             Defaults to ``None``.
-        recharging_duration (:obj:`float`): Rov/drone recharging duration in h.
+        recharging_duration (float): Rov/drone recharging duration in h.
             Defaults to ``None``.
-        max_distance (:obj:`float`): Rov/drone maximum distance in km.
+        max_distance (float): Rov/drone maximum distance in km.
             Defaults to ``None``.
-        avg_autonomy (:obj:`float`): Rov/drone average autonomy in h.
+        avg_autonomy (float): Rov/drone average autonomy in h.
             Defaults to ``None``.
         on_site (:obj:`bool`): True if rov/drone stays on site.
             Defaults to ``False``.
-        support_vessel (:obj:`str`): Rov/drone support vessel.
+        support_vessel (str): Rov/drone support vessel.
             Defaults to ``None``.
-        nr_technicians (:obj:`int`): Rov/drone technicians required.
+        nr_technicians (int): Rov/drone technicians required.
             Defaults to ``0``.
-        ws_max (:obj:`float`): Rov/drone max wind speed in m/s.
+        ws_max (float): Rov/drone max wind speed in m/s.
             Defaults to ``None``.
-        hs_max (:obj:`float`): Rov/drone max wave height in m.
+        hs_max (float): Rov/drone max wave height in m.
             Defaults to ``None``.
         daylight (:obj:`bool`): Rov/drone daylight needed.
             Defaults to ``False``.
-        precipitation_max (:obj:`float`): Rov/drone max precitiation in mm.
+        precipitation_max (float): Rov/drone max precitiation in mm.
             Defaults to ``None``.
-        rov_costs (:class:`~oriom.classes.Rovs_costs.Rovs_costs`): Cost
+        rov_costs (:class:`~oriom.domain.Rovs_costs.Rovs_costs`): Cost
             associated to the rov use. Defaults to ``None``.
 
     Note:
@@ -98,10 +98,10 @@ class RovDrone():
         """Initializes :class:`RovDrone` class.
 
         Args:
-            id_ (:obj:`str`): The rov/drone unique identifier.
-            name (:obj:`str`): The rov/drone name.
-            type_ (:obj:`str`): Rov/drone type.
-            daily_charter (:obj:`float`): Rov/drone daily charter rate, in €/day.
+            id_ (str): The rov/drone unique identifier.
+            name (str): The rov/drone name.
+            type_ (str): Rov/drone type.
+            daily_charter (float): Rov/drone daily charter rate, in €/day.
             weight (:obj:`float`,*optional*): Rov/drone weight in kg.
                 Defaults to ``None``.
             dimensions (:obj:`float`,*optional*): Rov/drone dimensions in m.
@@ -197,7 +197,7 @@ class RovDrone():
         returns them as :class:`RovDrone` items.
 
         Args:
-            file_path (:obj:`str`): YAML file location.
+            file_path (str): YAML file location.
 
         Raises:
             KeyError: if the keys in the YAML file are not expected.

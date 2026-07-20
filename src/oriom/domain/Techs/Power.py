@@ -9,11 +9,11 @@ class Curve():
     generates a :class:`Curve` class.
 
     Attributes:
-        file (:obj:`str`): CSV file path. Wind speed in m/s and power in watts,
+        file (str): CSV file path. Wind speed in m/s and power in watts,
             kilowatts or megawatts.
-        c_in (:obj:`float`): Cut in wind speed, in m/s, km/h or knots.
-        c_off (:obj:`float`): Cut off wind speed, in m/s, km/h or knots.
-        rated (:obj:`float`): WTG rated power.
+        c_in (float): Cut in wind speed, in m/s, km/h or knots.
+        c_off (float): Cut off wind speed, in m/s, km/h or knots.
+        rated (float): WTG rated power.
         array (:obj:`np.ndarray`): Generated power, in megawatts,
             per wind speed unit, in m/s.
 
@@ -41,11 +41,11 @@ class Curve():
         """Initializes :class:`Curve` class.
 
         Args:
-            file_ (:obj:`str`): CSV file path. Wind speed in m/s and power in
+            file_ (str): CSV file path. Wind speed in m/s and power in
                 watts, kilowatts or megawatts.
-            c_in (:obj:`float`): Cut in wind speed, in m/s, km/h or knots.
-            c_off (:obj:`float`): Cut off wind speed, in m/s, km/h or knots.
-            rated (:obj:`float`): WTG rated power.
+            c_in (float): Cut in wind speed, in m/s, km/h or knots.
+            c_off (float): Cut off wind speed, in m/s, km/h or knots.
+            rated (float): WTG rated power.
         """
         self.file = str(file_)
         self.c_in = float(c_in)
@@ -174,8 +174,8 @@ class Matrix():
         the current file is in kW
 
     Args:
-        file_ (:obj:`str`): The path to the CSV file containing the power matrix data.
-        rated (:obj:`float`): The rated power value in kW.
+        file_ (str): The path to the CSV file containing the power matrix data.
+        rated (float): The rated power value in kW.
     """
     def __init__(
 
@@ -186,8 +186,8 @@ class Matrix():
         """Initializes :class:`Matrix` class.
 
         Args:
-            file_ (:obj:`str`): The path to the CSV file containing the power matrix data.
-            rated (:obj:`float`): The rated power value.
+            file_ (str): The path to the CSV file containing the power matrix data.
+            rated (float): The rated power value.
         Raises:
             ValueError: If the rated power is negative.
             FileNotFoundError: If the specified file does not exist.
@@ -260,7 +260,7 @@ class PVPower():
     It reads the power matrix in the CSV file and convert it to :class:`np.ndarray`.
 
     Args:
-        file_ (:obj:`str`): The path to the CSV file containing the power matrix data.
+        file_ (str): The path to the CSV file containing the power matrix data.
     """
     def __init__(
             self,
@@ -269,7 +269,7 @@ class PVPower():
         """Initializes :class:`PVPower` class.
 
         Args:
-            file_ (:obj:`str`): CSV file path. PV panel hourly power output
+            file_ (str): CSV file path. PV panel hourly power output
                 per month in watts.
         """
         self.file = str(file_)
@@ -353,8 +353,8 @@ class Power_Losses():
         """Initializes :class:`Curve` class.
 
         Args:
-            file_electric_loss (:obj:`str`): CSV file path. Power electric loss in normalized %.
-            file_wake_loss (:obj:`str`): CSV file path. Power wake loss in normalized %.
+            file_electric_loss (str): CSV file path. Power electric loss in normalized %.
+            file_wake_loss (str): CSV file path. Power wake loss in normalized %.
         """
         self.power_loss = False
         self.electric_loss = pd.DataFrame()
@@ -476,8 +476,8 @@ def interpolate(df: pd.DataFrame, new_index: list):
     """Return a new DataFrame with all columns values interpolated to the new_index values.
 
     Args:
-        df (:obj:`pd.DataFrame`)
-        new_index (:obj:`list`)
+        df (pd.DataFrame)
+        new_index (list)
     """
     df_out = pd.DataFrame(index=new_index)
     df_out.index.name = df.index.name

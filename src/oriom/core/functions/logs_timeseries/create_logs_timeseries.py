@@ -67,13 +67,13 @@ def create_logs_timeseries_file(
 
     Args:
         inputs (object): Object from class `Inputs` that contains all the inputs of the simulation
-        dates_failures (:obj:`pd.DataFrame`): Log of all the dates_failures
-        failures (:obj:`list`): List of object :class:`Failures`.
-        operation_log_file_stats (:obj:`list`): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
-        inspections_port_stat (:obj:`list`): List of object :class:`InspectionsPortStat`.
-        inspections_site_stat (:obj:`list`): List of object :class:`InspectionsSiteStat`.
-        time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
-        vessels (:obj:`list`): List of objectts :class:`Vessel`
+        dates_failures (pd.DataFrame): Log of all the dates_failures
+        failures (list): List of object :class:`Failures`.
+        operation_log_file_stats (list): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
+        inspections_port_stat (list): List of object :class:`InspectionsPortStat`.
+        inspections_site_stat (list): List of object :class:`InspectionsSiteStat`.
+        time_fail_op_immediately (float): Time between failure and immediate operations.
+        vessels (list): List of objectts :class:`Vessel`
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         vessel_to_merge (:obj;`list`): list of vessel that are considered for the merge. Default to None
         percentile (:obj:`float`, *optional*): Percentile value to calculate the statistic for inspection_port. Default to 0.9

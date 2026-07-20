@@ -9,48 +9,48 @@ class InspectionSiteStat():
     '''InspectionSiteStat class.
 
     Attributes:
-        id (:obj:`str`): ID of the inspection at site.
-        vessel1 (:class:`~oriom.classes.Vessel.Vessel`): Main vessel
+        id (str): ID of the inspection at site.
+        vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation.
-        insp_class (:class:`~oriom.classes.Operations.InspectionSite`):
+        insp_class (:class:`~oriom.domain.Operations.InspectionSite`):
             Inspection at site.
-        dur_total_dict (:obj:`dict`): Statistical time of "dur_total".
+        dur_total_dict (dict): Statistical time of "dur_total".
             Defaults to ``None``.
-        wait_start_dict (:obj:`dict`): Dict statistical analysis of "wait_start".
+        wait_start_dict (dict): Dict statistical analysis of "wait_start".
             Defaults to ``None``.
-        transit_to_site_dict (:obj:`dict`): Dict statistical analysis of "transit_ts".
+        transit_to_site_dict (dict): Dict statistical analysis of "transit_ts".
             Defaults to ``None``.
-        transit_to_site_group_dict (:obj:`dict`): Dict statistical analysis of "transit_ts".
+        transit_to_site_group_dict (dict): Dict statistical analysis of "transit_ts".
             Defaults to ``None``.
-        transit_to_site_solo_dict (:obj:`dict`): Dict statistical analysis of "transit_ts".
+        transit_to_site_solo_dict (dict): Dict statistical analysis of "transit_ts".
             Defaults to ``None``.
-        dur_net_site_dict (:obj:`dict`): Dict statistical analysis of "dur_net_site".
+        dur_net_site_dict (dict): Dict statistical analysis of "dur_net_site".
             Defaults to ``None``.
-        dur_net_site_group_dict (:obj:`dict`): Dict statistical analysis of "dur_net_site".
+        dur_net_site_group_dict (dict): Dict statistical analysis of "dur_net_site".
             Defaults to ``None``.
-        dur_net_site_solo_dict (:obj:`dict`): Dict statistical analysis of "dur_net_site".
+        dur_net_site_solo_dict (dict): Dict statistical analysis of "dur_net_site".
             Defaults to ``None``.
-        transit_to_port_dict (:obj:`dict`): Dict statistical analysis of "transit_tp".
+        transit_to_port_dict (dict): Dict statistical analysis of "transit_tp".
             Defaults to ``None``.
-        transit_to_port_group_dict (:obj:`dict`): Dict statistical analysis of "transit_tp".
+        transit_to_port_group_dict (dict): Dict statistical analysis of "transit_tp".
             Defaults to ``None``.
-        transit_to_port_solo_dict (:obj:`dict`): Dict statistical analysis of "transit_tp".
+        transit_to_port_solo_dict (dict): Dict statistical analysis of "transit_tp".
             Defaults to ``None``.
-        wait_port_dict (:obj:`dict`): Dict statistical analysis of "wait_port".
+        wait_port_dict (dict): Dict statistical analysis of "wait_port".
             Defaults to ``None``.
-        wait_port_group_dict (:obj:`dict`): Dict statistical analysis of "wait_port".
+        wait_port_group_dict (dict): Dict statistical analysis of "wait_port".
             Defaults to ``None``.
-        wait_port_solo_dict (:obj:`dict`): Dict statistical analysis of "wait_port".
+        wait_port_solo_dict (dict): Dict statistical analysis of "wait_port".
             Defaults to ``None``.
-        wtg_shutdown_dict (:obj:`dict`): Statistical time of "dur_shutdown_wtg".
+        wtg_shutdown_dict (dict): Statistical time of "dur_shutdown_wtg".
             Defaults to ``None``.
-        wec_shutdown_dict (:obj:`dict`): Statistical time of "dur_shutdown_wec".
+        wec_shutdown_dict (dict): Statistical time of "dur_shutdown_wec".
             Defaults to ``None``.
-        pv_shutdown_dict (:obj:`dict`): Statistical time of "dur_shutdown_pv".
+        pv_shutdown_dict (dict): Statistical time of "dur_shutdown_pv".
             Defaults to ``None``.
-        n_vessel_1 (:obj:`int`): Number of main vessel.
+        n_vessel_1 (int): Number of main vessel.
             Defaults to ``0``.
-        n_vessel_2 (:obj:`int`): Number of auxiliary vessel.
+        n_vessel_2 (int): Number of auxiliary vessel.
             Defaults to ``0``.
     '''
     def __init__(
@@ -61,10 +61,10 @@ class InspectionSiteStat():
     ):
         '''
         Args:
-            inspection (:class:`~oriom.classes.Operations.InspectionSite`):
+            inspection (:class:`~oriom.domain.Operations.InspectionSite`):
                 Inspection at site with its attributes.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
-            run_dur (:obj:`str`): Folder in which there is the statistical analysis.
+            PERCENTILE (int): Percentile for the statistical analysis.
+            run_dur (str): Folder in which there is the statistical analysis.
         '''
         self.id = str(inspection.id).lower()
         self.vessel1 = inspection.vessel1
@@ -141,10 +141,10 @@ class InspectionSiteStat():
     ):
         '''
         Args:
-            inspection (:class:`~oriom.classes.Operations.InspectionSite`):
+            inspection (:class:`~oriom.domain.Operations.InspectionSite`):
                 Inspection at site.
-            run_dur (:obj:`str`): Folder in which there is the statistical analysis.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
+            run_dur (str): Folder in which there is the statistical analysis.
+            PERCENTILE (int): Percentile for the statistical analysis.
         '''
         op_path = os.path.join(run_dir, inspection.id, 'statistical_analysis_P' + str(PERCENTILE) + '.csv')
         df_stats = pd.read_csv(op_path)
@@ -267,10 +267,10 @@ class InspectionSiteStat():
     ):
         '''
         Args:
-            inspection (:obj:`list`):
-                List of :class:`~oriom.classes.Operations.InspectionSite`.
-            PERCENTILE (:obj:`int`): Percentile for the statistical analysis.
-            run_dur (:obj:`str`): Folder in which there is the statistical analysis.
+            inspection (list):
+                List of :class:`~oriom.domain.Operations.InspectionSite`.
+            PERCENTILE (int): Percentile for the statistical analysis.
+            run_dur (str): Folder in which there is the statistical analysis.
 
         '''
         inspections_stat = []

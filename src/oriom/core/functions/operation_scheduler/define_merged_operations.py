@@ -34,28 +34,28 @@ def define_merged_operations_values(
         of work at the device.
 
     Args:
-        ts_analyse (:obj:`list`): Timesteps of the metocean dataframe that are
+        ts_analyse (list): Timesteps of the metocean dataframe that are
             analysed.
         operations (:obj:`OperationInspectionSite` or :obj:`OperationInspectionPort`): Operation.
-        df_workability_group (:obj:`pd.DataFrame`): `~Workability` when operations
+        df_workability_group (pd.DataFrame): `~Workability` when operations
             are done in parallel.
-        df_workability_solo (:obj:`pd.DataFrame`): `~Workability` for the
+        df_workability_solo (pd.DataFrame): `~Workability` for the
             operation that last longer alone.
-        shift_data (:obj:`dict`): Information about the shift with the
+        shift_data (dict): Information about the shift with the
             following format:
-        number_shifts_main (:obj:`int`):
+        number_shifts_main (int):
             Number of shifts required for doing two operations in parallel.
-        duration_shift_main (:obj:`float`):
+        duration_shift_main (float):
             Duration of the shifts for doing the operations in parallel.
-        number_shifts_last (:obj:`int`):
+        number_shifts_last (int):
             Number of shifts required for the operation that lasts longer when done solo.
-        duration_shift_last (:obj:`float`):
+        duration_shift_last (float):
             Duration of the shift for the operation that lasts longer when done solo.
-        transit_duration (:obj:`float`): Duration of the transit btween the port
+        transit_duration (float): Duration of the transit btween the port
             and the site.
-        shutdown_wtg (:obj:`float`): For how long the WTGs are disconnected.
-        shutdown_wec (:obj:`float`): For how long the WECs are disconnected.
-        shutdown_pv (:obj:`float`): For how long the PVs are disconnected.
+        shutdown_wtg (float): For how long the WTGs are disconnected.
+        shutdown_wec (float): For how long the WECs are disconnected.
+        shutdown_pv (float): For how long the PVs are disconnected.
         double_shift (:obj:`bool`, *optional*): If the shifts are consecutive or
             not. Defaults to False.
         out_dir (:obj:`str`, *optional*): Path for the out directory.
