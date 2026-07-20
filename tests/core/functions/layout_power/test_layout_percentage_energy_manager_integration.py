@@ -8,7 +8,9 @@ import pandas as pd
 import networkx as nx
 
 from oriom.core.functions.layout_power import layout_percentage
+import pytest
 
+#pytest.skip("Test temporaneamente disabilitato", allow_module_level=True)
 # ------------------------------------------------------------------
 # Minimal test doubles
 # ------------------------------------------------------------------
@@ -98,7 +100,7 @@ class TestReturnPercentageWithRealEnergyManager(unittest.TestCase):
     )
     @patch(
         "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
-        return_value="device",
+        return_value=["device"],
     )
     @patch("oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations")
     def test_device_shutdown_false_shutdown_true_and_fix(
@@ -233,7 +235,7 @@ class TestReturnPercentageWithRealEnergyManager(unittest.TestCase):
     )
     @patch(
         "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
-        return_value="device",
+        return_value=["device"],
     )
     @patch("oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations")
     def test_array_cable_shutdown_and_fix(
@@ -654,7 +656,7 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
             return_value=(generated_events, {}),
         ), patch(
             "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
-            return_value="device",
+            return_value=["device"],
         ), patch(
             "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
             side_effect=lambda df, df_extra: df,

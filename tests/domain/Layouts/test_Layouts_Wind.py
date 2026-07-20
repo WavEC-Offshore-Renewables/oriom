@@ -61,7 +61,8 @@ class TestLayout1Wind(unittest.TestCase):
     def test_multiple_turbines_multiple_strings(self, _sf, _sh, _draw):
         G = self.w.layout1_wind(n_turbines=6, n_strings=3, substation_node=1, tow_string_shutdown = True, show_plot=False)
         # Six devices created
-        self.assertEqual(count_nodes_by_level(G, "device"), 6)
+        self.assertEqual(count_nodes_by_level(G, "device"), 3)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 3)
         # At least the chain cables between devices (array_cable)
         self.assertIn("array_cable", edge_levels(G))
 
@@ -83,7 +84,8 @@ class TestLayout2Wind(unittest.TestCase):
         # Two substations
         self.assertEqual(count_nodes_by_level(G, "substation"), 2)
         # 12 devices
-        self.assertEqual(count_nodes_by_level(G, "device"), 12)
+        self.assertEqual(count_nodes_by_level(G, "device"), 6)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 6)
         # Redundant cables between substations (two directions)
         levels = edge_levels(G)
         self.assertGreaterEqual(levels.count("redundant_cable"), 2)
@@ -123,7 +125,8 @@ class TestLayout4Wind(unittest.TestCase):
         G = self.w.layout4_wind(
             n_turbines=10, n_strings=3, substation_node=1, string_list=[3, 3, 4], tow_string_shutdown = True, show_plot=False
         )
-        self.assertEqual(count_nodes_by_level(G, "device"), 10)
+        self.assertEqual(count_nodes_by_level(G, "device"), 7)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 3)
         self.assertIn("array_cable", edge_levels(G))
 
     def test_custom_string_list_len_mismatch_raises(self, _sf, _sh, _draw):
@@ -196,13 +199,15 @@ class TestDispatcher(unittest.TestCase):
         # Not 73 or 40; divisible -> equal split is used
         G = self.w.layout_wind(n_layout=4, n_turbines=12, n_strings=3, show_plot=False)
         self.assertIsInstance(G, nx.DiGraph)
-        self.assertEqual(count_nodes_by_level(G, "device"), 12)
+        self.assertEqual(count_nodes_by_level(G, "device"), 9)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 3)
 
     def test_dispatch_layout4_known_pattern_40(self, _sf, _sh, _draw):
         # Triggers predefined string_list for 40 turbines
         G = self.w.layout_wind(n_layout=4, n_turbines=40, n_strings=6, show_plot=False)
         self.assertIsInstance(G, nx.DiGraph)
-        self.assertEqual(count_nodes_by_level(G, "device"), 40)
+        self.assertEqual(count_nodes_by_level(G, "device"), 34)
+        self.assertEqual(count_nodes_by_level(G, "last_string_device"), 6)
 
     def test_dispatch_invalid_layout_raises(self, _sf, _sh, _draw):
         with self.assertRaises(ValueError):
