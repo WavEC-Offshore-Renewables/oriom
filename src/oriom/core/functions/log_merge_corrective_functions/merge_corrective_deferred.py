@@ -98,10 +98,13 @@ def merge_deferred_operations(
             mob_time = vessel.mobilisation_time
             vessel_available = vessel.n_vessels
             vessel_busy = 0
-
+            # Find order in which operation id occures. Order them temporarly then alfabetically
+            id_order = (df_ops.groupby("id", as_index=False)["d_trigger"].min().sort_values(["d_trigger", "id"])["id"].tolist())
             # Regroup for same operation and loop on them
-            for op_id, op_row in df_ops.groupby('id'):
-                op_row = op_row.sort_values(by='d_end_leadtime', ascending=True)
+            grouped = df_ops.groupby("id")
+
+            for op_id in id_order:
+                op_row = grouped.get_group(op_id).sort_values("d_end_leadtime")
 
                 # Take all the parameters of the operation
                 (oper_stat, oper, tech_cost, vessel_2,
@@ -355,13 +358,13 @@ def merge_deferred_operations(
                 operation_number_analysed += 1
 
     # Add the statistical chart date for the merged deferred operations
-    row_merged_def, vessel_month_percentiles_dict = merged_deferred_aux.create_stat_chart_campaign_operation(
+    row_merged_def = merged_deferred_aux.create_stat_chart_campaign_operation(
         df = row_merged_def,
         vessels = vessels,
         percentile = percentile
     )
 
-    return row_merged_def, vessel_month_percentiles_dict
+    return row_merged_def
 
 
 if __name__ == '__main__':

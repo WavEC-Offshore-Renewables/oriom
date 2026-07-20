@@ -314,7 +314,7 @@ def ST_failures_event(
 
     list_ids, list_operation_triggered = [], []
     for fail in failures:
-        fail_events = math.ceil(fail.fail_rate * fail.n_element)
+        fail_events = math.ceil(fail.fail_rate)
         for _ in range(fail_events):
             list_ids.append(fail.id)
             list_operation_triggered.append(fail.operation_triggered)

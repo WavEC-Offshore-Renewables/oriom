@@ -204,7 +204,7 @@ def run(config: ConfigRun | None = None):
     vessels = list(operations['vessels'].values())
 
     logging.info('--------------------\tINPUTS - USER DEFINITION\t--------------------')
-    if user_inputs and Config.DIRS_OVERWRITE_PATH:
+    if user_inputs and getattr(Config, 'DIRS_OVERWRITE_PATH', False):
         failures, operations, vessels = user_inputs.user_input_overwrite.run_overwrite(
             inputs=inputs, 
             dirs=dirs, 
@@ -212,7 +212,7 @@ def run(config: ConfigRun | None = None):
             operations=operations,
             vessels = vessels,
             files_paths = dirs.overwrite_files_path,
-            ST = Config.ST
+            ST = getattr(Config, 'ST', False)
         )
 
     mother_vessels = [v for v in vessels if v.mother_vessel]
