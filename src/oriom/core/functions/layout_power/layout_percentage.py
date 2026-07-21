@@ -214,14 +214,6 @@ def return_percentage(
                     r["loc"] = loc
                     dict_locations[failure_id] = loc
 
-                    if r["name"].startswith("hybrid"):
-                        if isinstance(loc, tuple) is True:
-                            loc = min(loc)
-                        loc = choose_spec_loc_string(G,loc)
-
-                    r["loc"] = loc
-                    dict_locations[failure_id] = loc
-
                 # operation / tow: take location from failure
                 else:
                     loc = dict_locations.get(failure_id)
