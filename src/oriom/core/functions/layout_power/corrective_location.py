@@ -107,6 +107,36 @@ def logs_corrective_locations(
         # store failure → future operations will reference this
         dict_locations[r['id']] = None
 
+        # Introduce Hybrid management for failure finding
+        if 'hybrid' in failure.name:
+            events.append({
+                "date": r['Date'],
+                "event": "failure",
+                "id": 'hybrid_' + r['id'],
+                "comments": r['comments'],
+                "name": 'hybrid'+ failure.name,
+                "failure_id": 'hybrid'+ r['id'],
+                "level": level,
+                "shutdown": shut,
+                "shut_fix": "shut",
+                "loc": None,
+            })
+            events.append({
+                "date": r['Date'] + pd.Timedelta(days=2),
+                "event": "operation",
+                "id": 'ofw_op009',
+                "comments": 'oper_' + r['comments'],
+                "name": 'hybrid failure finding',
+                "failure_id": 'hybrid_'+ r['id'],
+                "level": level,
+                "shutdown": True,
+                "shut_fix":  "fix",
+                "loc": None,
+            })
+
+            # store failure → future operations will reference this
+            dict_locations['hybrid_' + r['id']] = None
+
     # ---------- TOW ----------
     elif r['event'] == 'tow':
         fail = r['comments'][4:]
