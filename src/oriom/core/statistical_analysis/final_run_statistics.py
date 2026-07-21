@@ -85,8 +85,8 @@ def return_statistics_runs(
         mobilisation_add (dict): dictionary of vessel_type and mobilisation yearly cost to add
         electricity_cost_dict: (dict): jey of tech and value cost of electricity per kWh
         n_runs (int): number of simulations
-        vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
-        operations_total (:obj: `list`): List of object for all the classes `Operations`
+        vessels (list): List of object with attribute `id` for class `Vessels`
+        operations_total (list): List of object for all the classes `Operations`
         save_dir (str, optional): directory to averaged results. Defaults to None.
     """
 

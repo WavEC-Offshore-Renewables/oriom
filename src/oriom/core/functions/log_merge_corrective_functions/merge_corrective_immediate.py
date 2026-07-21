@@ -89,7 +89,7 @@ def merge_operation(
             with 3 groups of operation merged insthead of 10 vessel. This do not happen many times.
             
         Args:
-            log_events (:obj: `pd.DataFrame`): Dataframe with the log events.
+            log_events (pd.DataFrame): Dataframe with the log events.
             log_mobilisation (pd.DataFrame): Dataframe with the mobilisation log events.
             day_oper (:obj:`pd.Series`): Row of days_vessel DataFrame that show how many vessel are used and which are the ops on the day under
                 analysis.

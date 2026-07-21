@@ -71,7 +71,7 @@ def failures_event(
         wear_out (int): Number of years of the end of the project with a higher probability of having failures
         fail_ratio (float): Probability of failure during infant mortality and wear out with reference with normal life
         fixed_seed (:obj:`bool`): Fixed seed True or False for repeatibility
-        dates_failures_OLD (:obj: `pd.DataFrame`): Failure dataframe imported from previous failure file if present
+        dates_failures_OLD (pd.DataFrame): Failure dataframe imported from previous failure file if present
             Defaults to ``pd.DataFrame.empty``.
     Returns:
         :obj:`pd.DataFrame`: a dataframe containing the dates of failure occurrences.

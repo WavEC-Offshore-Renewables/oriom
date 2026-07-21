@@ -175,7 +175,6 @@ def aux_operation_builder(
     for operation_type in [operations_inspect_port, operations_inspect_site]:
         aux_operation.level_component_check(Gs = G_layouts, operations = operation_type)
 
-
     # Save operation attributes as YAML files
     for operation in total_operations:
         op_dir = os.path.join(dirs.operation_dir, operation.id)

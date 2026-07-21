@@ -21,7 +21,7 @@ class VesselDayCounter():
         """
         Arg:
             log_events_merged(pd.DataFrame): Dataframe of lof_events_merged data
-            vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
+            vessels (list): List of object with attribute `id` for class `Vessels`
         """
 
         self.dict_vess_long_term = {}

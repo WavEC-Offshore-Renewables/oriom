@@ -91,11 +91,11 @@ def define_activities(
         of the :class:`CorrectiveMajor` or :class:`OperationTow`.
 
         Args:
-            operation (:obj: `object`): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
+            operation (object): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
             file_activities (str): The path to the YAML file containing activities.
             distance_to_site (float): The distance from port to site in kilometers.
             transit_between_devices (float): Time between two devices in hours.
-            tow_op (:obj: `bool`): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
+            tow_op (bool): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
         Raises:
             KeyError: if the operation is not found in the :attr:`file_activities`.
             ValueError: if activities defined as "Repeated" are not consecutive.
@@ -219,10 +219,10 @@ def recycle_activities(operation: object, dir: str, file_name: str, tow_op: bool
     Recycle previous ~Activity from a CSV file and update the current activities list.
 
     Args:
-        operation (:obj: `object`): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
+        operation (object): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
         dir (str): The directory where the CSV file is located.
         file_name (str): The name of the CSV file to recycle activities from.
-        tow_op (:obj: `bool`): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
+        tow_op (bool): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
     """
     operation_type = "OperationTow" if tow_op else "CorrectiveMajor"
 
@@ -263,7 +263,7 @@ def define_tow_operations(oper: object, towing_ops:list, op_type: str):
     Define tow operations based on the given towing operations and the technology identifier.
 
     Args:
-        oper (:obj: `object`): Operation Object of class `CorrectiveMajor` or `InspectionPort`
+        oper (object): Operation Object of class `CorrectiveMajor` or `InspectionPort`
         towing_ops (list): List of object :class:`OperationTow`.
         op_type (str): Type of class `CorrectiveMajor` or `InspectionPort`
     """

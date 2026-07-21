@@ -54,7 +54,7 @@ def working_shifts(
 
         Args:
             x1 (float): The first weather limit
-            x2 (:obj: `float`) the second weather limit
+            x2 (float) the second weather limit
         """
         if x1==None and x2!=None:
             y=x2

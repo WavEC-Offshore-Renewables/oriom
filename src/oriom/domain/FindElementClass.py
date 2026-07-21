@@ -9,15 +9,15 @@ class Find_Element:
     ???For each corrective operations all statistical results are included in this class.???
 
     Attributes:
-        operations (:obj: `list`): List of object with attribute `id` for class `Operations`.
-        operations_stats (:obj: `list`): List of object with attribute `id` for class `Operations_Stats`
-        vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
-        failures (:obj: `list`): List of object with attribute `operation_triggered` for class `Failures`
+        operations (list): List of object with attribute `id` for class `Operations`.
+        operations_stats (list): List of object with attribute `id` for class `Operations_Stats`
+        vessels (list): List of object with attribute `id` for class `Vessels`
+        failures (list): List of object with attribute `operation_triggered` for class `Failures`
 
-        operations_dict (:obj: `dict`): Dictionary of operations with items {oper.id: oper}
-        operations_stats_dict (:obj: `dict`): Dictionary of operations statistcs with items {oper.id: oper}
-        vessels_dict (:obj: `dict`): Dictionary of vessels with items {vessels.id: vessels}
-        failures_dict (:obj: `dict`): Dictionary of failures with items {failures.id: failures}
+        operations_dict (dict): Dictionary of operations with items {oper.id: oper}
+        operations_stats_dict (dict): Dictionary of operations statistcs with items {oper.id: oper}
+        vessels_dict (dict): Dictionary of vessels with items {vessels.id: vessels}
+        failures_dict (dict): Dictionary of failures with items {failures.id: failures}
 
     """
 
@@ -61,11 +61,11 @@ class Find_Element:
         Create the class
 
         Args:
-            operations (:obj: `list`): List of object with attribute `id` for class `Operations`.
-            operations_stats (:obj: `list`): List of object with attribute `id` for class `Operations_Stats` with P50 stats (or Pmain)
-            operations_stats_pmax (:obj: `list`): List of object with attribute `id` for class `Operations_Stats` with P90 stats (or Pmax)
-            vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
-            failures (:obj: `list`): List of object with attribute `operation_triggered` for class `Failures`
+            operations (list): List of object with attribute `id` for class `Operations`.
+            operations_stats (list): List of object with attribute `id` for class `Operations_Stats` with P50 stats (or Pmain)
+            operations_stats_pmax (list): List of object with attribute `id` for class `Operations_Stats` with P90 stats (or Pmax)
+            vessels (list): List of object with attribute `id` for class `Vessels`
+            failures (list): List of object with attribute `operation_triggered` for class `Failures`
 
         Returns:
             FindElement: Pbject initialized.
@@ -194,7 +194,7 @@ class Find_Element:
         Find a failure associated to an failure id
 
         Args:
-            fail_id (:obj: `str`): id of the failure.
+            fail_id (str): id of the failure.
 
         Returns:
             object or int: Object failure if found, `0` if the operation is a tow operation (`tow_to_port=True`).

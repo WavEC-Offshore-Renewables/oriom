@@ -61,17 +61,17 @@ def results_block(
         farm_technologies (object): object of class `FarmTechnologies`
             that contains all the technologies data from input file,
         results_dict (object): Object of class `Results`
-        failures (:obj: `list`): List of object for class `Failures`
-        operations_tow_stats (:obj: `list`): List of object for class `OperationTowStat`
+        failures (list): List of object for class `Failures`
+        operations_tow_stats (list): List of object for class `OperationTowStat`
             with Pmain and pmax for towing operations,
-        inspections_port_stats (:obj: `list`): List of object for class `InspectionPortStat`
+        inspections_port_stats (list): List of object for class `InspectionPortStat`
             with Pmain and pmax stats for port inspections operations,
-        inspections_site_stats (:obj: `list`): List of object for class `InspectionSiteStat`
+        inspections_site_stats (list): List of object for class `InspectionSiteStat`
             with Pmain and pmax stats for inspections site operations,
-        operations_corrective_stats (:obj: `list`): List of object for class `Corrective_Stats`
+        operations_corrective_stats (list): List of object for class `Corrective_Stats`
             with Pmain and pmax stats for port inspections operations,
-        vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
-        mother_vessels (:obj: `list`): List with the id of the mother vessels
+        vessels (list): List of object with attribute `id` for class `Vessels`
+        mother_vessels (list): List with the id of the mother vessels
         G_layouts (dict): dictionary with the graph of the layouts for wind, wave and pv
         dict_power_wind (dict): dictionary with the average hourly power production [kW of wind farm
         dict_power_wave (dict): dictionary with the average hourly power production [kW] of wave farm
