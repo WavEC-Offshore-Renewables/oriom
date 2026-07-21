@@ -205,8 +205,6 @@ def return_percentage(
                         list_failed=device_shutted,
                         tech=tech2
                     )
-                    r["loc"] = loc
-                    dict_locations[failure_id] = loc
 
                     if r["name"].startswith("hybrid"):
                         if isinstance(loc, tuple) is True:
@@ -214,7 +212,7 @@ def return_percentage(
                         loc = choose_spec_loc_string(G,loc)
 
                     r["loc"] = loc
-                    dict_locations['hybrid_'+ failure_id] = loc
+                    dict_locations[failure_id] = loc
 
                 # operation / tow: take location from failure
                 else:
