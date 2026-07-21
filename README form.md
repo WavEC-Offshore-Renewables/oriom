@@ -359,7 +359,9 @@ Check the layout level of nodes and edges to know which failures and at which le
 
 - **number_of_element_farm**: Is the number of element present that will be affected by the failure
 
-- **level_failure**: Is the level of the component that is failing. Levels are connected to the layout choosen of the technology. Important for energy calculations
+- **level_failure**: Is the level of the component that is failing. Levels are connected to the layout choosen of the technology. Important for energy calculations.
+
+    ⚠️ For failure regarding last device of the string it could require specific different operation specially regarding towing operation with additional operation. If so such specific additional operation must be defined in ``Operation Major``
 
 - **probability_failure**: Is the failure rate expressed in failure/year
 
@@ -508,6 +510,17 @@ Check the layout level of nodes and edges to know which failures and at which le
 - Additional Operations: <br>
 
     creates an operation required before the tow operation (if removal) or after (if redeploy) to disconnect full string
+
+    - The additional operation must be defined in ``Operation Major``. 
+    
+        ⚠️ For last device of the string could reqiured a shorter operation due to a reduce amout of cable to disconnect. Such reduced operation must be defined in ``Operation Major`` **WITH THE SAME ID of the normal operation + '_last_string_device'**
+
+        Example:
+
+                Normal cable disconnection: id = ´´ofw_mj1´´
+                Last device cable disconnection: id = ´´ofw_mj1_last_string_device´´
+
+        Such use will be managed by the Failure object that should have as level_failure == ``last_string_device``
 
 - String disconnection: <br>
 

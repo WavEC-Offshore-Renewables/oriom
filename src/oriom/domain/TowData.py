@@ -108,6 +108,15 @@ class TowData:
 
         add_op_tow_port = getattr(tow_op_port, 'addition_op_tow', None)
         add_op_tow_site = getattr(tow_op_site, 'addition_op_tow', None)
+        
+        # Modification of additional operation for last_string_device
+        if oper.failures[0].level_failure == 'last_string_device':
+            try: 
+                add_op_tow_port = finder.find_operation(add_op_tow_port.id +'_last_string_device')
+                add_op_tow_site = finder.find_operation(add_op_tow_site.id +'_last_string_device')
+            except NameError:
+                add_op_tow_port = getattr(tow_op_port, 'addition_op_tow', None)
+                add_op_tow_site = getattr(add_op_tow_site, 'addition_op_tow', None)
 
         tow_op_port_stat = finder.find_operation_stats_pmax(tow_op_port.id)
         tow_op_site_stat = finder.find_operation_stats_pmax(tow_op_site.id)

@@ -386,7 +386,7 @@ def create_logs_merge(
         log_events_merged = pd.concat([log_events_merged, log_mobilisation],ignore_index=False)
     
     log_events_merged = merged_deferred_aux.manage_recommissioning(log_events_merged)
-    log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
+    log_events_merged = log_events_merged.sort_values(by=['d_trigger', 'd_end_wait_start']).reset_index(drop=True)
 
     operation_vessel_percentiles_dict = {
         'tow_vessel_percentiles_dict': tow_vessel_percentiles_dict,

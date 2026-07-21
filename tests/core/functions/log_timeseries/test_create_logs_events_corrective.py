@@ -70,6 +70,7 @@ class DummyOp:
         op_tow_site=None,
         op_tow_site_port=None,
         addition_op_tow=None,
+        fail = None
     ):
         self.id = id_
         self.vessel1 = vessel1
@@ -97,6 +98,9 @@ class DummyOp:
         self.op_tow_site = op_tow_site
         self.addition_op_tow = addition_op_tow
         self.op_tow_site_port = op_tow_site_port
+        self.failures = []
+        if fail:
+            self.failures = [DummyFailure("immediately", lead_time=0)]
 
         # Present in your original dummy; keep for compatibility.
         self.tow_to_site_dict = {"1": 0}
@@ -113,7 +117,7 @@ class DummyFailure:
         self.maintenance_strategy = maintenance_strategy
         self.lead_time = lead_time
         self.preferred_month = preferred_month
-
+        self.level_failure = 'device'
 
 class DummyFinder:
     def __init__(
@@ -831,6 +835,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             op_tow_port="opTowPort",
             op_tow_site="opTowSite",
             op_tow_site_port="opTowSitePort",
+            fail = True
         )
         stat_main = DummyOperStat(op_main)
 
