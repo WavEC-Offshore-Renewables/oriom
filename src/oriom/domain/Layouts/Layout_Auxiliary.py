@@ -100,3 +100,33 @@ class Layout_Aux():
             start = end
 
         return [grp for grp in output if grp]
+    
+
+    @staticmethod
+    def interval_non_uniform(n_devices, n_times):
+        """
+        Divide the devices into n_times groups.
+
+        Example:
+            [1,2,3,4,5,6], n_times=3 -> [[1,2], [3,4], [5,6]]
+            [1,2,3,4,5],   n_times=3 -> [[1,2], [3,4], [5]]
+            [1,2,3,4,5,6,7], n_times=3 -> [[1,2,3], [4,5], [6,7]]
+        """
+        n_devices = sorted(set(n_devices))
+
+        q, r = divmod(len(n_devices), n_times)
+
+        output = []
+        start = 0
+
+        for i in range(n_times):
+            # I primi r gruppi hanno un elemento in più
+            size = q + (1 if i < r else 0)
+
+            if size == 0:
+                break
+
+            output.append(n_devices[start:start + size])
+            start += size
+
+        return output

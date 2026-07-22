@@ -49,9 +49,9 @@ class FakeOpTOW:
 def make_graph_with_levels(node_lvls=(), edge_lvls=()):
     G = nx.DiGraph()
     # Put a couple of nodes/edges with given level tags
-    G.add_node(0, name="SHORE", level="shore")
+    G.add_node(0, name="SHORE", level="shore", coords = (0,0))
     for i, lv in enumerate(node_lvls, start=1):
-        G.add_node(i, level=lv)
+        G.add_node(i, level=lv, coords = (0,i), name = lv)
     # Add edges and label their level
     last = 0
     for i, lv in enumerate(edge_lvls, start=1):
@@ -126,6 +126,31 @@ class TestLevelComponentCheck(unittest.TestCase):
 
         self.assertIn("Duplicate operation id found", str(context.exception))
 
+    def test_replace_last_device_failure(self):
+        self.Gs["G_wind"] = make_graph_with_levels(node_lvls=("substation", "device", "last_string_device"), edge_lvls=("exp_cable", "array_cable", "array_cable"))
+
+        ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
+        ok_1 = types.SimpleNamespace(id="ofw_200", level_failure="device")
+        ok_2 = types.SimpleNamespace(id="ofw_300", level_failure="substation")
+        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2], failure=True)
+        for _, attr in self.Gs["G_wind"].nodes(data=True):
+            self.assertNotEqual(attr['level'], "last_string_device")
+
+    def test_replace_not_last_device_failure(self):
+        self.Gs["G_wind"] = make_graph_with_levels(node_lvls=("substation", "device", "last_string_device"), edge_lvls=("exp_cable", "array_cable", "array_cable"))
+
+        ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
+        ok_1 = types.SimpleNamespace(id="ofw_200", level_failure="last_string_device")
+        ok_2 = types.SimpleNamespace(id="ofw_300", level_failure="substation")
+        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2], failure=True)
+        i=0
+        for _, attr in self.Gs["G_wind"].nodes(data=True):
+            if attr['level'] =="last_string_device":
+                i+=1
+
+        self.assertEqual(i, 1)
+        self.setUp()
+        
 class TestOperation(unittest.TestCase):
     @classmethod
     def setUpClass(self):

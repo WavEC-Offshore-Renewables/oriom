@@ -31,11 +31,6 @@ class TestCheckInputWind(unittest.TestCase):
         # n_turbines divisible by n_strings -> no exception
         self.w.check_input_wind(n_turbines=12, n_strings=3)
 
-    def test_not_divisible_raises(self):
-        # Not divisible -> ValueError
-        with self.assertRaises(ValueError):
-            self.w.check_input_wind(n_turbines=10, n_strings=3)
-
 
 # Patch draw operations to avoid IO and GUI during tests
 @patch("oriom.domain.Layouts.Layout_Auxiliary.Layout_Aux.draw_layout")
@@ -215,17 +210,20 @@ class TestDispatcher(unittest.TestCase):
 
     def test_dispatch_invalid_layout_5_raises(self, _sf, _sh, _draw):
         # Sum of sizes does not match total turbines -> ValueError
-        with self.assertRaises(ValueError):
-            self.w.layout_wind(
-                n_layout = 5, n_turbines=12, n_strings=5, n_substations=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=True
-            )
+        G = self.w.layout_wind(
+            n_layout = 5, n_turbines=12, n_strings=5, n_substations=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=True
+        )
+        self.assertIsInstance(G, nx.DiGraph)
+        self.assertEqual(count_nodes_by_level(G, "device"), 12)
 
     def test_dispatch_invalid_layout_6_raises(self, _sf, _sh, _draw):
         # Sum of sizes does not match total turbines -> ValueError
-        with self.assertRaises(ValueError):
-            self.w.layout_wind(
-                n_layout = 6, n_turbines=15, n_strings=2, n_substations=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=True
-            )
+        G = self.w.layout_wind(
+            n_layout = 6, n_turbines=15, n_strings=2, n_substations=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=True
+        )
+        self.assertIsInstance(G, nx.DiGraph)
+        self.assertEqual(count_nodes_by_level(G, "device"), 15)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

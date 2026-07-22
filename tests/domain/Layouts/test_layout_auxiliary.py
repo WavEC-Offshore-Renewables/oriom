@@ -93,6 +93,47 @@ class TestIntervalExtractNewBehaviour(unittest.TestCase):
         with self.assertRaises(ZeroDivisionError):
             Layout_Aux.interval_extract([1, 2, 3], n_times=0)
 
+class TestIntervalExtractNonUniform(unittest.TestCase):
+
+    def test_interval_extract_not_even_split(self):
+        devices = list(range(1, 14))
+
+        assert Layout_Aux.interval_non_uniform(devices, 5) == [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+            [10, 11],
+            [12, 13],
+        ]
+
+
+    def test_interval_extract_single_group(self):
+        devices = list(range(1, 6))
+
+        assert Layout_Aux.interval_non_uniform(devices, 1) == [
+            [1, 2, 3, 4, 5]
+        ]
+
+
+    def test_interval_extract_one_device_per_group(self):
+        devices = [1, 2, 3, 4]
+
+        assert Layout_Aux.interval_non_uniform(devices, 4) == [
+            [1],
+            [2],
+            [3],
+            [4],
+        ]
+
+
+    def test_interval_extract_duplicates_are_removed(self):
+        devices = [1, 2, 2, 3, 4, 4]
+
+        assert Layout_Aux.interval_non_uniform(devices, 2) == [
+            [1, 2],
+            [3, 4],
+        ]
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 

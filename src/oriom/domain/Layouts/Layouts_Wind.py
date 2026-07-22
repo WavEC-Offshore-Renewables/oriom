@@ -12,9 +12,8 @@ class Layout_Wind():
     def check_input_wind(self, n_turbines: int, n_strings: int):
         """Ensure number of turbines is divisible by number of strings."""
         if n_turbines % n_strings != 0:
-            msg = f"Layout: n_turbines ({n_turbines}) must be divisible by n_strings ({n_strings})"
-            logging.error(msg)
-            raise ValueError(msg)
+            msg = f'Layout: "n_turbines" ({n_turbines}) is not divisible by "n_strings" {n_strings}. Non-omogeneus strings have been created'
+            logging.warning(msg)
 
 
     # ---------------------------------------------------------------------
@@ -58,7 +57,7 @@ class Layout_Wind():
             }})
         else:
             turbines = list(range(1, n_turbines + 1))
-            turbines_per_string = Layout_Aux.interval_extract(turbines, n_strings)
+            turbines_per_string = Layout_Aux.interval_non_uniform(turbines, n_strings)
             node_counter = substation_node
 
             for s, string_turbines in enumerate(turbines_per_string):
@@ -344,20 +343,21 @@ class Layout_Wind():
             n_string_to_connector (int): Number of string that are connect to the same connector (hub).
                 Default value to ´´6´´
         """
+        self.check_input_wind(n_turbines, n_strings)
 
         G = nx.DiGraph()
         G.graph['tow_string_shutdown'] = tow_string_shutdown
         Layout_Aux.add_substation_and_shore(G, n_strings, substation_node)
 
         turbines = list(range(1, n_turbines + 1))
-        turb_per_string = Layout_Aux.interval_extract(turbines, n_strings)
+        turb_per_string = Layout_Aux.interval_non_uniform(turbines, n_strings)
 
         h = 4
 
         count_nodes = substation_node
         connector_node = substation_node
         list_connector = list(range(0, n_strings, n_string_to_connector))
-        for s in range(n_strings):
+        for s in range(len(turb_per_string)):
             if s in list_connector:
                 count_nodes +=1
                 G.add_node(count_nodes)
@@ -380,7 +380,7 @@ class Layout_Wind():
 
                 connector_node = count_nodes
 
-            for t in turb_per_string[s][:]:
+            for t in turb_per_string[s][:-1]:
                 offset = (-0.25, 0.25) if t % 2 == 0 else (0.25, 0.25)
                 count_nodes +=1
                 # Connector
@@ -421,7 +421,7 @@ class Layout_Wind():
                 nx.set_edge_attributes(G, attr_ef)
                 nx.set_node_attributes(G,values=att_w1)
                 h+=2
-                if t < turb_per_string[s][-1]:
+                if t < turb_per_string[s][-2]:
                     # Connector + 1
                     t_1 = t+1
                     G.add_node(count_nodes+2)
@@ -442,7 +442,27 @@ class Layout_Wind():
                     nx.set_edge_attributes(G, attr_ef2)
                     nx.set_node_attributes(G,values=att_w2)
                     h+=3
+                else:
+                    t_1 = t+1
+                    G.add_node(count_nodes+2)
+                    att_w1 = {count_nodes+2:{
+                            'name' : "WTG_%i" %t_1,
+                            'coords' : (s,h+2),
+                            'level' : 'device',
+                            'power' : 1
+                    }}
+                    nx.set_node_attributes(G,values=att_w1)
+                    G.add_edge(count_nodes+2,count_nodes)
+                    attr_ef = {(count_nodes+2,count_nodes):{
+                            'name' : "inter_array_cable",
+                            'level' : 'dyn_cable-sub',
+                            'visible': True,
+                            'p_limit': None
+                    }}
+                    nx.set_edge_attributes(G, attr_ef)
+                    count_nodes +=1
                 count_nodes+=1
+            
             h=4
 
         Layout_Aux.draw_layout(G, save_dir, show_plot, title="Wind_Layout_5")
@@ -486,6 +506,7 @@ class Layout_Wind():
                 Default value to ´´1´´
             n_strings (int): Number of strings in the layout. Is equal to n_turbines
         """
+        self.check_input_wind(n_turbines, n_strings)
 
         G = nx.DiGraph()
         G.graph['tow_string_shutdown'] = tow_string_shutdown
@@ -622,7 +643,7 @@ class Layout_Wind():
             }})
         else:
             turbines = list(range(1, n_turbines + 1))
-            turbines_per_string = Layout_Aux.interval_extract(turbines, n_strings)
+            turbines_per_string = Layout_Aux.interval_non_uniform(turbines, n_strings)
             node_counter = substation_node
 
             for s, string_turbines in enumerate(turbines_per_string):
@@ -638,7 +659,8 @@ class Layout_Wind():
                     G.add_node(node_counter)
                     nx.set_node_attributes(G, {node_counter: {
                         'name': f"Wtg_{t}", 'coords': (s, h),
-                        'level': 'device', 'power': 1
+                        'level': 'device' if t != string_turbines[-1] else 'last_string_device', 
+                        'power': 1
                     }})
                     if i == 0:
                         G.add_edge(node_counter, substation_node)
@@ -685,12 +707,8 @@ class Layout_Wind():
                 string_list = [n_turbines // n_strings] * n_strings
             return self.layout4_wind(n_turbines, n_strings, 1, string_list, tow_string_shutdown, save_dir, show_plot)
         elif n_layout == 5:
-            if n_turbines % n_strings != 0 or n_strings % n_string_to_connector:
-                raise ValueError("Layout 5: n_turbines must be divisible by n_strings or n_string_to_connector manually")
             return self.layout5_wind(n_turbines=n_turbines, n_strings=n_strings, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         elif n_layout == 6:
-            if n_turbines % n_string_to_connector:
-                raise ValueError("Layout 6: n_turbines must be divisible by n_string_to_connector manually")
             return self.layout6_wind(n_turbines=n_turbines, n_strings=n_turbines, substation_node=1, n_string_to_connector = n_string_to_connector, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         if n_layout == 7:
             return self.layout7_wind(n_turbines, n_strings, substation_node = 1, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)

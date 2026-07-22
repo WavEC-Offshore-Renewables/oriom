@@ -179,6 +179,9 @@ The installation process is modeled as follows:
 
     - **mobilisation to add**: Dictionary of vessel id and **YEARLT MOBILISATION COST** to add. The cost will be added only at the averaged results
 
+    - **TIME_FAIL_OP_IMMEDIATELY**: This value set a reaction time between a failure and the correspondent operation to plan. To be set in **HOURS**. Works only for IMMEDIATE CORRECTION
+
+
 ## PRIVATE FUNCTIONS
 To use Private functions:
 
@@ -361,7 +364,6 @@ Check the layout level of nodes and edges to know which failures and at which le
 
 - **level_failure**: Is the level of the component that is failing. Levels are connected to the layout choosen of the technology. Important for energy calculations.
 
-    ⚠️ For failure regarding last device of the string it could require specific different operation specially regarding towing operation with additional operation. If so such specific additional operation must be defined in ``Operation Major``
 
 - **probability_failure**: Is the failure rate expressed in failure/year
 
@@ -373,7 +375,12 @@ Check the layout level of nodes and edges to know which failures and at which le
 
 - **perc_shutdown**: Indicates the probability that a failure will lead to a shutdown of a component (if 10% one failure each 10 will lead to a shutdown)
 
-- **Name**: In FOPV the layout is setted with inverter resolution. To count failure on "device" or "string" level add "_device" and "_string" in the name of the failure to consider them. The level must be 'device' and 'array_cable' relatively. Event if the layout 4 of OPV do not take into consideration these levels, the availability algorithm will acocunt the reduction of the availability due to solar module and string failure. An eccess of module broken in a single line will cause a shutdown of the entire line
+⚠️  **SPECIFIC USE OF FAILURES**
+- **Name**: 
+    -   In FOPV the layout is setted with inverter resolution. To count failure on "device" or "string" level add "_device" and "_string" in the name of the failure to consider them. The level must be 'device' and 'array_cable' relatively. Event if the layout 4 of OPV do not take into consideration these levels, the availability algorithm will acocunt the reduction of the availability due to solar module and string failure. An eccess of module broken in a single line will cause a shutdown of the entire line
+
+- **level_failure**: 
+    - For failure regarding last device of the string it could require specific different operation specially regarding towing operation with additional operation. If so such specific additional operation must be defined in ``Operation Major``
 
 ## ALL OPERATIONS (INSPECTION & CORRECTION)
 

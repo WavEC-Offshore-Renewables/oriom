@@ -60,12 +60,12 @@ DEFAULT_CONFIG = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=False,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="P1_Radial_installation",
+    PROJECT_NAME="P1_Radial",
     BASEFILES_FROM_EXCEL=False,
     EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="P1_Radial_installation.xlsx",
-    TIME_FAIL_OP_IMMEDIATELY=0.02,
+    FORM_NAME="P1_Radial.xlsx",
+    TIME_FAIL_OP_IMMEDIATELY=30*24,
     ST = False,
     DIRS_OVERWRITE_PATH = r''
 )

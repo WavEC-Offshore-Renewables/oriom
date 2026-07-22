@@ -20,6 +20,7 @@ def get_graph_levels(G: nx.Graph) -> set:
 def level_component_check(Gs: dict, operations: list, failure: bool = False):
     """
     Check if any object has a level that is not defined in the tech Graph.
+    Convert graph nodes with level ``last_string_device`` to ``device`` when no object references that level.
 
     Args:
         Gs (dict): Dictionary of tech graphs (networkx.Graph)
@@ -33,6 +34,7 @@ def level_component_check(Gs: dict, operations: list, failure: bool = False):
 
     # Extrapolate all level for each graph
     level_dict = {tech: get_graph_levels(G) for gname, G in Gs.items() if (tech := tech_map.get(gname)) and G}
+    level_tech_dic = {}
 
     # Check all levels
     for obj in operations:
@@ -50,6 +52,18 @@ def level_component_check(Gs: dict, operations: list, failure: bool = False):
                 e_ = f"Level {object_name} '{level}' not found in graph for {obj.id}"
                 logging.error(e_)
                 raise KeyError(e_)
+            # Store levels oif tech found
+            if tech not in level_tech_dic.keys():
+                level_tech_dic[tech] = set()
+            level_tech_dic[tech].add(level)
+
+    for tech_G, tech in tech_map.items():
+        G = Gs.get(tech_G)
+        if G:
+            if 'last_string_device' not in level_tech_dic.get(tech, []):
+                for _, data in G.nodes(data=True):
+                    if data.get("level") == "last_string_device":
+                        data["level"] = "device"
 
 
 def operation_check_identities(total_operations: list):
