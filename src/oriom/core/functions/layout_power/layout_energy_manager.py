@@ -129,7 +129,7 @@ def shut(
                     G.nodes[loc]['power'] -= (n_pv_per_string - max_failure_module)
 
             elif tech == 'wind' or tech == 'wave':
-                G.nodes[loc]['power'] = 0
+                G.nodes[loc]['power'] = 0.5
 
             # DISCONNECT THE LOWER EDGE OF THE LOCATION LEVEL
             if (

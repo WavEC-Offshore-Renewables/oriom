@@ -98,6 +98,7 @@ ENV/
 
 # Other
 .env
+*.pdf
 
 # LOCAL Folders
 tmp/
