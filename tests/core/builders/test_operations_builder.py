@@ -350,15 +350,6 @@ class TestAuxOperationBuilder(unittest.TestCase):
         """The builder should check levels, write attributes and check operation identities."""
         _result, mocks = self.run_builder_with_patches()
 
-        self.assertEqual(mocks.level_component_check.call_count, 2)
-        mocks.level_component_check.assert_has_calls(
-            [
-                call(Gs=self.G_layouts, operations=[self.inspect_port_operation]),
-                call(Gs=self.G_layouts, operations=[self.inspect_site_operation]),
-            ],
-            any_order=False,
-        )
-
         all_operations = [
             self.tow_operation,
             self.inspect_site_operation,

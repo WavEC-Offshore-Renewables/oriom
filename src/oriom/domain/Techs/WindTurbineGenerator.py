@@ -213,10 +213,6 @@ class WindTurbineGenerator():
         if self.moorings < 0:
             raise ValueError('"moorings" must not be negative')
 
-        if self.number_devices % self.number_strings !=0:
-            if self.wtg_layout != 4:   #TODO insert string definition in excel file use if on this parameter != None
-                raise ValueError('"number_devices" must be divisible by "number_strings"')
-
         logging.debug('WindTurbineGenerator: attributes within ranges and valid.')
 
 

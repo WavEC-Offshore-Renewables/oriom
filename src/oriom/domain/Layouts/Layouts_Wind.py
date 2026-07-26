@@ -726,12 +726,12 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=7,
-        n_turbines=6,
-        n_strings=2,
+        n_layout=5,
+        n_turbines=33,
+        n_strings=6,
         n_substations=1,
         n_exports=1,
-        n_string_to_connector = 1,
+        n_string_to_connector = 6,
         tow_string_shutdown = True,
         save_dir = None,
         show_plot=True
