@@ -70,7 +70,7 @@ def create_yearly_mobilisation_mother_vessel(
 
     log_events_merged = pd.concat([log_events_merged, log_event_mother_vessel_mobi], axis=0, ignore_index=False)
 
-    log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
+    log_events_merged = log_events_merged.sort_values(by=['d_trigger', 'd_end_wait_start']).reset_index(drop=True)
 
     return log_events_merged
 
