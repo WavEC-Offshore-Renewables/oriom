@@ -14,7 +14,7 @@ def check_previous_fix(G, op_add_tow, r, type_id = 'tow', recommissioning = Fals
     Eliminate the failure connected from the dict
     """
     id_r = r.get('id', None)
-    if id_r in op_add_tow:
+    if id_r in op_add_tow or id_r.replace("_last_string_device", "") in op_add_tow:
         failure_id_r = r.get('failure_id', None)
         key = f"{type_id}" if id_r is not None else None
 
