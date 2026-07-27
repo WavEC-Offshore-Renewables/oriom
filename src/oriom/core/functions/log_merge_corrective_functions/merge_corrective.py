@@ -276,7 +276,7 @@ def create_logs_merge(
                 find_element_class
             )
             df_port_operation_def_log = port_operation_deferred.deferred_port_manager(
-                time_fail_op_immediately = time_fail_op_immediately
+                time_fail_op_immediately = 0.01 # Deferred operation react immediately
             )
             df_port_operation_def_log.reset_index(drop=True, inplace=True)
             df_events_return = deepcopy(df_port_operation_def_log.drop(columns=['year_month']))
@@ -311,7 +311,7 @@ def create_logs_merge(
             vessels = vessels,
             time_between_devices = time_between_devices,
             oper_per_vessel = oper_per_vessel,
-            time_fail_op_immediately = time_fail_op_immediately,
+            time_fail_op_immediately = 0.01, # Deferred operation react immediately
             percentile = percentile,
             COLS = COLS,
             find_element_class = find_element_class,

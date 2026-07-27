@@ -221,7 +221,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=pd.DataFrame(),
             operation_log_file_stats=[],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -264,7 +264,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -334,7 +334,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -397,7 +397,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -461,7 +461,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -521,7 +521,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -589,7 +589,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -633,7 +633,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -676,7 +676,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
                 CUTOFF_DATE=cutoff,
                 dates_failures=dates_failures,
                 operation_log_file_stats=[stat],
-                time_fail_op_immediately=1,
+                time_fail_op_immediately_original=1,
                 vessel_to_merge=[],
                 find_element_class=finder,
             )
@@ -737,7 +737,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -796,7 +796,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
@@ -977,7 +977,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             CUTOFF_DATE=cutoff,
             dates_failures=dates_failures,
             operation_log_file_stats=[stat_main],
-            time_fail_op_immediately=1,
+            time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
         )
