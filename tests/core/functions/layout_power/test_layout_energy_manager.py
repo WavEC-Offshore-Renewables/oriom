@@ -483,7 +483,7 @@ class TestEnergyFunctions(unittest.TestCase):
         G = nx.DiGraph()
 
         op_add_tow = {}
-        r = {'id': 1, 'failure_id': 'x'}
+        r = {'id': '1', 'failure_id': 'x'}
 
         # should not crash
         lem.check_previous_fix(G, op_add_tow, r, type_id='tow')
