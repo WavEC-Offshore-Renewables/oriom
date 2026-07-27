@@ -36,7 +36,7 @@ def create_logs_corrective_file(
         CUTOFF_DATE: datetime,
         dates_failures: pd.DataFrame,
         operation_log_file_stats: list,
-        time_fail_op_immediately: float,
+        time_fail_op_immediately_original: float,
         vessel_to_merge: list,
         find_element_class: object,
 )->pd.DataFrame:
@@ -64,8 +64,7 @@ def create_logs_corrective_file(
         dates_failures (pd.DataFrame): Log of all the events (failure,
             operation, inspection_port, inspection_site).
         operation_log_file_stats (list): List of objects :class:`OperationsCorrectiveStat` with max percentile.
-        time_fail_op_immediately (float): Time between failure and
-            immediate operations.
+        time_fail_op_immediately_original (float): Time between failure and immediate operations.
         vessel_to_merge (list): List of vessel that op can be merged when is possible to merge operations
         find_element_class (object): Object from class :class:`FindElementClass`
 
@@ -138,6 +137,9 @@ def create_logs_corrective_file(
 
             ves_1 = oper.vessel1_qt
             component_lead_time = failure.lead_time
+
+            # Manage time reaction. If is scheduled in a specific month the time reaction is immediate as already prepared
+            time_fail_op_immediately = time_fail_op_immediately_original if maintenance_strategy != "specific month" else 0.01
 
             #------------------------
             # TOWING PORT CREATION

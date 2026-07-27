@@ -105,7 +105,7 @@ def create_logs_timeseries_file(
         CUTOFF_DATE = CUTOFF_DATE,
         dates_failures=dates_failures,
         operation_log_file_stats = operation_log_file_stats,
-        time_fail_op_immediately=time_fail_op_immediately,
+        time_fail_op_immediately_original=time_fail_op_immediately,
         vessel_to_merge = vessel_to_merge,
         find_element_class = find_element_class,
     )
