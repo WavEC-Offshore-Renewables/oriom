@@ -355,31 +355,7 @@ class Layout_Wind():
         h = 4
 
         count_nodes = substation_node
-        connector_node = substation_node
-        list_connector = list(range(0, n_strings, n_string_to_connector))
         for s in range(len(turb_per_string)):
-            if s in list_connector:
-                count_nodes +=1
-                G.add_node(count_nodes)
-                att_w = {count_nodes:{
-                        'name' : "Connector_node",
-                        'coords' : (s+(n_string_to_connector/2)-0.5,1),
-                        'level' : 'hub',
-                        'power' : 0
-                }}
-                nx.set_node_attributes(G, values=att_w)
-
-                G.add_edge(count_nodes, substation_node)
-                attr_es = {(count_nodes, substation_node):{
-                        'name' : "feeder_cable",
-                        'level' : 'exp_cable_island',
-                        'visible': True,
-                        'p_limit': None
-                }}
-                nx.set_edge_attributes(G, attr_es)
-
-                connector_node = count_nodes
-
             for t in turb_per_string[s][:-1]:
                 offset = (-0.25, 0.25) if t % 2 == 0 else (0.25, 0.25)
                 count_nodes +=1
@@ -392,10 +368,10 @@ class Layout_Wind():
                         'power' : 0
                 }}
                 if t == turb_per_string[s][0]:
-                    G.add_edge(count_nodes, connector_node)
-                    attr_es = {(count_nodes, connector_node):{
-                            'name' : "array_cable",
-                            'level' : 'array_cable',
+                    G.add_edge(count_nodes, substation_node)
+                    attr_es = {(count_nodes, substation_node):{
+                            'name' : "feeder_cable",
+                            'level' : 'exp_cable_island',
                             'visible': True,
                             'p_limit': None
                     }}
@@ -731,8 +707,11 @@ if __name__ == "__main__":
         n_strings=6,
         n_substations=1,
         n_exports=1,
-        n_string_to_connector = 6,
+        n_string_to_connector = 1,
         tow_string_shutdown = True,
         save_dir = None,
         show_plot=True
     )
+
+    for u,v,attr in G.edges(data=True):
+        print(u,v,attr)

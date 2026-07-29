@@ -151,7 +151,7 @@ class TestLayout5Wind(unittest.TestCase):
             n_turbines=12, n_strings=4, substation_node=1, n_string_to_connector = 2, tow_string_shutdown = True, show_plot=False
         )
         self.assertEqual(count_nodes_by_level(G, "device"), 12)
-        self.assertEqual(count_nodes_by_level(G, "hub"), 2)
+        self.assertEqual(count_nodes_by_level(G, "circuit_braker"), 8)
         self.assertIn("dyn_cable-sub", edge_levels(G))
 
 

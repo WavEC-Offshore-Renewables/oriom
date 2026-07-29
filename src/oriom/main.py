@@ -60,11 +60,11 @@ DEFAULT_CONFIG = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="P1_Radial",
+    PROJECT_NAME="P1_Star_Active",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies",
+    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies\P1",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="P1_Radial.xlsx",
+    FORM_NAME="P1_Star_Active.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=30*24,
     ST = False,
     DIRS_OVERWRITE_PATH = r''
@@ -78,6 +78,8 @@ DEFAULT_CONFIG = ConfigRun(
 def run(config: ConfigRun | None = None):
     """Run a full simulation and return the created ProjectDirs."""
     Config = config or DEFAULT_CONFIG
+
+    print(Config.FORM_NAME)
 
     time_prefix = datetime.now().strftime("_[%Y%m%d_%H%M%S]")
 
