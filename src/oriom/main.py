@@ -80,6 +80,7 @@ def run(config: ConfigRun | None = None):
     Config = config or DEFAULT_CONFIG
 
     print(Config.FORM_NAME)
+    print()
 
     time_prefix = datetime.now().strftime("_[%Y%m%d_%H%M%S]")
 
