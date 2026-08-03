@@ -151,12 +151,15 @@ def define_activities(
             # Duration
             elif 'transit' in act["name"].lower():
                 # This is a transit activity
-                if act["duration"]:
-                    try:
-                        duration = float(act["duration"])
-                    except TypeError:
+                try:
+                    if act["duration"]:
+                        try:
+                            duration = float(act["duration"])
+                        except TypeError:
+                            duration = ((distance_to_site * 1000) / operation.vessel1.speed_transit) / 3600
+                    else:
                         duration = ((distance_to_site * 1000) / operation.vessel1.speed_transit) / 3600
-                else:
+                except KeyError:
                     duration = ((distance_to_site * 1000) / operation.vessel1.speed_transit) / 3600
             elif tow_op and re.search(r'\btow\b', act["name"].lower()) is not None:
                 towing = True
