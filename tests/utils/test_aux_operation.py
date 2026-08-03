@@ -85,27 +85,27 @@ class TestLevelComponentCheck(unittest.TestCase):
         ops.extend([a, b, c])
 
         # Should not raise
-        aux_operation.level_component_check(self.Gs, ops, failure=False)
+        aux_operation.level_component_check(self.Gs, ops)
 
     def test_valid_levels_for_oce_any(self):
         # 'oce' -> check against union of all graphs
         d = types.SimpleNamespace(id="oce_999", level="substation")
-        aux_operation.level_component_check(self.Gs, [d], failure=False)  # present in G_wind node levels
+        aux_operation.level_component_check(self.Gs, [d])  # present in G_wind node levels
 
     def test_missing_level_raises_keyerror(self):
         # 'opv' with level not present in PV graph -> KeyError
         bad = types.SimpleNamespace(id="opv_010", level="nonexistent_level")
         with self.assertRaises(KeyError):
-            aux_operation.level_component_check(self.Gs, [bad], failure=False)
+            aux_operation.level_component_check(self.Gs, [bad])
 
     def test_failure_mode_uses_level_failure(self):
         # In failure=True, code reads 'level_failure'
         ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
-        aux_operation.level_component_check(self.Gs, [ok], failure=True)  # should pass
+        aux_operation.level_component_check(self.Gs, [ok])  # should pass
 
         bad = types.SimpleNamespace(id="owc_200", level_failure="not_there")
         with self.assertRaises(KeyError):
-            aux_operation.level_component_check(self.Gs, [bad], failure=True)
+            aux_operation.level_component_check(self.Gs, [bad])
 
 
     def test_operation_check_identities(self):
@@ -132,7 +132,7 @@ class TestLevelComponentCheck(unittest.TestCase):
         ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
         ok_1 = types.SimpleNamespace(id="ofw_200", level_failure="device")
         ok_2 = types.SimpleNamespace(id="ofw_300", level_failure="substation")
-        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2], failure=True)
+        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2])
         for _, attr in self.Gs["G_wind"].nodes(data=True):
             self.assertNotEqual(attr['level'], "last_string_device")
 
@@ -142,7 +142,7 @@ class TestLevelComponentCheck(unittest.TestCase):
         ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
         ok_1 = types.SimpleNamespace(id="ofw_200", level_failure="last_string_device")
         ok_2 = types.SimpleNamespace(id="ofw_300", level_failure="substation")
-        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2], failure=True)
+        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2])
         i=0
         for _, attr in self.Gs["G_wind"].nodes(data=True):
             if attr['level'] =="last_string_device":

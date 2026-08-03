@@ -62,7 +62,7 @@ DEFAULT_CONFIG = ConfigRun(
     ENERGY_STATISTICAL_CALCULATION=False,
     PROJECT_NAME="P1_Radial_test_last",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies",
+    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies\P1",
     SOURCE_PATH_SHAREPOINT="",
     FORM_NAME="P1_Radial_test_last.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=30*24,
@@ -78,6 +78,9 @@ DEFAULT_CONFIG = ConfigRun(
 def run(config: ConfigRun | None = None):
     """Run a full simulation and return the created ProjectDirs."""
     Config = config or DEFAULT_CONFIG
+
+    print(Config.FORM_NAME)
+    print()
 
     time_prefix = datetime.now().strftime("_[%Y%m%d_%H%M%S]")
 
@@ -174,10 +177,6 @@ def run(config: ConfigRun | None = None):
         if getattr(failure, "fail_variation", False):
             failure.fail_rate *= inputs.stats.failure_ratio_sensitivity["value"]
             logging.info(f'Failure {failure.id_} FR have been multiplied by {inputs.stats.failure_ratio_sensitivity["value"]}')
-
-    # Check if all the levels defined are associated to a component in the graph
-    aux_operation.level_component_check(Gs = G_layouts, operations = failures, failure = True)
-
 
     logging.info('--------------------\tSYSTEM\t--------------------')
     #TODO oriom OOP. Code not yet used and integrated
@@ -345,9 +344,11 @@ def run(config: ConfigRun | None = None):
     logging.info('--------------------\tEND OF THE SIMULATION\t--------------------')
 
     if not Config.ST:
+        export_path = os.path.join(os.getcwd(), 'export_pack')
+        os.makedirs(export_path, exist_ok=True)
         from oriom.export.st_package import export_st_package
         export_st_package(
-            package_dir=r"C:\Users\RiccardoMeda\temp",
+            package_dir=export_path,
             operations_stats = operations_stats,
             overwrite = True
         )

@@ -172,8 +172,7 @@ def aux_operation_builder(
             operation.activities[0].save_activities_as_csv(operation, os.path.join(op_dir, 'activities.csv'))
 
     # Check if all the levels defined are associated to a component in the graph
-    for operation_type in [operations_inspect_port, operations_inspect_site]:
-        aux_operation.level_component_check(Gs = G_layouts, operations = operation_type)
+    aux_operation.level_component_check(Gs = G_layouts, operations = operations_inspect_port + operations_inspect_site + failures)
 
     # Save operation attributes as YAML files
     for operation in total_operations:

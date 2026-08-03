@@ -17,20 +17,17 @@ def get_graph_levels(G: nx.Graph) -> set:
     return all_levels
 
 
-def level_component_check(Gs: dict, operations: list, failure: bool = False):
+def level_component_check(Gs: dict, operations: list):
     """
     Check if any object has a level that is not defined in the tech Graph.
     Convert graph nodes with level ``last_string_device`` to ``device`` when no object references that level.
 
     Args:
         Gs (dict): Dictionary of tech graphs (networkx.Graph)
-        operations (list): List of objects to check (InspectionPort, InspectionSite | Failures)
-        failure (bool): If True, check 'level_failure'; else 'level'
+        operations (list): List of objects to check (InspectionPort, InspectionSite, Failures)
     """
 
     tech_map = {'G_wind': 'ofw', 'G_pv': 'opv', 'G_wave': 'owc'}
-    attr_to_check = 'level_failure' if failure else 'level'
-    object_name = 'failure' if failure else 'inspection'
 
     # Extrapolate all level for each graph
     level_dict = {tech: get_graph_levels(G) for gname, G in Gs.items() if (tech := tech_map.get(gname)) and G}
@@ -38,13 +35,20 @@ def level_component_check(Gs: dict, operations: list, failure: bool = False):
 
     # Check all levels
     for obj in operations:
+        # Dynamically assign name of attribute to use
+        if getattr(obj, 'level_failure', None):
+            attr_to_check = 'level_failure'
+            object_name = 'failure'
+        else:
+            attr_to_check = 'level'
+            object_name = 'inspection'
+
         tech = obj.id[:3]
         level = getattr(obj, attr_to_check, None)
         if tech == 'oce':
             all_levels = set().union(*level_dict.values())
             if level not in all_levels:
                 e_ = f"Level {object_name} '{level}' not found in graph for {obj.id}"
-
                 logging.error(e_)
                 raise KeyError(e_)
         else:
@@ -59,11 +63,11 @@ def level_component_check(Gs: dict, operations: list, failure: bool = False):
 
     for tech_G, tech in tech_map.items():
         G = Gs.get(tech_G)
-        if G:
-            if 'last_string_device' not in level_tech_dic.get(tech, []):
-                for _, data in G.nodes(data=True):
-                    if data.get("level") == "last_string_device":
-                        data["level"] = "device"
+        # Remove last_string_device level if is not present in operations dict levels
+        if G and level_tech_dic and 'last_string_device' not in level_tech_dic.get(tech, []):
+            for _, data in G.nodes(data=True):
+                if data.get("level") == "last_string_device":
+                    data["level"] = "device"
 
 
 def operation_check_identities(total_operations: list):

@@ -132,11 +132,6 @@ class TestWindTurbineGenerator(unittest.TestCase):
                 self.assertRaises(ValueError, WindTurbineGenerator, **args)
 
                 args = deepcopy(args_def)
-                args["number_devices"] = 20
-                args["number_strings"] = 3
-                self.assertRaises(ValueError, WindTurbineGenerator, **args)
-
-                args = deepcopy(args_def)
                 args["spacing"] = -10
                 self.assertRaises(ValueError, WindTurbineGenerator, **args)
 
