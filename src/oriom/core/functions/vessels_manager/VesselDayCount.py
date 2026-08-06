@@ -155,6 +155,7 @@ class VesselDayCounter():
             ascending=[False, False, True]
         ).drop(columns=["_is_insp","_deferred"])
 
+        self.log_event_day.dropna(axis=0, how='all', inplace=True)
         for idx, row in self.log_event_day.iterrows():
             event = row["event"]
 

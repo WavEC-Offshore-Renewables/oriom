@@ -126,6 +126,7 @@ def kpi_final_total_cost(
             (~log_events_merged['event'].str.contains('fail|mobi', na=False))
             & (log_events_merged['vessel_1'].isna())
         ]
+        log_event_op_port.dropna(axis=0, how='all', inplace=True)
 
         return (
             log_events_op, log_events_op_ST, log_events_op_merged,
