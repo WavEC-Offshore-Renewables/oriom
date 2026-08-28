@@ -60,11 +60,11 @@ DEFAULT_CONFIG = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="P1_Star_Active",
+    PROJECT_NAME="Form_file",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies\P1",
+    EXCEL_FILE_PATH=r"",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="P1_Star_Active.xlsx",
+    FORM_NAME="Form_file.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=30*24,
     ST = False,
     DIRS_OVERWRITE_PATH = r''
@@ -90,6 +90,18 @@ def run(config: ConfigRun | None = None):
         data_overwrite_user_path = Config.DIRS_OVERWRITE_PATH
     )
 
+    # Configure logging
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+    logging.basicConfig(
+            filename=os.path.join(dirs.run_dir, 'logging.log'),
+            encoding='utf-8',
+            format='%(asctime)s %(levelname)-8s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S',
+            level=logging.INFO
+    )
+
+
     ### ---------- CONVERT EXCEL FORM TO YAML BASE FILES ---------- ###
     extract_input_from_excel(
         dirs = dirs,
@@ -107,17 +119,6 @@ def run(config: ConfigRun | None = None):
     )
 
     handle_overwrite_previous(inputs_gen, dirs)
-
-    # Configure logging
-    for handler in logging.root.handlers[:]:
-                    logging.root.removeHandler(handler)
-    logging.basicConfig(
-            filename=os.path.join(dirs.run_dir, 'logging.log'),
-            encoding='utf-8',
-            format='%(asctime)s %(levelname)-8s %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S',
-            level=logging.INFO
-    )
 
     # Log configuration parameters
     Config.log_parameters(
