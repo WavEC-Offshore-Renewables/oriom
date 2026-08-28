@@ -161,7 +161,7 @@ def create_operation_site(
             oper = oper_['oper'],
             preferred_month = row_['row']['preferred_month'],
             tow_op = row_['tow_op_flag'],
-            day_preferred = failure_['failure'].preferred_day
+            day_preferred = failure_['date_failure'].day
         )
 
         # Evaluate end of leadtime date

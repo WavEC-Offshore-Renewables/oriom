@@ -197,7 +197,7 @@ def create_logs_corrective_file(
                             vessel = vessel,
                             oper = oper,
                             preferred_month = row['preferred_month'],
-                            day_preferred = failure.preferred_day
+                            day_preferred = date_failure.day
                         )
                         deferred_tow_correction.leadtime_evaluation(lead_mob_time = mob_time)
                         index_found = deferred_tow_correction.check_leadtime_index(oper_sched = oper.tow_data.tow_port_oper_sched, CUTOFF_DATE = CUTOFF_DATE)
