@@ -76,6 +76,15 @@ def merge_deferred_operations(
         first_not_zero = np.argmax(~mask_zero)
         return first_not_zero
 
+    def add_single_operation(operation_concluded, oper):
+        """ Auxiliary function to add an operation that cannot be merged consecutively with the previous one"""
+        operation_concluded += 1
+        total_device_this_shift = 1
+        number_technicians = oper.tech_required
+        n_vessel_used = oper.vessel1_qt
+
+        return operation_concluded, total_device_this_shift, number_technicians, n_vessel_used
+
 
     log_events_df = deepcopy(log_events_def)
 
@@ -228,27 +237,33 @@ def merge_deferred_operations(
                         duration_shift_actual = min(duration_shift, duration_shift_weather)    # TODO Consider more in case the vessel can stay out longer (along the night)
                         day_start_idx_of_shift = day_start_idx     # This value is stored in case we'll use after remaining vessels from this shift in the same day
 
-                        operation_concluded, day_start_idx, day_shift_end, total_device_this_shift, number_technicians, n_vessel_used = merge_shift_deferred(
-                            duration_shift = duration_shift_actual,
-                            duration_inspection = oper.ts_data.dur_net_site + oper.ts_data.dur_net_port,
-                            transit_between_devices = time_between_devices[oper.id[:3]],
-                            operation_total_duration = operation_total_duration,
-                            n_vessel = vessel_available,
-                            n_oper = n_oper,
-                            operation_concluded = operation_concluded,
-                            end_wait_start_list_idx = end_wait_start_list_idx,
-                            day_start_idx = day_start_idx,
-                            N_technicians_on_vessel = vessel.crew_capacity,
-                            N_technicians_per_inspection = oper.tech_required,
-                            vessel_type = vessel.type,
-                            rov = oper.rov_drone,
-                            day_start_oper = day_start_oper
+                        if oper.ts_data.dur_net_site < duration_shift_actual:
+                            operation_concluded, day_start_idx, day_shift_end, total_device_this_shift, number_technicians, n_vessel_used = merge_shift_deferred(
+                                duration_shift = duration_shift_actual,
+                                duration_inspection = oper.ts_data.dur_net_site + oper.ts_data.dur_net_port,
+                                transit_between_devices = time_between_devices[oper.id[:3]],
+                                operation_total_duration = operation_total_duration,
+                                n_vessel = vessel_available,
+                                n_oper = n_oper,
+                                operation_concluded = operation_concluded,
+                                end_wait_start_list_idx = end_wait_start_list_idx,
+                                day_start_idx = day_start_idx,
+                                N_technicians_on_vessel = vessel.crew_capacity,
+                                N_technicians_per_inspection = oper.tech_required,
+                                vessel_type = vessel.type,
+                                rov = oper.rov_drone,
+                                day_start_oper = day_start_oper
                         )
+                        else:
+                            operation_concluded, total_device_this_shift, number_technicians, n_vessel_used = add_single_operation(
+                                operation_concluded, 
+                                oper
+                            )
                     else:
-                        operation_concluded += 1
-                        total_device_this_shift = 1
-                        number_technicians = oper.tech_required
-                        n_vessel_used = oper.vessel1_qt
+                        operation_concluded, total_device_this_shift, number_technicians, n_vessel_used = add_single_operation(
+                            operation_concluded, 
+                            oper
+                        )
 
                     # id and comments of merged operations
                     subset = op_row.iloc[operation_concluded - total_device_this_shift : operation_concluded]

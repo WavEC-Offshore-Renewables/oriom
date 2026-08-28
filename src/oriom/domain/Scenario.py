@@ -104,7 +104,7 @@ class Scenario():
                 raise ValueError('Percentage of %s cannot be negative' % month)
             percentage_month += prob
 
-        if sum(self.percentage_month) != 1:
+        if round(sum(self.percentage_month), 3) != 1.000:
             logging.error('The sum of the percentages must be equal to 1')
             raise ValueError('The sum of the percentages must be equal to 1')
 
