@@ -53,15 +53,18 @@ class TestExtractInputFromExcelOverwriteAndEdge(unittest.TestCase):
         self.dirs = FakeDirs()
         self.dirs.tmp_dir = os.path.join(os.getcwd(), "tmp")
         self.dirs.base_dir = os.path.join(os.getcwd(), "out_base")
+        self.dirs.run_dir = os.path.join(os.getcwd(), "run_dir")
         os.makedirs(self.dirs.tmp_dir, exist_ok=True)
         os.makedirs(self.dirs.base_dir, exist_ok=True)
+        os.makedirs(self.dirs.run_dir, exist_ok=True)
 
     def tearDown(self):
         # Torna fuori prima di distruggere la TemporaryDirectory (evita lock su Windows)
         os.chdir(self.old_cwd)
 
     @patch("oriom.inputs.Input_manager.excel_to_yaml")
-    def test_local_excel_overwrites_existing_yaml(self, m_excel_to_yaml):
+    @patch("oriom.inputs.Input_manager.shutil.copy2")
+    def test_local_excel_overwrites_existing_yaml(self, m_copy2, m_excel_to_yaml):
         target_yaml = os.path.join(self.dirs.base_dir, "inputs_gen.yaml")
         with open(target_yaml, "w", encoding="utf-8") as f:
             f.write("OLD")
@@ -111,14 +114,15 @@ class TestExtractInputFromExcelOverwriteAndEdge(unittest.TestCase):
         with open(os.path.join(self.dirs.base_dir, "a.yaml"), "r", encoding="utf-8") as f:
             self.assertEqual(f.read(), "SRC_A")
 
+    @patch("oriom.inputs.Input_manager.shutil.copy2")
     @patch("oriom.inputs.Input_manager.msoffice365_sharepoint.download_file")
     @patch("oriom.inputs.Input_manager.excel_to_yaml")
-    def test_sharepoint_branch_downloads_and_converts(self, m_excel_to_yaml, m_download):
+    def test_sharepoint_branch_downloads_and_converts(self, m_excel_to_yaml, m_download, m_copy2):
         extract_input_from_excel(
             dirs=self.dirs,
             base_file_excel=True,
             sharepoint_file_path="/Share/Forms/FormA.xlsx",
-            excel_file_path=None,
+            excel_file_path=self.dirs.tmp_dir,
             form_name="FormA.xlsx",
         )
         m_download.assert_called_once()

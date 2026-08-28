@@ -108,11 +108,15 @@ def extract_input_from_excel(
                 out_dir = dirs.base_dir
         )
 
+        shutil.copy2(os.path.join(excel_file_path, form_name), os.path.join(dirs.run_dir, form_name))
+
     elif base_file_excel is False and excel_file_path is not None:
         excel_to_yaml(
                 file_excel=os.path.join(excel_file_path, form_name),
                 out_dir = dirs.base_dir
         )
+
+        shutil.copy2(os.path.join(excel_file_path, form_name), os.path.join(dirs.run_dir, form_name))
 
     elif base_file_excel is False and excel_file_path is None:
         for file_name in os.listdir(os.path.join(os.getcwd(),'tests','test_files','inputs')):
