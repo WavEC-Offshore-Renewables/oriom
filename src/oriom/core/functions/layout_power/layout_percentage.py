@@ -8,6 +8,8 @@ import numpy as np
 from oriom.core.functions.layout_power import aux_layout_power_func
 from oriom.core.functions.layout_power.corrective_location import logs_corrective_locations, choose_spec_loc_string
 from oriom.core.functions.layout_power.layout_energy_manager import shut, fix
+from oriom.utils.aux_functions import safe_getattr
+
 
 
 
@@ -137,6 +139,13 @@ def return_percentage(
     dict_locations = {}
     recommissioning = False
 
+    try:
+        operation_recover_hub = find_element_class.find_operation_stats('ofw_op_recover_hub')
+    except NameError:
+        operation_recover_hub = None
+
+    op_sched_oper_recover_hub = safe_getattr(operation_recover_hub.op_class, ['ts_data','oper_sched'])
+
     for op in operations_corrective_stat:
         if getattr(op.op_class, "tow_to_port", None) or getattr(op.op_class, "op_tow_site", None):
             tow_port_op = getattr(op.op_class, "op_tow_port", None)
@@ -169,7 +178,8 @@ def return_percentage(
                     find_element_class,
                     dict_locations,
                     op_corr_tow,
-                    op_add_tow
+                    op_add_tow,
+                    op_sched_oper_recover_hub
             )
 
             for row in rows:

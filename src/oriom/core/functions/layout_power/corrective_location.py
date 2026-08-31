@@ -2,6 +2,8 @@ import pandas as pd
 import networkx as nx
 import logging
 
+from oriom.core.functions.layout_power.manual_isolation_function import manual_isolation
+
 COLS = ['Date', 'Event', 'id', 'Comments', 'Name', 'Loc', 'Shutdown', 'Shut/Fix']
 
 RENAME_COL = {
@@ -66,7 +68,8 @@ def logs_corrective_locations(
     find_element_class,
     dict_locations: dict,
     op_corr_tow: dict,
-    op_add_tow: dict
+    op_add_tow: dict,
+    op_sched_oper_recover_hub: pd.DataFrame = None
 ) -> tuple[list, dict]:
     """
     Generate time-ordered abstract corrective events WITHOUT deciding location.
@@ -80,6 +83,7 @@ def logs_corrective_locations(
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         dict_locations (dict): Dictionary with key the failure id and value the location assigned.
+        op_sched_oper_recover_hub (pd.DataFrame): Scheduled operations for hub recovery.
     """
 
     events = []
@@ -121,18 +125,25 @@ def logs_corrective_locations(
                 "shut_fix": "shut",
                 "loc": None,
             })
-            events.append({
-                "date": r['Date'] + pd.Timedelta(days=2),
-                "event": "operation",
-                "id": 'ofw_op009',
-                "comments": 'oper_' + r['comments'],
-                "name": 'hybrid failure finding',
-                "failure_id": 'hybrid_'+ r['id'],
-                "level": level,
-                "shutdown": True,
-                "shut_fix":  "fix",
-                "loc": None,
-            })
+
+            if op_sched_oper_recover_hub is None:
+                date_end_restore = r['Date'] + pd.Timedelta(days=2)
+            else:
+                date_end_restore = manual_isolation(date_start=r['Date'], op_sched_oper_recover_hub=op_sched_oper_recover_hub)
+            
+            if date_end_restore is not None:
+                events.append({
+                    "date": date_end_restore,
+                    "event": "operation",
+                    "id": 'ofw_op009',
+                    "comments": 'oper_' + r['comments'],
+                    "name": 'hybrid failure finding',
+                    "failure_id": 'hybrid_'+ r['id'],
+                    "level": level,
+                    "shutdown": True,
+                    "shut_fix":  "fix",
+                    "loc": None,
+                })
 
             # store failure → future operations will reference this
             dict_locations['hybrid_' + r['id']] = None
