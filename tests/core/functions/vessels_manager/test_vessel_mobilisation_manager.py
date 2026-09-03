@@ -27,14 +27,22 @@ class TestCreateYearlyMobilisationMotherVessel(unittest.TestCase):
         mock_get_first_failure.return_value = "fail_001"
 
         # Fake create_mobilisation returns new rows appended
-        mock_create_mobilisation.side_effect = lambda **kwargs: kwargs["df"].append(
-            {
-                "event": "mobilisation",
-                "vessel_1": kwargs["vessel"].id,
-                "d_trigger": kwargs["end_mobi"],
-                "id": kwargs["oper_list"],
-                "comments": f"mobi_{kwargs['count_fail']}",
-            },
+        mock_create_mobilisation.side_effect = lambda **kwargs: pd.concat(
+            [
+                kwargs["df"],
+                pd.DataFrame(
+                    [
+                        {
+                            "event": "mobilisation",
+                            "vessel_1": kwargs["vessel"].id,
+                            "d_trigger": kwargs["end_mobi"],
+                            "id": kwargs["oper_list"],
+                            "comments": f"mobi_{kwargs['count_fail']}",
+                        }
+                    ],
+                    columns=kwargs["df"].columns,
+                ),
+            ],
             ignore_index=True,
         )
 
