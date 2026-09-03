@@ -196,6 +196,9 @@ def operation_consecutive_simultaneously(
         n_device_shift = 1
         crew_list.append(1)
 
+    if not crew_list:
+        crew_list.append(1)
+        
     max_crew = max(crew_list)
 
     return hours, n_device_shift, max_crew

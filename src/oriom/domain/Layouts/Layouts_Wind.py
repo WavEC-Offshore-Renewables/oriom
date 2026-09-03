@@ -327,8 +327,7 @@ class Layout_Wind():
                 onshore substation = 'shore';
                 export cable = 'exp_cable';
                 offshore substation = 'substation';
-                feeder cable = 'exp_cable_island' (offshore substation to main connector node);
-                Fishbone main connector = 'hub';
+                feeder cable = 'exp_cable_island' (offshore substation to first connector node);
                 array cable = 'array_cable' (cable between connectors);
                 Fishbone connector = 'circuit_braker';
                 interarray cable = 'dyn_cable-sub' (cable between WTG and connectors);

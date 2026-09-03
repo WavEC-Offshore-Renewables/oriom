@@ -129,7 +129,7 @@ def logs_corrective_locations(
             if op_sched_oper_recover_hub is None:
                 date_end_restore = r['Date'] + pd.Timedelta(days=2)
             else:
-                date_end_restore = manual_isolation(date_start=r['Date'], op_sched_oper_recover_hub=op_sched_oper_recover_hub)
+                date_end_restore = manual_isolation(date_start=r['Date'] + pd.Timedelta(days=2), op_sched_oper_recover_hub=op_sched_oper_recover_hub)
             
             if date_end_restore is not None:
                 events.append({

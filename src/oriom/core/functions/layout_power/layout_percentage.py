@@ -144,7 +144,7 @@ def return_percentage(
     except NameError:
         operation_recover_hub = None
 
-    op_sched_oper_recover_hub = safe_getattr(operation_recover_hub.op_class, ['ts_data','oper_sched'])
+    op_sched_oper_recover_hub = safe_getattr(operation_recover_hub, ['op_class', 'ts_data','oper_sched'])
 
     for op in operations_corrective_stat:
         if getattr(op.op_class, "tow_to_port", None) or getattr(op.op_class, "op_tow_site", None):

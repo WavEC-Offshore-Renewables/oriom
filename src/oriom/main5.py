@@ -50,25 +50,28 @@ logging.basicConfig(
 
 ### ---------- INPUTS ---------- ###
 ### Parameters hard coded to define ###
-DEFAULT_CONFIG = ConfigRun(
-    STATISTICAL_CHART=True,
-    DIFF_DISTANCE=False,
-    DIFF_KM_DISTANCE=5,
-    KM_MOTHER_VESSEL=5,
-    VESSEL_DIST_REDUCED_LIST=["ctv","sv"],
-    FUEL_TO_ADD = {},
-    MOBILISATION_TO_ADD={},
-    ENERGY_AVAILABILITY_CALCULATION=True,
-    ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="form_test_hybrid",
-    BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\Project\oriom\tests\test_files\test_end_to_end",
-    SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="form_test_hybrid.xlsx",
-    TIME_FAIL_OP_IMMEDIATELY=30*24,
-    ST = False,
-    DIRS_OVERWRITE_PATH = r''
-)
+def run_iterated(file_name):
+    DEFAULT_CONFIG = ConfigRun(
+        STATISTICAL_CHART=True,
+        DIFF_DISTANCE=False,
+        DIFF_KM_DISTANCE=5,
+        KM_MOTHER_VESSEL=5,
+        VESSEL_DIST_REDUCED_LIST=["ctv","sv"],
+        FUEL_TO_ADD = {},
+        MOBILISATION_TO_ADD={},
+        ENERGY_AVAILABILITY_CALCULATION=True,
+        ENERGY_STATISTICAL_CALCULATION=False,
+        PROJECT_NAME=file_name,
+        BASEFILES_FROM_EXCEL=False,
+        EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies\P6",
+        SOURCE_PATH_SHAREPOINT="",
+        FORM_NAME=f"{file_name}.xlsx",
+        TIME_FAIL_OP_IMMEDIATELY=30*24,
+        ST = False,
+        DIRS_OVERWRITE_PATH = r''
+    )
+
+    return DEFAULT_CONFIG
 
 
 ### ------------------------------------------------------------------ ###
@@ -80,7 +83,6 @@ def run(config: ConfigRun | None = None):
     Config = config or DEFAULT_CONFIG
 
     print(Config.FORM_NAME)
-    print()
 
     time_prefix = datetime.now().strftime("_[%Y%m%d_%H%M%S]")
 
@@ -356,4 +358,10 @@ def run(config: ConfigRun | None = None):
     return dirs
 
 if __name__ == "__main__":
-    run()
+    files = [
+        "P6_Star_Active"
+    ]
+
+    for file in files:
+        config = run_iterated(file_name=file)
+        run(config)

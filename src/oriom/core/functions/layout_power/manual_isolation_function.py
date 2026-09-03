@@ -17,7 +17,7 @@ def manual_isolation(date_start: pd.Timestamp, op_sched_oper_recover_hub: pd.Dat
 
     date_start_approx = approximate_hourly_data(date_start)
     delay = op_sched_oper_recover_hub.loc[op_sched_oper_recover_hub['datetime'] == date_start_approx, 'dur_total']
-    date_end_restore = date_start + pd.Timedelta(hours=delay.values[0]) if not delay.empty else None
+    date_end_restore = date_start + pd.Timedelta(hours=delay.values[0] - 24) if not delay.empty else None
 
     return date_end_restore
 

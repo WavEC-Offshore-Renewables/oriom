@@ -140,7 +140,6 @@ def create_logs_corrective_file(
 
             # Manage time reaction. If is scheduled in a specific month the time reaction is immediate as already prepared
             time_fail_op_immediately = time_fail_op_immediately_original if maintenance_strategy != "specific month" else 0.01
-
             #------------------------
             # TOWING PORT CREATION
             #------------------------
@@ -333,6 +332,8 @@ def create_logs_corrective_file(
             lead_mob_time = math.ceil(max(mob_time,component_lead_time))
             vessel1_id = oper.vessel1_id if not getattr(oper, 'tow_to_port', None) else None
             vessel2_id = oper.vessel2_id if not getattr(oper, 'tow_to_port', None) else None
+            if vessel1_id == 'v003':
+                time_fail_op_immediately = 24*7
 
             #------------------------
             # OPERATION CREATION
