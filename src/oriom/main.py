@@ -60,11 +60,11 @@ DEFAULT_CONFIG = ConfigRun(
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="P1_Star_Active",
+    PROJECT_NAME="TEEEEEST",
     BASEFILES_FROM_EXCEL=False,
     EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Ext-EDP-WavEC-CT DOEA - WP4 - Cost Assessment\Input definition\Case_studies\P1",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="P1_Star_Active.xlsx",
+    FORM_NAME="P1_Radial_TRIAL.xlsx",
     TIME_FAIL_OP_IMMEDIATELY=30*24,
     ST = False,
     DIRS_OVERWRITE_PATH = r''
@@ -175,7 +175,7 @@ def run(config: ConfigRun | None = None):
     for failure in failures:
         if getattr(failure, "fail_variation", False):
             failure.fail_rate *= inputs.stats.failure_ratio_sensitivity["value"]
-            logging.info(f'Failure {failure.id_} FR have been multiplied by {inputs.stats.failure_ratio_sensitivity["value"]}')
+            logging.info(f'Failure {failure.id} FR have been multiplied by {inputs.stats.failure_ratio_sensitivity["value"]}')
 
     logging.info('--------------------\tSYSTEM\t--------------------')
     #TODO oriom OOP. Code not yet used and integrated

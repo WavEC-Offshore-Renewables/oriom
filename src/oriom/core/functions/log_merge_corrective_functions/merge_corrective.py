@@ -328,7 +328,10 @@ def create_logs_merge(
         (log_event_to_merge['event'].isin(['operation'])) &
         (~comments_failure_id.isin(failure_avoid))
     )
-    log_events_oper_imm = log_event_to_merge[mask]
+    if not mask.empty:
+        log_events_oper_imm = log_event_to_merge[mask]
+    else:
+        log_events_oper_imm = pd.DataFrame()
 
     if not log_events_oper_imm.empty:
         if vessel_to_merge:

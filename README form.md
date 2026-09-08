@@ -588,15 +588,73 @@ Check the layout level of nodes and edges to know which failures and at which le
     - Other future chart for TTP operations are simply evaluated. If previous contract stipulated cover these lasts operation, the vessel will be reused (PRIVATE FUNCTIONALITIES)
 
 ## ACTIVITIES
-- More detailed are the activities and better it is, add more activities as refined as possible for long operations. One is a part of the O&M on which the work can be stopped and taken back in another day (when is decided by MAX HOUR BETWEEN ACTIVITY).
+Activities are the step that must be conducted to complete a ``Major Operation`` and will be aggregated to the corrispondent operation.
+
+
+
+More detailed are the activities and better it is, more activities are defined and longer will take ORIOM to schedule the operation. 
+
+Add more activities as refined as possible for long operations. 
+
+
 
 
 - The tech_shutdown_dur (wtg_shutdown_dur	wec_shutdown_dur	pv_shutdown_dur) must be a boolean
 
+- When considering a transit activity ``location`` must be ``"transit"``. If want to overwrite transit duration with a pre-defined vaue insert the values in ``duration``. Otherwise the duration will be evaluated by the distance to port and the vessel speed considered
 
-- If towing operation with redeploy_removal_tow and the activity must define transit to one device and another in name must be contained "transit" and "next" i.e. ACT1 name: "Transit to next device"
+- If towing operation:
+    - To consider transit with towing speed, ``location`` must be ``"transit"`` and the word ``"tow"`` must be present in the activity ``name``
+
+        Example
+        
+            id : OWT_A33_A9
+            op_type : Tow
+            op : ofw_removal_tow
+            name : Tow to port
+            location : transit
+            wtg_shutdown_dur : TRUE
+            wec_shutdown_dur : —
+            pv_shutdown_dur: —
+            duration : —
+            hs : 2.5
+            tp: —
+            ws : 30
+            ws_hub : —
+            cs : —
+            light : FALSE
+            
+    - To consider transit within one device and another in ``redeploy_removal_tow`` in ``name`` must be contained ``"transit"`` and ``"next"`` 
+
+        (Operation that bring ``device 1`` from port to site, connect the ``device 1``, move from ``device 1`` to ``device 2``, disconnect ``device 2``, bring ``device 2`` at port)
+
+        Example
+        
+            id : OWT_A33_A9
+            op_type : Tow
+            op : redeploy_removal_tow
+            name : Transit to next device
+            location : site
+            wtg_shutdown_dur : TRUE
+            wec_shutdown_dur : —
+            pv_shutdown_dur: —
+            duration : —
+            hs : 2.5
+            tp: —
+            ws : 30
+            ws_hub : —
+            cs : —
+            light : FALSE
+    
 
 - Avoid to add port activities at the end of the activities if they are not recommissioning.
+
+
+
+``(Operation_scheduler logic)``
+
+The operation can start in a timestep if all the activities can be conducted consecutively respecting the OLC defined. A maximum wait between one activity and the other can be considered with the parameter ``MAX HOUR BETWEEN ACTIVITY``. If the operation cannot be conducted respecting this rule, the next timestep will be evaluated .
+
 
 ## KPIs OUTPUT Overview
 

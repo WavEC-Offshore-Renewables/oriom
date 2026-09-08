@@ -205,7 +205,11 @@ def results_block(
             log_events_merged['d_end_stat_chart_orig'] = log_events_merged['d_end_stat_chart']
             log_events_merged['n_vessel_1_effective'] = log_events_merged['n_vessel_1']
 
-    aux_functions.save_file_csv(log_events_merged,result_dir_r,'log_events_merged.csv')
+    aux_functions.save_file_csv(
+        log_events_merged.sort_values(by=['d_trigger', 'd_end_wait_start']).reset_index(drop=True),
+        result_dir_r,
+        'log_events_merged.csv'
+    )
 
 
     logging.info('----------------------------------------------------')

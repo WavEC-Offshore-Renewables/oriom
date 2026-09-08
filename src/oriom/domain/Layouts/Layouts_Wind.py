@@ -328,7 +328,6 @@ class Layout_Wind():
                 export cable = 'exp_cable';
                 offshore substation = 'substation';
                 feeder cable = 'exp_cable_island' (offshore substation to main connector node);
-                Fishbone main connector = 'hub';
                 array cable = 'array_cable' (cable between connectors);
                 Fishbone connector = 'circuit_braker';
                 interarray cable = 'dyn_cable-sub' (cable between WTG and connectors);
@@ -702,12 +701,12 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=5,
-        n_turbines=33,
-        n_strings=6,
+        n_layout=6,
+        n_turbines=50,
+        n_strings=10,
         n_substations=1,
         n_exports=1,
-        n_string_to_connector = 1,
+        n_string_to_connector = 5,
         tow_string_shutdown = True,
         save_dir = None,
         show_plot=True
