@@ -34,6 +34,7 @@ class TestVesselDayCounter(unittest.TestCase):
         self.counter.dict_vess_long_term = {}
         self.counter.usage_records = {}
         self.counter.vessels_calendar = pd.DataFrame()
+        self.counter.first_counter = True
 
     # -------------------------------------------------------------------------
     # create_dict_vessel_contract_month
@@ -122,6 +123,60 @@ class TestVesselDayCounter(unittest.TestCase):
         # d_trigger of the campaign.
         campaign_row = out[out["event"] == "operation_deferred_merged"].iloc[0]
         self.assertEqual(campaign_row["d_trigger"], dt0)
+
+    def test_log_event_preparation_merges_campaign_operations_second_copunter(self):
+        """
+        Campaign operations (operation_deferred_merged) are reduced so that
+        only one row per campaign remains, with start taken from the earliest
+        row and non-campaign operations preserved.
+        """
+        # Columns: first three are those copied between rows in a campaign
+        dt0 = datetime(2025, 1, 1, 0, 0)
+        dt1 = datetime(2025, 1, 2, 0, 0)
+        dt2 = datetime(2025, 1, 3, 0, 0)
+        dt3 = datetime(2025, 1, 4, 0, 0)
+
+        df = pd.DataFrame(
+            {
+                "d_trigger": [dt0, dt0, dt0, dt2, dt3],
+                "d_end_leadtime": [dt0, dt0, dt0, dt2, dt3],
+                "d_end_wait_start": [dt0, dt0, dt0, dt2, dt3],
+                "d_end": [dt1, dt1, dt1, dt3, dt3],
+                "vessel_1": [None, 'v001', 'v001', 'v002', 'v001'],
+                "event": [
+                    "failure"    ,                 # failure
+                    "operation_deferred_merged",  # same campaign same vessel
+                    "operation_deferred_merged",  # same campaign same vessel
+                    "operation_deferred_merged",  # same campaign different vessel
+                    "operation",                  # normal operation
+                ],
+                "comments": ["x", "x", "x", "x", "y"],
+                "d_end_stat_chart_orig": [
+                    datetime(2025, 1, 10),
+                    datetime(2025, 1, 10),  # same key for first 2 rows
+                    datetime(2025, 1, 10), 
+                    datetime(2025, 1, 10),
+                    datetime(2025, 1, 20),
+                ],
+
+            }
+        )
+
+        self.counter.first_counter = False
+        out = self.counter.log_event_preparation(df.copy())
+
+        # We expect:
+        # - 1 merged campaign row for the 'operation_deferred_merged'
+        # - 1 row for the normal 'operation'
+        self.assertEqual(len(out), 3)
+        self.assertEqual(out["event"].tolist().count("operation_deferred_merged"), 2)
+        self.assertEqual(out["event"].tolist().count("operation"), 1)
+
+        # The remaining campaign row should have d_trigger equal to earliest
+        # d_trigger of the campaign.
+        campaign_row = out[out["event"] == "operation_deferred_merged"].iloc[0]
+        self.assertEqual(campaign_row["d_trigger"], dt0)
+
 
     # -------------------------------------------------------------------------
     # date_evaluation

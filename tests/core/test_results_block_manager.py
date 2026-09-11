@@ -123,6 +123,8 @@ class TestResultsBlock(unittest.TestCase):
 
         self.log_events_df = pd.DataFrame(
             {
+                "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
+                "d_end_wait_start": pd.to_datetime(["2025-01-01", "2025-01-02"]),
                 "event": ["operation", "recommissioning"],
                 "id": ["op1", "op2"],
                 "n_vessel_1": [1, 1],
@@ -132,6 +134,8 @@ class TestResultsBlock(unittest.TestCase):
 
         self.log_events_merged_df = pd.DataFrame(
             {
+                "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
+                "d_end_wait_start": pd.to_datetime(["2025-01-01", "2025-01-02"]),
                 "event": ["operation", "recommissioning"],
                 "id": ["op1", "op2"],
                 "n_vessel_1": [1, 1],

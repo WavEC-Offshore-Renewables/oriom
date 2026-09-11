@@ -494,6 +494,13 @@ def create_logs_corrective_file(
                 if rows_df is not None:
                     row_dates = pd.concat([row_dates, rows_df], axis=0, ignore_index=True)
             if row_mob_line is not None:
+                # Avoid multiple mobilisation of same vessel for TTP op and TTP additional operation
+                row_mob_line = (row_mob_line.sort_values(
+                        ["vessel_1", "n_vessel_1", "d_trigger"],
+                        ascending=[True, False, True],
+                        kind="stable"
+                    ).drop_duplicates("vessel_1", keep="first")
+                )
                 # Overwrite d_end in first mobilisation line with end wait of weather for operation for future mobilisation reduction (KPI_FINAL_COSTS)
                 row_mob_line.loc[0, 'd_end'] = date_end_wait_start
                 row_dates = pd.concat([row_dates, row_mob_line], axis=0, ignore_index=True)

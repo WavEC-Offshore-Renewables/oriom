@@ -144,7 +144,10 @@ def results_block(
         logging.info('Uploading Log events merged file from previous folder')
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
-        vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+        if Config.STATISTICAL_CHART:
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False)
+        else:
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
         log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
 
     except (TypeError, FileNotFoundError) as e_:
@@ -197,7 +200,7 @@ def results_block(
                 )
  
             # Recreate the usage_record considering the reused vessels
-            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False)
             _ = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged)
 
         else:
@@ -206,7 +209,7 @@ def results_block(
             log_events_merged['n_vessel_1_effective'] = log_events_merged['n_vessel_1']
 
     aux_functions.save_file_csv(
-        log_events_merged.sort_values(by=['d_trigger', 'd_end_wait_start']).reset_index(drop=True),
+        log_events_merged.sort_values(by=['d_trigger', 'd_end_wait_start'], na_position="first").reset_index(drop=True),
         result_dir_r,
         'log_events_merged.csv'
     )

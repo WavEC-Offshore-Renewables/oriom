@@ -1,6 +1,4 @@
 import logging
-import math
-import os
 import pandas as pd
 from datetime import timedelta, datetime
 from copy import deepcopy
@@ -10,7 +8,6 @@ from oriom.utils.read_dataframe_value import approximate_hourly_data
 from oriom.core.functions.logs_timeseries import logs_preventive_aux
 from oriom.core.functions.logs_timeseries.logs_corrective_aux import  compute_operation_datetimes, _check_index_row_validity
 from oriom.core.functions.logs_timeseries.logs_timeseries_func import create_mobilisation
-from oriom.core.functions.log_merge_corrective_functions import merged_deferred_aux
 
 
 class OperationDeferredPortCreation():
@@ -36,9 +33,14 @@ class OperationDeferredPortCreation():
         dict_oper_sched (dict): Dictionary containing oper_sched for towing op
         dict_oper_last_idx(dict): Dictionary containing last_valid_index for towing op
         actual_df_port_inspection_log (pd.DataFrame): log_events created of deferred tow
+        vessels (dict): Dictionary of vessel_1 used
+        vessels_2 (dict): Dictionary of vessel_2 used
         vessel_available (dict): Dictionary of vessels number available
         vessels_mobilidated (dict): Dictionary of vessels number mobilitated per each campaign
+        vessels_mobilidated_per_device (dict): Dictionary of vessels number mobilitated per each campaign for each device operated
         find_element_class (object) callable used to find objects.
+        n_device (int): Index (1-based) of the device being processed.
+        period (: pd.Period): Period of the deferred campaign
 
 
         NOTE:
@@ -69,15 +71,18 @@ class OperationDeferredPortCreation():
         self.oper_dict_tow = oper_dict_tow
         self.n_device_at_port = next(iter(oper_port_dict.values())).n_device_at_port
         self.n_device_stored_at_port = next(iter(oper_port_dict.values())).n_device_stored_at_port
-        self.vessels = {oper.vessel1_id : oper.vessel1 for oper in self.oper_dict_tow.values() if oper.vessel1_id is not None}
-        self.vessels_per_op = {oper.vessel1_id : oper.vessel1 for oper in self.oper_dict_tow.values() if oper.vessel1_id is not None}
+        self.vessels = {o.vessel1_id : o.vessel1 for o in self.oper_dict_tow.values() if o.vessel1_id is not None}
+        self.vessels_2 = {o.vessel2_id : o.vessel2 for o in self.oper_dict_tow.values() if o.vessel2_id is not None}
+        self.vessels_per_op = {o.vessel1_id : o.vessel1 for o in self.oper_dict_tow.values() if o.vessel1_id is not None}
+        self.vessels_per_op_2 = {o.vessel2_id : o.vessel2 for o in self.oper_dict_tow.values() if o.vessel2_id is not None}
         self.oper_port = None
+        self.n_device = 0
 
         self.reset_data_period()
 
         self.operation_completed, self.reuse_logs = True, True
         
-        self.vessel_available = {v.id: v.n_vessels for v in self.vessels.values()}
+        self.vessel_available = {v.id: v.n_vessels for v in list(self.vessels.values())+list(self.vessels_2.values())}
 
         # Building dict opeartions
         for oper_port in oper_port_dict.values():
@@ -101,14 +106,19 @@ class OperationDeferredPortCreation():
                     self.dict_oper_stat[op_add.id] = find_element_class.find_operation_stats(op_add.id)
 
 
-    def reset_data_period(self):
-        """ Reset the dictionaries for a new period"""
+    def reset_data_period(self, period = None):
+        """ Reset the dictionaries for a new period
+        Args:
+            period (pd.Period): Period of the campaign under analysis. Default to None
+        """
         self.dev_idx_station_port = 0
         self.tow_at_port_date = {v.id: {} for v in self.vessels.values()}
         self.tow_at_site_date = {v.id: {} for v in self.vessels.values()}
         self.oper_at_port_date = {}
-        self.vessels_mobilitated = {v.id: 0 for v in self.vessels.values()}
+        self.vessels_mobilitated = {v.id: 0 for v in list(self.vessels.values()) + list(self.vessels_2.values())}
+        self.vessels_mobilitated_per_device = {v.id: {} for v in list(self.vessels.values()) + list(self.vessels_2.values())}
         self.reuse_logs = True
+        self.period = period
 
 
     def write_event_row(self, row_dates_tow):
@@ -129,10 +139,12 @@ class OperationDeferredPortCreation():
         idx_oper_sched: int,
         last_valid_idx: int,
         row: pd.Series,
-        period: pd.Period
     ):
         """
         Verify and resolve overlaps between a proposed towing interval and existing tow intervals.
+
+        NOTE: 
+            Operated only for Vessel_1 
 
         Take the operation under analysis and the dict_towing operations presents,
         If overlaps are found that would exceed the number of available vessels/devices at port
@@ -148,7 +160,6 @@ class OperationDeferredPortCreation():
             idx_oper_sched(int): Index of the datetime at wich op start for oper_schedule.
             last_valid_idx (int): Int of the last valid index of oper_schedule simbolizing last op possible.
             row (: pd.Series): row of the df_log original.
-            period (: pd.Period): Period of the deferred campaign
 
         Returns:
             pd.DataFrame
@@ -211,14 +222,12 @@ class OperationDeferredPortCreation():
             True,
             False,
             False,
-            period
+            self.period
         ]],columns=self.df_port_oper_def_log.columns)
 
     def tow_to_port(
         self,
         row: pd.Series,
-        device_n: int,
-        period: pd.Period,
         same_vessel: bool,
         date_start_op: datetime = None
     ):
@@ -231,8 +240,6 @@ class OperationDeferredPortCreation():
 
         Args:
             row (: pd.Series): row of the df_log simbolizing an operation
-            device_n (int): Index (1-based) of the device being processed.
-            period (: pd.Period): Period of the deferred campaign
             same_vessel (bool): Boolean to consider same vessel for Towing and additional op
             date_start_op (:datetime): Candidate datetime for starting the operations.
                 (*optional*) Default to None
@@ -250,8 +257,8 @@ class OperationDeferredPortCreation():
         diff = 1
 
         # If the spots are free to the port take tow to port oper_schedule
-        if device_n == 1 or vessel_used_qt*device_n <= self.vessel_available[vessel_used]:
-            self.dev_idx_station_port = device_n
+        if self.n_device == 1 or vessel_used_qt*self.n_device <= self.vessel_available[vessel_used]:
+            self.dev_idx_station_port = self.n_device
             row_dates_tow = row.to_frame().T
         else:
             self.reuse_logs = False
@@ -299,7 +306,6 @@ class OperationDeferredPortCreation():
                 idx_oper_sched = idx_oper_sched,
                 last_valid_idx = self.dict_oper_last_idx[id_row],
                 row = row,
-                period = period
             )
             if row_dates_tow.empty:
                 self.operation_completed = False
@@ -318,26 +324,22 @@ class OperationDeferredPortCreation():
     def operation_at_port(
         self,
         row: pd.Series,
-        device_n: int,
-        date_start_op: datetime,
-        period: pd.Period
+        date_start_op: pd.Period
     ):
         """
         Code to inspect the device at port, return the date of event for device operated at port
 
         Args:
             row (: pd.Series): row of the df_log.
-            device_n (int): Index (1-based) of the device being processed.
             date_start_op (:datetime): Candidate datetime for starting the operations.
-            period (: pd.Period): Period of the deferred campaign
 
         Returns
             pd.DataFrame
                 updated event to a non-overlapping interval, or
                 empty DataFrame if a schedule could not be obtained from op_schedule.
         """
-        if device_n == 1:
-            self.dev_idx_station_port = device_n
+        if self.n_device == 1:
+            self.dev_idx_station_port = self.n_device
             row_dates_tow = row.to_frame().T
 
         else:
@@ -380,7 +382,7 @@ class OperationDeferredPortCreation():
                 row['shutdown'],
                 False,
                 False,
-                period
+                self.period
             ]],columns=self.df_port_oper_def_log.columns)
         
         self.oper_at_port_date[self.dev_idx_station_port] = row_dates_tow['d_end'].iloc[0], row_dates_tow['d_end_wait_start'].iloc[0]
@@ -391,10 +393,8 @@ class OperationDeferredPortCreation():
     def tow_to_site(
         self,
         row: pd.Series,
-        device_n: int,
         tts: bool,
         date_start_op: datetime,
-        period: pd.Period,
         same_vessel: bool
     ):
         """
@@ -402,10 +402,8 @@ class OperationDeferredPortCreation():
 
         Args:
             row (: pd.Series): row of the df_log simbolizing an operation
-            device_n (int): Index (1-based) of the device being processed.
             tts (: bool): Boolean that flag if is additional op or TTS operation
             date_start_op (:datetime): Candidate datetime for starting the operations.
-            period (: pd.Period): Period of the deferred campaign
             same_vessel (bool): Boolean to consider same vessel for Towing and additional op
 
         Returns
@@ -418,7 +416,7 @@ class OperationDeferredPortCreation():
         id_row = row['id']
 
         if self.reuse_logs:
-            self.dev_idx_station_port = device_n
+            self.dev_idx_station_port = self.n_device
             row_dates_tow = row.to_frame().T
         else:
             if tts:
@@ -463,7 +461,6 @@ class OperationDeferredPortCreation():
                     idx_oper_sched = idx_oper_sched,
                     last_valid_idx = oper_last_valid_idx,
                     row = row,
-                    period = period
                 )
 
             if row_dates_tow.empty:
@@ -502,6 +499,62 @@ class OperationDeferredPortCreation():
             n_vessel = n_vess
         )
         return row_mobi
+
+    
+    def mobilitate_manager(
+        self, 
+        row: pd.Series, 
+        vessel_: str, 
+        n_vessel: int, 
+        time_fail_op_immediately: float, 
+    ):
+        """
+        Method to manage creation of mobilisation of vessel. 
+        Evaluate if:
+            - A mobilisation is required
+            - Maximum number of vessels are already mobilised
+
+        Args:
+            row (pd.Series): Series of the dataframe under analysis.
+            vessel_ (str): String to define if vessel_1 or vessel_2 mobilisation.
+            n_vessel (str): String to define if n_vessel_1 or n_vessel_2 is analysed.
+            time_fail_op_immediately (float): Reaction time considered.
+        """
+        vessel_id = row[vessel_]
+        requested_vessels = row[n_vessel]
+
+        if vessel_id is None or pd.isna(vessel_id):
+            return
+        if requested_vessels is None or pd.isna(requested_vessels) or requested_vessels <= 0:
+            return
+
+        try:
+            vessel = self.vessels[vessel_id]
+        except KeyError:
+            vessel = self.vessels_2.get(vessel_id)
+
+        if vessel is None or vessel.mobilisation_time == 0 or row["id"] == self.oper_port.id:
+            return
+
+        total_already_mobilitated = self.vessels_mobilitated.get(vessel.id, 0)
+        available_vessels = self.vessel_available[vessel.id]
+        device_already_mobilitated = self.vessels_mobilitated_per_device[vessel.id].get(self.n_device, 0)
+
+        required_for_this_device = max(0, requested_vessels - device_already_mobilitated)
+        available_for_campaign = max(0, available_vessels - total_already_mobilitated)
+        n_vessel_mobilitate = min(required_for_this_device, available_for_campaign)
+
+        if n_vessel_mobilitate > 0:
+            row_mobi = self.create_mobi(
+                row=row[:-1],
+                time_fail_op_immediately=time_fail_op_immediately,
+                vessel=vessel,
+                n_vess=n_vessel_mobilitate,
+            )
+            self.vessels_mobilitated[vessel.id] += n_vessel_mobilitate
+            self.vessels_mobilitated_per_device[vessel.id][self.n_device] = (device_already_mobilitated + n_vessel_mobilitate)
+            row_mobi["year_month"] = self.period
+            self.write_event_row(row_mobi)
 
 
     def add_recommission(
@@ -566,10 +619,11 @@ class OperationDeferredPortCreation():
         # For each period of deferred campaign
         for period, df_group in self.log_events_tow_def.groupby('year_month', sort=False):
             failures_to_correct = {c.split('_', 1)[1] for c in df_group['comments'] if '_' in c}
-            self.reset_data_period()
+            self.reset_data_period(period = period)
 
             # For each failure to correct associated to an operation needed
             for n_device, failure in enumerate(failures_to_correct, start = 1):
+                self.n_device = n_device
                 fail_obj = self.find_element_class.find_failure_from_id(failure.split('.')[0])
                 self.oper_port = self.find_element_class.find_operation(fail_obj.operation_triggered)
                 row_dates_tow_recom = pd.DataFrame()
@@ -584,9 +638,7 @@ class OperationDeferredPortCreation():
                     if row['id'] in self.oper_port_dict:
                         row_dates_tow = self.operation_at_port(
                             row = row, 
-                            device_n = n_device,
                             date_start_op = row_dates_tow['d_end'].iloc[0],
-                            period = period
                         )
                         ttp = False
 
@@ -598,16 +650,22 @@ class OperationDeferredPortCreation():
                                 vessel_TTP = row['vessel_1']
                             else:
                                 date_start_op = None
-                            vessel_add_op = row['vessel_1']
+                                vessel_add_op = row['vessel_1']
                         else:
                             date_start_op = None
         
                         # Check if TTP use same vessel of additional operation
-                        if vessel_add_op:
-                            if vessel_add_op == vessel_TTP:
-                                same_vessel_TTP_add_op = True
+                        same_vessel_TTP_add_op = (
+                            vessel_add_op is not None
+                            and vessel_TTP is not None
+                            and vessel_add_op == vessel_TTP
+                        )
 
-                        row_dates_tow, write_event = self.tow_to_port(row, n_device, period, same_vessel_TTP_add_op, date_start_op)
+                        row_dates_tow, write_event = self.tow_to_port(
+                            row = row, 
+                            same_vessel = same_vessel_TTP_add_op, 
+                            date_start_op = date_start_op
+                        )
 
                     ## Tow the device to site ##
                     else:
@@ -618,10 +676,8 @@ class OperationDeferredPortCreation():
                             vessel_TTS = row['vessel_1']
                         row_dates_tow = self.tow_to_site(
                             row = row, 
-                            device_n = n_device,
                             tts = tts,
                             date_start_op = row_dates_tow['d_end'].iloc[0],
-                            period = period,
                             same_vessel = same_vessel_TTS_add_op
                         )
 
@@ -643,24 +699,15 @@ class OperationDeferredPortCreation():
                         self.write_event_row(row_dates_tow)
                         if not row_dates_tow_recom.empty:
                             self.write_event_row(row_dates_tow_recom)
-                        # Mobilitate vessel only on towing to port, vessel wait the operation to be completed at port
-                        if n_device == 1 and ttp:
-                            vessel = self.vessels[row['vessel_1']]
-                            if vessel.mobilisation_time !=0 and row['id'] != self.oper_port.id:
-                                n_vessel_mobilitate = row['n_vessel_1']
-                                if vessel.id in self.vessels_mobilitated and row['n_vessel_1'] > self.vessels_mobilitated[vessel.id]:
-                                    n_vessel_mobilitate = row['n_vessel_1'] - self.vessels_mobilitated[vessel.id]
-                                if n_vessel_mobilitate > 0:
-                                    # Mobilitate only if not already mobilitated
-                                    row_mobi = self.create_mobi(
-                                        row = row[:-1],
-                                        time_fail_op_immediately = time_fail_op_immediately,
-                                        vessel = vessel,
-                                        n_vess = n_vessel_mobilitate
-                                    )
-                                    self.vessels_mobilitated[vessel.id] += n_vessel_mobilitate
-                                    row_mobi['year_month'] = period
-                                    self.write_event_row(row_mobi)
+                        # Mobilitate vessel only on towing to port until reached max nº vessel considered, vessel not demobilised till TTP completed
+                        for vessel_, n_vessel in zip(['vessel_1', 'vessel_2'], ['n_vessel_1', 'n_vessel_2']):
+                            if ttp:
+                                self.mobilitate_manager(
+                                    row = row, 
+                                    vessel_ = vessel_, 
+                                    n_vessel = n_vessel,
+                                    time_fail_op_immediately = time_fail_op_immediately,
+                                )
 
                 if not self.operation_completed:
                     break
