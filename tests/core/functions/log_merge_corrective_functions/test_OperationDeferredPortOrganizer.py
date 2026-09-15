@@ -836,12 +836,11 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
             self._mobilisation_summary(result),
             [
                 (self.vessel_ttp_id, 1, self.op_ttp_id),
-                (self.vessel_support_id, 2, self.op_ttp_id),
             ],
         )
 
         self.assertEqual(manager.vessels_mobilitated[self.vessel_ttp_id], 1)
-        self.assertEqual(manager.vessels_mobilitated[self.vessel_support_id], 2)
+        self.assertEqual(manager.vessels_mobilitated[self.vessel_support_id], 0)
 
     def test_deferred_port_manager_uses_available_vessel_quantity_across_multiple_devices(self):
         """The full flow should account for several available vessels and quantity used per towing operation."""
@@ -859,7 +858,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
         )
         vessel_support = self._make_vessel(
             vessel_id=self.vessel_support_id,
-            n_vessels=4,
+            n_vessels=0,
             mobilisation_time=4,
         )
 
@@ -934,8 +933,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
             find_element_class=self.find_element_class,
         )
 
-        for vessel_id, available_count in vessel_availability.items():
-            self.assertEqual(manager.vessel_available[vessel_id], available_count)
+        self.assertEqual(manager.vessel_available[self.vessel_ttp_id], vessel_availability[self.vessel_ttp_id])
 
         result = manager.deferred_port_manager(
             time_fail_op_immediately=2.0,

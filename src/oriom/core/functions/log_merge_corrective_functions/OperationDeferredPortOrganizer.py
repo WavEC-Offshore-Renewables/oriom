@@ -700,7 +700,7 @@ class OperationDeferredPortCreation():
                         if not row_dates_tow_recom.empty:
                             self.write_event_row(row_dates_tow_recom)
                         # Mobilitate vessel only on towing to port until reached max nº vessel considered, vessel not demobilised till TTP completed
-                        for vessel_, n_vessel in zip(['vessel_1', 'vessel_2'], ['n_vessel_1', 'n_vessel_2']):
+                        for vessel_, n_vessel in zip(['vessel_1'], ['n_vessel_1']):
                             if ttp:
                                 self.mobilitate_manager(
                                     row = row, 
