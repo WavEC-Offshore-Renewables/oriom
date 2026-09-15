@@ -3,6 +3,7 @@ import logging
 import os
 
 from oriom.utils import aux_functions
+from oriom.common.constants import EVENT_LOG_ORDER
 
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.vessels_manager import vessel_mobilisation_manager
@@ -208,11 +209,21 @@ def results_block(
             log_events_merged['d_end_stat_chart_orig'] = log_events_merged['d_end_stat_chart']
             log_events_merged['n_vessel_1_effective'] = log_events_merged['n_vessel_1']
 
-    aux_functions.save_file_csv(
-        log_events_merged.sort_values(by=['d_trigger', 'd_end_wait_start'], na_position="first").reset_index(drop=True),
-        result_dir_r,
-        'log_events_merged.csv'
-    )
+        log_events_merged = vessel_mobilisation_manager.mobilitate_second_vessel(
+            log_events_merged = log_events_merged,
+            find_element_class = find_element,
+            operations_tow = operations_tow_stats
+        )
+
+    # Reorder and save log events merged
+    log_events_merged["_event_order"] = (log_events_merged["event"].map(EVENT_LOG_ORDER).fillna(99))
+    log_events_merged = (
+        log_events_merged.sort_values(
+            by=["d_trigger", "d_end_wait_start", "_event_order"],
+            na_position="first"
+        ).drop(columns="_event_order").reset_index(drop=True))
+
+    aux_functions.save_file_csv(log_events_merged, result_dir_r, 'log_events_merged.csv')
 
 
     logging.info('----------------------------------------------------')

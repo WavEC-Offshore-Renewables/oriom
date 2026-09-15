@@ -264,7 +264,10 @@ class TestResultsBlock(unittest.TestCase):
         with patch(
             "oriom.core.results_block_manager.manage_def_to_log_events",
             return_value=self.log_events_df.copy(),
-        ) as mock_manage_def_to_log_events:
+        ) as mock_manage_def_to_log_events, patch(
+            "oriom.core.results_block_manager.vessel_mobilisation_manager.mobilitate_second_vessel",
+            side_effect=lambda log_events_merged, find_element_class, operations_tow: log_events_merged,
+        ) as mock_mobilitate_second_vessel:
             results_block(
                 result_dir_r=self.result_dir,
                 r=self.run_index,
