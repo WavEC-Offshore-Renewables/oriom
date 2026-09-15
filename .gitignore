@@ -115,3 +115,7 @@ KPI_Insight.py
 check_files.py
 VesselMobilisationScheduler.py
 user_inputs.py
+
+# Test payloads and downloaded results
+*.zip
+*.json
