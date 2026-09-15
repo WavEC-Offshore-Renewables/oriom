@@ -1,0 +1,9 @@
+.git
+.github
+docs
+tmp
+export_pack
+**/__pycache__
+*.pyc
+.DS_Store
+src/oriom.egg-info

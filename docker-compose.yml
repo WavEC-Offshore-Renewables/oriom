@@ -1,0 +1,25 @@
+services:
+  oriom-api:
+    build: .
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+    environment:
+      ORIOM_FAST_TEST: "1"        # full test run in 1 min
+      # ORIOM_POLL_SECONDS: "3"   # dispatcher loop interval
+      # ORIOM_MAX_RUNNING: "4"    # parallel simulations
+      # ORIOM_KEEP_DAYS: "7"      # uncollected results kept this long
+
+    volumes:
+      - oriom-tmp:/app/tmp
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  oriom-tmp:
