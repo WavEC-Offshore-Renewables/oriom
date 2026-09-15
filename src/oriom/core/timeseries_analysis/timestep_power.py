@@ -5,9 +5,9 @@ import numpy as np
 import os
 
 # Import classes
-from oriom.classes import Metocean
-from oriom.classes.Techs.Power import Curve as PowerCurve
-from oriom.classes.Techs.Power import Matrix
+from oriom.domain import Metocean
+from oriom.domain.Techs.Power import Curve as PowerCurve
+from oriom.domain.Techs.Power import Matrix
 
 
 def apply_power_loss(

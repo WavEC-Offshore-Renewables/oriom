@@ -1,18 +1,46 @@
 # READ ME
 
+**TO USE PRIVATE FUNCTION THE ``PRIVATE MODULES`` MUST BE LOCATED IN**
+
+        oriom\
+           |
+           domain\
+           core\
+              |
+              functions\
+                 |
+                 private\
+                    |
+                    private_module_1.py
+                    private_module_2.py
+            inputs\
+
+The ``Private modules`` will consent to:
+- Reuse old simulation
+- Evaluate Vessel statistical chart time, vessel reutilization and contract expiration
+- ST O&M with forecast API
+- Additional KPI of vessel available
+
+If no ``Private modules`` are available, the simulation will simply not take into consideration the above funcionalities
+
 ## Excel Input General informations
 
 This file give informations and assist the user to better understand how to compile the input excel form file for ORIOM.
 
 Informations are divided for each sheet of the excel form
+---------------------------------------
 
-
-# INSTALLATION MODE
+# ⚙️**INSTALLATION MODE**
 
 To use ORIOM in **Installation Mode**, the workflow is based on:
 
-- creation of pre-existing failures representing installation demand
-- execution through deferred corrective (installation) operations
+- creation of pre-existing failures representing installation demand and reuse such failure in the simulation
+
+        
+- execution through deferred corrective (installation) operations that creates installation campaign with same starting month
+- Manage order of installation using ``preferred_day`` in *Failure* attribute
+- Deactivate ``ENERGY_AVAILABILITY_CALCULATION`` from *Config* attribure
+
 
 Each failure corresponds to a **component to be installed** or an **installation campaign**, depending on the chosen configuration.
 
@@ -25,6 +53,24 @@ The installation process is modeled as follows:
    - Each failure represents a component that must be installed.
    - The number of failures corresponds to the number of devices to install (or grouped campaigns).
 
+    Example of failure creation:
+
+    Two years of campaign with 2 differed opeartion installation, 3 type of components to install (represented as failure)
+
+        datetime	    |id	                |maintenance_strategy	|operation_triggered	|preferred_month
+        1/1/2006 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+        1/1/2006 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2006 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+        1/1/2007 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+        1/1/2007 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2007 9:00	|ofw_fail_type_1	|specific month	        |ofw_op002	            |6
+        1/1/2007 9:00	|ofw_fail_type_2	|specific month	        |ofw_op002	            |6
+        1/1/2007 9:00	|ofw_fail_type_3	|specific month	        |ofw_op003	            |6
+
 2. **Deferred operations**
    - Each failure is resolved through an installation operation.
    - The operation defines the installation activity and scheduling.
@@ -33,7 +79,9 @@ The installation process is modeled as follows:
    - Failures are deferred to specific months.
    - Installation is executed progressively according to the defined campaign strategy.
 
-## ⚙️ Installation Strategies
+   **SEE INSTALLATION STRATEGY**
+
+## Installation Strategies
 
 ### a) Example A — Single Device per Trip
 
@@ -111,10 +159,8 @@ The installation process is modeled as follows:
     - ensure sequential execution on consecutive days
     
     - complete the installation campaign without loss of remaining units
-
-
-# 🔧 O&M MODE
-
+---------------------------------------
+# 🔧 **O&M MODE**
 
 ## HARD CODED PARAMETERS
 
@@ -133,10 +179,33 @@ The installation process is modeled as follows:
 
     - **mobilisation to add**: Dictionary of vessel id and **YEARLT MOBILISATION COST** to add. The cost will be added only at the averaged results
 
+    - **TIME_FAIL_OP_IMMEDIATELY**: This value set a reaction time between a failure and the correspondent operation to plan. To be set in **HOURS**. Works only for IMMEDIATE CORRECTION
+
+
+## PRIVATE FUNCTIONS
+To use Private functions:
+
+Copy and paste the folder with the private modules inside:
+
+        .\oriom\src\core\functions\private
+
+If private functions are not found it will not be possible:
+- Consider statistical chart duration of the vessels and recall-reuse mobilitated vessels
+- Reuse previous simulations. All data must be recalculated
+- Reduced KPI Vessels Insight
+- It will not be available to use ORIOM as ShortTerm O&M Simulator
+
 ## GEN_INPUTS
-
-
 - **Use previous run directory**: Insert the path of the previous directory to reuse
+    
+    If reuse a old simulation, remove from the reuse folder the file to integrate eventuale changes in the files:
+
+        inputs_gen
+        inputs_stats
+        inputs_tseries
+        inputs_cost
+        wtg
+        timeseries
 
 - **Use previous TimeSeries Analysis**: Clarify if reuse the past timeseries analysis (T/F)
 
@@ -169,6 +238,16 @@ The installation process is modeled as follows:
         Example:
         Merge operation vessel: ctv, sov, juv
 
+- **Metocean files**:
+    Metocean files must have the following columns:
+
+            datetime: timestep in DD%MM%YYYY : HH:MM:SS
+            hs: Significant Wave variable of the timestep in [m]
+            tp: Peak Period variable of the timestep in [s]
+            ws: Wind speed variable of the timestep [m/s]
+            cs: Current speed variable of the timestep in [m/s]
+            
+
 
 - **Additional Metocean tow file**:
 
@@ -183,11 +262,11 @@ The installation process is modeled as follows:
     
     -    **Wake energy losses**:
 
-            This parameter should point to the csv file that define wake energy losses. Wind speed must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1. If not defined, no wake losses will be considered.
+            This parameter should point to the csv file that define wake energy losses. Wind speed must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1 and must define the amount of percentage of loss. If not defined, no wake losses will be considered.
 
     -    **Electric energy losses**:
 
-            This parameter should point to the csv file that define electric energy losses. Power production must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1. If not defined, no electric losses will be considered.
+            This parameter should point to the csv file that define electric energy losses. Power production must be the influencing variable, Power losses values of system must be defined as percentage from 0 to 1 and must define the amount of percentage of loss. If not defined, no electric losses will be considered.
 
 
 ## SA_inputs
@@ -213,6 +292,14 @@ The installation process is modeled as follows:
             .
 
     - The case on which a nÂº of pv module fail in the same string and cause a string shutdown is not considered in the energy availability. Anyway if it happens it is seen in the logging file. There it say how many time it happen in the lifetime of the farm
+
+## LAYOUT
+
+Create documentation to check which layout are availables
+
+- **Layout_string_disconnection**:
+Does not allow for electrical continuity on the array if a device is TOWED. If set to True, a tow device do disconnect all the consecutive devices.
+
 
 ## VESSEL
 
@@ -275,7 +362,8 @@ Check the layout level of nodes and edges to know which failures and at which le
 
 - **number_of_element_farm**: Is the number of element present that will be affected by the failure
 
-- **level_failure**: Is the level of the component that is failing. Levels are connected to the layout choosen of the technology. Important for energy calculations
+- **level_failure**: Is the level of the component that is failing. Levels are connected to the layout choosen of the technology. Important for energy calculations.
+
 
 - **probability_failure**: Is the failure rate expressed in failure/year
 
@@ -287,7 +375,12 @@ Check the layout level of nodes and edges to know which failures and at which le
 
 - **perc_shutdown**: Indicates the probability that a failure will lead to a shutdown of a component (if 10% one failure each 10 will lead to a shutdown)
 
-- **Name**: In FOPV the layout is setted with inverter resolution. To count failure on "device" or "string" level add "_device" and "_string" in the name of the failure to consider them. The level must be 'device' and 'array_cable' relatively. Event if the layout 4 of OPV do not take into consideration these levels, the availability algorithm will acocunt the reduction of the availability due to solar module and string failure. An eccess of module broken in a single line will cause a shutdown of the entire line
+⚠️  **SPECIFIC USE OF FAILURES**
+- **Name**: 
+    -   In FOPV the layout is setted with inverter resolution. To count failure on "device" or "string" level add "_device" and "_string" in the name of the failure to consider them. The level must be 'device' and 'array_cable' relatively. Event if the layout 4 of OPV do not take into consideration these levels, the availability algorithm will acocunt the reduction of the availability due to solar module and string failure. An eccess of module broken in a single line will cause a shutdown of the entire line
+
+- **level_failure**: 
+    - For failure regarding last device of the string it could require specific different operation specially regarding towing operation with additional operation. If so such specific additional operation must be defined in ``Operation Major``
 
 ## ALL OPERATIONS (INSPECTION & CORRECTION)
 
@@ -425,6 +518,17 @@ Check the layout level of nodes and edges to know which failures and at which le
 
     creates an operation required before the tow operation (if removal) or after (if redeploy) to disconnect full string
 
+    - The additional operation must be defined in ``Operation Major``. 
+    
+        ⚠️ For last device of the string could reqiured a shorter operation due to a reduce amout of cable to disconnect. Such reduced operation must be defined in ``Operation Major`` **WITH THE SAME ID of the normal operation + '_last_string_device'**
+
+        Example:
+
+                Normal cable disconnection: id = ´´ofw_mj1´´
+                Last device cable disconnection: id = ´´ofw_mj1_last_string_device´´
+
+        Such use will be managed by the Failure object that should have as level_failure == ``last_string_device``
+
 - String disconnection: <br>
 
     If additional operations is present and disconnection = TRUE, shutdown the entire string of the device that is towed for the whole duration of the additional operation
@@ -435,20 +539,21 @@ Check the layout level of nodes and edges to know which failures and at which le
 
         Example "RECOMMISSION ACTIVITY" in last TTS additional operation:
 
-        id	OWT_MJ2_8
-        op_type	CorrectiveMajor
-        op	ofw_MJ2
-        name	Recommissioning
-        location	port
+        DESCR             VALUES
+        id	            OWT_MJ2_8
+        op_type	        CorrectiveMajor
+        op	            ofw_MJ2
+        name	            Recommissioning
+        location	        port
         wtg_shutdown_dur	TRUE
-        duration	24
-        hs	3
+        duration	        24
+        hs	            3
 
 - Combination available for TTP 
 
     To use recommissioning or string disconnection it must be present an additional operation
 
-    additional_operation = A, string_disconnection = B,  Layout_string_disconnection = C, Recommissioning = D
+    additional_operation = A, string_disconnection = B,  Layout_string_disconnection = C (if a device TOWED no electrical continuity), Recommissioning = D
     
     
            A      B      C      D
@@ -483,13 +588,73 @@ Check the layout level of nodes and edges to know which failures and at which le
     - Other future chart for TTP operations are simply evaluated. If previous contract stipulated cover these lasts operation, the vessel will be reused (PRIVATE FUNCTIONALITIES)
 
 ## ACTIVITIES
-- More detailed are the activities and better it is, add more activities as refined as possible for long operations. One is a part of the O&M on which the work can be stopped and taken back in another day (when is decided by MAX HOUR BETWEEN ACTIVITY).
+Activities are the step that must be conducted to complete a ``Major Operation`` and will be aggregated to the corrispondent operation.
+
+
+
+More detailed are the activities and better it is, more activities are defined and longer will take ORIOM to schedule the operation. 
+
+Add more activities as refined as possible for long operations. 
+
+
 
 
 - The tech_shutdown_dur (wtg_shutdown_dur	wec_shutdown_dur	pv_shutdown_dur) must be a boolean
 
+- When considering a transit activity ``location`` must be ``"transit"``. If want to overwrite transit duration with a pre-defined vaue insert the values in ``duration``. Otherwise the duration will be evaluated by the distance to port and the vessel speed considered
 
-- If towing operation with redeply_removal_tow and the activity must define transit to one device and another in name must be contained "transit" and "next" i.e. ACT1 name: "Transit to next device"
+- If towing operation:
+    - To consider transit with towing speed, ``location`` must be ``"transit"`` and the word ``"tow"`` must be present in the activity ``name``
+
+        Example
+        
+            id : OWT_A33_A9
+            op_type : Tow
+            op : ofw_removal_tow
+            name : Tow to port
+            location : transit
+            wtg_shutdown_dur : TRUE
+            wec_shutdown_dur : —
+            pv_shutdown_dur: —
+            duration : —
+            hs : 2.5
+            tp: —
+            ws : 30
+            ws_hub : —
+            cs : —
+            light : FALSE
+            
+    - To consider transit within one device and another in ``redeploy_removal_tow`` in ``name`` must be contained ``"transit"`` and ``"next"`` 
+
+        (Operation that bring ``device 1`` from port to site, connect the ``device 1``, move from ``device 1`` to ``device 2``, disconnect ``device 2``, bring ``device 2`` at port)
+
+        Example
+        
+            id : OWT_A33_A9
+            op_type : Tow
+            op : redeploy_removal_tow
+            name : Transit to next device
+            location : site
+            wtg_shutdown_dur : TRUE
+            wec_shutdown_dur : —
+            pv_shutdown_dur: —
+            duration : —
+            hs : 2.5
+            tp: —
+            ws : 30
+            ws_hub : —
+            cs : —
+            light : FALSE
+    
+
+- Avoid to add port activities at the end of the activities if they are not recommissioning.
+
+
+
+``(Operation_scheduler logic)``
+
+The operation can start in a timestep if all the activities can be conducted consecutively respecting the OLC defined. A maximum wait between one activity and the other can be considered with the parameter ``MAX HOUR BETWEEN ACTIVITY``. If the operation cannot be conducted respecting this rule, the next timestep will be evaluated .
+
 
 ## KPIs OUTPUT Overview
 

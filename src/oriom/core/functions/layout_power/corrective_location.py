@@ -74,9 +74,9 @@ def logs_corrective_locations(
 
     Args:
         r (:obj:`pd.Series`): Row of the Log_event (failure, operation, inspection_port, inspection_site).
-        op_corr_excluding_tow (:obj:`list`): list of string representig object.id :class:`OperationsMinor`+`OperationsMajor`.
-        op_corr_tow (:obj:`dict`): dict of string representig object.id :class:`OperationsTow`.
-        op_add_tow (:obj:`dict`): dict of string representig object.id : string_disconnection that are additions to other operations.
+        op_corr_excluding_tow (list): list of string representig object.id :class:`OperationsMinor`+`OperationsMajor`.
+        op_corr_tow (dict): dict of string representig object.id :class:`OperationsTow`.
+        op_add_tow (dict): dict of string representig object.id : string_disconnection that are additions to other operations.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         dict_locations (dict): Dictionary with key the failure id and value the location assigned.

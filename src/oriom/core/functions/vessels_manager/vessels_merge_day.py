@@ -72,9 +72,9 @@ def number_vessels_func_with_oper(
     Take into consideration also mobilisation of the vessel to merge operation
 
     Args:
-        log_events (:obj:`pd.DataFrame`): Log of all the events (failure,
+        log_events (pd.DataFrame): Log of all the events (failure,
             operation, inspection_port, inspection_site).
-        col_to_count (:obj:`str`): The column on which should start the count of date of the charting vessel
+        col_to_count (str): The column on which should start the count of date of the charting vessel
         mobilisation (bool): Boolean to evaluate only the mobilisation. Defaults to False
 
     Returns:

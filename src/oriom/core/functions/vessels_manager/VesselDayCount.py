@@ -15,19 +15,22 @@ class VesselDayCounter():
         self.vessels_calendar (pd.DataFrame): Calendar of vessel per each date
         self.log_event_day(pd.DataFrame): Dataframe of lof_events_date for only operations and inspection
         vessels (dict): Dictionary of month on which n_vessel are contracted
+        first_counter (bool): Flag to consider if the preparation of the df has never been done. Default to True
     """
 
-    def __init__(self, log_events_merged, vessels):
+    def __init__(self, log_events_merged, vessels, first_counter = True):
         """
         Arg:
             log_events_merged(pd.DataFrame): Dataframe of lof_events_merged data
-            vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
+            vessels (list): List of object with attribute `id` for class `Vessels`
+            first_counter (bool): Flag to consider if the preparation of the df has never been done. Default to True
         """
 
         self.dict_vess_long_term = {}
         self.usage_records = {}
         self.vessels_calendar = pd.DataFrame()
         self.vessels = vessels
+        self.first_counter = first_counter
 
         log_event_day = aux_functions.safe_copy_df(log_events_merged, ['id', 'comments'])
         log_event_day = aux_functions.log_event_convert_stringtime(log_event_day)
@@ -68,14 +71,18 @@ class VesselDayCounter():
                     - all row not in campaign le righe che non sono della campagna
                     - only final row of campaign with start of the initial op and end by the final op
             """
+            if not self.first_counter:
+                group_by_date = 'd_end_stat_chart_orig'
+            else:
+                group_by_date = 'd_end_stat_chart'
 
             mask = df[col] == value
             if not mask.any():
                 return df
 
             # Find idx of each campaign for max d_end and min d_end
-            idx_max = df.loc[mask].groupby(['vessel_1', 'd_end_stat_chart'])['d_end'].idxmax()
-            idx_min = df.loc[mask].groupby(['vessel_1', 'd_end_stat_chart'])['d_end'].idxmin()
+            idx_max = df.loc[mask].groupby(['vessel_1', group_by_date])['d_end'].idxmax()
+            idx_min = df.loc[mask].groupby(['vessel_1', group_by_date])['d_end'].idxmin()
 
             # col to update from idx_min into idx_max
             cols_to_update = ['d_trigger', 'd_end_leadtime', 'd_end_wait_start']
@@ -117,6 +124,12 @@ class VesselDayCounter():
 
     def allocate_vessels(self,  log_events_merged: pd.DataFrame, ST = False, contract_evaluation = True):
         """
+        .. figure:: /_static/Flowchart/Vessel_Counter.png
+            :width: 8000px
+            :alt: example
+
+            Vessel Counter logic diagram
+
         Account the number of vessels type for each day and select the dates of the operation
 
         This function has various type of use:
@@ -124,7 +137,7 @@ class VesselDayCounter():
                 - Evaluate calendar the TOTAL amount of vessels used and modify the log_events_merged ST
             2) ST = False & contract_evaluation = True
                 - After the chart SA to evaluate in calendar the TOTAL amount of vessels used that do not
-                    account for vessels that have already been reused
+                    account for vessels that are reused for more operations
             3) ST = False & contract_evaluation = False
                 - After the chart SA to evaluate in calendar ONLY the ST amount vessels that do not
                     account for vessels that have already been reused

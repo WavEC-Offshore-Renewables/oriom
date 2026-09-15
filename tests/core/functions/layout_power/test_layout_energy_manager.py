@@ -483,13 +483,245 @@ class TestEnergyFunctions(unittest.TestCase):
         G = nx.DiGraph()
 
         op_add_tow = {}
-        r = {'id': 1, 'failure_id': 'x'}
+        r = {'id': '1', 'failure_id': 'x'}
 
         # should not crash
         lem.check_previous_fix(G, op_add_tow, r, type_id='tow')
 
         self.assertEqual(op_add_tow, {})
 
+
+class TestTowStringShutdown(unittest.TestCase):
+    """
+    Tests for the tow_string_shutdown logic.
+    """
+
+    def setUp(self):
+        self.G = nx.DiGraph()
+
+        self.G.add_node(0, level="SHORE", power=0.0)
+        self.G.add_node(1, level="device", power=1.0)
+
+        self.G.add_edge(1, 0, visible=True)
+
+        self.G.graph["tow_string_shutdown"] = True
+
+        self.component_level_power = "device"
+        self.levels_no_power = {"SHORE"}
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_shut_tow_disconnects_string(self, mock_manage):
+        """
+        shutdown=True + tow:
+        the string must be disconnected.
+        """
+
+        lem.shut(
+            loc=1,
+            shutdown=True,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="tow",
+        )
+
+        mock_manage.assert_called_once()
+
+        _, kwargs = mock_manage.call_args
+        self.assertIs(kwargs["G"], self.G)
+        self.assertEqual(kwargs["loc"], 1)
+        self.assertFalse(kwargs["action"])
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_shut_restore_tow_reconnects_string(self, mock_manage):
+        """
+        shutdown=False + tow:
+        the string must be restored.
+        """
+
+        lem.shut(
+            loc=1,
+            shutdown=True,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="tow",
+        )
+
+        mock_manage.assert_called_once()
+
+        _, kwargs = mock_manage.call_args
+        self.assertIs(kwargs["G"], self.G)
+        self.assertEqual(kwargs["loc"], 1)
+        self.assertFalse(kwargs["action"])
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_fix_tow_reconnects_string(self, mock_manage):
+        """
+        During fix of a tow event the string must be reconnected.
+        """
+
+        lem.fix(
+            loc=1,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="tow",
+            n_pv_per_string=None,
+            r=pd.Series({"id": "tow_fix"}),
+        )
+
+        mock_manage.assert_called_once()
+
+        _, kwargs = mock_manage.call_args
+        self.assertIs(kwargs["G"], self.G)
+        self.assertEqual(kwargs["loc"], 1)
+        self.assertTrue(kwargs["action"])
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_fix_ttp_disconnects_string_again(self, mock_manage):
+        """
+        TTP operations must disconnect the string again after the fix.
+        """
+
+        op_add_tow = {
+            "tow_fix": {
+                "type": "TTP"
+            }
+        }
+
+        lem.fix(
+            loc=1,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="",
+            op_add_tow=op_add_tow,
+            n_pv_per_string=None,
+            r=pd.Series({"id": "tow_fix"}),
+        )
+
+        mock_manage.assert_called_once()
+
+        _, kwargs = mock_manage.call_args
+        self.assertIs(kwargs["G"], self.G)
+        self.assertEqual(kwargs["loc"], 1)
+        self.assertFalse(kwargs["action"])
+
+class TestTowStringNoShutdown(unittest.TestCase):
+    """
+    Tests for the tow_string_shutdown logic.
+    """
+
+    def setUp(self):
+        self.G = nx.DiGraph()
+
+        self.G.add_node(0, level="SHORE", power=0.0)
+        self.G.add_node(1, level="device", power=1.0)
+
+        self.G.add_edge(1, 0, visible=True)
+
+        self.G.graph["tow_string_shutdown"] = False
+
+        self.component_level_power = "device"
+        self.levels_no_power = {"SHORE"}
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_shut_tow_no_disconnects_string(self, mock_manage):
+        """
+        shutdown=True + tow:
+        the string must be disconnected.
+        """
+
+        lem.shut(
+            loc=1,
+            shutdown=True,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="tow",
+        )
+
+        mock_manage.assert_not_called()
+
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_shut_restore_tow_no_reconnects_string(self, mock_manage):
+        """
+        shutdown=False + tow:
+        the string must be restored.
+        """
+
+        lem.shut(
+            loc=1,
+            shutdown=True,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="tow",
+        )
+
+        mock_manage.assert_not_called()
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_fix_tow_no_reconnects_string(self, mock_manage):
+        """
+        During fix of a tow event the string must be reconnected.
+        """
+
+        lem.fix(
+            loc=1,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="tow",
+            n_pv_per_string=None,
+            r=pd.Series({"id": "tow_fix"}),
+        )
+
+        mock_manage.assert_not_called()
+
+
+    @patch("oriom.core.functions.layout_power.layout_energy_manager.manage_string_tow_operation")
+    def test_fix_ttp_no_disconnects_string_again(self, mock_manage):
+        """
+        TTP operations must disconnect the string again after the fix.
+        """
+
+        op_add_tow = {
+            "tow_fix": {
+                "type": "TTP"
+            }
+        }
+
+        lem.fix(
+            loc=1,
+            G=self.G,
+            component_level_power=self.component_level_power,
+            levels_component_no_power=self.levels_no_power,
+            tech="wind",
+            names_tech="device",
+            event="",
+            op_add_tow=op_add_tow,
+            n_pv_per_string=None,
+            r=pd.Series({"id": "tow_fix"}),
+        )
+
+        mock_manage.assert_not_called()
 
 
 if __name__ == "__main__":

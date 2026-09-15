@@ -17,7 +17,7 @@ with (here / "README.md").open(encoding="utf-8") as f:
 
 setuptools.setup(
     name="oriom",
-    version="0.1.0",
+    version="1.2.0",
     python_requires=">=3.9,<3.11",
     packages=setuptools.find_packages(where="src"),
     package_dir={"": "src"},

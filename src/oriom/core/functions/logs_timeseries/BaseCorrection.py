@@ -17,8 +17,8 @@ class BaseCorrection:
     Attributes:
         date_failure (datetime): Date to consider as start of the operation (failure date or end of tow)
         vessel (:obj:`object`): Objectts :class:`Vessel`
-        oper (:obj:`list`): Objectts :class:`OperationMinor` or `OperationMajor`
-        time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
+        oper (list): Objectts :class:`OperationMinor` or `OperationMajor`
+        time_fail_op_immediately (float): Time between failure and immediate operations.
         date_op (datetime): date to consider for start of the operation after raction time
         date_end_leadtime (datetime): date to consider for start of the operation after leadtime
         idx_end_leadtime (int):index of date_end_leadtime

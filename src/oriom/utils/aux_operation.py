@@ -5,7 +5,7 @@ import networkx as nx
 from collections import Counter
 from ruamel.yaml import YAML
 
-from oriom.classes.Activity import Activity
+from oriom.domain.Activity import Activity
 
 
 def get_graph_levels(G: nx.Graph) -> set:
@@ -17,32 +17,38 @@ def get_graph_levels(G: nx.Graph) -> set:
     return all_levels
 
 
-def level_component_check(Gs: dict, operations: list, failure: bool = False):
+def level_component_check(Gs: dict, operations: list):
     """
     Check if any object has a level that is not defined in the tech Graph.
+    Convert graph nodes with level ``last_string_device`` to ``device`` when no object references that level.
 
     Args:
         Gs (dict): Dictionary of tech graphs (networkx.Graph)
         operations (list): List of objects to check (InspectionPort, InspectionSite, Failures)
-        failure (bool): If True, check 'level_failure'; else 'level'
     """
 
     tech_map = {'G_wind': 'ofw', 'G_pv': 'opv', 'G_wave': 'owc'}
-    attr_to_check = 'level_failure' if failure else 'level'
-    object_name = 'failure' if failure else 'inspection'
 
     # Extrapolate all level for each graph
     level_dict = {tech: get_graph_levels(G) for gname, G in Gs.items() if (tech := tech_map.get(gname)) and G}
+    level_tech_dic = {}
 
     # Check all levels
     for obj in operations:
+        # Dynamically assign name of attribute to use
+        if getattr(obj, 'level_failure', None):
+            attr_to_check = 'level_failure'
+            object_name = 'failure'
+        else:
+            attr_to_check = 'level'
+            object_name = 'inspection'
+
         tech = obj.id[:3]
         level = getattr(obj, attr_to_check, None)
         if tech == 'oce':
             all_levels = set().union(*level_dict.values())
             if level not in all_levels:
                 e_ = f"Level {object_name} '{level}' not found in graph for {obj.id}"
-
                 logging.error(e_)
                 raise KeyError(e_)
         else:
@@ -50,6 +56,18 @@ def level_component_check(Gs: dict, operations: list, failure: bool = False):
                 e_ = f"Level {object_name} '{level}' not found in graph for {obj.id}"
                 logging.error(e_)
                 raise KeyError(e_)
+            # Store levels oif tech found
+            if tech not in level_tech_dic.keys():
+                level_tech_dic[tech] = set()
+            level_tech_dic[tech].add(level)
+
+    for tech_G, tech in tech_map.items():
+        G = Gs.get(tech_G)
+        # Remove last_string_device level if is not present in operations dict levels
+        if G and level_tech_dic and 'last_string_device' not in level_tech_dic.get(tech, []):
+            for _, data in G.nodes(data=True):
+                if data.get("level") == "last_string_device":
+                    data["level"] = "device"
 
 
 def operation_check_identities(total_operations: list):
@@ -87,15 +105,15 @@ def define_activities(
         """
         Define activities for :class:`CorrectiveMajor` or :class:`OperationTow` based on a YAML file path :attr:`file_activities` if
         the operation ID of the activity matches the ID of this CorrectiveMajor, that
-        :class:`~oriom.classes.Activity.Activity` is assumed as part
+        :class:`~oriom.domain.Activity.Activity` is assumed as part
         of the :class:`CorrectiveMajor` or :class:`OperationTow`.
 
         Args:
-            operation (:obj: `object`): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
-            file_activities (:obj:`str`): The path to the YAML file containing activities.
-            distance_to_site (:obj:`float`): The distance from port to site in kilometers.
-            transit_between_devices (:obj:`float`): Time between two devices in hours.
-            tow_op (:obj: `bool`): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
+            operation (object): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
+            file_activities (str): The path to the YAML file containing activities.
+            distance_to_site (float): The distance from port to site in kilometers.
+            transit_between_devices (float): Time between two devices in hours.
+            tow_op (bool): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
         Raises:
             KeyError: if the operation is not found in the :attr:`file_activities`.
             ValueError: if activities defined as "Repeated" are not consecutive.
@@ -134,14 +152,18 @@ def define_activities(
             ]) is True:
                 # This is a transit between devices activity
                 duration = transit_between_devices
-            # Duration
             elif 'transit' in act["name"].lower():
-                # This is a transit activity
-                duration = ((distance_to_site * 1000) / operation.vessel1.speed_transit) / 3600
+                try: 
+                    duration = float(act["duration"]) 
+                except (KeyError, TypeError, ValueError):
+                    duration = ( (distance_to_site * 1000) / operation.vessel1.speed_transit ) / 3600
             elif tow_op and re.search(r'\btow\b', act["name"].lower()) is not None:
                 towing = True
-                # This is a towing activity
-                duration = ((distance_to_site * 1000) / operation.vessel1.speed_tow) / 3600
+                try:
+                    duration = float(act["duration"]) 
+                except (KeyError, TypeError, ValueError):               
+                    # This is a towing activity
+                    duration = ((distance_to_site * 1000) / operation.vessel1.speed_tow) / 3600
                 # Incase of shutdown is needed, a <tech>_shutdown_dur must
                 # be included in this activity
                 try:
@@ -219,10 +241,10 @@ def recycle_activities(operation: object, dir: str, file_name: str, tow_op: bool
     Recycle previous ~Activity from a CSV file and update the current activities list.
 
     Args:
-        operation (:obj: `object`): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
-        dir (:obj:`str`): The directory where the CSV file is located.
-        file_name (:obj:`str`): The name of the CSV file to recycle activities from.
-        tow_op (:obj: `bool`): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
+        operation (object): Objects of class: ``OperationTow`` or class: ``CorrectiveMajor``
+        dir (str): The directory where the CSV file is located.
+        file_name (str): The name of the CSV file to recycle activities from.
+        tow_op (bool): Flag to define if is a operation under analysis is OperationTow or CorrectiveMajor
     """
     operation_type = "OperationTow" if tow_op else "CorrectiveMajor"
 
@@ -241,8 +263,8 @@ def get_failures(
 
     Args:
         operation (:obj: object) Object of CorrectiveMajor or CorrectiveMinor
-        failures_list (:class:`~oriom.classes.Failure.Failure`): List of
-            :class:`~oriom.classes.Failure.Failure`.
+        failures_list (:class:`~oriom.domain.Failure.Failure`): List of
+            :class:`~oriom.domain.Failure.Failure`.
     Raises:
         TypeError: if the operation is not corrective.
     """
@@ -263,9 +285,9 @@ def define_tow_operations(oper: object, towing_ops:list, op_type: str):
     Define tow operations based on the given towing operations and the technology identifier.
 
     Args:
-        oper (:obj: `object`): Operation Object of class `CorrectiveMajor` or `InspectionPort`
-        towing_ops (:obj:`list`): List of object :class:`OperationTow`.
-        op_type (:obj:`str`): Type of class `CorrectiveMajor` or `InspectionPort`
+        oper (object): Operation Object of class `CorrectiveMajor` or `InspectionPort`
+        towing_ops (list): List of object :class:`OperationTow`.
+        op_type (str): Type of class `CorrectiveMajor` or `InspectionPort`
     """
     
     if 'ofw' in oper.id:

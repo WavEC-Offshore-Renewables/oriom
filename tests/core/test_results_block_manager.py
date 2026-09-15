@@ -21,6 +21,7 @@ class DummyResults:
             "availability_year_wave": [],
             "availability_year_pv": [],
         }
+        self.dfs_failures = {}
         self.dfs_ctv_list = []
         self.dfs_tot_cost_list = []
         self.dfs_tot_yearly_cost_list = []
@@ -58,6 +59,7 @@ class TestResultsBlock(unittest.TestCase):
                 merge_vessel={"value": ["ctv"]},
                 time_between_devices_dict={"device": 1.0},
                 shift_duration={"value": 12},
+                ST_O_M = False
             ),
             stats=SimpleNamespace(
                 lifetime={"value": 20},
@@ -121,6 +123,8 @@ class TestResultsBlock(unittest.TestCase):
 
         self.log_events_df = pd.DataFrame(
             {
+                "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
+                "d_end_wait_start": pd.to_datetime(["2025-01-01", "2025-01-02"]),
                 "event": ["operation", "recommissioning"],
                 "id": ["op1", "op2"],
                 "n_vessel_1": [1, 1],
@@ -130,6 +134,8 @@ class TestResultsBlock(unittest.TestCase):
 
         self.log_events_merged_df = pd.DataFrame(
             {
+                "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
+                "d_end_wait_start": pd.to_datetime(["2025-01-01", "2025-01-02"]),
                 "event": ["operation", "recommissioning"],
                 "id": ["op1", "op2"],
                 "n_vessel_1": [1, 1],
@@ -206,6 +212,7 @@ class TestResultsBlock(unittest.TestCase):
             merged_after_create,
             [0, 1],
             deferred_log_df,
+            {}
         )
 
         vessel_day_counter_instance = DummyVesselDayCounter(
@@ -257,7 +264,10 @@ class TestResultsBlock(unittest.TestCase):
         with patch(
             "oriom.core.results_block_manager.manage_def_to_log_events",
             return_value=self.log_events_df.copy(),
-        ) as mock_manage_def_to_log_events:
+        ) as mock_manage_def_to_log_events, patch(
+            "oriom.core.results_block_manager.vessel_mobilisation_manager.mobilitate_second_vessel",
+            side_effect=lambda log_events_merged, find_element_class, operations_tow: log_events_merged,
+        ) as mock_mobilitate_second_vessel:
             results_block(
                 result_dir_r=self.result_dir,
                 r=self.run_index,

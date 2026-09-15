@@ -196,10 +196,10 @@ def energy_availability(
     Args:
         inputs( pbj: object): Object of ``Input`` class
         r (int): number of the simulation,
-        log_events (:obj:`pd.DataFrame`): Log of all the events (failure, operation, inspection_port, inspection_site).
-        operations_corrective_stat (:obj:`list`): list of objects :class:`OperationsCorrectiveStat`.
-        inspections_site_stat (:obj:`list`): list of objects :class:`InspectionsSiteStat`.
-        inspections_port_stat (:obj:`list`): list of objects :class:`InspectionsPortStat`.
+        log_events (pd.DataFrame): Log of all the events (failure, operation, inspection_port, inspection_site).
+        operations_corrective_stat (list): list of objects :class:`OperationsCorrectiveStat`.
+        inspections_site_stat (list): list of objects :class:`InspectionsSiteStat`.
+        inspections_port_stat (list): list of objects :class:`InspectionsPortStat`.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
         dict_power_wind (dict, *optional*): dictionary with the average hourly power production [kW] of wind farm. Default as None
@@ -245,12 +245,12 @@ def energy_availability(
         returns the time and energy availabiltiy on a monthly and yearly basis.
 
         Args:
-            df_corrective (:obj:`pd.DataFrame`): Output of :func:`corrective_layout`.
-            df_preventive (:obj:`pd.DataFrame`): Output of :func:`preventive_energy`.
-            dict_power (:obj:`dict`): Power with monthly power.
+            df_corrective (pd.DataFrame): Output of :func:`corrective_layout`.
+            df_preventive (pd.DataFrame): Output of :func:`preventive_energy`.
+            dict_power (dict): Power with monthly power.
             n_devices (:obj:`int`, optional): Number of devices of farm.
             degradation_rate (:obj:`float`, optional): Yearly degradation rate for PV farm in %.
-            tech (:obj:`str`): Technology under analisys.
+            tech (str): Technology under analisys.
 
         Returns:
             pd.DataFrame: dataframe with the energy and time availability per month.

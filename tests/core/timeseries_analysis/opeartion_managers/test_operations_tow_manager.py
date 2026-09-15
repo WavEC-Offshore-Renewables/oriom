@@ -85,7 +85,7 @@ class TestOperationTowManager(unittest.TestCase):
         """If reuse_file_exist returns True, the function must skip the heavy computation."""
         m_tqdm.side_effect = lambda iterable, *a, **k: iterable
         Config = MagicMock(DIFF_DISTANCE=5)
-        inputs_tseries = MagicMock(distance={'value':10})
+        inputs_tseries = MagicMock(distance={'value':10}, ST_O_M=False)
         op = DummyOperationTow("tow_001", "Tow operation 1")
         operations = [op]
 
@@ -141,7 +141,7 @@ class TestOperationTowManager(unittest.TestCase):
         """When no reuse is available, the full pipeline should run and ts_data should be created."""
         m_tqdm.side_effect = lambda iterable, *a, **k: iterable
         Config = MagicMock(DIFF_DISTANCE=5)
-        inputs_tseries = MagicMock(distance={'value':10})
+        inputs_tseries = MagicMock(distance={'value':10}, ST_O_M=False)
         op = DummyOperationTow("tow_002", "Tow operation 2")
         operations = [op]
 

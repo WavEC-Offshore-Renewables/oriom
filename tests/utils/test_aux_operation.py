@@ -6,11 +6,11 @@ import networkx as nx
 from copy import deepcopy
 
 from oriom.utils import aux_operation
-from oriom.classes.DefineOperationTechs import Define_operation
-from oriom.classes.Operations.CorrectiveMajor import CorrectiveMajor
-from oriom.classes.Operations.CorrectiveMinor import CorrectiveMinor
-from oriom.classes.Operations.OperationTow import OperationTow
-from oriom.classes.Vessel import Vessel
+from oriom.core.builders.DefineOperationTechs import Define_operation
+from oriom.domain.Operations.CorrectiveMajor import CorrectiveMajor
+from oriom.domain.Operations.CorrectiveMinor import CorrectiveMinor
+from oriom.domain.Operations.OperationTow import OperationTow
+from oriom.domain.Vessels.Vessel import Vessel
 
 # ---------------------------
 # Helpers / fakes for tests
@@ -49,9 +49,9 @@ class FakeOpTOW:
 def make_graph_with_levels(node_lvls=(), edge_lvls=()):
     G = nx.DiGraph()
     # Put a couple of nodes/edges with given level tags
-    G.add_node(0, name="SHORE", level="shore")
+    G.add_node(0, name="SHORE", level="shore", coords = (0,0))
     for i, lv in enumerate(node_lvls, start=1):
-        G.add_node(i, level=lv)
+        G.add_node(i, level=lv, coords = (0,i), name = lv)
     # Add edges and label their level
     last = 0
     for i, lv in enumerate(edge_lvls, start=1):
@@ -85,27 +85,27 @@ class TestLevelComponentCheck(unittest.TestCase):
         ops.extend([a, b, c])
 
         # Should not raise
-        aux_operation.level_component_check(self.Gs, ops, failure=False)
+        aux_operation.level_component_check(self.Gs, ops)
 
     def test_valid_levels_for_oce_any(self):
         # 'oce' -> check against union of all graphs
         d = types.SimpleNamespace(id="oce_999", level="substation")
-        aux_operation.level_component_check(self.Gs, [d], failure=False)  # present in G_wind node levels
+        aux_operation.level_component_check(self.Gs, [d])  # present in G_wind node levels
 
     def test_missing_level_raises_keyerror(self):
         # 'opv' with level not present in PV graph -> KeyError
         bad = types.SimpleNamespace(id="opv_010", level="nonexistent_level")
         with self.assertRaises(KeyError):
-            aux_operation.level_component_check(self.Gs, [bad], failure=False)
+            aux_operation.level_component_check(self.Gs, [bad])
 
     def test_failure_mode_uses_level_failure(self):
         # In failure=True, code reads 'level_failure'
         ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
-        aux_operation.level_component_check(self.Gs, [ok], failure=True)  # should pass
+        aux_operation.level_component_check(self.Gs, [ok])  # should pass
 
         bad = types.SimpleNamespace(id="owc_200", level_failure="not_there")
         with self.assertRaises(KeyError):
-            aux_operation.level_component_check(self.Gs, [bad], failure=True)
+            aux_operation.level_component_check(self.Gs, [bad])
 
 
     def test_operation_check_identities(self):
@@ -126,6 +126,31 @@ class TestLevelComponentCheck(unittest.TestCase):
 
         self.assertIn("Duplicate operation id found", str(context.exception))
 
+    def test_replace_last_device_failure(self):
+        self.Gs["G_wind"] = make_graph_with_levels(node_lvls=("substation", "device", "last_string_device"), edge_lvls=("exp_cable", "array_cable", "array_cable"))
+
+        ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
+        ok_1 = types.SimpleNamespace(id="ofw_200", level_failure="device")
+        ok_2 = types.SimpleNamespace(id="ofw_300", level_failure="substation")
+        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2])
+        for _, attr in self.Gs["G_wind"].nodes(data=True):
+            self.assertNotEqual(attr['level'], "last_string_device")
+
+    def test_replace_not_last_device_failure(self):
+        self.Gs["G_wind"] = make_graph_with_levels(node_lvls=("substation", "device", "last_string_device"), edge_lvls=("exp_cable", "array_cable", "array_cable"))
+
+        ok = types.SimpleNamespace(id="ofw_100", level_failure="device")
+        ok_1 = types.SimpleNamespace(id="ofw_200", level_failure="last_string_device")
+        ok_2 = types.SimpleNamespace(id="ofw_300", level_failure="substation")
+        aux_operation.level_component_check(self.Gs, [ok, ok_1, ok_2])
+        i=0
+        for _, attr in self.Gs["G_wind"].nodes(data=True):
+            if attr['level'] =="last_string_device":
+                i+=1
+
+        self.assertEqual(i, 1)
+        self.setUp()
+        
 class TestOperation(unittest.TestCase):
     @classmethod
     def setUpClass(self):

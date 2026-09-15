@@ -5,8 +5,10 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import logging
 import numpy as np
+import math
 
-DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
+from oriom.utils import aux_functions
+from oriom.common.constants import DICT_DAYS
 
 
 def find_month_available(month_check: int, dict_failures_variables_id: list):
@@ -41,6 +43,11 @@ def failures_event(
         dates_failures_OLD:  pd.DataFrame = None
 ) -> pd.DataFrame:
     """Create a table with failures throughtout the months for the lifetime.
+    .. figure:: /_static/Flowchart/Failure_Generation_Chart.png
+        :width: 8000px
+        :alt: example
+
+        Failure generation logic diagram
 
     Note:
         The failure generation considers:
@@ -53,18 +60,18 @@ def failures_event(
         failure are more concentrated in the initial year (as many as the ``infant_mortality``) and lasts years (as many as ``wear_out``).
 
     Args:
-        s (:obj:`int`): Choose between the 6 (s: [0,5]) available scenarios
-        scenarios (:obj:`list`): List obtained from the class, percentages of probability
+        s (int): Choose between the 6 (s: [0,5]) available scenarios
+        scenarios (list): List obtained from the class, percentages of probability
             for each month
-        failures (:obj:`list`): List obtained from the class, failure rate for each component
-        N_LIFETIME (:obj:`int`): Lifetime of the project
-        START_YEAR (:obj:`int`): Starting year of the project
-        START_MONTH (:obj:`int`): starting month of the project
-        infant_mortality (:obj:`int`): Number of years at the start of the project with a higher probability of having failures
-        wear_out (:obj:`int`): Number of years of the end of the project with a higher probability of having failures
-        fail_ratio (:obj:`float`): Probability of failure during infant mortality and wear out with reference with normal life
+        failures (list): List obtained from the class, failure rate for each component
+        N_LIFETIME (int): Lifetime of the project
+        START_YEAR (int): Starting year of the project
+        START_MONTH (int): starting month of the project
+        infant_mortality (int): Number of years at the start of the project with a higher probability of having failures
+        wear_out (int): Number of years of the end of the project with a higher probability of having failures
+        fail_ratio (float): Probability of failure during infant mortality and wear out with reference with normal life
         fixed_seed (:obj:`bool`): Fixed seed True or False for repeatibility
-        dates_failures_OLD (:obj: `pd.DataFrame`): Failure dataframe imported from previous failure file if present
+        dates_failures_OLD (pd.DataFrame): Failure dataframe imported from previous failure file if present
             Defaults to ``pd.DataFrame.empty``.
     Returns:
         :obj:`pd.DataFrame`: a dataframe containing the dates of failure occurrences.
@@ -283,6 +290,51 @@ def failures_event(
         dates_failures['operation_triggered'] = list_operation_triggered
         dates_failures['preferred_month'] = pd.Series(list_preferred_month, dtype='Int64')
         dates_failures = dates_failures.sort_values(by ='datetime').reset_index(drop=True)
+
+
+    return dates_failures
+
+
+def ST_failures_event(
+    failures: list,
+    result_dir_r: str
+):
+    """Create a table with failures throughtout the months for the lifetime.
+
+    NOTE:
+        The Short Term failure generation considers:
+            - if the math.ceil(FR*N_device) of total value of events for each type of failures defined
+        All failures are generated on the date of Short Term run. All operations are immediate corrected
+        Save directly the failure event file
+        
+    Args:
+        failures (list): List obtained from the class, failure rate for each component.
+        result_dir_r (str): string of the folder on which the results are stored
+    """
+
+    list_ids, list_operation_triggered = [], []
+    for fail in failures:
+        fail_events = math.ceil(fail.fail_rate)
+        for _ in range(fail_events):
+            list_ids.append(fail.id)
+            list_operation_triggered.append(fail.operation_triggered)
+
+    dates_failures = pd.DataFrame(columns=[
+        'datetime',
+        'id',
+        'maintenance_strategy',
+        'operation_triggered',
+        'preferred_month'
+    ])
+
+    dates_failures['datetime'] = [datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)]*len(list_ids)
+    dates_failures['id'] = list_ids
+    dates_failures['maintenance_strategy'] = 'immediately'
+    dates_failures['operation_triggered'] = list_operation_triggered
+    dates_failures['preferred_month'] = pd.Series(None, dtype='Int64')
+    dates_failures = dates_failures.sort_values(by ='datetime').reset_index(drop=True)
+
+    aux_functions.save_file_csv(dates_failures, result_dir_r)
 
 
     return dates_failures

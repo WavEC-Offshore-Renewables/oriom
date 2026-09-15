@@ -18,8 +18,8 @@ def startability(
     This is called only for those operations defined by activities.
 
     Args:
-        activities (:obj:`list`): List of objects where each object is an
-            :class:`~oriom.classes.Activity.Activity`.
+        activities (list): List of objects where each object is an
+            :class:`~oriom.domain.Activity.Activity`.
         df_workability (:obj:`pandas.DataFrame`): Boolean table with timesteps
             as rows and activity IDs as columns.
         out_dir (:obj:`str`, *optional*): Output directory folder path.
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     df_workability['datetime'] = pd.to_datetime(df_workability['datetime'])
     df_workability.set_index('datetime', inplace=True)
 
-    from oriom.classes import Activity
+    from oriom.domain import Activity
     activities = Activity.get_activities_from_csv(file_activities)
 
     temp_dir = os.path.join(os.getcwd(), 'tmp')

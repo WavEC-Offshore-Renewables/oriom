@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import timedelta, datetime
 import pandas as pd
 
-from oriom.classes.TowData import TowData
+from oriom.domain.TowData import TowData
 from oriom.utils.aux_functions import safe_getattr
 from oriom.utils.read_dataframe_value import approximate_hourly_data
 from oriom.core.functions.logs_timeseries import logs_timeseries_func
@@ -36,7 +36,7 @@ def create_logs_corrective_file(
         CUTOFF_DATE: datetime,
         dates_failures: pd.DataFrame,
         operation_log_file_stats: list,
-        time_fail_op_immediately: float,
+        time_fail_op_immediately_original: float,
         vessel_to_merge: list,
         find_element_class: object,
 )->pd.DataFrame:
@@ -61,11 +61,10 @@ def create_logs_corrective_file(
     Args:
         COLS (list): List of columns of the log dataframe
         CUTOFF_DATE (datetime): last date of possible creation for log corrective on last month
-        dates_failures (:obj:`pd.DataFrame`): Log of all the events (failure,
+        dates_failures (pd.DataFrame): Log of all the events (failure,
             operation, inspection_port, inspection_site).
-        operation_log_file_stats (:obj:`list`): List of objects :class:`OperationsCorrectiveStat` with max percentile.
-        time_fail_op_immediately (:obj:`float`): Time between failure and
-            immediate operations.
+        operation_log_file_stats (list): List of objects :class:`OperationsCorrectiveStat` with max percentile.
+        time_fail_op_immediately_original (float): Time between failure and immediate operations.
         vessel_to_merge (list): List of vessel that op can be merged when is possible to merge operations
         find_element_class (object): Object from class :class:`FindElementClass`
 
@@ -139,6 +138,9 @@ def create_logs_corrective_file(
             ves_1 = oper.vessel1_qt
             component_lead_time = failure.lead_time
 
+            # Manage time reaction. If is scheduled in a specific month the time reaction is immediate as already prepared
+            time_fail_op_immediately = time_fail_op_immediately_original if maintenance_strategy != "specific month" else 0.01
+
             #------------------------
             # TOWING PORT CREATION
             #------------------------
@@ -172,6 +174,8 @@ def create_logs_corrective_file(
                         index = {'fail_index': fail_index, 'last_valid_idx': safe_getattr(oper.tow_data.add_op_tow_port, ['ts_data','last_valid_index'])},
                         CONST = {'COLS': COLS, 'CUTOFF_DATE': CUTOFF_DATE, 'time_fail_op_immediately': time_fail_op_immediately},
                     )
+                    # As first operation made, next reaction is expected so consider immediate reaction
+                    time_fail_op_immediately = 0.01
 
                     if row_add_op_tow_port is None or row_add_op_tow_port.empty:
                         continue
@@ -321,7 +325,8 @@ def create_logs_corrective_file(
                 mob_time = 0
                 lead_mob_time = lead_mob_time_tow
                 vessel1_id, vessel2_id, ves_1, ves_2 = None, None, None, None
-
+                # As TTP made, next reaction is expected so consider immediate reaction
+                time_fail_op_immediately = 0.01
 
             #------------------------
             # SITE CREATION
@@ -436,7 +441,7 @@ def create_logs_corrective_file(
                     tow_stat_chart_month = oper.tow_data.tow_op_site_stat.dur_total_dict[str(row_tow_site['d_end_leadtime'].iloc[0].month)]
 
                     # Update the fail_index
-                    end_tow_site_date = approximate_hourly_data(row_dates['d_end'][0])
+                    end_tow_site_date = approximate_hourly_data(row_tow_site['d_end'][0])
                     end_add_op_time_site = approximate_hourly_data(row_tow_site['d_end_dur_net_site'].iloc[0])
                     fail_index = oper.tow_data.tow_site_oper_sched.index[oper.tow_data.tow_site_oper_sched['datetime'] == end_tow_site_date][0]
 
@@ -489,6 +494,13 @@ def create_logs_corrective_file(
                 if rows_df is not None:
                     row_dates = pd.concat([row_dates, rows_df], axis=0, ignore_index=True)
             if row_mob_line is not None:
+                # Avoid multiple mobilisation of same vessel for TTP op and TTP additional operation
+                row_mob_line = (row_mob_line.sort_values(
+                        ["vessel_1", "n_vessel_1", "d_trigger"],
+                        ascending=[True, False, True],
+                        kind="stable"
+                    ).drop_duplicates("vessel_1", keep="first")
+                )
                 # Overwrite d_end in first mobilisation line with end wait of weather for operation for future mobilisation reduction (KPI_FINAL_COSTS)
                 row_mob_line.loc[0, 'd_end'] = date_end_wait_start
                 row_dates = pd.concat([row_dates, row_mob_line], axis=0, ignore_index=True)

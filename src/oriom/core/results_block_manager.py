@@ -3,6 +3,7 @@ import logging
 import os
 
 from oriom.utils import aux_functions
+from oriom.common.constants import EVENT_LOG_ORDER
 
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.vessels_manager import vessel_mobilisation_manager
@@ -10,7 +11,7 @@ from oriom.core.functions.graphs import report_graphs
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective import create_logs_merge
 from oriom.core.functions.layout_power.layout_power import energy_availability, config_energy_availability
 from oriom.core.functions.kpi_final.kpi_final_costs import kpi_final_total_cost
-from oriom.core.functions.logs_timeseries.failures import failures_event
+from oriom.core.functions.logs_timeseries.failures import failures_event, ST_failures_event
 from oriom.core.functions.logs_timeseries.create_logs_timeseries import create_logs_timeseries_file
 from oriom.core.functions.logs_timeseries.logs_corrective_aux import manage_def_to_log_events
 try:
@@ -61,17 +62,17 @@ def results_block(
         farm_technologies (object): object of class `FarmTechnologies`
             that contains all the technologies data from input file,
         results_dict (object): Object of class `Results`
-        failures (:obj: `list`): List of object for class `Failures`
-        operations_tow_stats (:obj: `list`): List of object for class `OperationTowStat`
+        failures (list): List of object for class `Failures`
+        operations_tow_stats (list): List of object for class `OperationTowStat`
             with Pmain and pmax for towing operations,
-        inspections_port_stats (:obj: `list`): List of object for class `InspectionPortStat`
+        inspections_port_stats (list): List of object for class `InspectionPortStat`
             with Pmain and pmax stats for port inspections operations,
-        inspections_site_stats (:obj: `list`): List of object for class `InspectionSiteStat`
+        inspections_site_stats (list): List of object for class `InspectionSiteStat`
             with Pmain and pmax stats for inspections site operations,
-        operations_corrective_stats (:obj: `list`): List of object for class `Corrective_Stats`
+        operations_corrective_stats (list): List of object for class `Corrective_Stats`
             with Pmain and pmax stats for port inspections operations,
-        vessels (:obj: `list`): List of object with attribute `id` for class `Vessels`
-        mother_vessels (:obj: `list`): List with the id of the mother vessels
+        vessels (list): List of object with attribute `id` for class `Vessels`
+        mother_vessels (list): List with the id of the mother vessels
         G_layouts (dict): dictionary with the graph of the layouts for wind, wave and pv
         dict_power_wind (dict): dictionary with the average hourly power production [kW of wind farm
         dict_power_wave (dict): dictionary with the average hourly power production [kW] of wave farm
@@ -79,14 +80,15 @@ def results_block(
         """
 
     dates_failures_OLD = pd.DataFrame ()
-
+    operation_vessel_percentiles_dict = {}
     try:
         failure_dir = os.path.join(inputs.general.failureevent_file["value"], f"{'result_'}{r}", 'dates_failures.csv')
+        if inputs.tseries.ST_O_M:
+            failure_dir = os.path.join(inputs.general.failureevent_file["value"], 'dates_failures.csv')
+            ST_failures_event(failures = failures, result_dir_r = failure_dir)
         dates_failures = pd.read_csv(failure_dir, sep=',')
         dates_failures = aux_functions.convert_stringtime(dates_failures)
-        dates_failures['preferred_month'] = pd.to_numeric(
-            dates_failures['preferred_month'], errors='coerce'
-        ).astype('Int64')
+        dates_failures['preferred_month'] = pd.to_numeric(dates_failures['preferred_month'], errors='coerce').astype('Int64')
         logging.info('Uploading Failure file from previous run %d folder', r)
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 
@@ -107,7 +109,7 @@ def results_block(
         )
 
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
-
+    results_dict.dfs_failures[r] = dates_failures
 
     # Creating logs directly in the main.py file
     logging.info('--------------------\tLog events and kpis\t----------------')
@@ -143,11 +145,14 @@ def results_block(
         logging.info('Uploading Log events merged file from previous folder')
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
-        vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+        if Config.STATISTICAL_CHART:
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False)
+        else:
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
         log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
 
     except (TypeError, FileNotFoundError) as e_:
-        log_events_merged, index_overwrite_log_ev, df_port_operation_def_log = create_logs_merge(
+        log_events_merged, index_overwrite_log_ev, df_port_operation_def_log, operation_vessel_percentiles_dict = create_logs_merge(
             log_events_original = log_events,
             failures = failures,
             operation_log_file_stats = operations_tow_stats['pmax'] + operations_corrective_stats['pmax'],
@@ -196,7 +201,7 @@ def results_block(
                 )
  
             # Recreate the usage_record considering the reused vessels
-            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False)
             _ = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged)
 
         else:
@@ -204,7 +209,21 @@ def results_block(
             log_events_merged['d_end_stat_chart_orig'] = log_events_merged['d_end_stat_chart']
             log_events_merged['n_vessel_1_effective'] = log_events_merged['n_vessel_1']
 
-    aux_functions.save_file_csv(log_events_merged,result_dir_r,'log_events_merged.csv')
+        log_events_merged = vessel_mobilisation_manager.mobilitate_second_vessel(
+            log_events_merged = log_events_merged,
+            find_element_class = find_element,
+            operations_tow = operations_tow_stats
+        )
+
+    # Reorder and save log events merged
+    log_events_merged["_event_order"] = (log_events_merged["event"].map(EVENT_LOG_ORDER).fillna(99))
+    log_events_merged = (
+        log_events_merged.sort_values(
+            by=["d_trigger", "d_end_wait_start", "_event_order"],
+            na_position="first"
+        ).drop(columns="_event_order").reset_index(drop=True))
+
+    aux_functions.save_file_csv(log_events_merged, result_dir_r, 'log_events_merged.csv')
 
 
     logging.info('----------------------------------------------------')
@@ -326,6 +345,10 @@ def results_block(
     if not dates_failures.empty:
         report_graphs.distribution_failures(df = dates_failures, save_dir = graph_dir_r)
 
+    for k, it in operation_vessel_percentiles_dict.items():
+        aux_functions.save_file_csv(pd.DataFrame.from_dict(it, orient='index'), result_dir_r, f'{k}.csv', True)
+
+    return 
 
 if __name__ == '__main__':
     pass

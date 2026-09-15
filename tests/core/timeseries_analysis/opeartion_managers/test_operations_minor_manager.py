@@ -71,6 +71,7 @@ class DummyInputsTseries:
         self.distance = {"value": distance}
         self.shift_duration = {"value": shift_duration}
         self._time_between = time_between
+        self.ST_O_M = False
 
     def find_time_between_devices(self, operation_obj_id: str) -> float:
         return self._time_between

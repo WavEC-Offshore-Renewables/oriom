@@ -102,7 +102,7 @@ def energy_yield_combined(
     '''It produces a graph representing the potential monthly energy and produced monthyl energy.
 
     Args:
-        dfs (:obj:`dict`): Dictionary of energy availability dataframes.
+        dfs (dict): Dictionary of energy availability dataframes.
         save_dir (:obj:`str`, *optional*): Path dir to save graph representation.
             Deafults to `None`.
     '''
@@ -206,8 +206,8 @@ def direct_cost_diversified(
 
     Args:
         df (:obj:`DataFrame`): kpi_om.
-        ops_corr (:obj:`list`): List of corrective operations.
-        insp (:obj:`list`): List of inspections.
+        ops_corr (list): List of corrective operations.
+        insp (list): List of inspections.
         save_dir (:obj:`str`, *optional*): Path dir to save graph representation.
             Deafults to `None`.
     '''
@@ -249,7 +249,7 @@ def indirect_costs_per_year(
 
     Args:
         df (:obj:`DataFrame`): Availability_energy.
-        electricity_price (:obj:`float`): Float price of electricity in €/MWh.
+        electricity_price (float): Float price of electricity in €/MWh.
         save_dir (:obj:`str`, *optional*): Path dir to save graph representation.
             Defaults to `None`.
     '''
@@ -421,9 +421,9 @@ def distribution_mobilization(
     '''It produces a graph representing the distribution of failures.
 
     Args:
-        df_logs (:obj:`pd.DataFrame`): log_events.
-        vessels (:obj:`list`): list of vessels class.
-        df_kpi_om (:obj:`pd.DataFrame`): kpi_om.
+        df_logs (pd.DataFrame): log_events.
+        vessels (list): list of vessels class.
+        df_kpi_om (pd.DataFrame): kpi_om.
         save_dir (:obj:`str`, *optional*): path dir to save graph representation.
             Deafults to `None`.
     '''

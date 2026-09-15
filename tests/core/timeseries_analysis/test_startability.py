@@ -4,7 +4,7 @@ import pandas as pd
 from copy import deepcopy
 
 # Import classes
-from oriom.classes.Activity import Activity
+from oriom.domain.Activity import Activity
 
 # Import functions
 from oriom.core.timeseries_analysis.startability import startability

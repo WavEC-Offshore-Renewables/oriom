@@ -57,7 +57,7 @@ class TestCreateLogsMerge(unittest.TestCase):
         # This avoids needing the real complex system
         self.patcher2 = unittest.mock.patch(
             'oriom.core.functions.log_merge_corrective_functions.merge_corrective.merge_deferred_operations',
-            return_value=pd.DataFrame()
+            return_value=(pd.DataFrame(), pd.DataFrame())
         )
         self.patcher3 = unittest.mock.patch(
             'oriom.core.functions.log_merge_corrective_functions.merge_corrective.merge_operation',
@@ -82,7 +82,7 @@ class TestCreateLogsMerge(unittest.TestCase):
         Ensure the function returns a pandas DataFrame.
         """
 
-        df_out, index, df_tow_merge = merge_corrective.create_logs_merge(
+        df_out, index, df_tow_merge, _ = merge_corrective.create_logs_merge(
             log_events_original=self.log_events,
             failures=self.failures,
             operation_log_file_stats=self.operation_log_file_stats,
@@ -103,7 +103,7 @@ class TestCreateLogsMerge(unittest.TestCase):
         Check that failure events are kept in the output DataFrame.
         """
 
-        df_out, index, df_tow_merge = merge_corrective.create_logs_merge(
+        df_out, index, df_tow_merge, _ = merge_corrective.create_logs_merge(
             log_events_original=self.log_events,
             failures=self.failures,
             operation_log_file_stats=self.operation_log_file_stats,
@@ -125,7 +125,7 @@ class TestCreateLogsMerge(unittest.TestCase):
         Ensure the output is sorted by d_trigger.
         """
  
-        df_out, index, df_tow_merge = merge_corrective.create_logs_merge(
+        df_out, index, df_tow_merge, _ = merge_corrective.create_logs_merge(
             log_events_original=self.log_events.sample(frac=1),  # shuffle rows
             failures=self.failures,
             operation_log_file_stats=self.operation_log_file_stats,

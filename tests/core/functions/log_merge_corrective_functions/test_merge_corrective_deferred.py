@@ -98,7 +98,7 @@ class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
-        side_effect=lambda df, vessels, percentile: df,
+        side_effect=lambda df, vessels, percentile: (df, {}),
     )
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
@@ -216,7 +216,7 @@ class TestMergeDeferredOperationsSingleOp(unittest.TestCase):
         vessel = DummyVessel(vid="V1", n_vessels=1, mobilisation_time=0.0)
         finder = DummyFinder(vessel)
 
-        result = merge_corrective_deferred.merge_deferred_operations(
+        result, _ = merge_corrective_deferred.merge_deferred_operations(
             log_events_def=log_events_def,
             vessels=[vessel],
             time_between_devices={"opv": 1.0},
@@ -246,7 +246,7 @@ class TestMergeDeferredOperationsMultipleOps(unittest.TestCase):
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
-        side_effect=lambda df, vessels, percentile: df,
+        side_effect=lambda df, vessels, percentile: (df, {}),
     )
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
@@ -365,7 +365,7 @@ class TestMergeDeferredOperationsMultipleOps(unittest.TestCase):
         vessel = DummyVessel(vid="V1", n_vessels=1, mobilisation_time=0.0)
         finder = DummyFinder(vessel)
 
-        result = merge_corrective_deferred.merge_deferred_operations(
+        result, _ = merge_corrective_deferred.merge_deferred_operations(
             log_events_def=log_events_def,
             vessels=[vessel],
             time_between_devices={"opv": 1.0},
@@ -402,7 +402,7 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
         "merged_deferred_aux.create_stat_chart_campaign_operation",
-        side_effect=lambda df, vessels, percentile: df,
+        side_effect=lambda df, vessels, percentile: (df, {}),
     )
     @patch(
         "oriom.core.functions.log_merge_corrective_functions.merge_corrective_deferred."
@@ -542,7 +542,7 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
         op_stat = DummyOperStat(15)
         finder = DummyFinder(vessel, op_stat)
 
-        result = merge_corrective_deferred.merge_deferred_operations(
+        result, _ = merge_corrective_deferred.merge_deferred_operations(
             log_events_def=log_events_def,
             vessels=[vessel],
             time_between_devices={"opv": 1.0},

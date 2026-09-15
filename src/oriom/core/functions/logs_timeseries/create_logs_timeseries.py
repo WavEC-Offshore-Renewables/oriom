@@ -5,9 +5,9 @@ from oriom.core.functions.logs_timeseries import logs_timeseries_func
 from oriom.core.functions.logs_timeseries import create_logs_events_preventive
 from oriom.core.functions.logs_timeseries import create_logs_events_corrective
 from oriom.core.functions.vessels_manager.VesselChartInspCampaign import Stat_chart_inspection_campaign
+from oriom.common.constants import DICT_DAYS
 
 
-DICT_DAYS = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
 
 COLS =  [
     'd_trigger',
@@ -67,13 +67,13 @@ def create_logs_timeseries_file(
 
     Args:
         inputs (object): Object from class `Inputs` that contains all the inputs of the simulation
-        dates_failures (:obj:`pd.DataFrame`): Log of all the dates_failures
-        failures (:obj:`list`): List of object :class:`Failures`.
-        operation_log_file_stats (:obj:`list`): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
-        inspections_port_stat (:obj:`list`): List of object :class:`InspectionsPortStat`.
-        inspections_site_stat (:obj:`list`): List of object :class:`InspectionsSiteStat`.
-        time_fail_op_immediately (:obj:`float`): Time between failure and immediate operations.
-        vessels (:obj:`list`): List of objectts :class:`Vessel`
+        dates_failures (pd.DataFrame): Log of all the dates_failures
+        failures (list): List of object :class:`Failures`.
+        operation_log_file_stats (list): List of objectts :class:`OperationsCorrectiveStat` + `OperationsTowStat`.
+        inspections_port_stat (list): List of object :class:`InspectionsPortStat`.
+        inspections_site_stat (list): List of object :class:`InspectionsSiteStat`.
+        time_fail_op_immediately (float): Time between failure and immediate operations.
+        vessels (list): List of objectts :class:`Vessel`
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         vessel_to_merge (:obj;`list`): list of vessel that are considered for the merge. Default to None
         percentile (:obj:`float`, *optional*): Percentile value to calculate the statistic for inspection_port. Default to 0.9
@@ -105,7 +105,7 @@ def create_logs_timeseries_file(
         CUTOFF_DATE = CUTOFF_DATE,
         dates_failures=dates_failures,
         operation_log_file_stats = operation_log_file_stats,
-        time_fail_op_immediately=time_fail_op_immediately,
+        time_fail_op_immediately_original=time_fail_op_immediately,
         vessel_to_merge = vessel_to_merge,
         find_element_class = find_element_class,
     )

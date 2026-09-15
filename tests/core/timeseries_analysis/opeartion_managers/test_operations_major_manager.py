@@ -48,6 +48,7 @@ class DummyInputsTseries:
     def __init__(self, distance=10.0, max_wait=24.0):
         self.distance = {"value": distance}
         self.max_wait = {"value": max_wait}
+        self.ST_O_M = False
 
 
 class TestOperationMajorManager(unittest.TestCase):

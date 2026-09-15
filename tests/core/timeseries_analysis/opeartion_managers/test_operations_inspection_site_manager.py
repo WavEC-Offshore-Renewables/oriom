@@ -81,10 +81,11 @@ class DummyOperation:
 class DummyInputsTseries:
     """Minimal InputsTimeSeries-like object used by inspect_site_manager."""
 
-    def __init__(self, distance=5.0, shift_duration=8.0, time_between_devices=1.5):
+    def __init__(self, distance=5.0, shift_duration=8.0, time_between_devices=1.5, ST_O_M = False):
         self._time_between_devices = time_between_devices
         self.distance = {"value": distance}
         self.shift_duration = {"value": shift_duration}
+        self.ST_O_M=ST_O_M
 
     def find_time_between_devices(self, operation_obj_id: str) -> float:
         """Return a constant time between devices for testing."""

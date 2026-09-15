@@ -73,7 +73,7 @@ Tool flowchart
    :caption: Index
    :titlesonly:
 
-   Classes package <_api/oriom.classes>
+   Domain package <_api/oriom.domain>
    Core package <_api/oriom.core>
    Inputs package <_api/oriom.inputs>
    Utils package <_api/oriom.utils>

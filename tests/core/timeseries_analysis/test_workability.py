@@ -8,8 +8,8 @@ import itertools
 import pandas as pd
 import numpy as np
 
-from oriom.classes.Metocean import Metocean
-from oriom.classes.Activity import Activity
+from oriom.domain.Metocean import Metocean
+from oriom.domain.Activity import Activity
 
 from oriom.core.timeseries_analysis.workability import workability, workability_tow, workability_tow_distance_lag
 

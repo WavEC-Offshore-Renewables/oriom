@@ -4,7 +4,7 @@ import os
 
 from tqdm import tqdm
 
-from oriom.classes.OperationTimeSeriesData import OperationTimeSeriesData
+from oriom.domain.OperationTimeSeriesData import OperationTimeSeriesData
 
 from oriom.core.timeseries_analysis.workability import workability
 from oriom.core.timeseries_analysis.startability import startability
@@ -55,7 +55,7 @@ def operation_major_manager(
         i+=1
 
         # Check if there is already an operation_schedule file
-        if check_files:
+        if check_files and not inputs_tseries.ST_O_M:
             if check_files.check_file_exists(path=op_dir, file_name='operation_schedule.csv'):
                 operation.ts_data = OperationTimeSeriesData.create_timeseries_data(operation, 'operation_schedule.csv', op_dir)
                 continue

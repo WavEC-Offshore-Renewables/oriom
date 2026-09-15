@@ -85,12 +85,12 @@ def corrective_layout(
     (power averaged among the month).
 
     Args:
-        log_events (:obj:`pd.DataFrame`): Log of all the events (failure,
+        log_events (pd.DataFrame): Log of all the events (failure,
             operation, inspection_port, inspection_site, tow).
-        start_year (:obj:`int`): Start_year of the project.
-        start_month (:obj:`int`): Start_month of the project
-        n_lifetime (:obj:`int`): Lifetime of the project in years.
-        operations_corrective_stat (:obj:`list`): List of objects :class:`OperationsCorrectiveStat`.
+        start_year (int): Start_year of the project.
+        start_month (int): Start_month of the project
+        n_lifetime (int): Lifetime of the project in years.
+        operations_corrective_stat (list): List of objects :class:`OperationsCorrectiveStat`.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         n_device_wtg (:obj:`int`, optional): Number of devices of WTG.  Defalut as None
         n_device_wec (:obj:`int`, optional):  Number of devices of WEC. Defalut as None
@@ -101,7 +101,7 @@ def corrective_layout(
         power_wind (:obj:`dict`, optional): Statistical power wind. Defalut as None
         power_wave (:obj:`dict`, optional): Statistical power wave. Defalut as None
         power_pv (:obj:`dict`, optional): Statistical power pv. Defalut as None
-        degradation_rate (:obj:`float`): Yearly degradation rate for PV farm in %. Defalut as None
+        degradation_rate (float): Yearly degradation rate for PV farm in %. Defalut as None
         n_strings_per_inv (:obj:`int`, *optional*): number of string each inverter Defalut as None
         n_modules_per_strings (:obj:`int`, *optional*): number of modules each string Defalut as None
         max_failure_module (:obj:`int`, *optional*): number of failed module allowed each string Defalut as None

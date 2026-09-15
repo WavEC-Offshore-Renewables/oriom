@@ -15,8 +15,9 @@ def create_yearly_mobilisation_mother_vessel(
     """
     Create for each year of the log_events_merged file a mobilisation of a mother vessel from the first use
 
-    NOTE This code is run as mother_vessel are defined as second vessels and second vessel do not generate a mobilisation
-    Generate 1 mobilisation per year. To add externaly more mobilisation if more call are made
+    NOTE:
+        This code is run as mother_vessel are defined as second vessels and second vessel do not generate a mobilisation
+        Generate 1 mobilisation per year. To add externaly more mobilisation if more call are made
 
     Args:
         log_events_merged (pd.DataFrame): dataframe of all log_events_merged,
@@ -69,7 +70,7 @@ def create_yearly_mobilisation_mother_vessel(
 
     log_events_merged = pd.concat([log_events_merged, log_event_mother_vessel_mobi], axis=0, ignore_index=False)
 
-    log_events_merged = log_events_merged.sort_values(by='d_trigger').reset_index(drop=True)
+    log_events_merged = log_events_merged.sort_values(by=['d_trigger', 'd_end_wait_start']).reset_index(drop=True)
 
     return log_events_merged
 
@@ -146,6 +147,61 @@ def reduce_redundant_mobilisations_inspection(
 
     return log_events_merged
 
+
+def mobilitate_second_vessel(log_events_merged: pd.DataFrame, find_element_class: object, operations_tow: dict):
+    
+    """
+    Mobilitate the second vessel of the opeartion if the refered vessel_1 have been mobilitated 
+
+    Args:
+        log_events_merged (pd.DataFrame): dataframe of all log_events_merged,
+        find_element_class (object): Object from class :class:`FindElementClass`
+        operations_tow (dict): List of Object from class :class:`OperationsTow`
+
+    Return:
+        pd.DataFrame: log_events_merged with mobilisation of the second vessel
+    """
+    # Avoid to mobilitate second vessel of additional operation of TTP if they have same vessel
+    list_oper_avoid, vessel_tow_list = [], []
+
+    for oper_tow in operations_tow['pmain']:
+        if oper_tow.op_class.vessel1_id is not None:
+            vessel_tow_list.append(oper_tow.op_class.vessel1_id)
+        if oper_tow.op_class.vessel2_id is not None:
+            vessel_tow_list.append(oper_tow.op_class.vessel2_id)
+
+    for op in operations_tow['pmain']:
+        oper_add = getattr(op.op_class, "addition_op_tow", None)
+        if oper_add is not None:
+            if oper_add.vessel2_id in vessel_tow_list:
+                list_oper_avoid.append(oper_add.id)
+
+    log_second_vessel = pd.DataFrame(columns=log_events_merged.columns)
+
+    log_mobilisation = log_events_merged[log_events_merged["event"].isin(["mobilisation", "mobilisation_merged"])]
+
+    for _, row in log_mobilisation.iterrows():
+        oper = find_element_class.find_operation(row["comments"][0])
+        if oper.id in list_oper_avoid:
+            continue
+        vessel_2 = getattr(oper, 'vessel2', None)
+        n_vessel_2 = getattr(oper, 'vessel2_qt', None)
+        if vessel_2 and vessel_2.mobilisation_cost:
+            log_second_vessel = create_mobilisation(
+                df = log_second_vessel,
+                mobilisation_date = row["d_trigger"],
+                end_mobi = row["d_trigger"] + pd.Timedelta(hours=vessel_2.mobilisation_time),
+                event = 'mobilisation',
+                vessel = vessel_2,
+                oper_list = row["comments"],
+                count_fail = row["id"].removeprefix("mobi_"),
+                concat = True,
+                n_vessel = n_vessel_2
+            )
+            log_second_vessel.loc[log_second_vessel.index[-1], "d_end_stat_chart"] = row["d_end_stat_chart"]
+
+    log_events_merged = pd.concat([log_events_merged, log_second_vessel], axis=0, ignore_index=False)
+    return log_events_merged
 
 if __name__ == '__main__':
     pass

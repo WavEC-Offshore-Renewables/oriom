@@ -11,8 +11,8 @@ def get_meaningful_timesteps(
     Extract meaningful timesteps from a given timeseries based on specified timesteps and conditions.
 
     Args:
-        timeseries (:obj:`pd.DataFrame`): The input timeseries data
-        timesteps (:obj:`list`): List of timesteps to consider
+        timeseries (pd.DataFrame): The input timeseries data
+        timesteps (list): List of timesteps to consider
 
     Returns:
         :obj:`list`: List of meaningful timesteps

@@ -5,7 +5,7 @@ import numpy as np
 from copy import deepcopy
 
 # Import classes
-from oriom.classes.Metocean import Metocean
+from oriom.domain.Metocean import Metocean
 
 # Import functions
 from oriom.core.timeseries_analysis.timestep_power import (

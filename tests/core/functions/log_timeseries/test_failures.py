@@ -5,8 +5,8 @@ import pandas as pd
 import numpy as np
 
 from oriom.core.functions.logs_timeseries.failures import failures_event, find_month_available
-from oriom.classes.Failure import Failure
-from oriom.classes.Scenario import Scenario
+from oriom.domain.Failure import Failure
+from oriom.domain.Scenario import Scenario
 
 
 class TestFailures(unittest.TestCase):

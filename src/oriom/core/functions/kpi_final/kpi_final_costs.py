@@ -36,26 +36,26 @@ def kpi_final_total_cost(
         operations.
 
     Args:
-        log_events (:obj:`pd.DataFrame`): Log of all the events (failure,
+        log_events (pd.DataFrame): Log of all the events (failure,
             operation, inspection_port, inspection_site).
-        log_events_merged: (:obj:`pd.DataFrame`): Log of all the events merged (failure,
+        log_events_merged: (pd.DataFrame): Log of all the events merged (failure,
             operation, inspection_port, inspection_site).
-        vessels (:obj:`list`): List of objects :class:`Vessel`
+        vessels (list): List of objects :class:`Vessel`
         inputs (object): object of class `Inputs` that contains all the input data from input file,
-        vessel_day_counter (: object): Object of ``VesselDayCount`` for ,
+        vessel_day_counter (object): Object of ``VesselDayCount`` for ,
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
-        operations_corrective_stat (:obj:`list`): List of obejcts :class:`OperationsCorrectiveStat`.
-        operations_tow_stat (:obj:`list`): List of objects :class:`OperationsTowStat`.
-        inspections_site_stat(:obj:`list`): list of objects :class:`InspectionsSiteStat`
-        inspections_port_stat(:obj:`list`): list of objects :class:`InspectionsTowStat`
-        fuel_cost_hfo (:obj:`int`): Fuel cost €/ton.
-        fuel_cost_mdo (:obj:`int`): Fuel cost €/ton.
-        fuel_cost_mgo (:obj:`int`): Fuel cost €/ton.
-        n_lifetime (:obj:`int`): Year lifetime of the case study
-        port_cost_annual (:obj:`float`): Annual port costs.
-        insurance_cost_annual (:obj:`float`): Annual insurance costs.
-        technician_cost_annual (:obj:`float`): Annual technician costs.
+        operations_corrective_stat (list): List of obejcts :class:`OperationsCorrectiveStat`.
+        operations_tow_stat (list): List of objects :class:`OperationsTowStat`.
+        inspections_site_stat(list): list of objects :class:`InspectionsSiteStat`
+        inspections_port_stat(list): list of objects :class:`InspectionsTowStat`
+        fuel_cost_hfo (int): Fuel cost €/ton.
+        fuel_cost_mdo (int): Fuel cost €/ton.
+        fuel_cost_mgo (int): Fuel cost €/ton.
+        n_lifetime (int): Year lifetime of the case study
+        port_cost_annual (float): Annual port costs.
+        insurance_cost_annual (float): Annual insurance costs.
+        technician_cost_annual (float): Annual technician costs.
         mother_vessels (list): list of object from class ´´Vessels´´ considered for mother vessel campaign
 
     Returns:

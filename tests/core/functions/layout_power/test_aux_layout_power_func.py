@@ -108,12 +108,12 @@ class TestFindHighestPowerNode(unittest.TestCase):
 
     def test_returns_level_of_node_with_max_power(self):
         G = nx.DiGraph()
-        G.add_node("sub", level="substation", power=10.0)
+        G.add_node("sub", level="substation", power=0)
         G.add_node("dev1", level="device", power=5.0)
-        G.add_node("dev2", level="device", power=15.0)
+        G.add_node("dev2", level="last_string_device", power=15.0)
 
         level = aux_layout_power_func.find_highest_power_node(G)
-        self.assertEqual(level, "device")
+        self.assertEqual(level, ["device", "last_string_device"])
 
     def test_missing_power_treated_as_zero(self):
         G = nx.DiGraph()
@@ -121,7 +121,7 @@ class TestFindHighestPowerNode(unittest.TestCase):
         G.add_node("n2", level="level_b", power=3)
 
         level = aux_layout_power_func.find_highest_power_node(G)
-        self.assertEqual(level, "level_b")
+        self.assertEqual(level, ["level_b"])
 
     def test_all_zero_power_returns_first_level(self):
         G = nx.DiGraph()
@@ -129,7 +129,7 @@ class TestFindHighestPowerNode(unittest.TestCase):
         G.add_node("n2", level="L2", power=0.0)
 
         level = aux_layout_power_func.find_highest_power_node(G)
-        self.assertEqual(level, "L1")
+        self.assertEqual(level, [])
 
 
 class TestGetNearestMonthValue(unittest.TestCase):

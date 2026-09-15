@@ -15,11 +15,11 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
     The operations merged are ranked by less restrictive to most restrictive (Higher rank means more restrictive operation)
 
     Args:
-        oper_dict (:obj:`dict`): A dictionary containing operation details.
-        result_dir_r (:obj:`str`): The directory where the result file will be saved.
-        OLC_LIST (:obj:`list`): A list of OLC keys to be considered for ranking.
+        oper_dict (dict): A dictionary containing operation details.
+        result_dir_r (str): The directory where the result file will be saved.
+        OLC_LIST (list): A list of OLC keys to be considered for ranking.
     Returns:
-        grouped_operations (:obj:`dict`): A dictionary containing the grouped and ranked operations.
+        grouped_operations (dict): A dictionary containing the grouped and ranked operations.
 
     """
 
@@ -71,10 +71,10 @@ def mergeble_operation(oper_dict, result_dir_r, OLC_LIST):
         Higher rank will mean more restrictive operation, OLC are considered before than duration of the operation
 
         Args:
-            op (:obj:`str`): The key from the dictionary, representing the operation name.
-            details (:obj:`dict`): The value associated with the key, containing the operation details (Vessel, OLC, duration, rov).
-            oper_dict (:obj:`dict`): The dictionary above cited
-            oper_list (:obj:`list`): A list of all operation prsent
+            op (str): The key from the dictionary, representing the operation name.
+            details (dict): The value associated with the key, containing the operation details (Vessel, OLC, duration, rov).
+            oper_dict (dict): The dictionary above cited
+            oper_list (list): A list of all operation prsent
 
         Returns:
             No returns, it create a dictionary.

@@ -10,7 +10,7 @@ def f_montecarlo(data_panda: pd.DataFrame, ts_percent_dec: float) -> tuple:
     """Select randomly the timestemp to analyse selecting a fixed % for each months.
 
     Args:
-        data_panda (:obj:`pd.DataFrame`): Table with metocean data.
+        data_panda (pd.DataFrame): Table with metocean data.
 
             :obj:`index`: timestamps of type :class:`pandas.DatetimeIndex`.
 

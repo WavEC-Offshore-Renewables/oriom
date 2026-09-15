@@ -1,4 +1,4 @@
-# test_OperationDeferredPortOrganizer.py
+# tests/core/functions/log_merge_corrective_functions/test_OperationDeferredPortOrganizer.py
 
 import unittest
 from types import SimpleNamespace
@@ -6,19 +6,30 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
+import oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer as deferred_port_module
+
 from oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer import (
     OperationDeferredPortCreation,
 )
 
 
 class TestOperationDeferredPortCreation(unittest.TestCase):
+    """Tests for OperationDeferredPortCreation with vessel quantity and mobilisation logic."""
 
     def setUp(self):
-        """
-        Prepare a minimal but realistic environment for the class under test.
-        """
-
+        """Prepare reusable deterministic test data."""
         self.base_time = pd.Timestamp("2025-01-10 00:00:00")
+        self.period = pd.Period("2025-01", freq="M")
+
+        self.op_ttp_id = 10
+        self.op_add_port_id = 11
+        self.op_tts_id = 20
+        self.op_port_id = 100
+
+        self.vessel_ttp_id = "V_TTP"
+        self.vessel_add_id = "V_ADD"
+        self.vessel_shared_id = "V_SHARED"
+        self.vessel_support_id = "V_SUPPORT"
 
         self.log_columns = [
             "d_trigger",
@@ -41,107 +52,63 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
             "shutdown",
             "ST_contract_1",
             "ST_contract_2",
+            "year_month",
+        ]
+
+        self.log_columns_without_year_month = [
+            column for column in self.log_columns if column != "year_month"
         ]
 
         self.schedule = pd.DataFrame(
             {
-                "datetime": pd.date_range(self.base_time, periods=200, freq="h"),
+                "datetime": pd.date_range(
+                    self.base_time,
+                    periods=300,
+                    freq="h",
+                ),
             }
         )
-
-        self.vessel = SimpleNamespace(
-            id="V1",
-            n_vessels=1,
-            mobilisation_time=4,
-        )
-
-        self.add_op_tow_port = None
-        self.add_op_tow_site = None
-        
-        self.oper_port_dict = {100: SimpleNamespace(
-            id=100,
-            n_device_at_port=1,
-            n_device_stored_at_port=0,
-            ts_data=SimpleNamespace(
-                oper_sched=self.schedule,
-                last_valid_index=len(self.schedule) - 1,
-            ),
-            tow_data=SimpleNamespace(
-                dict_tow_oper_sched={
-                    10: self.schedule,
-                    11: self.schedule,
-                    20: self.schedule,
-                    21: self.schedule,
-                    22: self.schedule,
-                    100: self.schedule,
-                },
-                dict_tow_oper_last_idx={
-                    10: len(self.schedule) - 1,
-                    11: len(self.schedule) - 1,
-                    20: len(self.schedule) - 1,
-                    21: len(self.schedule) - 1,
-                    22: len(self.schedule) - 1,
-                    100: len(self.schedule) - 1,
-                },
-                dict_oper_stat={
-                    10: {"dummy": True},
-                    11: {"dummy": True},
-                    20: {"dummy": True},
-                    21: {"dummy": True},
-                    22: {"dummy": True},
-                    100: {"dummy": True},
-                },
-                add_op_tow_port=self.add_op_tow_port,
-                add_op_tow_site=self.add_op_tow_site,
-                tow_site_oper_sched=self.schedule,
-                last_valid_idx_tow_site=len(self.schedule) - 1,
-            ),
-        )}
-
-        self.oper_dict_tow = {
-            10: SimpleNamespace(id=10, vessel1_id="V1", vessel1=self.vessel, recommissioning_time=0),
-            11: SimpleNamespace(id=11, vessel1_id="V1", vessel1=self.vessel, recommissioning_time=0),
-            20: SimpleNamespace(id=20, vessel1_id="V1", vessel1=self.vessel, recommissioning_time=0),
-            21: SimpleNamespace(id=21, vessel1_id="V1", vessel1=self.vessel, recommissioning_time=6),
-            22: SimpleNamespace(id=22, vessel1_id="V1", vessel1=self.vessel, recommissioning_time=0),
-        }
 
         self.find_element_class = MagicMock()
         self.find_element_class.find_operation_stats.return_value = {"dummy": True}
 
-        self.period = pd.Period("2025-01", freq="M")
-
-        self.patcher_safe_getattr = patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer.safe_getattr",
-            side_effect=lambda obj, attrs: getattr(getattr(obj, attrs[0]), attrs[1]),
+        self.patcher_safe_getattr = patch.object(
+            deferred_port_module,
+            "safe_getattr",
+            side_effect=self._fake_safe_getattr,
         )
-        self.patcher_approximate_hourly_data = patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer.approximate_hourly_data",
+        self.patcher_approximate_hourly_data = patch.object(
+            deferred_port_module,
+            "approximate_hourly_data",
             side_effect=lambda dt: pd.Timestamp(dt).floor("h"),
         )
-        self.patcher_overlap = patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer.logs_preventive_aux.date_ranges_overlap",
-            side_effect=lambda start_1, end_1, start_2, end_2: not (end_1 <= start_2 or end_2 <= start_1),
+        self.patcher_overlap = patch.object(
+            deferred_port_module.logs_preventive_aux,
+            "date_ranges_overlap",
+            side_effect=self._fake_date_ranges_overlap,
         )
-        self.patcher_check_index = patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer._check_index_row_validity",
+        self.patcher_check_index = patch.object(
+            deferred_port_module,
+            "_check_index_row_validity",
             side_effect=self._fake_check_index_row_validity,
         )
-        self.patcher_compute = patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer.compute_operation_datetimes",
+        self.patcher_compute = patch.object(
+            deferred_port_module,
+            "compute_operation_datetimes",
             side_effect=self._fake_compute_operation_datetimes,
         )
-        self.patcher_create_mobilisation = patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer.create_mobilisation",
+        self.patcher_create_mobilisation = patch.object(
+            deferred_port_module,
+            "create_mobilisation",
             side_effect=self._fake_create_mobilisation,
         )
 
-        self.patcher_safe_getattr.start()
-        self.patcher_approximate_hourly_data.start()
-        self.patcher_overlap.start()
-        self.patcher_check_index.start()
-        self.patcher_compute.start()
-        self.patcher_create_mobilisation.start()
+        self.mock_safe_getattr = self.patcher_safe_getattr.start()
+        self.mock_approximate_hourly_data = self.patcher_approximate_hourly_data.start()
+        self.mock_overlap = self.patcher_overlap.start()
+        self.mock_check_index = self.patcher_check_index.start()
+        self.mock_compute = self.patcher_compute.start()
+        self.mock_create_mobilisation = self.patcher_create_mobilisation.start()
 
         self.addCleanup(self.patcher_safe_getattr.stop)
         self.addCleanup(self.patcher_approximate_hourly_data.stop)
@@ -150,94 +117,34 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
         self.addCleanup(self.patcher_compute.stop)
         self.addCleanup(self.patcher_create_mobilisation.stop)
 
-    def _build_row(
-        self,
-        trigger_offset_minutes,
-        event,
-        operation_id,
-        comments="failure_1",
-    ):
-        """
-        Build one log row using deterministic timestamps.
-        """
+    # ------------------------------------------------------------------
+    # Fake external functions
+    # ------------------------------------------------------------------
 
-        trigger = self.base_time + pd.Timedelta(minutes=trigger_offset_minutes)
+    @staticmethod
+    def _fake_safe_getattr(obj, attrs):
+        """Return a nested attribute."""
+        value = obj
+        for attr in attrs:
+            value = getattr(value, attr)
+        return value
 
-        return [
-            trigger,
-            trigger + pd.Timedelta(hours=1),
-            trigger + pd.Timedelta(hours=2),
-            trigger + pd.Timedelta(hours=3),
-            trigger + pd.Timedelta(hours=4),
-            trigger + pd.Timedelta(hours=5),
-            trigger + pd.Timedelta(hours=6),
-            trigger + pd.Timedelta(hours=7),
-            trigger + pd.Timedelta(hours=8),
-            trigger + pd.Timedelta(hours=9),
-            event,
-            operation_id,
-            "V1",
-            1,
-            None,
-            None,
-            comments,
-            True,
-            False,
-            False,
-        ]
+    @staticmethod
+    def _fake_date_ranges_overlap(start_1, end_1, start_2, end_2):
+        """Return True when two time intervals overlap."""
+        return not (end_1 <= start_2 or end_2 <= start_1)
 
-    def _build_log_events_three_rows(self):
-        """
-        Build a campaign with three rows:
-        tow_to_port -> operation_at_port -> tow_to_site
-        """
-
-        df = pd.DataFrame(
-            [
-                self._build_row(0, "tow_to_port", 10),
-                self._build_row(10, "operation_at_port", 100),
-                self._build_row(20, "tow_to_site", 20),
-            ],
-            columns=self.log_columns,
-        )
-        df["year_month"] = df["d_trigger"].dt.to_period("M")
-        return df
-
-    def _build_log_events_five_rows(self):
-        """
-        Build a campaign with five rows:
-        additional_before_tow_port -> tow_to_port -> operation_at_port
-        -> tow_to_site -> additional_after_tow_site
-        """
-
-        df = pd.DataFrame(
-            [
-                self._build_row(0, "additional_before_tow_port", 11),
-                self._build_row(10, "tow_to_port", 10),
-                self._build_row(20, "operation_at_port", 100),
-                self._build_row(30, "tow_to_site", 20),
-                self._build_row(40, "additional_after_tow_site", 21),
-            ],
-            columns=self.log_columns,
-        )
-        df["year_month"] = df["d_trigger"].dt.to_period("M")
-        return df
-
-    def _fake_check_index_row_validity(self, idx_end_leadtime, last_valid_idx, r, oper_sched):
-        """
-        Return one valid schedule row when the index is valid, otherwise an empty DataFrame.
-        """
-
+    @staticmethod
+    def _fake_check_index_row_validity(idx_end_leadtime, last_valid_idx, r, oper_sched):
+        """Return one schedule row when the requested index is valid."""
         if idx_end_leadtime > last_valid_idx:
             return pd.DataFrame()
 
         return oper_sched.iloc[[idx_end_leadtime]].copy()
 
-    def _fake_compute_operation_datetimes(self, df_filtered_start_tow, oper_stat):
-        """
-        Build deterministic operation datetimes from the selected schedule row.
-        """
-
+    @staticmethod
+    def _fake_compute_operation_datetimes(df_filtered_start_tow, oper_stat):
+        """Build deterministic operation datetimes from the selected schedule row."""
         start = pd.Timestamp(df_filtered_start_tow["datetime"].iloc[0])
 
         return {
@@ -261,12 +168,9 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
         oper_list,
         count_fail,
         concat,
-        n_vessel
+        n_vessel,
     ):
-        """
-        Create a minimal mobilisation row compatible with the class output schema.
-        """
-
+        """Create a minimal mobilisation row compatible with the output schema."""
         return pd.DataFrame(
             [
                 [
@@ -283,7 +187,7 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
                     event,
                     oper_list[0],
                     vessel.id,
-                    1,
+                    n_vessel,
                     None,
                     None,
                     f"mobi_{count_fail}",
@@ -292,402 +196,997 @@ class TestOperationDeferredPortCreation(unittest.TestCase):
                     False,
                 ]
             ],
-            columns=self.log_columns,
+            columns=self.log_columns_without_year_month,
         )
 
-    def _build_instance(self, log_events_tow_def):
-        """
-        Create a fresh class instance for each test branch.
-        """
+    # ------------------------------------------------------------------
+    # Builders
+    # ------------------------------------------------------------------
 
-        return OperationDeferredPortCreation(
-            log_events_tow_def=log_events_tow_def.copy(),
-            oper_port_dict=self.oper_port_dict,
-            oper_dict_tow=self.oper_dict_tow,
+    @staticmethod
+    def _make_vessel(vessel_id, n_vessels=4, mobilisation_time=4):
+        """Create a minimal vessel object."""
+        return SimpleNamespace(
+            id=vessel_id,
+            n_vessels=n_vessels,
+            mobilisation_time=mobilisation_time,
+        )
+
+    def _make_operation(
+        self,
+        operation_id,
+        vessel_1,
+        vessel_2=None,
+        recommissioning_time=0,
+    ):
+        """Create a minimal tow/additional operation object."""
+        return SimpleNamespace(
+            id=operation_id,
+            vessel1_id=vessel_1.id if vessel_1 else None,
+            vessel1=vessel_1,
+            vessel2_id=vessel_2.id if vessel_2 else None,
+            vessel2=vessel_2,
+            recommissioning_time=recommissioning_time,
+        )
+
+    def _make_port_operation(self, add_op_tow_port=None):
+        """Create a minimal port operation object."""
+        operation_ids = [
+            self.op_ttp_id,
+            self.op_tts_id,
+            self.op_port_id,
+        ]
+
+        if add_op_tow_port is not None:
+            operation_ids.append(self.op_add_port_id)
+
+        operation_ids = sorted(set(operation_ids))
+
+        return SimpleNamespace(
+            id=self.op_port_id,
+            n_device_at_port=10,
+            n_device_stored_at_port=0,
+            ts_data=SimpleNamespace(
+                oper_sched=self.schedule,
+                last_valid_index=len(self.schedule) - 1,
+            ),
+            tow_data=SimpleNamespace(
+                dict_tow_oper_sched={
+                    operation_id: self.schedule for operation_id in operation_ids
+                },
+                dict_tow_oper_last_idx={
+                    operation_id: len(self.schedule) - 1 for operation_id in operation_ids
+                },
+                dict_oper_stat={
+                    operation_id: {"dummy": True} for operation_id in operation_ids
+                },
+                add_op_tow_port=add_op_tow_port,
+                add_op_tow_site=None,
+                tow_site_oper_sched=self.schedule,
+                last_valid_idx_tow_site=len(self.schedule) - 1,
+            ),
+        )
+
+    def _make_row(
+        self,
+        offset_minutes,
+        event,
+        operation_id,
+        vessel_1,
+        n_vessel_1,
+        vessel_2,
+        n_vessel_2,
+        comments="failure_F1",
+    ):
+        """Build one deterministic log row."""
+        trigger = self.base_time + pd.Timedelta(minutes=offset_minutes)
+
+        return [
+            trigger,
+            trigger + pd.Timedelta(hours=1),
+            trigger + pd.Timedelta(hours=2),
+            trigger + pd.Timedelta(hours=3),
+            trigger + pd.Timedelta(hours=4),
+            trigger + pd.Timedelta(hours=5),
+            trigger + pd.Timedelta(hours=6),
+            trigger + pd.Timedelta(hours=7),
+            trigger + pd.Timedelta(hours=8),
+            trigger + pd.Timedelta(hours=9),
+            event,
+            operation_id,
+            vessel_1,
+            n_vessel_1,
+            vessel_2,
+            n_vessel_2,
+            comments,
+            True,
+            False,
+            False,
+            self.period,
+        ]
+
+    def _make_log_events(
+        self,
+        has_additional_operation,
+        add_vessel_id,
+        ttp_vessel_id,
+        add_quantity,
+        ttp_quantity,
+        vessel_2_id=None,
+        vessel_2_quantity=0,
+    ):
+        """Build one complete deferred campaign for a single failure."""
+        rows = []
+
+        if vessel_2_id is None:
+            vessel_2_id = self.vessel_support_id
+
+        if has_additional_operation:
+            rows.append(
+                self._make_row(
+                    offset_minutes=0,
+                    event="additional_before_tow_port",
+                    operation_id=self.op_add_port_id,
+                    vessel_1=add_vessel_id,
+                    n_vessel_1=add_quantity,
+                    vessel_2=vessel_2_id,
+                    n_vessel_2=0,
+                )
+            )
+            ttp_offset = 10
+            port_offset = 20
+            tts_offset = 30
+        else:
+            ttp_offset = 0
+            port_offset = 10
+            tts_offset = 20
+
+        rows.extend(
+            [
+                self._make_row(
+                    offset_minutes=ttp_offset,
+                    event="tow_to_port",
+                    operation_id=self.op_ttp_id,
+                    vessel_1=ttp_vessel_id,
+                    n_vessel_1=ttp_quantity,
+                    vessel_2=vessel_2_id,
+                    n_vessel_2=vessel_2_quantity,
+                ),
+                self._make_row(
+                    offset_minutes=port_offset,
+                    event="operation_at_port",
+                    operation_id=self.op_port_id,
+                    vessel_1=ttp_vessel_id,
+                    n_vessel_1=0,
+                    vessel_2=vessel_2_id,
+                    n_vessel_2=0,
+                ),
+                self._make_row(
+                    offset_minutes=tts_offset,
+                    event="tow_to_site",
+                    operation_id=self.op_tts_id,
+                    vessel_1=ttp_vessel_id,
+                    n_vessel_1=ttp_quantity,
+                    vessel_2=vessel_2_id,
+                    n_vessel_2=0,
+                ),
+            ]
+        )
+
+        return pd.DataFrame(rows, columns=self.log_columns)
+
+    def _build_instance(
+        self,
+        has_additional_operation,
+        add_vessel_id,
+        ttp_vessel_id,
+        add_quantity,
+        ttp_quantity,
+        vessel_2_id=None,
+        vessel_2_quantity=0,
+        vessel_availability=None,
+    ):
+        """Build a complete manager instance for one test case."""
+        if vessel_availability is None:
+            vessel_availability = {}
+
+        if vessel_2_id is None:
+            vessel_2_id = self.vessel_support_id
+
+        vessel_ids = {
+            self.vessel_ttp_id,
+            self.vessel_add_id,
+            self.vessel_shared_id,
+            self.vessel_support_id,
+            add_vessel_id,
+            ttp_vessel_id,
+            vessel_2_id,
+        }
+        vessel_ids.discard(None)
+
+        vessels = {
+            vessel_id: self._make_vessel(
+                vessel_id=vessel_id,
+                n_vessels=vessel_availability.get(vessel_id, 4),
+                mobilisation_time=4,
+            )
+            for vessel_id in vessel_ids
+        }
+
+        add_op_object = None
+        if has_additional_operation:
+            add_op_object = SimpleNamespace(id=self.op_add_port_id)
+
+        port_operation = self._make_port_operation(
+            add_op_tow_port=add_op_object,
+        )
+
+        oper_dict_tow = {
+            self.op_ttp_id: self._make_operation(
+                operation_id=self.op_ttp_id,
+                vessel_1=vessels[ttp_vessel_id],
+                vessel_2=vessels[vessel_2_id],
+            ),
+            self.op_tts_id: self._make_operation(
+                operation_id=self.op_tts_id,
+                vessel_1=vessels[ttp_vessel_id],
+                vessel_2=vessels[vessel_2_id],
+            ),
+        }
+
+        if has_additional_operation:
+            oper_dict_tow[self.op_add_port_id] = self._make_operation(
+                operation_id=self.op_add_port_id,
+                vessel_1=vessels[add_vessel_id],
+                vessel_2=vessels[vessel_2_id],
+            )
+
+        log_events_tow_def = self._make_log_events(
+            has_additional_operation=has_additional_operation,
+            add_vessel_id=add_vessel_id,
+            ttp_vessel_id=ttp_vessel_id,
+            add_quantity=add_quantity,
+            ttp_quantity=ttp_quantity,
+            vessel_2_id=vessel_2_id,
+            vessel_2_quantity=vessel_2_quantity,
+        )
+
+        self.find_element_class.find_failure_from_id.return_value = SimpleNamespace(
+            id="F1",
+            operation_triggered=self.op_port_id,
+        )
+        self.find_element_class.find_operation.return_value = port_operation
+
+        manager = OperationDeferredPortCreation(
+            log_events_tow_def=log_events_tow_def,
+            oper_port_dict={
+                self.op_port_id: port_operation,
+            },
+            oper_dict_tow=oper_dict_tow,
             find_element_class=self.find_element_class,
         )
 
-    def test_init_builds_internal_state(self):
-        """
-        Ensure initialization populates schedules, vessel availability and dictionaries.
-        """
+        return manager
 
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
+    def _run_case(
+        self,
+        has_additional_operation,
+        add_vessel_id,
+        ttp_vessel_id,
+        add_quantity,
+        ttp_quantity,
+        vessel_2_id=None,
+        vessel_2_quantity=0,
+        vessel_availability=None,
+    ):
+        """Build a manager, execute the full deferred_port_manager flow and return both."""
+        manager = self._build_instance(
+            has_additional_operation=has_additional_operation,
+            add_vessel_id=add_vessel_id,
+            ttp_vessel_id=ttp_vessel_id,
+            add_quantity=add_quantity,
+            ttp_quantity=ttp_quantity,
+            vessel_2_id=vessel_2_id,
+            vessel_2_quantity=vessel_2_quantity,
+            vessel_availability=vessel_availability,
+        )
 
-        self.assertEqual(manager.n_device_at_port, 1)
-        self.assertEqual(manager.vessel_available["V1"], 1)
-        self.assertIn(100, manager.dict_oper_sched)
-        self.assertIn(11, manager.dict_oper_sched)
-        self.assertIn(22, manager.dict_oper_sched)
+        result = manager.deferred_port_manager(
+            time_fail_op_immediately=2.0,
+        )
+
+        return manager, result
+
+    # ------------------------------------------------------------------
+    # Assertion helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _operation_events(result):
+        """Return all non-mobilisation event names."""
+        return result.loc[
+            result["event"] != "mobilisation_merged",
+            "event",
+        ].tolist()
+
+    @staticmethod
+    def _mobilisation_summary(result):
+        """Return mobilisation rows as tuples of vessel id, quantity and operation id."""
+        mobilisation_rows = result[result["event"] == "mobilisation_merged"]
+
+        return [
+            (
+                row["vessel_1"],
+                int(row["n_vessel_1"]),
+                row["id"],
+            )
+            for _, row in mobilisation_rows.iterrows()
+        ]
+
+    def _assert_tow_storage_slot(self, manager, vessel_id, slot_index, should_exist):
+        """Assert whether a tow-at-port storage slot exists for device 1."""
+        self.assertIn(vessel_id, manager.tow_at_port_date)
+        self.assertIn(1, manager.tow_at_port_date[vessel_id])
+
+        slot_value = manager.tow_at_port_date[vessel_id][1][slot_index]
+
+        if should_exist:
+            self.assertIsNotNone(slot_value)
+        else:
+            self.assertIsNone(slot_value)
+
+    # ------------------------------------------------------------------
+    # Main parameterised cases
+    # ------------------------------------------------------------------
+
+    def test_deferred_port_manager_mobilisation_cases(self):
+        """Test full deferred_port_manager flow for add-operation and vessel-quantity combinations."""
+        cases = [
+            {
+                "name": "no additional operation, two vessels used by towing",
+                "has_additional_operation": False,
+                "add_vessel_id": None,
+                "ttp_vessel_id": self.vessel_ttp_id,
+                "add_quantity": 0,
+                "ttp_quantity": 2,
+                "expected_events": [
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_ttp_id, 2, self.op_ttp_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_ttp_id: 2,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_ttp_id, 0, True),
+                    (self.vessel_ttp_id, 1, False),
+                ],
+            },
+            {
+                "name": "no additional operation, one vessel used by towing",
+                "has_additional_operation": False,
+                "add_vessel_id": None,
+                "ttp_vessel_id": self.vessel_ttp_id,
+                "add_quantity": 0,
+                "ttp_quantity": 1,
+                "expected_events": [
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_ttp_id, 1, self.op_ttp_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_ttp_id: 1,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_ttp_id, 0, True),
+                    (self.vessel_ttp_id, 1, False),
+                ],
+            },
+            {
+                "name": "additional operation with different vessel, all quantities equal to one",
+                "has_additional_operation": True,
+                "add_vessel_id": self.vessel_add_id,
+                "ttp_vessel_id": self.vessel_ttp_id,
+                "add_quantity": 1,
+                "ttp_quantity": 1,
+                "expected_events": [
+                    "additional_before_tow_port",
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_add_id, 1, self.op_add_port_id),
+                    (self.vessel_ttp_id, 1, self.op_ttp_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_add_id: 1,
+                    self.vessel_ttp_id: 1,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_add_id, 0, True),
+                    (self.vessel_add_id, 1, False),
+                    (self.vessel_ttp_id, 0, True),
+                    (self.vessel_ttp_id, 1, False),
+                ],
+            },
+            {
+                "name": "additional operation with different vessel, add quantity one and TTP quantity two",
+                "has_additional_operation": True,
+                "add_vessel_id": self.vessel_add_id,
+                "ttp_vessel_id": self.vessel_ttp_id,
+                "add_quantity": 1,
+                "ttp_quantity": 2,
+                "expected_events": [
+                    "additional_before_tow_port",
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_add_id, 1, self.op_add_port_id),
+                    (self.vessel_ttp_id, 2, self.op_ttp_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_add_id: 1,
+                    self.vessel_ttp_id: 2,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_add_id, 0, True),
+                    (self.vessel_add_id, 1, False),
+                    (self.vessel_ttp_id, 0, True),
+                    (self.vessel_ttp_id, 1, False),
+                ],
+            },
+            {
+                "name": "additional operation with different vessel, add quantity two and TTP quantity one",
+                "has_additional_operation": True,
+                "add_vessel_id": self.vessel_add_id,
+                "ttp_vessel_id": self.vessel_ttp_id,
+                "add_quantity": 2,
+                "ttp_quantity": 1,
+                "expected_events": [
+                    "additional_before_tow_port",
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_add_id, 2, self.op_add_port_id),
+                    (self.vessel_ttp_id, 1, self.op_ttp_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_add_id: 2,
+                    self.vessel_ttp_id: 1,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_add_id, 0, True),
+                    (self.vessel_add_id, 1, False),
+                    (self.vessel_ttp_id, 0, True),
+                    (self.vessel_ttp_id, 1, False),
+                ],
+            },
+            {
+                "name": "additional operation with different vessel, add quantity two and TTP quantity two",
+                "has_additional_operation": True,
+                "add_vessel_id": self.vessel_add_id,
+                "ttp_vessel_id": self.vessel_ttp_id,
+                "add_quantity": 2,
+                "ttp_quantity": 2,
+                "expected_events": [
+                    "additional_before_tow_port",
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_add_id, 2, self.op_add_port_id),
+                    (self.vessel_ttp_id, 2, self.op_ttp_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_add_id: 2,
+                    self.vessel_ttp_id: 2,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_add_id, 0, True),
+                    (self.vessel_add_id, 1, False),
+                    (self.vessel_ttp_id, 0, True),
+                    (self.vessel_ttp_id, 1, False),
+                ],
+            },
+            {
+                "name": "additional operation with same vessel, add quantity two and TTP quantity one",
+                "has_additional_operation": True,
+                "add_vessel_id": self.vessel_shared_id,
+                "ttp_vessel_id": self.vessel_shared_id,
+                "add_quantity": 2,
+                "ttp_quantity": 1,
+                "expected_events": [
+                    "additional_before_tow_port",
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_shared_id, 2, self.op_add_port_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_shared_id: 2,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_shared_id, 0, True),
+                    (self.vessel_shared_id, 1, True),
+                ],
+            },
+            {
+                "name": "additional operation with same vessel, add quantity two and TTP quantity two",
+                "has_additional_operation": True,
+                "add_vessel_id": self.vessel_shared_id,
+                "ttp_vessel_id": self.vessel_shared_id,
+                "add_quantity": 2,
+                "ttp_quantity": 2,
+                "expected_events": [
+                    "additional_before_tow_port",
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_shared_id, 2, self.op_add_port_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_shared_id: 2,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_shared_id, 0, True),
+                    (self.vessel_shared_id, 1, True),
+                ],
+            },
+            {
+                "name": "additional operation with same vessel, add quantity one and TTP quantity two",
+                "has_additional_operation": True,
+                "add_vessel_id": self.vessel_shared_id,
+                "ttp_vessel_id": self.vessel_shared_id,
+                "add_quantity": 1,
+                "ttp_quantity": 2,
+                "expected_events": [
+                    "additional_before_tow_port",
+                    "tow_to_port",
+                    "operation_at_port",
+                    "tow_to_site",
+                ],
+                "expected_mobilisations": [
+                    (self.vessel_shared_id, 1, self.op_add_port_id),
+                    (self.vessel_shared_id, 1, self.op_ttp_id),
+                ],
+                "expected_mobilised": {
+                    self.vessel_shared_id: 2,
+                    self.vessel_support_id: 0,
+                },
+                "expected_storage": [
+                    (self.vessel_shared_id, 0, True),
+                    (self.vessel_shared_id, 1, True),
+                ],
+            },
+        ]
+
+        for case in cases:
+            with self.subTest(case=case["name"]):
+                manager, result = self._run_case(
+                    has_additional_operation=case["has_additional_operation"],
+                    add_vessel_id=case["add_vessel_id"],
+                    ttp_vessel_id=case["ttp_vessel_id"],
+                    add_quantity=case["add_quantity"],
+                    ttp_quantity=case["ttp_quantity"],
+                )
+
+                self.assertTrue(manager.operation_completed)
+                self.assertEqual(
+                    self._operation_events(result),
+                    case["expected_events"],
+                )
+                self.assertEqual(
+                    self._mobilisation_summary(result),
+                    case["expected_mobilisations"],
+                )
+
+                for vessel_id, expected_count in case["expected_mobilised"].items():
+                    self.assertEqual(
+                        manager.vessels_mobilitated[vessel_id],
+                        expected_count,
+                    )
+
+                for vessel_id, slot_index, should_exist in case["expected_storage"]:
+                    self._assert_tow_storage_slot(
+                        manager=manager,
+                        vessel_id=vessel_id,
+                        slot_index=slot_index,
+                        should_exist=should_exist,
+                    )
+
+    def test_deferred_port_manager_creates_mobilisation_for_vessel_1_and_vessel_2(self):
+        """The full flow should create mobilisation rows for vessel_1 and vessel_2 when both have positive quantity."""
+        manager, result = self._run_case(
+            has_additional_operation=False,
+            add_vessel_id=None,
+            ttp_vessel_id=self.vessel_ttp_id,
+            add_quantity=0,
+            ttp_quantity=1,
+            vessel_2_id=self.vessel_support_id,
+            vessel_2_quantity=2,
+        )
+
         self.assertTrue(manager.operation_completed)
 
-    def test_reset_data_period_reinitializes_runtime_dictionaries(self):
-        """
-        Ensure period-specific state is reset correctly.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-
-        manager.dev_idx_station_port = 99
-        manager.tow_at_port_date["V1"][1] = ("x", "y")
-        manager.tow_at_site_date["V1"][1] = ("x", "y")
-        manager.oper_at_port_date[1] = ("x", "y")
-
-        manager.reset_data_period()
-
-        self.assertEqual(manager.dev_idx_station_port, 0)
-        self.assertEqual(manager.tow_at_port_date, {"V1": {}})
-        self.assertEqual(manager.tow_at_site_date, {"V1": {}})
-        self.assertEqual(manager.oper_at_port_date, {})
-
-    def test_write_event_row_appends_dataframe(self):
-        """
-        Ensure a new event row is appended to the internal log.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row_to_write = log_events_tow_def.iloc[[0]]
-
-        manager.write_event_row(row_to_write)
-
-        self.assertEqual(len(manager.df_port_oper_def_log), 1)
-        self.assertEqual(manager.df_port_oper_def_log.iloc[0]["id"], 10)
-
-    def test_overlap_shift_tow_returns_row_without_recomputation_when_no_overlap(self):
-        """
-        Ensure overlap_shift_tow returns a new row directly when there is no overlap.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[0]
-        row_dates = self._fake_compute_operation_datetimes(
-            pd.DataFrame({"datetime": [self.base_time + pd.Timedelta(hours=10)]}),
-            {},
+        self.assertEqual(
+            self._mobilisation_summary(result),
+            [
+                (self.vessel_ttp_id, 1, self.op_ttp_id),
+            ],
         )
+
+        self.assertEqual(manager.vessels_mobilitated[self.vessel_ttp_id], 1)
+        self.assertEqual(manager.vessels_mobilitated[self.vessel_support_id], 0)
+
+    def test_deferred_port_manager_uses_available_vessel_quantity_across_multiple_devices(self):
+        """The full flow should account for several available vessels and quantity used per towing operation."""
+        vessel_availability = {
+            self.vessel_ttp_id: 5,
+            self.vessel_support_id: 4,
+        }
+
+        port_operation = self._make_port_operation(add_op_tow_port=None)
+
+        vessel_ttp = self._make_vessel(
+            vessel_id=self.vessel_ttp_id,
+            n_vessels=5,
+            mobilisation_time=4,
+        )
+        vessel_support = self._make_vessel(
+            vessel_id=self.vessel_support_id,
+            n_vessels=0,
+            mobilisation_time=4,
+        )
+
+        oper_dict_tow = {
+            self.op_ttp_id: self._make_operation(
+                operation_id=self.op_ttp_id,
+                vessel_1=vessel_ttp,
+                vessel_2=vessel_support,
+            ),
+            self.op_tts_id: self._make_operation(
+                operation_id=self.op_tts_id,
+                vessel_1=vessel_ttp,
+                vessel_2=vessel_support,
+            ),
+        }
+
+        rows = []
+
+        for failure_index, failure_name in enumerate(["F1", "F2"]):
+            offset = failure_index * 60
+            comments = f"failure_{failure_name}"
+
+            rows.extend(
+                [
+                    self._make_row(
+                        offset_minutes=offset,
+                        event="tow_to_port",
+                        operation_id=self.op_ttp_id,
+                        vessel_1=self.vessel_ttp_id,
+                        n_vessel_1=2,
+                        vessel_2=self.vessel_support_id,
+                        n_vessel_2=0,
+                        comments=comments,
+                    ),
+                    self._make_row(
+                        offset_minutes=offset + 10,
+                        event="operation_at_port",
+                        operation_id=self.op_port_id,
+                        vessel_1=self.vessel_ttp_id,
+                        n_vessel_1=0,
+                        vessel_2=self.vessel_support_id,
+                        n_vessel_2=0,
+                        comments=comments,
+                    ),
+                    self._make_row(
+                        offset_minutes=offset + 20,
+                        event="tow_to_site",
+                        operation_id=self.op_tts_id,
+                        vessel_1=self.vessel_ttp_id,
+                        n_vessel_1=2,
+                        vessel_2=self.vessel_support_id,
+                        n_vessel_2=0,
+                        comments=comments,
+                    ),
+                ]
+            )
+
+        log_events_tow_def = pd.DataFrame(rows, columns=self.log_columns)
+
+        self.find_element_class.find_failure_from_id.return_value = SimpleNamespace(
+            id="F",
+            operation_triggered=self.op_port_id,
+        )
+        self.find_element_class.find_operation.return_value = port_operation
+
+        manager = OperationDeferredPortCreation(
+            log_events_tow_def=log_events_tow_def,
+            oper_port_dict={
+                self.op_port_id: port_operation,
+            },
+            oper_dict_tow=oper_dict_tow,
+            find_element_class=self.find_element_class,
+        )
+
+        self.assertEqual(manager.vessel_available[self.vessel_ttp_id], vessel_availability[self.vessel_ttp_id])
+
+        result = manager.deferred_port_manager(
+            time_fail_op_immediately=2.0,
+        )
+
+        self.assertTrue(manager.operation_completed)
+
+        operation_events = self._operation_events(result)
+        self.assertEqual(operation_events.count("tow_to_port"), 2)
+        self.assertEqual(operation_events.count("operation_at_port"), 2)
+        self.assertEqual(operation_events.count("tow_to_site"), 2)
+
+        self.assertEqual(
+            self._mobilisation_summary(result),
+            [
+                (self.vessel_ttp_id, 2, self.op_ttp_id),
+                (self.vessel_ttp_id, 2, self.op_ttp_id),
+            ],
+        )
+
+        self.assertEqual(manager.vessels_mobilitated[self.vessel_ttp_id], 4)
+        self.assertLessEqual(
+            manager.vessels_mobilitated[self.vessel_ttp_id],
+            manager.vessel_available[self.vessel_ttp_id],
+        )
+
+
+    def test_overlap_shift_tow_keeps_dates_when_no_overlap_exists(self):
+        """overlap_shift_tow should keep the proposed row dates when no vessel overlap exists."""
+        manager = self._build_instance(
+            has_additional_operation=False,
+            add_vessel_id=None,
+            ttp_vessel_id=self.vessel_ttp_id,
+            add_quantity=0,
+            ttp_quantity=1,
+        )
+
+        row = manager.log_events_tow_def.iloc[0]
+        manager.period = self.period
+
+        row_dates = {
+            "date_end_wait_start": self.base_time + pd.Timedelta(hours=20),
+            "date_end_dur_net_port": self.base_time + pd.Timedelta(hours=21),
+            "date_end_transit_ts": self.base_time + pd.Timedelta(hours=22),
+            "date_end_wait_site": self.base_time + pd.Timedelta(hours=23),
+            "date_end_dur_net_site": self.base_time + pd.Timedelta(hours=24),
+            "date_end_transit_tp": self.base_time + pd.Timedelta(hours=25),
+            "date_end": self.base_time + pd.Timedelta(hours=26),
+            "date_end_stat_chart": self.base_time + pd.Timedelta(hours=27),
+        }
+
+        existing_intervals = {
+            "device_1": [
+                (
+                    self.base_time + pd.Timedelta(hours=5),
+                    self.base_time + pd.Timedelta(hours=1),
+                    1,
+                )
+            ]
+        }
 
         result = manager.overlap_shift_tow(
             overlap_date=True,
-            tow_at_site_date={"dev_1": (self.base_time, self.base_time + pd.Timedelta(minutes=30))},
-            n_vess_row=2,
+            tow_at_site_date=existing_intervals,
+            n_vess_row=4,
             oper_schedule=self.schedule,
             row_dates=row_dates,
-            idx_oper_sched=0,
+            idx_oper_sched=20,
             last_valid_idx=len(self.schedule) - 1,
             row=row,
-            period=self.period,
         )
 
-        self.assertIsInstance(result, pd.DataFrame)
         self.assertFalse(result.empty)
-        self.assertEqual(result.iloc[0]["event"], "tow_to_port")
-
-    def test_overlap_shift_tow_returns_empty_when_schedule_cannot_be_found(self):
-        """
-        Ensure overlap_shift_tow returns an empty DataFrame when no valid schedule exists.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[0]
-        row_dates = self._fake_compute_operation_datetimes(
-            pd.DataFrame({"datetime": [self.base_time + pd.Timedelta(hours=5)]}),
-            {},
+        self.assertEqual(
+            result["d_end_wait_start"].iloc[0],
+            self.base_time + pd.Timedelta(hours=20),
+        )
+        self.assertEqual(
+            result["d_end"].iloc[0],
+            self.base_time + pd.Timedelta(hours=26),
         )
 
-        with patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer._check_index_row_validity",
+
+    def test_overlap_shift_tow_reschedules_when_overlap_exceeds_vessel_capacity(self):
+        """overlap_shift_tow should reschedule when overlapping vessel demand exceeds available vessels."""
+        manager = self._build_instance(
+            has_additional_operation=False,
+            add_vessel_id=None,
+            ttp_vessel_id=self.vessel_ttp_id,
+            add_quantity=0,
+            ttp_quantity=2,
+            vessel_availability={
+                self.vessel_ttp_id: 3,
+            },
+        )
+
+        row = manager.log_events_tow_def.iloc[0]
+        manager.period = self.period
+
+        row_dates = {
+            "date_end_wait_start": self.base_time + pd.Timedelta(hours=10),
+            "date_end_dur_net_port": self.base_time + pd.Timedelta(hours=11),
+            "date_end_transit_ts": self.base_time + pd.Timedelta(hours=12),
+            "date_end_wait_site": self.base_time + pd.Timedelta(hours=13),
+            "date_end_dur_net_site": self.base_time + pd.Timedelta(hours=14),
+            "date_end_transit_tp": self.base_time + pd.Timedelta(hours=15),
+            "date_end": self.base_time + pd.Timedelta(hours=16),
+            "date_end_stat_chart": self.base_time + pd.Timedelta(hours=17),
+        }
+
+        existing_intervals = {
+            "device_1": [
+                (
+                    self.base_time + pd.Timedelta(hours=18),
+                    self.base_time + pd.Timedelta(hours=9),
+                    2,
+                )
+            ]
+        }
+
+        result = manager.overlap_shift_tow(
+            overlap_date=True,
+            tow_at_site_date=existing_intervals,
+            n_vess_row=3,
+            oper_schedule=self.schedule,
+            row_dates=row_dates,
+            idx_oper_sched=10,
+            last_valid_idx=len(self.schedule) - 1,
+            row=row,
+        )
+
+        self.assertFalse(result.empty)
+
+        self.assertGreater(
+            result["d_end_wait_start"].iloc[0],
+            self.base_time + pd.Timedelta(hours=10),
+        )
+        self.assertTrue(manager.operation_completed)
+
+
+    def test_overlap_shift_tow_accepts_exact_vessel_capacity(self):
+        """overlap_shift_tow should accept overlaps when total vessel use equals available capacity."""
+        manager = self._build_instance(
+            has_additional_operation=False,
+            add_vessel_id=None,
+            ttp_vessel_id=self.vessel_ttp_id,
+            add_quantity=0,
+            ttp_quantity=2,
+            vessel_availability={
+                self.vessel_ttp_id: 4,
+            },
+        )
+
+        row = manager.log_events_tow_def.iloc[0]
+        manager.period = self.period
+
+        row_dates = {
+            "date_end_wait_start": self.base_time + pd.Timedelta(hours=10),
+            "date_end_dur_net_port": self.base_time + pd.Timedelta(hours=11),
+            "date_end_transit_ts": self.base_time + pd.Timedelta(hours=12),
+            "date_end_wait_site": self.base_time + pd.Timedelta(hours=13),
+            "date_end_dur_net_site": self.base_time + pd.Timedelta(hours=14),
+            "date_end_transit_tp": self.base_time + pd.Timedelta(hours=15),
+            "date_end": self.base_time + pd.Timedelta(hours=16),
+            "date_end_stat_chart": self.base_time + pd.Timedelta(hours=17),
+        }
+
+        existing_intervals = {
+            "device_1": [
+                (
+                    self.base_time + pd.Timedelta(hours=18),
+                    self.base_time + pd.Timedelta(hours=9),
+                    2,
+                )
+            ]
+        }
+
+        result = manager.overlap_shift_tow(
+            overlap_date=True,
+            tow_at_site_date=existing_intervals,
+            n_vess_row=4,
+            oper_schedule=self.schedule,
+            row_dates=row_dates,
+            idx_oper_sched=10,
+            last_valid_idx=len(self.schedule) - 1,
+            row=row,
+        )
+
+        self.assertFalse(result.empty)
+        self.assertEqual(
+            result["d_end_wait_start"].iloc[0],
+            self.base_time + pd.Timedelta(hours=10),
+        )
+        self.assertEqual(
+            result["d_end"].iloc[0],
+            self.base_time + pd.Timedelta(hours=16),
+        )
+
+    def test_overlap_shift_tow_returns_empty_when_reschedule_has_no_valid_index(self):
+        """overlap_shift_tow should stop the operation when no valid reschedule row exists."""
+        manager = self._build_instance(
+            has_additional_operation=False,
+            add_vessel_id=None,
+            ttp_vessel_id=self.vessel_ttp_id,
+            add_quantity=0,
+            ttp_quantity=2,
+            vessel_availability={
+                self.vessel_ttp_id: 3,
+            },
+        )
+
+        row = manager.log_events_tow_def.iloc[0]
+        manager.period = self.period
+
+        row_dates = {
+            "date_end_wait_start": self.base_time + pd.Timedelta(hours=10),
+            "date_end_dur_net_port": self.base_time + pd.Timedelta(hours=11),
+            "date_end_transit_ts": self.base_time + pd.Timedelta(hours=12),
+            "date_end_wait_site": self.base_time + pd.Timedelta(hours=13),
+            "date_end_dur_net_site": self.base_time + pd.Timedelta(hours=14),
+            "date_end_transit_tp": self.base_time + pd.Timedelta(hours=15),
+            "date_end": self.base_time + pd.Timedelta(hours=16),
+            "date_end_stat_chart": self.base_time + pd.Timedelta(hours=17),
+        }
+
+        existing_intervals = {
+            "device_1": [
+                (
+                    self.base_time + pd.Timedelta(hours=18),
+                    self.base_time + pd.Timedelta(hours=9),
+                    2,
+                )
+            ]
+        }
+
+        with patch.object(
+            deferred_port_module,
+            "_check_index_row_validity",
             return_value=pd.DataFrame(),
         ):
             result = manager.overlap_shift_tow(
                 overlap_date=True,
-                tow_at_site_date={
-                    "dev_1": (
-                        self.base_time + pd.Timedelta(hours=20),
-                        self.base_time + pd.Timedelta(hours=5),
-                    )
-                },
-                n_vess_row=1,
+                tow_at_site_date=existing_intervals,
+                n_vess_row=3,
                 oper_schedule=self.schedule,
                 row_dates=row_dates,
-                idx_oper_sched=0,
+                idx_oper_sched=10,
                 last_valid_idx=len(self.schedule) - 1,
                 row=row,
-                period=self.period,
             )
 
         self.assertTrue(result.empty)
         self.assertFalse(manager.operation_completed)
-
-    def test_tow_to_port_first_device_uses_original_row(self):
-        """
-        Ensure the first device uses the original event row without rescheduling.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[0]
-
-        result, write_event = manager.tow_to_port(row=row, device_n=1, period=self.period)
-
-        self.assertTrue(write_event)
-        self.assertEqual(result.iloc[0]["id"], 10)
-        self.assertIn(1, manager.tow_at_port_date["V1"])
-
-    def test_tow_to_port_reschedules_for_second_device(self):
-        """
-        Ensure the tow-to-port event is rescheduled when vessel capacity is exceeded.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[0]
-        manager.tow_at_port_date[1] = {'V1':
-            (
-                self.base_time + pd.Timedelta(hours=20),
-                self.base_time + pd.Timedelta(hours=10),
-            )
-        }
-        manager.n_device_at_port = 2
-        manager.dev_idx_station_port = 2
-        result, write_event = manager.tow_to_port(
-            row=row,
-            device_n=2,
-            period=self.period,
-            date_start_op=self.base_time + pd.Timedelta(hours=10),
-        )
-
-        self.assertTrue(write_event)
-        self.assertFalse(result.empty)
-        self.assertEqual(result.iloc[0]["id"], 10)
-        self.assertIn(2, manager.tow_at_port_date["V1"])
-
-    def test_tow_to_port_returns_empty_when_reschedule_fails(self):
-        """
-        Ensure tow_to_port returns an empty DataFrame when schedule lookup fails.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[0]
-
-        with patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer._check_index_row_validity",
-            return_value=pd.DataFrame(),
-        ):
-            result = manager.tow_to_port(
-                row=row,
-                device_n=2,
-                period=self.period,
-                date_start_op=self.base_time + pd.Timedelta(hours=10),
-            )
-
-        self.assertTrue(result.empty)
-        self.assertFalse(manager.operation_completed)
-
-    def test_operation_at_port_first_device_uses_original_row(self):
-        """
-        Ensure the first port operation reuses the original row.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[1]
-
-        result = manager.operation_at_port(
-            row=row,
-            device_n=1,
-            date_start_op=self.base_time,
-            period=self.period,
-        )
-
-        self.assertFalse(result.empty)
-        self.assertEqual(result.iloc[0]["id"], 100)
-        self.assertIn(1, manager.oper_at_port_date)
-
-    def test_operation_at_port_second_device_is_rescheduled(self):
-        """
-        Ensure subsequent port operations are rescheduled from the provided start date.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[1]
-
-        result = manager.operation_at_port(
-            row=row,
-            device_n=2,
-            date_start_op=self.base_time + pd.Timedelta(hours=11),
-            period=self.period,
-        )
-
-        self.assertFalse(result.empty)
-        self.assertEqual(result.iloc[0]["event"], "operation_at_port")
-
-    def test_tow_to_site_second_device_with_tts_branch(self):
-        """
-        Ensure tow_to_site uses the dedicated tow-site schedule when tts is True.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        manager.n_device_at_port = 2
-        manager.oper_port = manager.oper_port_dict[100]
-        manager.dev_idx_station_port = 2
-        row = log_events_tow_def.iloc[2]
-        manager.tow_at_site_date["V1"][1] = (
-            self.base_time + pd.Timedelta(hours=50),
-            self.base_time + pd.Timedelta(hours=40),
-        )
-
-        result = manager.tow_to_site(
-            row=row,
-            device_n=2,
-            tts=True,
-            date_start_op=self.base_time + pd.Timedelta(hours=12),
-            period=self.period,
-        )
-
-        self.assertFalse(result.empty)
-        self.assertEqual(result.iloc[0]["id"], 20)
-        self.assertIn(2, manager.tow_at_site_date["V1"])
-
-    def test_create_mobi_returns_mobilisation_row(self):
-        """
-        Ensure create_mobi builds a valid mobilisation row.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        manager.df_port_oper_def_log = log_events_tow_def.iloc[[0]].copy()
-        row = log_events_tow_def.iloc[0]
-
-        result = manager.create_mobi(
-            row=row,
-            time_fail_op_immediately=2.0,
-            vessel=self.vessel,
-            n_vess=1
-        )
-
-        self.assertFalse(result.empty)
-        self.assertEqual(result.iloc[0]["event"], "mobilisation_merged")
-        self.assertEqual(result.iloc[0]["vessel_1"], "V1")
-
-    def test_add_recommission_updates_event_and_site_tracking(self):
-        """
-        Ensure add_recommission updates timestamps and tracking dictionaries.
-        """
-
-        log_events_tow_def = self._build_log_events_five_rows()
-        manager = self._build_instance(log_events_tow_def)
-        row = log_events_tow_def.iloc[4]
-        row_dates_tow_recom = log_events_tow_def.iloc[[4]].copy()
-        manager.dev_idx_station_port = 1
-        manager.tow_at_site_date["V1"][1] = (
-            row_dates_tow_recom["d_end"].iloc[0],
-            row_dates_tow_recom["d_end_wait_start"].iloc[0],
-        )
-        manager.oper_port = manager.oper_port_dict[100]
-        manager.oper_port.tow_data.add_op_tow_port = SimpleNamespace(
-            id=11,
-            ts_data=SimpleNamespace(
-                oper_sched=self.schedule,
-                last_valid_index=len(self.schedule) - 1,
-            ),
-        )
-        manager.oper_port.tow_data.add_op_tow_site = SimpleNamespace(
-            id=22,
-            ts_data=SimpleNamespace(
-                oper_sched=self.schedule,
-                last_valid_index=len(self.schedule) - 1,
-            ),
-        )
-
-        result = manager.add_recommission(
-            row_dates_tow_recom=row_dates_tow_recom,
-            row=row,
-            recommission=6,
-        )
-
-        self.assertEqual(result.iloc[0]["event"], "recommissioning")
-        self.assertIsNone(result.iloc[0]["vessel_1"])
-        self.assertEqual(
-            manager.tow_at_site_date["V1"][1][0],
-            result.iloc[0]["d_end"],
-        )
-
-    def test_deferred_port_manager_full_flow_with_three_rows(self):
-        """
-        Ensure the main manager handles the basic three-row flow correctly.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        self.find_element_class.find_operation.return_value = self.oper_port_dict[100]
-        result = manager.deferred_port_manager(time_fail_op_immediately=2.0)
         
-        self.assertIsInstance(result, pd.DataFrame)
-        self.assertFalse(result.empty)
-        self.assertIn("mobilisation_merged", result["event"].values)
-        self.assertIn("tow_to_port", result["event"].values)
-        self.assertIn("operation_at_port", result["event"].values)
-        self.assertIn("tow_to_site", result["event"].values)
-        self.assertNotIn("recommissioning", result["event"].values)
-
-    def test_deferred_port_manager_full_flow_with_five_rows(self):
-        """
-        Ensure the main manager handles the five-row flow with additional operations.
-        """
-
-        log_events_tow_def = self._build_log_events_five_rows()
-        manager = self._build_instance(log_events_tow_def)
-        self.find_element_class.find_operation.return_value = self.oper_port_dict[100]
-        result = manager.deferred_port_manager(time_fail_op_immediately=2.0)
-
-        self.assertIsInstance(result, pd.DataFrame)
-        self.assertFalse(result.empty)
-        self.assertIn("mobilisation_merged", result["event"].values)
-        self.assertIn("additional_before_tow_port", result["event"].values)
-        self.assertIn("tow_to_port", result["event"].values)
-        self.assertIn("operation_at_port", result["event"].values)
-        self.assertIn("tow_to_site", result["event"].values)
-        self.assertIn("additional_after_tow_site", result["event"].values)
-        self.assertIn("recommissioning", result["event"].values)
-
-    def test_deferred_port_manager_logs_error_when_operation_is_not_completed(self):
-        """
-        Ensure an error is logged when a deferred campaign cannot be completed.
-        """
-
-        log_events_tow_def = self._build_log_events_three_rows()
-        manager = self._build_instance(log_events_tow_def)
-        manager.oper_port = manager.oper_port_dict[100]
-        manager.oper_port.tow_data.add_op_tow_port = False
-        self.find_element_class.find_operation.return_value = self.oper_port_dict[100]
-        with patch.object(
-            manager,
-            "tow_to_port",
-            side_effect=lambda *args, **kwargs: self._mark_incomplete_and_return_empty(manager),
-        ), patch(
-            "oriom.core.functions.log_merge_corrective_functions.OperationDeferredPortOrganizer.logging.error"
-        ) as mock_logging_error:
-            result = manager.deferred_port_manager(time_fail_op_immediately=2.0)
-
-        self.assertTrue(result.empty)
-        mock_logging_error.assert_called_once()
-
-    @staticmethod
-    def _mark_incomplete_and_return_empty(manager):
-        """
-        Helper used to simulate a failed scheduling flow.
-        """
-
-        manager.operation_completed = False
-        return pd.DataFrame(), True
-
-
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
