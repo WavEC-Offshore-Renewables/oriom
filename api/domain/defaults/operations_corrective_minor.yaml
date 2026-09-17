@@ -1,0 +1,47 @@
+- id: owc_M01
+  name: M01 - Inverter
+  tech_wtg: false
+  tech_wec: true
+  tech_pv: false
+  duration_net: 2
+  device_shutdown: true
+  wave_height: 1.5
+  light: true
+  vessel1_id: V101
+  vessel1_qt: 1
+  vessel2_qt: 1
+  tech_required: 2
+  tech_cost: 0
+  level: device
+
+- id: owc_M02
+  name: M02 - C-gen
+  tech_wtg: false
+  tech_wec: true
+  tech_pv: false
+  duration_net: 2
+  device_shutdown: true
+  wave_height: 1.5
+  light: true
+  vessel1_id: V101
+  vessel1_qt: 1
+  vessel2_qt: 1
+  tech_required: 2
+  tech_cost: 0
+  level: device
+
+- id: owc_M03
+  name: M03 - PTO
+  tech_wtg: false
+  tech_wec: true
+  tech_pv: false
+  duration_net: 4
+  device_shutdown: true
+  wave_height: 1.5
+  light: true
+  vessel1_id: V101
+  vessel1_qt: 1
+  vessel2_qt: 1
+  tech_required: 2
+  tech_cost: 0
+  level: device

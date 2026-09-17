@@ -1,0 +1,9 @@
+consider double shifts:
+    value: false
+    units:
+number_runs:
+    value: 10
+    units:
+consider tseries:
+    value: false
+    units:

@@ -1,0 +1,24 @@
+- id: owc_MJ1
+  name: Power Electronics
+  tow_to_port: false
+  tech_required: 3
+  tech_cost: 0
+  vessel1_id: V002
+  vessel1_qt: 1
+  vessel2_qt: 1
+
+- id: owc_MJ2
+  name: C-Gen
+  tow_to_port: true
+  tech_required: 3
+  tech_cost: 0
+  vessel1_qt: 1
+  vessel2_qt: 1
+
+- id: owc_MJ3
+  name: PTO
+  tow_to_port: true
+  tech_required: 3
+  tech_cost: 0
+  vessel1_qt: 1
+  vessel2_qt: 1

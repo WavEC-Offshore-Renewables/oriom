@@ -1,0 +1,85 @@
+- id: owc_CPO_A1
+  name: Power Electronics inspection
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 2
+  dur_per_device: 1
+  device_shutdown: true
+  level: device
+  months: 7
+  intervened_wtg: 0
+  intervened_wec: 1
+  intervened_pv: 0
+  wave_height: 1.5
+  light: true
+  vessel1_id: V201
+  vessel1_qt: 1
+
+- id: owc_CPO_A2
+  name: C-GEN inspection
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 2
+  dur_per_device: 4
+  device_shutdown: true
+  level: device
+  months: 7
+  intervened_wtg: 0
+  intervened_wec: 1
+  intervened_pv: 0
+  wave_height: 1.5
+  light: true
+  vessel1_id: V201
+  vessel1_qt: 1
+
+- id: owc_CPO_U1
+  name: UAV Inspection
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 2
+  dur_per_device: 0.25
+  device_shutdown: true
+  level: device
+  months: 7
+  intervened_wtg: 0
+  intervened_wec: 1
+  intervened_pv: 0
+  wave_height: 1.5
+  light: true
+  vessel1_id: V201
+  vessel1_qt: 1
+  rov_drone: EVA_AUV_1
+
+- id: owc_CPO_M1
+  name: Mooring inspection
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 2
+  dur_per_device: 4
+  device_shutdown: true
+  level: device
+  months: 7
+  intervened_wtg: 0
+  intervened_wec: 1
+  intervened_pv: 0
+  wave_height: 1.5
+  light: true
+  vessel1_id: V201
+  vessel1_qt: 1
+
+- id: owc_CPO_A5
+  name: PTO inspection
+  overnight_stay: false
+  periodicity: 1
+  tech_per_device: 2
+  dur_per_device: 3
+  device_shutdown: true
+  level: device
+  months: 7
+  intervened_wtg: 0
+  intervened_wec: 1
+  intervened_pv: 0
+  wave_height: 1.5
+  light: true
+  vessel1_id: V201
+  vessel1_qt: 1

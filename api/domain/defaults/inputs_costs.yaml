@@ -1,0 +1,30 @@
+vessel cost year:
+    value: 0.0
+    units: euros
+port cost day:
+    value: 0.0
+    units: euros
+merge:
+    value: false
+    units:
+time between merge:
+    value: 30
+    units: days
+fuel cost hfo:
+    value: 390.0
+    units: euros/ton
+fuel cost mgo:
+    value: 730.0
+    units: euros/ton
+fuel cost mdo:
+    value: 700.0
+    units: euros/ton
+port cost annual:
+    value: 1500.0
+    units: Euros
+electricity price:
+    value: 97.0
+    units: Euros/MWh
+technicians year:
+    value: 1230000.0
+    units: Euros

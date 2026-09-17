@@ -1,0 +1,8 @@
+- operation: transit
+  load_factor: 0.8
+
+- operation: maneuver
+  load_factor: 0.4
+
+- operation: standby
+  load_factor: 0.2

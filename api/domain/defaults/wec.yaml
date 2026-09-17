@@ -1,0 +1,27 @@
+devices:
+    value: 1
+    units:
+rated power:
+    value: 0.4
+    units: MW
+power matrix file:
+    value: ./tests/test_files/pmatrix_wave.csv
+    units:
+number of strings:
+    value: 1
+    units:
+layout type:
+    value: 5
+    units:
+number of substations:
+    value: 1
+    units:
+number export cables:
+    value: 1
+    units:
+wec number of o&m device at port:
+    value: 1
+    units:
+wec number of device stored at port:
+    value: 0
+    units:

@@ -1,0 +1,9 @@
+- id: owc_CPO_P1
+  name: WEC maintenance
+  periodicity: 1
+  tech_per_device: 3
+  tech_cost: 0
+  dur_per_device: 168
+  intervened_devices: 1
+  level: hub
+  double_shift: true

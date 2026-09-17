@@ -1,0 +1,23 @@
+- id: owc_removal_tow
+  name: WEC removal
+  tech_required: 1
+  tech_cost: 0
+  vessel1_id: V002
+  vessel1_qt: 1
+  vessel2_qt: 1
+
+- id: owc_redeploy_removal_tow
+  name: WEC re-deploy and removal
+  tech_required: 1
+  tech_cost: 0
+  vessel1_id: V002
+  vessel1_qt: 1
+  vessel2_qt: 1
+
+- id: owc_redeploy_tow
+  name: WEC re-deploy
+  tech_required: 1
+  tech_cost: 0
+  vessel1_id: V002
+  vessel1_qt: 1
+  vessel2_qt: 1

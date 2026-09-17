@@ -1,0 +1,70 @@
+- id: owc_fail_M01
+  name: M01 - Power Electronic
+  number_of_element_farm: 1
+  probability_failure: 0.34
+  maintenance_strategy: Immediately
+  level_failure: device
+  op_trigger: owc_M01
+  preferred_day: 3
+  potential_shutdown: true
+  perc_shutdown: 100
+  parts_cost: 100
+
+- id: owc_fail_M02
+  name: M02 - Power Electronic Major
+  number_of_element_farm: 1
+  probability_failure: 0.01
+  maintenance_strategy: Immediately
+  level_failure: device
+  op_trigger: owc_MJ1
+  lead_time: 72
+  potential_shutdown: true
+  perc_shutdown: 100
+  parts_cost: 1000
+
+- id: owc_fail_M03
+  name: M03 - C-GEN
+  number_of_element_farm: 1
+  probability_failure: 0.3
+  maintenance_strategy: Immediately
+  level_failure: device
+  op_trigger: owc_M02
+  potential_shutdown: true
+  perc_shutdown: 100
+  parts_cost: 200
+
+- id: owc_fail_M04
+  name: M04 - C-GEN Major
+  number_of_element_farm: 1
+  probability_failure: 0.1
+  maintenance_strategy: Specific month
+  level_failure: device
+  op_trigger: owc_MJ2
+  preferred_month: 6
+  lead_time: 72
+  potential_shutdown: true
+  perc_shutdown: 100
+  parts_cost: 2000
+
+- id: owc_fail_M05
+  name: M05 - PTO
+  number_of_element_farm: 1
+  probability_failure: 0.3
+  maintenance_strategy: Immediately
+  level_failure: device
+  op_trigger: owc_M03
+  potential_shutdown: true
+  perc_shutdown: 100
+  parts_cost: 300
+
+- id: owc_fail_M06
+  name: M06 - PTO Major
+  number_of_element_farm: 1
+  probability_failure: 0.1
+  maintenance_strategy: Immediately
+  level_failure: device
+  op_trigger: owc_MJ3
+  lead_time: 72
+  potential_shutdown: true
+  perc_shutdown: 100
+  parts_cost: 3000

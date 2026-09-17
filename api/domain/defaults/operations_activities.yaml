@@ -1,0 +1,100 @@
+owc_removal_tow:
+- id: CPO_A30_A1
+  name: Transit to site
+  location: transit
+  hs: 1.5
+  light: false
+- id: CPO_A30_A2
+  name: WEC disconnect
+  location: site
+  wec_shutdown_dur: true
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A30_A3
+  name: Tow to port
+  location: transit
+  wec_shutdown_dur: true
+  hs: 1.5
+  light: false
+owc_redeploy_removal_tow:
+- id: CPO_A31_A1
+  name: Tow to site
+  location: transit
+  wec_shutdown_dur: true
+  hs: 1.5
+  light: false
+- id: CPO_A31_A2
+  name: WEC connect
+  location: site
+  wec_shutdown_dur: true
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A31_A3
+  name: Transit to next device
+  location: site
+  hs: 1.5
+  light: false
+- id: CPO_A31_A4
+  name: WEC disconnect
+  location: site
+  wec_shutdown_dur: true
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A31_A5
+  name: Tow to port
+  location: transit
+  wec_shutdown_dur: true
+  hs: 1.5
+  light: false
+owc_redeploy_tow:
+- id: CPO_A33_A1
+  name: Tow to site
+  location: transit
+  wec_shutdown_dur: true
+  hs: 1.5
+  light: false
+- id: CPO_A33_A2
+  name: WEC connect
+  location: site
+  wec_shutdown_dur: true
+  duration: 2
+  hs: 1.5
+  light: true
+- id: CPO_A33_A3
+  name: Transit to port
+  location: transit
+  hs: 1.5
+  light: false
+owc_MJ2:
+- id: ACT_MJ2_01
+  name: Maintenance G-GEN
+  location: port
+  wec_shutdown_dur: true
+  duration: 168
+  light: false
+owc_MJ1:
+- id: ACT_MJ1_01
+  name: Transit to site
+  location: transit
+  light: false
+- id: ACT_MJ1_02
+  name: Exchange of power electronics
+  location: site
+  wec_shutdown_dur: true
+  duration: 6
+  hs: 1.5
+  light: true
+- id: ACT_MJ1_03
+  name: Transit to port
+  location: transit
+  light: false
+owc_MJ3:
+- id: ACT_MJ3_01
+  name: Maintenance PTO
+  location: port
+  wec_shutdown_dur: true
+  duration: 168
+  light: false
