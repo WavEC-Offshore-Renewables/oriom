@@ -119,3 +119,8 @@ user_inputs.py
 # Test payloads and downloaded results
 *.zip
 *.json
+
+# Misc
+TESTING.md
+test_suite.sh
+HANDOVER.md
