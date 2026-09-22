@@ -9,6 +9,8 @@ from api.domain.schemas import JobStatus, RunAccepted, RunRequest
 
 app = FastAPI(title="ORIOM API", version="1.0.0")
 
+## To Do - clear this up, messy
+
 
 def get_row(job_id: str) -> sqlite3.Row:
     row = db.get_job(job_id)
