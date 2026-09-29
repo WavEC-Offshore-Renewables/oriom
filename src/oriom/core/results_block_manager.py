@@ -201,7 +201,7 @@ def results_block(
                 )
  
             # Recreate the usage_record considering the reused vessels
-            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False)
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False, ST_used = False)
             _ = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged)
 
         else:
