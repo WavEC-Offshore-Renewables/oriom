@@ -214,7 +214,7 @@ def create_logs_merge(
     # Copy all log_files that is not going to be merged
     log_mobilisation = log_events[log_events['event'] == 'mobilisation']
     log_event_filt = log_events.loc[log_events['event'].isin(FILTER_EVENT)]
-    log_event_to_merge = log_events.loc[~log_events['event'].isin(FILTER_EVENT)]
+    log_event_to_merge = log_events.loc[(~log_events["event"].isin(FILTER_EVENT))& (log_events["event"] != "mobilisation")]
 
     log_events_merged = pd.concat([log_events_merged, log_event_filt],ignore_index=True)
 
@@ -230,7 +230,7 @@ def create_logs_merge(
     )
 
     #------------------
-    # TOW OPERATION DEFERRED
+    # TOW OPERATION
     #------------------
     log_event_tow = log_event_to_merge.loc[log_event_to_merge['event'] == 'tow']
 

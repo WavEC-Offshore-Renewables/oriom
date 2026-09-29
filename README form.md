@@ -190,10 +190,23 @@ Copy and paste the folder with the private modules inside:
         .\oriom\src\core\functions\private
 
 If private functions are not found it will not be possible:
-- Consider statistical chart duration of the vessels and recall-reuse mobilitated vessels
+
 - Reuse previous simulations. All data must be recalculated
+
 - Reduced KPI Vessels Insight
+
 - It will not be available to use ORIOM as ShortTerm O&M Simulator
+
+- Consider statistical chart duration of the vessels and recall-reuse mobilitated vessels.
+
+    Assumption consider in statistical chart of the vessel:
+    -   Reuse of charted Vessel that end prematurly the operation then the end of its contract
+    -   Rechart of the vessel that cannot complete the oepration before its end of contract.
+        1) A new vessel is mobilitated with a new contract duration regarding the max statistical month duration considered
+        2) If the monthly statistical duration is lower then 48 h, the new contract considered is of 2 days lenght
+        3) If is an inspection at site and the monthly statistical duration is more then 5 days, 5 days of new contract are considered
+        4) If the vessel has a mobilisation that not exceed 14 days and its montly statistical duration chart is lower than a third of its mobilisation time, the new duration of contracts is three time the lengh of its mobilisation time.
+        
 
 ## GEN_INPUTS
 - **Use previous run directory**: Insert the path of the previous directory to reuse
