@@ -92,6 +92,7 @@ class TestVesselDayCounter(unittest.TestCase):
                 "d_end_wait_start": [dt0, dt0, dt0, dt2, dt3],
                 "d_end": [dt1, dt1, dt1, dt3, dt3],
                 "vessel_1": [None, 'v001', 'v001', 'v002', 'v001'],
+                "vessel_2": [None, 'v003', 'v003', 'v003', 'v003'],
                 "event": [
                     "failure"    ,                 # failure
                     "operation_deferred_merged",  # same campaign same vessel
@@ -110,7 +111,7 @@ class TestVesselDayCounter(unittest.TestCase):
             }
         )
 
-        out = self.counter.log_event_preparation(df.copy())
+        out = self.counter.log_event_preparation(df.copy(), ST = False)
 
         # We expect:
         # - 1 merged campaign row for the 'operation_deferred_merged'
@@ -124,7 +125,7 @@ class TestVesselDayCounter(unittest.TestCase):
         campaign_row = out[out["event"] == "operation_deferred_merged"].iloc[0]
         self.assertEqual(campaign_row["d_trigger"], dt0)
 
-    def test_log_event_preparation_merges_campaign_operations_second_copunter(self):
+    def test_log_event_preparation_merges_campaign_operations_second_counter(self):
         """
         Campaign operations (operation_deferred_merged) are reduced so that
         only one row per campaign remains, with start taken from the earliest
@@ -143,6 +144,7 @@ class TestVesselDayCounter(unittest.TestCase):
                 "d_end_wait_start": [dt0, dt0, dt0, dt2, dt3],
                 "d_end": [dt1, dt1, dt1, dt3, dt3],
                 "vessel_1": [None, 'v001', 'v001', 'v002', 'v001'],
+                "vessel_2": [None, 'v003', 'v003', 'v003', 'v003'],
                 "event": [
                     "failure"    ,                 # failure
                     "operation_deferred_merged",  # same campaign same vessel
@@ -163,7 +165,7 @@ class TestVesselDayCounter(unittest.TestCase):
         )
 
         self.counter.first_counter = False
-        out = self.counter.log_event_preparation(df.copy())
+        out = self.counter.log_event_preparation(df.copy(), ST=False)
 
         # We expect:
         # - 1 merged campaign row for the 'operation_deferred_merged'

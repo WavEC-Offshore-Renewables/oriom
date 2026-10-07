@@ -16,9 +16,10 @@ class VesselDayCounter():
         self.log_event_day(pd.DataFrame): Dataframe of lof_events_date for only operations and inspection
         vessels (dict): Dictionary of month on which n_vessel are contracted
         first_counter (bool): Flag to consider if the preparation of the df has never been done. Default to True
+        ST_used (bool): Flag to consider we are not interest in calculating the charting days. Default to True
     """
 
-    def __init__(self, log_events_merged, vessels, first_counter = True):
+    def __init__(self, log_events_merged, vessels, first_counter = True, ST_used = True):
         """
         Arg:
             log_events_merged(pd.DataFrame): Dataframe of lof_events_merged data
@@ -34,7 +35,7 @@ class VesselDayCounter():
 
         log_event_day = aux_functions.safe_copy_df(log_events_merged, ['id', 'comments'])
         log_event_day = aux_functions.log_event_convert_stringtime(log_event_day)
-        self.log_event_day = self.log_event_preparation(log_event_day)
+        self.log_event_day = self.log_event_preparation(log_event_day, ST = ST_used)
         self.create_dict_vessel_contract_month(vessels)
 
 
@@ -56,48 +57,76 @@ class VesselDayCounter():
                 self.dict_vess_long_term[v.id] = dict_months_vessel_contract
 
 
-    def log_event_preparation(self, log_event_day):
+    def log_event_preparation(self, log_event_day, ST):
         """
         Filter the df only for the operations considering for campaign only start and end event
 
+        If ST == False is used to counts the days of charts of vessel
+        
         Return:
             pd.dataframe: Log_events_day filtered per operations
         """
 
-        def manage_campaign_op(df, col, value):
+        def manage_campaign_op(df, col, value, ST=True):
             """
-            Find idx of each vessel campaign for max d_end and min d_end and concatenate row of last op of campaign with start corrected
-                Returning df with:
-                    - all row not in campaign le righe che non sono della campagna
-                    - only final row of campaign with start of the initial op and end by the final op
-            """
-            if not self.first_counter:
-                group_by_date = 'd_end_stat_chart_orig'
-            else:
-                group_by_date = 'd_end_stat_chart'
+            Find the first and last operation of each vessel campaign and concatenate the final row of the campaign with the start corrected.
 
+            If ST=False, ensure that all vessels used in the campaign are represented in the final campaign rows. 
+            If a vessel is missing, all rows belonging to the groups where that vessel was not represented in the final campaign rows are added.
+
+            Returning df with:
+                - all rows not in the campaign
+                - only final row(s) of campaign with the start of the initial operation and end by the final operation
+                - if ST=False, additional rows for vessels not represented in the final campaign rows
+            """
+
+            cols_to_update = ['d_trigger', 'd_end_leadtime', 'd_end_wait_start']
+            group_by_date = 'd_end_stat_chart_orig' if not self.first_counter else 'd_end_stat_chart'
+
+            def get_campaign_rows(df, vessel_number = 'vessel_1'):
+                idx_min = df.groupby([vessel_number, group_by_date])['d_end'].idxmin()
+                idx_max = df.groupby([vessel_number, group_by_date])['d_end'].idxmax()
+
+                src = df.loc[idx_min, cols_to_update].copy()
+                src.index = idx_max.values
+                df.loc[idx_max.values, cols_to_update] = src
+
+                return df.loc[idx_max.values].copy()
+                        
+            def find_vessel_missing(df, mask, campaign_final):
+                """ Find if there is a second vessel not called in campaign final"""
+                # Vessels used in the campaign
+                vessel_used = set(df.loc[mask, 'vessel_1'].dropna())
+                vessel_used.update(df.loc[mask, 'vessel_2'].dropna())
+                vessel_present = set(campaign_final['vessel_1'].dropna())
+                vessel_present.update(campaign_final['vessel_2'].dropna())
+                return  vessel_used - vessel_present
+            
             mask = df[col] == value
             if not mask.any():
                 return df
-
-            # Find idx of each campaign for max d_end and min d_end
-            idx_max = df.loc[mask].groupby(['vessel_1', group_by_date])['d_end'].idxmax()
-            idx_min = df.loc[mask].groupby(['vessel_1', group_by_date])['d_end'].idxmin()
-
-            # col to update from idx_min into idx_max
-            cols_to_update = ['d_trigger', 'd_end_leadtime', 'd_end_wait_start']
-
-            # take value of idx_min and reindex into the destination index
-            src = df.loc[idx_min.values, cols_to_update].copy()
-            src.index = idx_max.values
-
-            # assign the values
-            df.loc[idx_max.values, cols_to_update] = src
-
-            # hold only row of df on which: all op out of campaign + modified final op of campaign
-            out = pd.concat(
-                [df.loc[~mask], df.loc[idx_max.values]]
-            ).sort_values(by='d_trigger')
+            
+            cols_to_copy = ['d_end_stat_chart', 'ST_contract_1', 'n_vessel_1_effective']
+            
+            campaign_final = get_campaign_rows(df = df.loc[mask])
+            # Remove original campaign rows and add final campaign rows
+            out = pd.concat([df.loc[~mask], campaign_final]).sort_values(by='d_trigger')
+            
+            # If ST=False, make sure every vessel used in the campaign is represented in the final rows
+            # ---------------------------------------------------------------
+            if not ST:
+                missing_vessels = find_vessel_missing(df, mask, campaign_final)
+                
+                for vessel in missing_vessels:
+                    df_vessel = df.loc[mask & (df["vessel_2"] == vessel)].copy()
+                    # Find first and last operation of each vessel campaign
+                    campaign_final_add = get_campaign_rows(df = df_vessel, vessel_number = 'vessel_2')
+                    # Final campaign second vessel copy column from first vessel and switch second to first vessel
+                    campaign_final_add[cols_to_copy] = campaign_final[cols_to_copy].to_numpy()
+                    campaign_final_add[['vessel_1', 'n_vessel_1']] = campaign_final_add[['vessel_2', 'n_vessel_2']]
+                    campaign_final_add[['vessel_2', 'n_vessel_2']] = [None, None]
+                    # add the additional rows of campaign_final_add to the dataframe output
+                    out = pd.concat([out, campaign_final_add]).sort_values(by='d_trigger')
 
             return out
 
@@ -105,8 +134,8 @@ class VesselDayCounter():
         log_event_day = log_event_day[~log_event_day['event'].str.contains('fail|mobi', na=False)]
 
         # Find rows of each last op of 'operation_deferred_merged' campaign
-        log_event_day = manage_campaign_op(df = log_event_day, col = 'event', value = 'operation_deferred_merged')
-        log_event_day = manage_campaign_op(df = log_event_day, col = 'comments', value = 'inspection_site_campaign')
+        log_event_day = manage_campaign_op(df = log_event_day, col = 'event', value = 'operation_deferred_merged', ST = ST)
+        log_event_day = manage_campaign_op(df = log_event_day, col = 'comments', value = 'inspection_site_campaign', ST = ST)
 
         return log_event_day
 
