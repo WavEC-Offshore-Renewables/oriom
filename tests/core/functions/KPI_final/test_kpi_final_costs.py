@@ -49,14 +49,14 @@ class TestKpiFinalTotalCost(unittest.TestCase):
 
     def _make_logs(self, start="2025-01-01 00:00:00", n=2):
         cols = [
-            "event", "d_end", "vessel_1", "d_end_leadtime", "d_trigger",
+            "event", "d_end", "d_end_stat_chart", "vessel_1", "d_end_leadtime", "d_trigger",
             "d_end_transit_ts", "d_end_dur_net_port", "d_end_transit_tp",
             "d_end_dur_net_site", "id", "comments", "vessel_2",
             "n_vessel_1", "n_vessel_1_effective", "n_vessel_2", "ST_contract_1", "ST_contract_2"
         ]
 
         dt_cols = [
-            "d_end", "d_end_leadtime", "d_trigger", "d_end_transit_ts",
+            "d_end", "d_end_stat_chart", "d_end_leadtime", "d_trigger", "d_end_transit_ts",
             "d_end_dur_net_port", "d_end_transit_tp", "d_end_dur_net_site"
         ]
 
@@ -74,6 +74,7 @@ class TestKpiFinalTotalCost(unittest.TestCase):
             rows.append({
                 "event": "operation",
                 "d_end": d_end,
+                "d_end_stat_chart": d_end,
                 "vessel_1": "V1",
                 "d_end_leadtime": d_end - timedelta(hours=8),
                 "d_trigger": d_end - timedelta(hours=10),

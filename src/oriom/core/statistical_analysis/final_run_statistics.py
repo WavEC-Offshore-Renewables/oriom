@@ -125,7 +125,7 @@ def return_statistics_runs(
     ws = wb.active
     ws.title = "Lifetime_results"
 
-    lifetime_fixed_port_cost, lifetime_technician_cost , lifetime_vessels_cost, lifetime_rov_cost  = [], [], [], []
+    lifetime_fixed_port_cost, lifetime_technician_cost , lifetime_vessels_cost, lifetime_rov_cost, lifetime_other_cost  = [], [], [], [], []
     lifetime_repair_cost, lifetime_fixed_tech_cost,  lifetime_mobilisation_cost, lifetime_fixed_insurance_cost  = [], [], [], []
     final_cost, final_energy = {}, {}
 
@@ -145,6 +145,7 @@ def return_statistics_runs(
         lifetime_mobilisation_cost.append(kpi_tot['tot_mobilization_costs'] + n_lifetime * mobilisation_to_add)
         lifetime_rov_cost.append(kpi_tot['tot_rov_costs'])
         lifetime_repair_cost.append(kpi_tot['tot_part_costs'])
+        lifetime_other_cost.append(kpi_tot['tot_other_costs'])
 
 
     lifetime_fixed_insurance_cost_avg = sum(lifetime_fixed_insurance_cost)/len(lifetime_fixed_insurance_cost)
@@ -155,6 +156,7 @@ def return_statistics_runs(
     lifetime_repair_cost_avg = sum(lifetime_repair_cost)/len(lifetime_repair_cost)
     lifetime_fixed_tech_cost_avg = sum(lifetime_fixed_tech_cost)/len(lifetime_fixed_tech_cost)
     lifetime_fixed_port_cost_avg = sum(lifetime_fixed_port_cost)/len(lifetime_fixed_port_cost)
+    lifetime_other_cost_avg = sum(lifetime_other_cost)/len(lifetime_other_cost)
 
 
     dict_cost = {
@@ -163,6 +165,7 @@ def return_statistics_runs(
         'lifetime_rov_cost €':lifetime_rov_cost_avg,
         'lifetime_technician_cost €':lifetime_technician_cost_avg,
         'lifetime_repair_cost €':lifetime_repair_cost_avg,
+        'lifetime_oher_cost €':lifetime_other_cost_avg,
         'lifetime_fixed_port_cost €':lifetime_fixed_port_cost_avg,
         'lifetime_fixed_tech_cost €':lifetime_fixed_tech_cost_avg,
         'lifetime_fixed_insurance_cost €':lifetime_fixed_insurance_cost_avg,

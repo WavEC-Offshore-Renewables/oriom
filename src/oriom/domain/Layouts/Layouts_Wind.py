@@ -664,7 +664,23 @@ class Layout_Wind():
                 n_substations: int = 1, n_exports: int = 1, n_string_to_connector = 6,
                 tow_string_shutdown: bool = True, save_dir: str = None, show_plot: bool = True
         ):
-        """Select and build the desired wind farm layout."""
+        """
+        Generate and plot the electrical layout of the offshore wind farm.
+
+        Args:
+            n_layout (int): Layout configuration identifier.
+            n_turbines (int): Total number of wind turbines in the wind farm.
+            n_strings (int): Total number of inter-array cable strings.
+            n_substations (int, optional): Number of offshore substations. Defaults to 1.
+            n_exports (int, optional): Number of export cable connections. Defaults to 1.
+            n_string_to_connector (int, optional): Number of turbine strings connected to each connector. Defaults to 6.
+            tow_string_shutdown (bool, optional): If True, electrical continuity not ensure while device TTP. Defaults to True.
+            save_dir (str, optional): Directory where the generated layout plot is saved. If None, the plot is not saved. Defaults to None.
+            show_plot (bool, optional): If True, display the generated layout plot. Defaults to True.
+        
+        Return:
+            :obj:`nx.DiGraph`: a graph representing the Wind system.
+        """
         if n_layout == 1:
             return self.layout1_wind(n_turbines, n_strings, substation_node = 1, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         elif n_layout == 2:
@@ -701,12 +717,12 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=6,
-        n_turbines=50,
-        n_strings=10,
+        n_layout=1,
+        n_turbines=10,
+        n_strings=2,
         n_substations=1,
         n_exports=1,
-        n_string_to_connector = 5,
+        n_string_to_connector = 6,
         tow_string_shutdown = True,
         save_dir = None,
         show_plot=True
@@ -714,3 +730,6 @@ if __name__ == "__main__":
 
     for u,v,attr in G.edges(data=True):
         print(u,v,attr)
+        
+    for u,v in G.nodes(data=True):
+            print(u,v)
