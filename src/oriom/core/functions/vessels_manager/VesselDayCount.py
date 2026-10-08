@@ -19,7 +19,7 @@ class VesselDayCounter():
         ST_used (bool): Flag to consider we are not interest in calculating the charting days. Default to True
     """
 
-    def __init__(self, log_events_merged, vessels, first_counter = True, ST_used = True):
+    def __init__(self, log_events_merged, vessels, first_counter = True, ST_used = True, prepare_df = True):
         """
         Arg:
             log_events_merged(pd.DataFrame): Dataframe of lof_events_merged data
@@ -35,7 +35,10 @@ class VesselDayCounter():
 
         log_event_day = aux_functions.safe_copy_df(log_events_merged, ['id', 'comments'])
         log_event_day = aux_functions.log_event_convert_stringtime(log_event_day)
-        self.log_event_day = self.log_event_preparation(log_event_day, ST = ST_used)
+        if prepare_df:
+            self.log_event_day = self.log_event_preparation(log_event_day, ST = ST_used)
+        else:
+            self.log_event_day = log_event_day
         self.create_dict_vessel_contract_month(vessels)
 
 
@@ -106,8 +109,6 @@ class VesselDayCounter():
             if not mask.any():
                 return df
             
-            cols_to_copy = ['d_end_stat_chart', 'ST_contract_1', 'n_vessel_1_effective']
-            
             campaign_final = get_campaign_rows(df = df.loc[mask])
             # Remove original campaign rows and add final campaign rows
             out = pd.concat([df.loc[~mask], campaign_final]).sort_values(by='d_trigger')
@@ -121,10 +122,8 @@ class VesselDayCounter():
                     df_vessel = df.loc[mask & (df["vessel_2"] == vessel)].copy()
                     # Find first and last operation of each vessel campaign
                     campaign_final_add = get_campaign_rows(df = df_vessel, vessel_number = 'vessel_2')
-                    # Final campaign second vessel copy column from first vessel and switch second to first vessel
-                    campaign_final_add[cols_to_copy] = campaign_final[cols_to_copy].to_numpy()
-                    campaign_final_add[['vessel_1', 'n_vessel_1']] = campaign_final_add[['vessel_2', 'n_vessel_2']]
-                    campaign_final_add[['vessel_2', 'n_vessel_2']] = [None, None]
+                    # Final campaign first vessel elimination to avoid recount
+                    campaign_final_add[['vessel_1', 'n_vessel_1']] = [None, None]
                     # add the additional rows of campaign_final_add to the dataframe output
                     out = pd.concat([out, campaign_final_add]).sort_values(by='d_trigger')
 
