@@ -1,351 +1,147 @@
-#test_layout_percentage_energy_manager_integration
+# tests/core/functions/layout_power/test_layout_percentage_energy_manager_integration.py
 
 import unittest
-from unittest.mock import patch
-from datetime import datetime
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
+from unittest import skip
 
-import pandas as pd
 import networkx as nx
+import pandas as pd
 
 from oriom.core.functions.layout_power import layout_percentage
-import pytest
-
-#pytest.skip("Test temporaneamente disabilitato", allow_module_level=True)
-# ------------------------------------------------------------------
-# Minimal test doubles
-# ------------------------------------------------------------------
-
-class DummyOpClass:
-    def __init__(self, tow_to_port=False, op_tow_site=None, op_tow_port=None):
-        self.tow_to_port = tow_to_port
-        self.op_tow_site = op_tow_site
-        self.op_tow_port = op_tow_port
 
 
-class DummyOp:
-    def __init__(self, op_id, tow_to_port=False):
-        self.id = op_id
-        self.op_class = DummyOpClass(tow_to_port=tow_to_port)
+# =============================================================================
+# Expected results
+# =============================================================================
 
-DUMMY_OPERATIONS_STATS = [DummyOp("op_corr_001", tow_to_port=False)]
+CASES = [
+    (False, False, False, False),
+    (False, False, True, False),
+    (True, False, False, False),
+    (True, True, False, False),
+    (True, True, True, False),
+    (True, False, True, True),
+    (True, False, True, False),
+    (True, False, False, True),
+    (True, True, False, True),
+    (True, True, True, True),
+    
+]
 
 
-# ------------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------------
+EXPECTED_AVAILABILITY_4_TURBINES_LOC_2 = {
+    1: [100, 75, 100],
+    2: [100, 50, 100],
+    3: [100, 75, 75, 75, 75, 100],
+    4: [100, 50, 75, 75, 75, 50, 100],
+    5: [100, 50, 50, 50, 50, 50, 100],
+    6: [100, 50, 50, 50, 50, 75, 100],
+    7: [100, 50, 50, 50, 50, 100],
+    8: [100, 75, 75, 75, 75, 75, 100],
+    9: [100, 50, 75, 75, 75, 50, 75, 100],
+    10: [100, 50, 50, 50, 50, 50, 75, 100],
+}
 
-def make_direct_device_graph(n_devices=10):
-    """
-    Graph:
-        device_i -> shore
 
-    Each device has power = 1.
-    Total farm power = n_devices.
-    """
-    G = nx.DiGraph()
-    G.add_node(0, level="SHORE", power=0)
+EXPECTED_AVAILABILITY_6_TURBINES_LOC_3 = {
+    1: [100, 83, 100],
+    2: [100, 66, 100],
+    3: [100, 83, 83, 83, 83, 100],
+    4: [100, 50, 83, 83, 83, 50, 100],
+    5: [100, 50, 66, 66, 66, 50, 100],
+    6: [100, 66, 66, 66, 66, 83, 100],
+    7: [100, 66, 66, 66, 66, 100],
+    8: [100, 83, 83, 83, 83, 83, 100],
+    9: [100, 50, 83, 83, 83, 50, 83, 100],
+    10: [100, 50, 66, 66, 66, 50, 83, 100],
+}
 
-    for i in range(1, n_devices + 1):
-        G.add_node(i, level="device", power=1)
-        G.add_edge(i, 0, visible=True)
 
-    return G
+# =============================================================================
+# Graph builders
+# =============================================================================
+
+def make_direct_device_graph(n_devices=1):
+    """Create a direct device graph."""
+    graph = nx.DiGraph()
+    graph.add_node(0, level="shore", power=0)
+    graph.add_node(1, level="substation", power=1)
+    graph.add_edge(1, 0, visible=True)
+
+    for node in range(2, n_devices + 2):
+        graph.add_node(node, level="device", power=1)
+        graph.add_edge(node, node - 1, visible=True)
+
+    return graph
 
 
 def make_array_cable_graph(n_devices=3):
+    """Create a simple array/cable graph."""
+    graph = nx.DiGraph()
+    graph.add_node(0, level="substation", power=0)
+
+    for node in range(1,n_devices+1):
+        graph.add_node(node, level="device", power=1)
+
+    graph.add_edge(1, 0, visible=True)
+    graph.add_edge(2, 1, visible=True)
+    graph.add_edge(3, 2, visible=True)
+
+    return graph
+
+
+def make_tow_graph(n_devices, devices_per_string):
     """
-    Graph:
-        device_i -> hub -> shore
+    Create a two-string offshore wind graph.
 
-    Closing edge (100, 0) disconnects all devices from shore.
+    Node convention:
+        0 = shore
+        1 = substation
+        2..N = turbines
+
+    Direction:
+        device -> upstream node -> substation -> shore
     """
-    G = nx.DiGraph()
-    G.add_node(0, level="SHORE", power=0)
-    G.add_node(100, level="hub", power=0)
+    graph = nx.DiGraph()
+    graph.graph["tow_string_shutdown"] = False
 
-    for i in range(1, n_devices + 1):
-        G.add_node(i, level="device", power=1)
-        G.add_edge(i, 100, visible=True)
+    graph.add_node(0, level="shore", power=0)
+    graph.add_node(1, level="substation", power=0)
+    graph.add_edge(1, 0, visible=True)
 
-    G.add_edge(100, 0, visible=True)
+    n_strings = 2
+    first_device_node = 2
 
-    return G
+    for string_index in range(n_strings):
+        previous_node = 1
 
+        for device_index in range(devices_per_string):
+            node = first_device_node + string_index * devices_per_string + device_index
 
-# ------------------------------------------------------------------
-# Integration tests
-# ------------------------------------------------------------------
+            graph.add_node(node, level="device", power=1)
+            graph.add_edge(node, previous_node, visible=True)
 
-class TestReturnPercentageWithRealEnergyManager(unittest.TestCase):
-    """
-    Integration tests for:
+            previous_node = node
 
-        layout_percentage.return_percentage()
-        +
-        layout_energy_manager.shut()
-        +
-        layout_energy_manager.fix()
+    actual_device_nodes = [
+        node
+        for node, data in graph.nodes(data=True)
+        if data.get("level") == "device"
+    ]
 
-    These tests mock logs_corrective_locations only to control the generated
-    events. shut() and fix() are NOT mocked.
-    """
+    assert len(actual_device_nodes) == n_devices
 
-    @patch(
-        "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
-        side_effect=lambda df: df,
-    )
-    @patch(
-        "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
-        side_effect=lambda df, df_extra: df,
-    )
-    @patch(
-        "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
-        return_value=["device"],
-    )
-    @patch("oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations")
-    def test_device_shutdown_false_shutdown_true_and_fix(
-        self,
-        mock_logs_corr,
-        _mock_find_highest_power_node,
-        _mock_add_markers_month_year,
-        _mock_fix_percentage_markers_dates,
-    ):
-        """
-        Non-PV device case with real shut/fix:
-
-        1. failure with shutdown=False -> availability remains 100%
-        2. failure with shutdown=True  -> one device power becomes 0 -> 90%
-        3. operation fix              -> device power restored -> 100%
-        """
-        log_events = pd.DataFrame(
-            {
-                "id": ["ofw.001", "ofw.002", "ofw.003"],
-                "event": ["failure", "failure", "operation"],
-                "d_trigger": [
-                    datetime(2025, 1, 10, 0, 0, 0),
-                    datetime(2025, 1, 11, 0, 0, 0),
-                    datetime(2025, 1, 20, 0, 0, 0),
-                ],
-            }
-        )
-
-        G = make_direct_device_graph(n_devices=10)
-
-        def fake_logs_corrective_locations(
-            r,
-            op_corr_excluding_tow,
-            shut_attribute,
-            find_element_class,
-            dict_locations,
-            op_corr_tow={},
-            op_add_tow={},
-        ):
-            if r["id"] == "ofw.001":
-                return (
-                    [
-                        {
-                            "date": r["Date"],
-                            "event": "failure",
-                            "id": r["id"],
-                            "comments": "non-shutdown failure",
-                            "name": "WTG minor failure",
-                            "failure_id": r["id"],
-                            "level": "device",
-                            "shutdown": False,
-                            "shut_fix": "shut",
-                            "loc": 1,
-                        }
-                    ],
-                    dict_locations,
-                )
-
-            if r["id"] == "ofw.002":
-                return (
-                    [
-                        {
-                            "date": r["Date"],
-                            "event": "failure",
-                            "id": r["id"],
-                            "comments": "shutdown failure",
-                            "name": "WTG major failure",
-                            "failure_id": r["id"],
-                            "level": "device",
-                            "shutdown": True,
-                            "shut_fix": "shut",
-                            "loc": 2,
-                        }
-                    ],
-                    dict_locations,
-                )
-
-            if r["id"] == "ofw.003":
-                return (
-                    [
-                        {
-                            "date": r["Date"],
-                            "event": "operation",
-                            "id": r["id"],
-                            "comments": "repair operation",
-                            "name": "WTG repair",
-                            "failure_id": "ofw.002",
-                            "level": "device",
-                            "shutdown": True,
-                            "shut_fix": "fix",
-                            "loc": 2,
-                        }
-                    ],
-                    dict_locations,
-                )
-
-            return ([], dict_locations)
-
-        mock_logs_corr.side_effect = fake_logs_corrective_locations
-
-        df = layout_percentage.return_percentage(
-            log_events=log_events,
-            prefix_list=["ofw", "oce"],
-            operations_corrective_stat=DUMMY_OPERATIONS_STATS,
-            G=G,
-            shut_attribute="wtg_shutdown_dict",
-            start_year=2025,
-            start_month=1,
-            n_lifetime=1,
-            n_devices=10,
-            tech="wind",
-            find_element_class=None,
-        )
-
-        df_events = df[df["Event"].isin(["failure", "operation"])].sort_values("Date")
-
-        self.assertEqual(
-            df_events["Perc_availability"].tolist(),
-            [100.0, 90.0, 100.0],
-        )
-
-        # Real fix() restored device 2 power.
-        self.assertEqual(G.nodes[2]["power"], 1)
-
-    @patch(
-        "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
-        side_effect=lambda df: df,
-    )
-    @patch(
-        "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.add_markers_month_year",
-        side_effect=lambda df, df_extra: df,
-    )
-    @patch(
-        "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
-        return_value=["device"],
-    )
-    @patch("oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations")
-    def test_array_cable_shutdown_and_fix(
-        self,
-        mock_logs_corr,
-        _mock_find_highest_power_node,
-        _mock_add_markers_month_year,
-        _mock_fix_percentage_markers_dates,
-    ):
-        """
-        Non-PV cable/edge case with real shut/fix:
-
-        1. cable failure closes edge (100, 0) -> all devices disconnected -> 0%
-        2. operation fix restores edge       -> all devices connected -> 100%
-        """
-        log_events = pd.DataFrame(
-            {
-                "id": ["ofw.001", "ofw.002"],
-                "event": ["failure", "operation"],
-                "d_trigger": [
-                    datetime(2025, 2, 10, 0, 0, 0),
-                    datetime(2025, 2, 20, 0, 0, 0),
-                ],
-            }
-        )
-
-        G = make_array_cable_graph(n_devices=3)
-
-        def fake_logs_corrective_locations(
-            r,
-            op_corr_excluding_tow,
-            shut_attribute,
-            find_element_class,
-            dict_locations,
-            op_corr_tow={},
-            op_add_tow={},
-        ):
-            if r["id"] == "ofw.001":
-                return (
-                    [
-                        {
-                            "date": r["Date"],
-                            "event": "failure",
-                            "id": r["id"],
-                            "comments": "array cable failure",
-                            "name": "array cable failure",
-                            "failure_id": r["id"],
-                            "level": "array_cable",
-                            "shutdown": True,
-                            "shut_fix": "shut",
-                            "loc": (100, 0),
-                        }
-                    ],
-                    dict_locations,
-                )
-
-            if r["id"] == "ofw.002":
-                return (
-                    [
-                        {
-                            "date": r["Date"],
-                            "event": "operation",
-                            "id": r["id"],
-                            "comments": "array cable repair",
-                            "name": "array cable repair",
-                            "failure_id": "ofw.001",
-                            "level": "array_cable",
-                            "shutdown": True,
-                            "shut_fix": "fix",
-                            "loc": (100, 0),
-                        }
-                    ],
-                    dict_locations,
-                )
-
-            return ([], dict_locations)
-
-        mock_logs_corr.side_effect = fake_logs_corrective_locations
-
-        df = layout_percentage.return_percentage(
-            log_events=log_events,
-            prefix_list=["ofw", "oce"],
-            operations_corrective_stat=DUMMY_OPERATIONS_STATS,
-            G=G,
-            shut_attribute="wtg_shutdown_dict",
-            start_year=2025,
-            start_month=1,
-            n_lifetime=1,
-            n_devices=3,
-            tech="wind",
-            find_element_class=None,
-        )
-
-        df_events = df[df["Event"].isin(["failure", "operation"])].sort_values("Date")
-
-        self.assertEqual(
-            df_events["Perc_availability"].tolist(),
-            [0.0, 100.0],
-        )
-
-        # Real fix() restored the edge visibility.
-        self.assertTrue(G.edges[100, 0]["visible"])
+    return graph
 
 
-
-# ------------------------------------------------------------------
-# Tow-to-port integration test doubles
-# ------------------------------------------------------------------
+# =============================================================================
+# Test doubles
+# =============================================================================
 
 class TowToPortOpClass:
+    """Minimal operation class for tow-to-port corrective operations."""
+
     def __init__(self, tow_to_port=True, op_tow_port=None, op_tow_site=None):
         self.tow_to_port = tow_to_port
         self.op_tow_port = op_tow_port
@@ -353,6 +149,8 @@ class TowToPortOpClass:
 
 
 class TowToPortCorrectiveStat:
+    """Minimal corrective-stat operation object."""
+
     def __init__(self, op_id, op_tow_port, op_tow_site):
         self.id = op_id
         self.op_class = TowToPortOpClass(
@@ -362,16 +160,32 @@ class TowToPortCorrectiveStat:
         )
 
 
+class RegularCorrectiveStat:
+    """Minimal non-TTP corrective operation object."""
+
+    def __init__(self, op_id="regular_operation"):
+        self.id = op_id
+        self.op_class = SimpleNamespace(
+            tow_to_port=False,
+            op_tow_port=None,
+            op_tow_site=None,
+        )
+
+
 class AdditionalTowOperation:
+    """Minimal additional tow operation."""
+
     def __init__(self, op_id):
         self.id = op_id
 
 
 class TowOperation:
+    """Minimal tow operation returned by find_element_class.find_operation."""
+
     def __init__(
         self,
         op_id,
-        addition_op_tow=False,
+        addition_op_tow=None,
         string_disconnection=False,
         recommissioning_time=0,
     ):
@@ -382,278 +196,123 @@ class TowOperation:
 
 
 class DummyFindElement:
-    def __init__(self, operations):
-        self.operations = operations
+    """Minimal finder object."""
+
+    def __init__(self, operations=None):
+        self.operations = operations or {}
 
     def find_operation(self, op_id):
+        """Return an operation by id."""
         return self.operations[op_id]
 
 
-# ------------------------------------------------------------------
-# Tow-to-port helpers
-# ------------------------------------------------------------------
-from itertools import product
+# =============================================================================
+# Test helpers
+# =============================================================================
 
-def make_wind_string_graph(tow_string_shutdown=False):
-    """
-    Graph:
-
-        device 2 -> device 1 -> shore
-
-    This is intentional.
-
-    If device 1 is towed and edge (1, 0) is disconnected,
-    device 2 also loses its path to shore. This makes the effect of
-    tow_string_shutdown visible in the availability result.
-    """
-    G = nx.DiGraph()
-    G.graph["tow_string_shutdown"] = tow_string_shutdown
-
-    G.add_node(0, level="SHORE", power=0, name="SHORE", coords=(0, 0))
-    G.add_node(1, level="device", power=1, name="D1", coords=(1, 0))
-    G.add_node(2, level="device", power=1, name="D2", coords=(2, 0))
-    G.add_node(3, level="device", power=1, name="D3", coords=(3, 0))
-    G.add_node(4, level="device", power=1, name="D4", coords=(4, 0))
-
-    # Edges
-    G.add_edge(1, 0, visible=True, name="1-0")
-    G.add_edge(2, 1, visible=True, name="2-1")
-    G.add_edge(3, 2, visible=True, name="3-2")
-    G.add_edge(4, 3, visible=True, name="4-3")
-
-    return G
-
-
-def make_tow_to_port_objects(
-    has_add_operation,
-    string_disconnection,
-    recommissioning,
+def make_event(
+    date,
+    event,
+    event_id,
+    shut_fix,
+    loc,
+    shutdown=True,
+    name="event_name",
+    failure_id="ofw_fail_001",
+    level="device",
 ):
-    tow_add_port_id = "ofw_add_tow_port_001"
-    tow_add_site_id = "ofw_add_tow_site_001"
-    tow_port_id = "ofw_redeploy_tow"
-    tow_site_id = "ofw_removal_tow"
+    """Create one abstract corrective event as returned by logs_corrective_locations."""
+    return {
+        "date": pd.Timestamp(date),
+        "id": event_id,
+        "event": event,
+        "comments": f"{event} comments",
+        "name": name,
+        "failure_id": failure_id,
+        "level": level,
+        "shutdown": shutdown,
+        "shut_fix": shut_fix,
+        "loc": loc,
+    }
 
-    add_op_port = AdditionalTowOperation(tow_add_port_id) if has_add_operation else None
-    add_op_site = AdditionalTowOperation(tow_add_site_id) if has_add_operation else None
 
-    tow_port = TowOperation(
-        op_id=tow_port_id,
-        addition_op_tow=add_op_port,
-        string_disconnection=string_disconnection if string_disconnection else False,
-        recommissioning_time=1 if recommissioning else 0,
+def make_log_events_from_abstract_events(events):
+    """Create the log_events dataframe consumed by return_percentage."""
+    return pd.DataFrame(
+        [
+            {
+                "id": event["id"],
+                "event": event["event"],
+                "d_trigger": event["date"],
+            }
+            for event in events
+        ]
     )
 
-    tow_site = TowOperation(
-        op_id=tow_site_id,
-        addition_op_tow=add_op_site,
-        string_disconnection=string_disconnection if string_disconnection else False,
-        recommissioning_time=1 if recommissioning else 0,
-    )
 
-    operations_corrective_stat = [
-        TowToPortCorrectiveStat(
-            op_id="op_corr_001",
-            op_tow_port=tow_port_id,
-            op_tow_site=tow_site_id,
+def make_logs_corrective_locations_side_effect(events):
+    """Return one abstract event per input log row."""
+    events_by_key = {
+        (event["id"], event["date"]): event
+        for event in events
+    }
+
+    def fake_logs_corrective_locations(
+        r,
+        shut_attribute,
+        find_element_class,
+        dict_locations,
+        op_add_tow,
+    ):
+        key = (
+            r["id"],
+            r["Date"],
         )
+
+        return [
+            events_by_key[key],
+        ], dict_locations
+
+    return fake_logs_corrective_locations
+
+
+def round_availability_sequence(values):
+    """Convert percentage values into the integer format used by the reference sequences."""
+    return [
+        int(value)
+        for value in values
     ]
 
-    find_element_class = DummyFindElement(
-        {
-            tow_port_id: tow_port,
-            tow_site_id: tow_site,
-        }
-    )
 
-    return operations_corrective_stat, find_element_class
+# =============================================================================
+# Tests
+# =============================================================================
 
+class TestLayoutPercentageEnergyManagerIntegration(unittest.TestCase):
+    """Integration tests for return_percentage energy-manager behaviour."""
 
-def make_tow_to_port_events(
-    has_add_operation,
-    recommission,
-):
-    failure_id = "ofw_fail_001"
-
-    failure = {
-        "date": datetime(2025, 3, 1, 8, 0, 0),
-        "event": "failure",
-        "id": failure_id,
-        "comments": "failure before tow to port",
-        "name": "WTG major failure",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "shut",
-        "loc": 2,
-    }
-    add_op_TTP = {
-        "date": datetime(2025, 3, 2, 8, 0, 0),
-        "event": "operation",
-        "id": "ofw_add_tow_port_001",
-        "comments": "additional tow/site operation starts",
-        "name": "Tow site additional operation",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "shut",
-        "loc": 2,
-    }
-    add_op_TTS = {
-        "date": datetime(2025, 3, 2, 14, 0, 0),
-        "event": "operation",
-        "id": "ofw_add_tow_port_001",
-        "comments": "additional tow/site operation completed",
-        "name": "Tow site additional operation",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "fix",
-        "loc": 2,
-    }
-    tow_port = {
-        "date": datetime(2025, 3, 2, 15, 0, 0),
-        "event": "tow",
-        "id": "ofw_removal_tow",
-        "comments": "tow to port starts",
-        "name": "Tow to port",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "shut",
-        "loc": 2,
-    }
-    tow_site = {
-        "date": datetime(2025, 3, 4, 12, 0, 0),
-        "event": "tow",
-        "id": "ofw_redeploy_tow",
-        "comments": "tow to port completed",
-        "name": "Tow to port",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "fix",
-        "loc": 2,
-    }
-    add_op_TTS_shut = {
-        "date": datetime(2025, 3, 4, 13, 0, 0),
-        "event": "operation",
-        "id": "ofw_add_tow_site_001",
-        "comments": "additional tow/site operation starts",
-        "name": "Tow site additional operation",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "shut",
-        "loc": 2,
-    }
-    add_op_TTS_fix = {
-        "date": datetime(2025, 3, 4, 18, 0, 0),
-        "event": "operation",
-        "id": "ofw_add_tow_site_001",
-        "comments": "additional tow/site operation completed",
-        "name": "Tow site additional operation",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "fix",
-        "loc": 2,
-    }
-    recommissioning = {
-        "date": datetime(2025, 3, 4, 19, 0, 0),
-        "event": "recommissioning",
-        "id": "ofw_add_tow_site_001",
-        "comments": "recommissioning completed",
-        "name": "Recommissioning",
-        "failure_id": failure_id,
-        "level": "device",
-        "shutdown": True,
-        "shut_fix": "fix",
-        "loc": 2,
-    }
-
-    # NORMAL TOW
-    if not has_add_operation and not recommission:
-        events = [failure, tow_port, tow_site]
-    elif not has_add_operation and recommission:
-        events = [failure, tow_port, tow_site, recommissioning]
-    # TOW with additional operations
-    elif has_add_operation and not recommission:
-        events = [failure, add_op_TTP, add_op_TTS, tow_port, tow_site, add_op_TTS_shut, add_op_TTS_fix]
-    # TOW with additional operations and recommission
-    else:
-        events = [failure, add_op_TTP, add_op_TTS, tow_port, tow_site, add_op_TTS_shut, add_op_TTS_fix, recommissioning]
-
-    return events
-
-
-# ------------------------------------------------------------------
-# Tow-to-port integration tests
-# ------------------------------------------------------------------
-
-EXPECTED_AVAILABILITY = {
-    # existing cases
-    (False, False, False, False): [75.0, 75.0, 100.0],
-    (False, False, True,  False): [75.0, 25.0, 100.0],
-    (True,  False, False, False): [75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 100.0],
-    (True,  True,  False, False): [75.0, 0.0, 75.0, 75.0, 75.0, 0.0, 100.0],
-    (True,  True,  True,  False): [75.0, 0.0, 25.0, 25.0, 25.0, 0.0, 100.0],
-    (True,  False, True,  True ): [75.0, 75.0, 25.0, 25.0, 25.0, 25.0, 75.0, 100.0],
-    (True,  True,  True,  True ): [75.0, 0.0, 25.0, 25.0, 25.0, 0.0, 75.0, 100.0],
-    (True,  False, True,  False): [75.0, 75.0, 25.0, 25.0, 25.0, 25.0, 100.0],
-    (True,  False, False, True ): [75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 100.0],
-    (True,  True,  False, True ): [75.0, 0.0, 75.0, 75.0, 75.0, 0.0, 75.0, 100.0],
-}
-
-class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
-    """
-    Integration tests for tow-to-port logic.
-
-    Real functions tested:
-        - return_percentage()
-        - shut()
-        - fix()
-
-    Mocked only:
-        - logs_corrective_locations()
-        - monthly marker helpers
-        - find_highest_power_node()
-        - choose_spec_loc_string()
-    """
-
-    def run_tow_to_port_case(
+    def run_return_percentage(
         self,
-        has_add_operation,
-        string_disconnection,
-        tow_string_shutdown,
-        recommissioning,
+        graph,
+        events,
+        n_devices,
+        operations_corrective_stat=None,
+        find_element_class=None,
     ):
-        log_events = pd.DataFrame(
-            {
-                "id": ["ofw.seed"],
-                "event": ["failure"],
-                "d_trigger": [datetime(2025, 3, 1, 0, 0, 0)],
-            }
-        )
+        """Run return_percentage with mocked event generation and monthly markers."""
+        if operations_corrective_stat is None:
+            operations_corrective_stat = [
+                RegularCorrectiveStat(),
+            ]
 
-        G = make_wind_string_graph(
-            tow_string_shutdown=tow_string_shutdown,
-        )
+        if find_element_class is None:
+            find_element_class = DummyFindElement()
 
-        operations_corrective_stat, find_element_class = make_tow_to_port_objects(
-            has_add_operation=has_add_operation,
-            string_disconnection=string_disconnection,
-            recommissioning=recommissioning,
-        )
-
-        generated_events = make_tow_to_port_events(
-            has_add_operation=has_add_operation,
-            recommission=recommissioning,
-        )
+        log_events = make_log_events_from_abstract_events(events)
 
         with patch(
             "oriom.core.functions.layout_power.layout_percentage.logs_corrective_locations",
-            return_value=(generated_events, {}),
+            side_effect=make_logs_corrective_locations_side_effect(events),
         ), patch(
             "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.find_highest_power_node",
             return_value=["device"],
@@ -663,70 +322,452 @@ class TestReturnPercentageTowToPortIntegration(unittest.TestCase):
         ), patch(
             "oriom.core.functions.layout_power.layout_percentage.aux_layout_power_func.fix_percentage_markers_dates",
             side_effect=lambda df: df,
-        ), patch(
-            "oriom.core.functions.layout_power.layout_percentage.choose_spec_loc_string",
-            side_effect=lambda G, loc: (1, 0) if isinstance(loc, int) else loc,
         ):
-            df = layout_percentage.return_percentage(
+            result = layout_percentage.return_percentage(
                 log_events=log_events,
                 prefix_list=["ofw", "oce"],
                 operations_corrective_stat=operations_corrective_stat,
-                G=G,
+                G=graph,
                 shut_attribute="wtg_shutdown_dict",
                 start_year=2025,
                 start_month=1,
                 n_lifetime=1,
-                n_devices=4,
+                n_devices=n_devices,
                 tech="wind",
                 find_element_class=find_element_class,
             )
 
-        return df, G
+        return result, graph
 
-    def test_tow_to_port_all_combinations(self):
-    
-        for (
-            has_add_operation,
-            string_disconnection,
-            tow_string_shutdown,
-            recommissioning,
-        ) in product(
-            [False, True],
-            [False, True],
-            [False, True],
-            [False, True],
-        ):
+    @staticmethod
+    def availability_sequence(result):
+        """Return the availability sequence including the initial 100% state."""
+        corrective_rows = result[
+            result["Event"].isin(
+                [
+                    "failure",
+                    "operation",
+                    "tow",
+                    "recommissioning",
+                ]
+            )
+        ].sort_values("Date")
 
-            if not has_add_operation and string_disconnection or not has_add_operation and recommissioning:
-                continue
+        values = round_availability_sequence(
+            corrective_rows["Perc_availability"].tolist()
+        )
 
-            case_key = (
-                has_add_operation,
-                string_disconnection,
-                tow_string_shutdown,
-                recommissioning,
+        return [
+            *values,
+        ]
+
+    def test_device_shutdown_and_fix(self):
+        """A device shutdown should reduce availability and a fix should restore it."""
+        graph = make_direct_device_graph(n_devices=1)
+
+        events = [
+            make_event(
+                date="2025-01-01 08:00",
+                event="failure",
+                event_id="ofw_fail_001",
+                shut_fix="shut",
+                loc=2,
+                name="device failure",
+                failure_id="ofw_fail_001",
+            ),
+            make_event(
+                date="2025-01-02 08:00",
+                event="operation",
+                event_id="ofw_repair_001",
+                shut_fix="shut",
+                loc=2,
+                name="device shut",
+                failure_id="ofw_fail_001",
+            ),
+            make_event(
+                date="2025-01-02 18:00",
+                event="operation",
+                event_id="ofw_repair_001",
+                shut_fix="fix",
+                loc=2,
+                name="device repair",
+                failure_id="ofw_fail_001",
+            ),
+        ]
+
+        result, graph = self.run_return_percentage(
+            graph=graph,
+            events=events,
+            n_devices=1,
+        )
+
+        actual = self.availability_sequence(result)
+
+        self.assertEqual(
+            actual,
+            [
+                0,
+                0,
+                100,
+            ],
+        )
+
+        self.assertEqual(graph.nodes[2]["power"], 1)
+        self.assertTrue(graph.edges[2, 1]["visible"])
+
+    def test_cable_shutdown_and_fix(self):
+        """An array/cable-level shutdown and fix should update availability."""
+        graph = make_array_cable_graph(n_devices=3)
+
+        events = [
+            make_event(
+                date="2025-01-01 08:00",
+                event="failure",
+                event_id="ofw_cable_fail_001",
+                shut_fix="shut",
+                loc=1,
+                name="array cable failure",
+                failure_id="ofw_cable_fail_001",
+                level="device",
+            ),
+            make_event(
+                date="2025-01-02 08:00",
+                event="operation",
+                event_id="ofw_cable_repair_001",
+                shut_fix="fix",
+                loc=1,
+                name="array cable repair",
+                failure_id="ofw_cable_fail_001",
+                level="device",
+            ),
+        ]
+
+        result, graph = self.run_return_percentage(
+            graph=graph,
+            events=events,
+            n_devices=3,
+        )
+
+        actual = self.availability_sequence(result)
+
+        self.assertEqual(
+            actual,
+            [
+                66,
+                100,
+            ],
+        )
+
+    def make_tow_to_port_objects(
+        self,
+        has_add_operation=False,
+        string_disconnection=False,
+        recommissioning=False,
+    ):
+        """Create TTP operation objects and a finder."""
+        tow_port_id = "ofw_removal_tow"
+        tow_site_id = "ofw_redeploy_tow"
+
+        addition_port = (
+            AdditionalTowOperation("ofw_add_tow_port_001")
+            if has_add_operation
+            else None
+        )
+
+        addition_site = (
+            AdditionalTowOperation("ofw_add_tow_site_001")
+            if has_add_operation
+            else None
+        )
+
+        tow_port = TowOperation(
+            op_id=tow_port_id,
+            addition_op_tow=addition_port,
+            string_disconnection=string_disconnection,
+            recommissioning_time=0,
+        )
+
+        tow_site = TowOperation(
+            op_id=tow_site_id,
+            addition_op_tow=addition_site,
+            string_disconnection=string_disconnection,
+            recommissioning_time=1 if recommissioning else 0,
+        )
+
+        corrective_stat = TowToPortCorrectiveStat(
+            op_id="ofw_corrective_main",
+            op_tow_port=tow_port_id,
+            op_tow_site=tow_site_id,
+        )
+
+        find_element_class = DummyFindElement(
+            operations={
+                tow_port_id: tow_port,
+                tow_site_id: tow_site,
+            }
+        )
+
+        return corrective_stat, find_element_class
+
+    @staticmethod
+    def make_tow_events(
+        has_add_operation=False,
+        recommissioning=False,
+        failure_loc=3,
+        string_disconnection = False,
+        shutdown = True
+    ):
+        """Create an abstract TTP event sequence."""
+        events = [
+            make_event(
+                date="2025-03-01 08:00",
+                event="failure",
+                event_id="ofw_fail_001",
+                shut_fix="shut",
+                loc=failure_loc,
+                name="device failure",
+                failure_id="ofw_fail_001",
+                shutdown= shutdown
+            ),
+        ]
+
+        if has_add_operation:
+            events.extend(
+                [
+                    make_event(
+                        date="2025-03-02 08:00",
+                        event="operation",
+                        event_id="ofw_add_tow_port_001",
+                        shut_fix="shut",
+                        loc=failure_loc,
+                        name="additional tow-to-port preparation",
+                        failure_id="ofw_fail_001",
+                    )
+                ]
+            )
+            if string_disconnection:
+                events.extend(
+                    [
+                        make_event(
+                            date="2025-03-02 14:00",
+                            event="operation",
+                            event_id="ofw_add_tow_port_001",
+                            shut_fix="fix",
+                            loc=failure_loc,
+                            name="additional tow-to-port preparation",
+                            failure_id="ofw_fail_001",
+                        ),
+                ]
             )
 
-            with self.subTest(case=case_key):
+        events.extend(
+            [
+                make_event(
+                    date="2025-03-02 15:00",
+                    event="tow",
+                    event_id="ofw_removal_tow",
+                    shut_fix="shut",
+                    loc=failure_loc,
+                    name="tow removal",
+                    failure_id="ofw_fail_001",
+                ),
+                make_event(
+                    date="2025-03-04 12:00",
+                    event="tow",
+                    event_id="ofw_redeploy_tow",
+                    shut_fix="fix",
+                    loc=failure_loc,
+                    name="tow redeploy",
+                    failure_id="ofw_fail_001",
+                ),
+            ]
+        )
 
-                df, G = self.run_tow_to_port_case(
+        if has_add_operation:
+            events.extend(
+                [
+                    make_event(
+                        date="2025-03-04 13:00",
+                        event="operation",
+                        event_id="ofw_add_tow_site_001",
+                        shut_fix="shut",
+                        loc=failure_loc,
+                        name="additional tow-to-site preparation",
+                        failure_id="ofw_fail_001",
+                    ),
+                    make_event(
+                        date="2025-03-04 18:00",
+                        event="operation",
+                        event_id="ofw_add_tow_site_001",
+                        shut_fix="fix",
+                        loc=failure_loc,
+                        name="additional tow-to-site preparation",
+                        failure_id="ofw_fail_001",
+                    ),
+                ]
+            )
+
+        if recommissioning:
+            events.append(
+                make_event(
+                    date="2025-03-04 19:00",
+                    event="recommissioning",
+                    event_id="ofw_add_tow_site_001",
+                    shut_fix="fix",
+                    loc=failure_loc,
+                    name="recommissioning",
+                    failure_id="ofw_fail_001",
+                )
+            )
+
+        return events
+
+    def run_tow_case(
+        self,
+        has_add_operation,
+        string_disconnection,
+        tow_string_shutdown,
+        recommissioning,
+        n_devices,
+        devices_per_string,
+        failure_loc,
+    ):
+        """Run one tow-to-port case through return_percentage."""
+        graph = make_tow_graph(
+            n_devices=n_devices,
+            devices_per_string=devices_per_string,
+        )
+        graph.graph["tow_string_shutdown"] = tow_string_shutdown
+
+        corrective_stat, find_element_class = self.make_tow_to_port_objects(
+            has_add_operation=has_add_operation,
+            string_disconnection=string_disconnection,
+            recommissioning=recommissioning,
+        )
+
+        events = self.make_tow_events(
+            has_add_operation=has_add_operation,
+            recommissioning=recommissioning,
+            failure_loc=failure_loc,
+            string_disconnection=string_disconnection,
+            shutdown=False,
+        )
+
+        result, graph = self.run_return_percentage(
+            graph=graph,
+            events=events,
+            n_devices=n_devices,
+            operations_corrective_stat=[
+                corrective_stat,
+            ],
+            find_element_class=find_element_class,
+        )
+
+        return result, graph
+
+    @skip
+    def test_tow_to_port_cases_4_turbines_two_strings_failure_at_node_2(self):
+        """
+        Test the 10 TTP cases for 4 turbines split into two strings.
+
+        Layout:
+            string 1: node 2 -> node 3
+            string 2: node 4 -> node 5
+
+        Failure location:
+            node 2, first turbine in the first string.
+        """
+        for case_index, case in enumerate(CASES, start=1):
+            with self.subTest(case_index=case_index, case=case):
+                (
+                    has_add_operation,
+                    string_disconnection,
+                    tow_string_shutdown,
+                    recommissioning,
+                ) = case
+
+                result, graph = self.run_tow_case(
                     has_add_operation=has_add_operation,
                     string_disconnection=string_disconnection,
                     tow_string_shutdown=tow_string_shutdown,
                     recommissioning=recommissioning,
+                    n_devices=4,
+                    devices_per_string=2,
+                    failure_loc=2,
                 )
+
+                actual = self.availability_sequence(result)
+                expected = EXPECTED_AVAILABILITY_4_TURBINES_LOC_2[case_index]
 
                 self.assertEqual(
-                    df["Perc_availability"].tolist(),
-                    EXPECTED_AVAILABILITY[case_key],
-                    msg=('\n',has_add_operation,string_disconnection,tow_string_shutdown,recommissioning),
+                    actual,
+                    expected,
+                    msg=(
+                        "Unexpected availability sequence for 4 turbines. "
+                        f"case_index={case_index}, "
+                        f"case={case}, "
+                        f"actual={actual}, "
+                        f"expected={expected}"
+                    ),
                 )
 
+                self.assertEqual(graph.nodes[3]["power"], 1)
+                self.assertTrue(graph.edges[1, 0]["visible"])
 
-                self.assertEqual(G.nodes[1]["power"], 1)
-                self.assertTrue(G.edges[1, 0]["visible"])
+                for node in range(2, 6):
+                    self.assertEqual(graph.nodes[node]["power"], 1)
+
+    def test_tow_to_port_cases_6_turbines_two_strings_failure_at_node_3(self):
+        """
+        Test the 10 TTP cases for 6 turbines split into two strings.
+
+        Layout:
+            string 1: node 2 -> node 3 -> node 4
+            string 2: node 5 -> node 6 -> node 7
+
+        Failure location:
+            node 3, second turbine in the first string.
+        """
+        for case_index, case in enumerate(CASES, start=1):
+            with self.subTest(case_index=case_index, case=case):
+                (
+                    has_add_operation,
+                    string_disconnection,
+                    tow_string_shutdown,
+                    recommissioning,
+                ) = case
+
+                result, graph = self.run_tow_case(
+                    has_add_operation=has_add_operation,
+                    string_disconnection=string_disconnection,
+                    tow_string_shutdown=tow_string_shutdown,
+                    recommissioning=recommissioning,
+                    n_devices=6,
+                    devices_per_string=3,
+                    failure_loc=3,
+                )
+
+                actual = self.availability_sequence(result)
+                expected = EXPECTED_AVAILABILITY_6_TURBINES_LOC_3[case_index]
+                
+                self.assertEqual(
+                    actual,
+                    expected,
+                    msg=(
+                        "Unexpected availability sequence for 6 turbines. "
+                        f"case_index={case_index},\n"
+                        f"case={case}\n"
+                        f"actual={actual}\n"
+                        f"expected={expected}"
+                    ),
+                )
+
+                self.assertEqual(graph.nodes[3]["power"], 1)
+                self.assertTrue(graph.edges[1, 0]["visible"])
+
+                for node in range(2, 8):
+                    self.assertEqual(graph.nodes[node]["power"], 1)
 
 
-            
 if __name__ == "__main__":
     unittest.main(verbosity=2)

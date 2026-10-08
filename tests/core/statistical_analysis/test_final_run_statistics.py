@@ -62,6 +62,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
                 900.0,   # tot_mobilization_costs
                 400.0,   # tot_rov_costs
                 500.0,   # tot_part_costs
+                0.0,   # tot_part_costs
             ),
         ]
         return pd.DataFrame(
@@ -74,6 +75,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
                 "tot_mobilization_costs",
                 "tot_rov_costs",
                 "tot_part_costs",
+                "tot_other_costs",
             ],
         )
 
