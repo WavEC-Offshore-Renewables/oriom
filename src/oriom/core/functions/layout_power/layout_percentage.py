@@ -124,17 +124,10 @@ def return_percentage(
         LEVELS_NO_POWER.discard(x)
 
     # Create list of operations id to consider for shut down or fix strategy
-    op_corr_excl_tow = [op.id for op in operations_corrective_stat if not getattr(op.op_class, "tow_to_port", None)]
-    op_corr_tow = {}
-    op_add_tow = {}
-    events_total = []
-    percentage = []
-
-    device_shutted = set()
-    device_failed = set()
-    device_shutted_string_level = {}
-    device_string_level = {}
-    dict_locations = {}
+    op_corr_tow, op_add_tow = {}, {}
+    device_shutted_string_level, device_string_level, dict_locations = {}, {}, {}
+    events_total, percentage = [], []
+    device_shutted, device_failed = set(), set()
     recommissioning = False
 
     for op in operations_corrective_stat:
@@ -164,11 +157,9 @@ def return_percentage(
         for _, r in log.iterrows():
             rows, dict_locations = logs_corrective_locations(
                     r,
-                    op_corr_excl_tow,
                     shut_attribute,
                     find_element_class,
                     dict_locations,
-                    op_corr_tow,
                     op_add_tow
             )
 
@@ -190,6 +181,7 @@ def return_percentage(
             failure_id = r["failure_id"]
             r_id = r["id"]
             shut_downstream_device = False
+            
             # LOCATION SELECTION
             # ------------------
             if loc is None:
@@ -216,7 +208,7 @@ def return_percentage(
                         raise RuntimeError(f"Location not resolved for event {r['id']} at {date}")
                     r["loc"] = loc
 
-
+            locs = [loc]
             # ACTION SELECTION
             # ------------------
             # Store the shutdown of the device and evaluate the power of the farm
@@ -250,57 +242,59 @@ def return_percentage(
 
                 # Shutdown the component if is a failure that requires it or the op require shutdown and was not already shutted
                 if loc not in device_shutted or event == 'tow' or r_id in op_add_tow.keys():
+                    # Add to disconnect the entire string
                     if op_add_tow.get(r_id, {}).get('string', False):
-                        loc = choose_spec_loc_string(G,loc)
+                        locs.append(choose_spec_loc_string(G,loc))
+                    if event == 'tow' or r_id in op_add_tow.keys():
                         # Add to do electrical discontinuity
                         if getattr(G, 'graph', {}).get('tow_string_shutdown', False):
                             shut_downstream_device = r["loc"]
 
-                    G, power_farm = shut(
-                        loc,
-                        shutdown if loc not in device_shutted else False, # Manage case device failed but need tow and create string disconn
+                    for loc_, shut_downstream in zip(locs, [shut_downstream_device, False][:len(locs)]):
+                        G, power_farm = shut(
+                            loc_,
+                            shutdown if loc_ not in device_shutted else False, # Manage case device failed but need tow and create string disconn
+                            G,
+                            COMPONENT_LEVEL_POWER,
+                            LEVELS_NO_POWER,
+                            tech,
+                            name,
+                            n_pv_per_string,
+                            max_failure_module,
+                            device_shutted_string_level,
+                            list_failed = device_shutted,
+                            string_inverter = string_inverter,
+                            event = event,
+                            op_add_tow = op_add_tow,
+                            r_id = r_id,
+                            shut_downstream_device = shut_downstream
+                        )
+                        if shutdown and close_device:
+                            device_shutted.add(loc_)
+                            
+                    perc = power_farm / n_devices * 100
+
+            # Store the fix of the device and evaluate the power of the farm
+            elif shut_fix == 'fix':
+                if op_add_tow.get(r_id, {}).get('string', False):
+                    locs.append(choose_spec_loc_string(G,loc))
+                for loc_ in locs:
+                    G, power_farm = fix(
+                        loc_,
                         G,
                         COMPONENT_LEVEL_POWER,
                         LEVELS_NO_POWER,
                         tech,
                         name,
                         n_pv_per_string,
-                        max_failure_module,
-                        device_shutted_string_level,
-                        list_failed = device_shutted,
-                        string_inverter = string_inverter,
                         event = event,
+                        op_corr_tow = op_corr_tow,
                         op_add_tow = op_add_tow,
-                        r_id = r_id,
-                        shut_downstream_device = shut_downstream_device
+                        r = r,
+                        recommissioning = recommissioning
                     )
-
-                    perc = power_farm / n_devices * 100
-
-                    # Store the closed device if lead to a shutdown and is a component that can be closed or the event
-                    if shutdown and close_device:
-                        device_shutted.add(loc)
-
-            # Store the fix of the device and evaluate the power of the farm
-            elif shut_fix == 'fix':
-                if op_add_tow.get(r_id, {}).get('string', False):
-                    loc = choose_spec_loc_string(G,loc)
-                G, power_farm = fix(
-                    loc,
-                    G,
-                    COMPONENT_LEVEL_POWER,
-                    LEVELS_NO_POWER,
-                    tech,
-                    name,
-                    n_pv_per_string,
-                    event = event,
-                    op_corr_tow = op_corr_tow,
-                    op_add_tow = op_add_tow,
-                    r = r,
-                    recommissioning = recommissioning
-                )
-                device_failed.discard(loc)
-                device_shutted.discard(loc)
+                    device_failed.discard(loc_)
+                    device_shutted.discard(loc_)
                 perc = power_farm / n_devices * 100
 
             # Raise an error if there is no indication specific of the shutdown/restoration

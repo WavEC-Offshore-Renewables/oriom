@@ -138,6 +138,9 @@ def shut(
                 or (event == 'tow' and getattr(G, 'graph', {}).get('tow_string_shutdown', False)) # TOW and no continuity
             ):
                 manage_string_tow_operation(G = G, loc = loc, action = False)
+                
+            if shut_downstream_device:
+                manage_string_tow_operation(G = G, loc = shut_downstream_device, action = False)
 
         elif isinstance(loc, tuple):
             if tech == 'PV':
@@ -178,13 +181,14 @@ def shut(
             elif tech == 'wind' or tech == 'wave':
                 if G.edges[loc[0],loc[1]]['visible'] is True:
                     G.edges[loc[0],loc[1]]['visible'] = False
-                    if shut_downstream_device:
-                        manage_string_tow_operation(G = G, loc = shut_downstream_device, action = False)
             else: pass
 
     # Device already shut down but TOW and farm electr layout has no continuity
     else:
-        if getattr(G, 'graph', {}).get('tow_string_shutdown', False) and (event == 'tow') or op_add_tow.get(r_id, {}).get('string', False):
+        if (
+            getattr(G, 'graph', {}).get('tow_string_shutdown', False)
+            and (event == 'tow') or op_add_tow.get(r_id, {}).get('string', False)
+        ):
             manage_string_tow_operation(G = G, loc = loc, action = False)
 
     # Returning the percentage available

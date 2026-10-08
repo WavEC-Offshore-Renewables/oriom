@@ -477,7 +477,23 @@ class Layout_Wave():
                 n_substations: int = 1, n_exports: int = 1, n_string_to_connector = 6,
                 tow_string_shutdown: bool = False, save_dir: str = None, show_plot: bool = True
         ):
-        """Select and build the desired wind farm layout."""
+        """
+        Generate and plot the electrical layout of the offshore wind farm.
+
+        Args:
+            n_layout (int): Layout configuration identifier.
+            n_wec (int): Total number of wec in the wave farm.
+            n_strings (int): Total number of inter-array cable strings.
+            n_substations (int, optional): Number of offshore substations. Defaults to 1.
+            n_exports (int, optional): Number of export cable connections. Defaults to 1.
+            n_string_to_connector (int, optional): Number of wec strings connected to each connector. Defaults to 6.
+            tow_string_shutdown (bool, optional): If True, electrical continuity not ensure while device TTP. Defaults to False.
+            save_dir (str, optional): Directory where the generated layout plot is saved. If None, the plot is not saved. Defaults to None.
+            show_plot (bool, optional): If True, display the generated layout plot. Defaults to True.
+            
+        Return:
+            :obj:`nx.DiGraph`: a graph representing the Wave system.
+        """
         if n_layout == 1:
             G = self.layout1_wave(n_wec=n_wec, n_strings=n_strings, substation_node=1, tow_string_shutdown = tow_string_shutdown, save_dir = save_dir, show_plot = show_plot)
         elif n_layout == 2:
