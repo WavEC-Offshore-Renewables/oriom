@@ -6,7 +6,7 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 import numpy as np
 from copy import deepcopy
 
-
+from oriom.common.constants import PERCENTILE_DICT
 from oriom.utils import aux_functions
 from oriom.core.functions.graphs import final_economic_graphs
 from oriom.core.functions.graphs import report_graphs
@@ -57,7 +57,43 @@ def compute_mean(dfs_lists):
 
     return df_out.reset_index().rename(columns={"index": "vessel_id"})
 
+
+def calculate_statistics(values, axis=None, ignore_nan=False):
+    mean_func = np.nanmean if ignore_nan else np.mean
+    percentile_func = np.nanpercentile if ignore_nan else np.percentile
+
+    return {
+        stat: (mean_func(values, axis=axis) if percentile == '' else percentile_func(values, percentile, axis=axis))
+        for stat, percentile in PERCENTILE_DICT.items()
+    }
     
+def prepare_statistics_sheets(wb): 
+    sheets = {}
+    for i, stat in enumerate(PERCENTILE_DICT):
+        ws = wb.active if i == 0 else wb.create_sheet()
+        ws.title = stat
+        sheets[stat] = ws
+        
+    return sheets
+    
+def append_df_to_sheet(ws, name, df):
+    ws.append([name])
+    for row in dataframe_to_rows(df, index=False, header=True):
+        ws.append(row)
+        ws.append([])
+
+def calculate_df_statistics(dfs):
+    dfs = [df.astype(float) for df in dfs if not df.empty]
+    if not dfs: return {}
+    df_concat = pd.concat(dfs, keys=range(len(dfs)))
+    grouped = df_concat.groupby(level=1)
+    
+    return {stat: 
+        (grouped.mean() if percentile == '' else grouped.quantile(percentile / 100)).reset_index(drop=True)
+        for stat, percentile in PERCENTILE_DICT.items()
+    }
+
+
 def return_statistics_runs(
         n_lifetime: int,
         find_element_class: dict,
@@ -120,16 +156,23 @@ def return_statistics_runs(
 
         return data
 
-    wb = openpyxl.Workbook()
+    wb_resume = openpyxl.Workbook()
+    wb_Y_cost = openpyxl.Workbook()
+    wb_V_fuel = openpyxl.Workbook()
+    wb_E_month = openpyxl.Workbook()
+    wb_E_year = openpyxl.Workbook()
 
-    ws = wb.active
+    ws = wb_resume.active
+    
     ws.title = "Lifetime_results"
-
+    
+    # Lifetime costs
+    #--------------------
     lifetime_fixed_port_cost, lifetime_technician_cost , lifetime_vessels_cost, lifetime_rov_cost, lifetime_other_cost  = [], [], [], [], []
     lifetime_repair_cost, lifetime_fixed_tech_cost,  lifetime_mobilisation_cost, lifetime_fixed_insurance_cost  = [], [], [], []
     final_cost, final_energy = {}, {}
 
-    # Averaged total costs
+    # Extrapolate all cost found in the simulations
     for kpi_tot_sim in results_dict.dfs_tot_cost_list:
         kpi_tot = kpi_tot_sim.iloc[-1]
         kpi_tot_sim = kpi_tot_sim.iloc[:-1]
@@ -147,102 +190,115 @@ def return_statistics_runs(
         lifetime_repair_cost.append(kpi_tot['tot_part_costs'])
         lifetime_other_cost.append(kpi_tot['tot_other_costs'])
 
-
-    lifetime_fixed_insurance_cost_avg = sum(lifetime_fixed_insurance_cost)/len(lifetime_fixed_insurance_cost)
-    lifetime_technician_cost_avg = sum(lifetime_technician_cost)/len(lifetime_technician_cost)
-    lifetime_vessels_cost_avg = sum(lifetime_vessels_cost)/len(lifetime_vessels_cost)
-    lifetime_mobilisation_cost_avg = sum(lifetime_mobilisation_cost)/len(lifetime_mobilisation_cost)
-    lifetime_rov_cost_avg = sum(lifetime_rov_cost)/len(lifetime_rov_cost)
-    lifetime_repair_cost_avg = sum(lifetime_repair_cost)/len(lifetime_repair_cost)
-    lifetime_fixed_tech_cost_avg = sum(lifetime_fixed_tech_cost)/len(lifetime_fixed_tech_cost)
-    lifetime_fixed_port_cost_avg = sum(lifetime_fixed_port_cost)/len(lifetime_fixed_port_cost)
-    lifetime_other_cost_avg = sum(lifetime_other_cost)/len(lifetime_other_cost)
-
-
-    dict_cost = {
-        'lifetime_vessels_cost €':lifetime_vessels_cost_avg,
-        'lifetime_mobilisation_cost €':lifetime_mobilisation_cost_avg,
-        'lifetime_rov_cost €':lifetime_rov_cost_avg,
-        'lifetime_technician_cost €':lifetime_technician_cost_avg,
-        'lifetime_repair_cost €':lifetime_repair_cost_avg,
-        'lifetime_oher_cost €':lifetime_other_cost_avg,
-        'lifetime_fixed_port_cost €':lifetime_fixed_port_cost_avg,
-        'lifetime_fixed_tech_cost €':lifetime_fixed_tech_cost_avg,
-        'lifetime_fixed_insurance_cost €':lifetime_fixed_insurance_cost_avg,
+    # Create a dataframe with P10, avg and P90 costs
+    costs = {
+        'lifetime_vessels_cost €': lifetime_vessels_cost,
+        'lifetime_mobilisation_cost €': lifetime_mobilisation_cost,
+        'lifetime_rov_cost €': lifetime_rov_cost,
+        'lifetime_technician_cost €': lifetime_technician_cost,
+        'lifetime_repair_cost €': lifetime_repair_cost,
+        'lifetime_other_cost €': lifetime_other_cost,
+        'lifetime_fixed_port_cost €': lifetime_fixed_port_cost,
+        'lifetime_fixed_tech_cost €': lifetime_fixed_tech_cost,
+        'lifetime_fixed_insurance_cost €': lifetime_fixed_insurance_cost,
     }
-
-    df_cost = pd.DataFrame([{'cost_type': k, 'value': v} for k, v in dict_cost.items()])
-    final_cost['lifetime_direct_cost'] = df_cost['value'].sum()
-
+    
+    dict_cost = {name: calculate_statistics(values) for name, values in costs.items()}
+    df_cost = pd.DataFrame.from_dict(dict_cost, orient='index').rename_axis('cost_type').reset_index()
+    df_cost_yearly = deepcopy(df_cost)
+    
+    for aggregation in PERCENTILE_DICT:
+        final_cost[f'lifetime_direct_cost_{aggregation}'] = df_cost[aggregation].sum()
+        final_cost[f'yearly_direct_cost_{aggregation}'] = (final_cost[f'lifetime_direct_cost_{aggregation}'] / n_lifetime)
+        df_cost_yearly[aggregation] /= n_lifetime
+        
     # Create graphs
     final_economic_graphs.lifetime_cost(df = df_cost, title = 'Lifetime costs', save_dir = save_dir, file_name='lifetime cost')
-    df_cost_yearly = deepcopy(df_cost)
-    final_cost['yearly_direct_cost'] = final_cost['lifetime_direct_cost']/n_lifetime
-    df_cost_yearly['value'] = df_cost_yearly['value'] / n_lifetime
     final_economic_graphs.lifetime_cost(df = df_cost_yearly, title = 'Yearly costs', save_dir = save_dir, file_name='yearly cost')
 
-    # Save on excel
-    df_cost.loc[len(df_cost)] = ['lifetime_direct_cost', df_cost['value'].sum()]
+    # Add a single total row after calculating all statistics
+    df_cost.loc[len(df_cost)] = {'cost_type': 'lifetime_direct_cost',
+        **{aggregation: df_cost[aggregation].sum()for aggregation in PERCENTILE_DICT}
+    }
 
-    ws2 = wb.create_sheet(title="Lifetime_costs")
+    ws2 = wb_resume.create_sheet(title="Lifetime_costs")
     for row in dataframe_to_rows(df_cost, index=False, header=True):
         ws2.append(row)
-
-
-    # Averaged yearly values
+        
+    # Yearly costs
+    #--------------------
     # If read from excel file need to create multiindex
     if recycled:
         for i in range(len(results_dict.dfs_tot_yearly_cost_list)):
             results_dict.dfs_tot_yearly_cost_list[i] = restructure_df_year(results_dict.dfs_tot_yearly_cost_list[i])
     
     array_stack, all_index, all_columns = safe_stack(results_dict.dfs_tot_yearly_cost_list)
-    # Evaluate the average for each cell
-    mean_array = np.nanmean(array_stack, axis=0)
+    # Evaluate the average, P10 and P90 for each cell
+    percentile_arrays = calculate_statistics(array_stack, axis=0, ignore_nan=True)
+    # Reconstruct one DataFrame for each statistic
+    df_cost_yearly_dict = {}
 
-    # Reconstruct the df
-    df_cost_yearly = pd.DataFrame(mean_array, index=all_index, columns=all_columns)
-    df_cost_yearly = df_cost_yearly.reset_index().rename(columns={"index": "vessel_id"})
+    for stat, values in percentile_arrays.items():
+        df = pd.DataFrame(values, index=all_index, columns=all_columns)
+        df = df.reset_index().rename(columns={"index": "vessel_id"})
 
-    years = sorted(set(col[0] for col in df_cost_yearly.columns if col[1] == 'direct_costs'))
+        # Add fuel and mobilisation costs to direct costs
+        years = sorted(set(col[0] for col in df.columns if isinstance(col, tuple) and col[1] == 'direct_costs'))
 
-    for ves in fuel_add.keys():
-        for year in years:
-            col_key = (year, 'direct_costs')
-            if col_key in df_cost_yearly.columns:
-                mask = df_cost_yearly['vessel_id'] == ves
-                df_cost_yearly.loc[mask, col_key] += fuel_add[ves]
-    for ves in mobilisation_add.keys():
-        for year in years:
-            col_key = (year, 'direct_costs')
-            if col_key in df_cost_yearly.columns:
-                mask = df_cost_yearly['vessel_id'] == ves
-                df_cost_yearly.loc[mask, col_key] += mobilisation_add[ves]
+        for ves, addition in fuel_add.items():
+            for year in years:
+                col_key = (year, 'direct_costs')
+                if col_key in df.columns:
+                    mask = df['vessel_id'] == ves
+                    df.loc[mask, col_key] += addition
 
-    ws3 = wb.create_sheet(title="Yearly_costs")
-    for row in dataframe_to_rows(df_cost_yearly, index=False, header=True):
-        ws3.append(row)
-    final_economic_graphs.yearly_vessel_cost(df = df_cost_yearly, title = 'Yearly costs', find_element_class = find_element_class, save_dir = save_dir)
+        for ves, addition in mobilisation_add.items():
+            for year in years:
+                col_key = (year, 'direct_costs')
+                if col_key in df.columns:
+                    mask = df['vessel_id'] == ves
+                    df.loc[mask, col_key] += addition
+
+        df_cost_yearly_dict[stat] = df
+
+    # Export all three statistics to separate Excel sheets
+    for stat, df in df_cost_yearly_dict.items():
+        ws_Y_cost = wb_Y_cost.create_sheet(title=f"Yearly_costs_{stat}")
+        for row in dataframe_to_rows(df, index=False, header=True):
+            ws_Y_cost.append(row)
+
+    final_economic_graphs.yearly_vessel_cost(df = df_cost_yearly_dict['AVG'], title = 'Yearly costs', find_element_class = find_element_class, save_dir = save_dir)
 
     # Average cost ctv
-    if results_dict.dfs_ctv_list and any(not df.empty for df in results_dict.dfs_ctv_list):
-        df_ctv = sum(results_dict.dfs_ctv_list) / len(results_dict.dfs_ctv_list)
-        df_ctv['n_vessel'] = range(len(df_ctv))
-        df_ctv = df_ctv[['n_vessel'] + [col for col in df_ctv.columns if col != 'n_vessel']]
-        ws4 = wb.create_sheet(title="CTV_yearly_strategy")
-        for row in dataframe_to_rows(df_ctv, index=False, header=True):
-            ws4.append(row)
-        final_economic_graphs.plot_ctv_annual_chart_strategy(df_ctv = df_ctv, save_dir = save_dir)
+    #--------------------
+    for dfs, sheet_prefix in [
+        (results_dict.dfs_ctv_list, "CTV_yearly_strategy"),
+        (results_dict.dfs_vessel_fuel_usage, "Vessel_fuel_usage"),
+    ]:
+        # Avoid if no data
+        if not dfs or not any(not df.empty for df in dfs):
+            continue
 
-    if results_dict.dfs_vessel_fuel_usage and any(not df.empty for df in results_dict.dfs_vessel_fuel_usage):
-        df_avg_fuel_usage = (
-            pd.concat(results_dict.dfs_vessel_fuel_usage)
-            .groupby(level=0)
-            .sum()
-            .div(len(results_dict.dfs_vessel_fuel_usage))
-        )
-        aux_functions.save_file_csv(df_to_save = df_avg_fuel_usage, save_dir = save_dir, filename = f'df_avg_fuel_usage.csv', indexing = True)
-        
-        
+        dfs = [df for df in dfs if not df.empty]
+        df_concat = pd.concat(dfs, keys=range(len(dfs)))
+
+        # Create statistical results
+        df_stat_dict_CTV = {}
+        for stat, percentile in PERCENTILE_DICT.items():
+            grouped = df_concat.groupby(level=1)
+            df_stat = (grouped.mean() if percentile == '' else grouped.quantile(percentile / 100))
+
+            if sheet_prefix == "CTV_yearly_strategy":
+                df_stat.insert(0, 'n_vessel', range(len(df_stat)))
+                df_stat_dict_CTV[percentile] = df_stat
+
+            ws_V_guel = wb_V_fuel.create_sheet(title=f"{sheet_prefix}_{stat}")
+            for row in dataframe_to_rows(df_stat, index=False, header=True):
+                ws_V_guel.append(row)
+
+        if sheet_prefix == "CTV_yearly_strategy":
+            final_economic_graphs.plot_ctv_annual_chart_strategy(df_ctv=df_stat_dict_CTV, save_dir=save_dir)
+            
     # Average type cost
     if results_dict.kpi_om_type_cost_list:
         kpi_om_type_cost_concat = pd.concat(results_dict.kpi_om_type_cost_list)
@@ -262,69 +318,81 @@ def return_statistics_runs(
             file_name_save = 'O&M type cost'
         )
 
-    # Availability year average and year_month avg
+    # Availability year and year_month
+    #--------------------  
+    # YEARLY
+    sheets_year = prepare_statistics_sheets(wb_E_year)
+    sheets_month = prepare_statistics_sheets(wb_E_month)
     final_cost['AEP_kWh'] = 0
     final_cost['En_loss_€'] = 0
     final_cost['En_loss_kWh'] = 0
+    yearly_stats = {}
+    for k, dfs in results_dict.dfs_energy_yearly_dict.items():
+        if not dfs or not any(not df.empty for df in dfs):
+            continue
 
-    for k in results_dict.dfs_energy_yearly_dict.keys():
-        if results_dict.dfs_energy_yearly_dict[k]:
-            df_yearly_mean = (
-                pd.concat([
-                        df.astype(float) for df in results_dict.dfs_energy_yearly_dict[k]],
-                        axis=0,
-                        keys=range(len(results_dict.dfs_energy_yearly_dict[k]
-                    )))
-                .groupby(level=1)
-                .mean()
-                .reset_index(drop=True)
-            )
-            aux_functions.save_file_csv(df_to_save = df_yearly_mean, save_dir = save_dir, filename = f'{k}.csv', indexing = True)
-            report_graphs.farm_availability(df = df_yearly_mean, name_file = k[17:], save_dir = save_dir)
-            if 'pv' in k:
-                electricity_cost_tech = electricity_cost_dict['pv']
-                tech = 'pv'
-            elif 'wind' in k:
-                electricity_cost_tech = electricity_cost_dict['wt']
-                tech = 'wind'
-            elif 'wave' in k:
-                electricity_cost_tech = electricity_cost_dict['wec']
-                tech = 'wave'
+        stats = calculate_df_statistics(dfs)
+        yearly_stats[k] = stats
 
-            final_energy[f'{tech}_En_max_kWh'] = df_yearly_mean['En_max_kWh'].sum()
-            final_energy[f'{tech}_En_loss_kWh'] = df_yearly_mean['En_loss_kWh'].sum()
-            final_energy[f'{tech}_En_loss_€'] = final_energy[f'{tech}_En_loss_kWh'] * electricity_cost_tech/1e3  #eur/MWh
-            final_energy[f'{tech}_En_produced_kWh'] = final_energy[f'{tech}_En_max_kWh'] - final_energy[f'{tech}_En_loss_kWh']
-            final_energy[f'{tech}_AEP_kWh'] = final_energy[f'{tech}_En_produced_kWh']/n_lifetime
-            final_energy[f'{tech}_En_availability_%'] = df_yearly_mean['En_availability'].mean()
-            final_energy[f'{tech}_Time_availability_%'] = df_yearly_mean['Time_availability'].mean()
-            final_cost['AEP_kWh'] += final_energy[f'{tech}_AEP_kWh']
-            final_cost['En_loss_€'] += final_energy[f'{tech}_En_loss_€']
-            final_cost['En_loss_kWh'] += final_energy[f'{tech}_En_loss_kWh']
-            report_graphs.indirect_costs_per_year(df = df_yearly_mean, electricity_price = electricity_cost_tech, name_file = k[17:], save_dir = save_dir)
+        for stat, df_yearly in stats.items():
+            append_df_to_sheet(sheets_year[stat], k, df_yearly)
 
-    # Monthly
+        # Graphs: AVG bars with P10-P90 error bars
+        report_graphs.farm_availability(df_=stats, name_file=k[17:], save_dir=save_dir)
+
+        if 'pv' in k:
+            electricity_cost_tech = electricity_cost_dict['pv']
+            tech = 'pv'
+        elif 'wind' in k:
+            electricity_cost_tech = electricity_cost_dict['wt']
+            tech = 'wind'
+        elif 'wave' in k:
+            electricity_cost_tech = electricity_cost_dict['wec']
+            tech = 'wave'
+        else:
+            continue
+
+        # Calculate energy/economic indicators separately for each statistic
+        for stat, df_yearly in stats.items():
+            final_energy[f'{tech}_En_max_kWh_{stat}'] = df_yearly['En_max_kWh'].sum()
+            final_energy[f'{tech}_En_loss_kWh_{stat}'] = df_yearly['En_loss_kWh'].sum()
+            final_energy[f'{tech}_En_loss_€_{stat}'] = (final_energy[f'{tech}_En_loss_kWh_{stat}'] * electricity_cost_tech / 1e3)
+            final_energy[f'{tech}_En_produced_kWh_{stat}'] = (final_energy[f'{tech}_En_max_kWh_{stat}'] - final_energy[f'{tech}_En_loss_kWh_{stat}'])
+            final_energy[f'{tech}_AEP_kWh_{stat}'] = (final_energy[f'{tech}_En_produced_kWh_{stat}'] / n_lifetime)
+
+            final_cost[f'AEP_kWh_{stat}'] = (final_cost.get(f'AEP_kWh_{stat}', 0) + final_energy[f'{tech}_AEP_kWh_{stat}'])
+            final_cost[f'En_loss_€_{stat}'] = (final_cost.get(f'En_loss_€_{stat}', 0) + final_energy[f'{tech}_En_loss_€_{stat}'])
+            final_cost[f'En_loss_kWh_{stat}'] = (final_cost.get(f'En_loss_kWh_{stat}', 0) + final_energy[f'{tech}_En_loss_kWh_{stat}'])
+
+        report_graphs.indirect_costs_per_year(
+            df=stats['AVG'],
+            df_p10=stats['P10'],
+            df_p90=stats['P90'],
+            electricity_price=electricity_cost_tech,
+            name_file=k[17:],
+            save_dir=save_dir
+        )
+
+    # MONTHLY
     combined = {}
-    for k in results_dict.dfs_energy_yearly_month_dict.keys():
-        if results_dict.dfs_energy_yearly_month_dict[k]:
-            df_monthly_mean = (
-                pd.concat(
-                        [df.astype(float) for df in results_dict.dfs_energy_yearly_month_dict[k]],
-                        axis=0,
-                        keys=range(len(results_dict.dfs_energy_yearly_month_dict[k]
-                    )))
-                .groupby(level=1)
-                .mean()
-                .reset_index(drop=True)
-            )
-            combined.update({k:df_monthly_mean})
 
-            aux_functions.save_file_csv(df_to_save = df_monthly_mean, save_dir = save_dir, filename = f'{k}.csv')
-            report_graphs.energy_yield(df = df_monthly_mean, name_file = k[18:], save_dir = save_dir)
+    for k, dfs in results_dict.dfs_energy_yearly_month_dict.items():
+        if not dfs or not any(not df.empty for df in dfs):
+            continue
 
-    if len(combined.keys())>1:
-        report_graphs.energy_yield_combined(dfs = combined, save_dir = save_dir)
+        stats = calculate_df_statistics(dfs)
+        for stat, df_monthly in stats.items():
+            append_df_to_sheet(sheets_month[stat], k, df_monthly)
 
+        # Keep the average DataFrames for the combined graph
+        combined[k] = stats['AVG']
+        report_graphs.energy_yield(df=stats['AVG'],name_file=k[18:],save_dir=save_dir)
+
+    if len(combined) > 1:
+        report_graphs.energy_yield_combined(dfs=combined,save_dir=save_dir)
+    
+    # KPI_Insight
+    #--------------------  
     if KPI_Insight is not None:
         # Add insights from log events
         run_insight = KPI_Insight(N_SIMULATION = n_runs, n_lifetime = n_lifetime)
@@ -338,37 +406,43 @@ def return_statistics_runs(
         cost_insight = pd.DataFrame()
         vessel_insight = pd.DataFrame()
 
-    df_lifetime_cost = pd.DataFrame({
-        'Descriptions': final_cost.keys(),
-        'Values': final_cost.values(),
-    })
+    for df_, ws_use in zip([final_cost, final_energy], [ws, wb_resume.create_sheet(title="Energy_results")]):
+        if df_:
+            df_save = pd.DataFrame([
+                {
+                    'Descriptions': key.rsplit('_', 1)[0],
+                    'P10': df_.get(f'{key.rsplit("_", 1)[0]}_P10'),
+                    'AVG': df_.get(f'{key.rsplit("_", 1)[0]}_AVG'),
+                    'P90': df_.get(f'{key.rsplit("_", 1)[0]}_P90'),
+                } for key in df_ if key.endswith('_P10')]
+            )
+            for row in dataframe_to_rows(df_save, index=False, header=True):
+                ws_use.append(row)
 
-    for row in dataframe_to_rows(df_lifetime_cost, index=False, header=True):
-        ws.append(row)
+    # SAVE RESULTS
+    #--------------------  
+    for wb_, ws_, file_name in zip(
+        [wb_resume, wb_Y_cost, wb_V_fuel, wb_E_month, wb_E_year],
+        [ws, None, None, None, None],
+        ["Average_results.xlsx", "Yearly_costs.xlsx", "Fuel_vessel_use.xlsx", "Availability_month_wind.xlsx", "Availability_year_wind.xlsx"]
+    ):
+        if ws_ is not None:
+            wb_._sheets = [ws_] + [s for s in wb_._sheets if s != ws_]
+        else:
+            # Remove empty default sheets if other sheets contain data.
+            for sheet in wb_._sheets[:]:
+                if sheet.max_row == 1 and sheet.max_column == 1 and sheet['A1'].value is None:
+                    if len(wb_._sheets) > 1:
+                        wb_._sheets.remove(sheet)
 
-    if final_energy:
-        df_energy_production = pd.DataFrame({
-                'Descriptions': final_energy.keys(),
-                'Values': final_energy.values(),
-            })
-        ws5 = wb.create_sheet(title="Energy_results")
-        for row in dataframe_to_rows(df_energy_production, index=False, header=True):
-            ws5.append(row)
+        wb_.save(os.path.join(save_dir, file_name))
 
-        wb._sheets = [ws5] + [s for s in wb._sheets if s != ws5]
-
-    # Reorder sheets and create final file
-    wb._sheets = [ws] + [s for s in wb._sheets if s != ws]
-    wb.save(os.path.join(save_dir,"Average_results.xlsx"))
 
     if (KPI_Insight is not None and
         (vessel_insight is not None and not vessel_insight.empty)
-         or (cost_insight is not None and not cost_insight.empty)
+        or (cost_insight is not None and not cost_insight.empty)
     ):
-        with pd.ExcelWriter(
-            os.path.join(save_dir, 'KPI_insight.xlsx'),
-            engine='openpyxl'
-        ) as writer:
+        with pd.ExcelWriter(os.path.join(save_dir, 'KPI_insight.xlsx'),engine='openpyxl') as writer:
             v_ins, c_ins = False, False
             if not vessel_insight.empty:
                 vessel_insight.to_excel(writer, sheet_name='KPI_vessel_use', index=True)

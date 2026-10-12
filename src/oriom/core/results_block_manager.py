@@ -281,7 +281,7 @@ def results_block(
                         electricity_cost_tech = inputs.cost.electricity_price_dict['wt']
                     elif 'wave' in k:
                         electricity_cost_tech = inputs.cost.electricity_price_dict['wec']
-                    report_graphs.farm_availability(df = df, name_file = name[17:], save_dir = graph_dir_r)
+                    report_graphs.farm_availability(df_ = df, name_file = name[17:], save_dir = graph_dir_r)
                     report_graphs.indirect_costs_per_year(df = df, electricity_price = electricity_cost_tech, name_file = name[17:], save_dir = graph_dir_r)
 
         if len(combined.keys())>1:

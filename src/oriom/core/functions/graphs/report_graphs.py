@@ -161,39 +161,43 @@ def energy_yield_combined(
 
 def direct_costs_per_year(
         df: pd.DataFrame,
-        save_dir: str=None
+        df_p10: pd.DataFrame,
+        df_p90: pd.DataFrame,
+        save_dir: str = None
     ):
-    ''' It produces a graph representing the direct costs.
+    """Plot yearly direct costs: AVG bars with P10-P90 error bars."""
 
-    Args:
-        df (:obj:`DataFrame`): kpi_year.
-        save_dir (:obj:`str`, *optional*): Path dir to save graph representation.
-            Deafults to `None`.
-    '''
+    years_cols = df.columns[1:-1]
 
-    years = df.columns[1:-1]
-    direct_costs = []
-    for i in years:
-        direct_costs.append(df[i].sum())
+    years = np.array([int(c) for c in years_cols])
+    avg = df.loc[:, years_cols].sum(axis=0).to_numpy(dtype=float) / 1e6
+    p10 = df_p10.loc[:, years_cols].sum(axis=0).to_numpy(dtype=float) / 1e6
+    p90 = df_p90.loc[:, years_cols].sum(axis=0).to_numpy(dtype=float) / 1e6
 
-    dir_costs_mill = []
-    for i in direct_costs:
-        dir_costs_mill.append(i/1000000)
+    yerr = np.maximum(np.vstack([avg - p10, p90 - avg]), 0)
 
-    fig4 = plt.figure(figsize=(15,6))
+    fig, ax = plt.subplots(figsize=(15, 6))
+    ax.bar(years, avg, color='skyblue', edgecolor='black')
+    ax.errorbar(
+        years, avg, yerr=yerr,
+        fmt='none', ecolor='black',
+        capsize=4, elinewidth=1.2
+    )
 
-    years = [int(c) for c in years]
+    ax.set_xticks(years)
+    ax.set_xlabel('Years')
+    ax.set_ylabel('Direct costs (M€)')
+    ax.set_title('Direct costs per year (AVG with P10-P90 range)')
+    ax.grid(axis='y', alpha=0.3)
+    ax.set_axisbelow(True)
 
-    plt.plot(years,dir_costs_mill,'-k')
-    plt.xticks(years)
-    plt.grid()
-    plt.xlabel('Years')
-    plt.ylabel('Direct costs M€')
-    plt.title('Direct costs per year')
+    fig.tight_layout()
 
     if save_dir is not None:
-        plt.savefig(os.path.join(save_dir, 'yearly_direct_costs.jpg'))
-    plt.close()
+        fig.savefig(os.path.join(save_dir, 'yearly_direct_costs.jpg'),dpi=300,bbox_inches='tight')
+
+    plt.close(fig)
+
 
 
 def direct_cost_diversified(
@@ -243,93 +247,155 @@ def indirect_costs_per_year(
         df: pd.DataFrame,
         electricity_price: float,
         name_file: str = None,
-        save_dir: str = None
+        save_dir: str = None,
+        df_p10: pd.DataFrame = None,
+        df_p90: pd.DataFrame = None
     ):
-    '''It produces a bar graph representing the yearly indirect costs.
+    """Plot yearly indirect costs with optional P10-P90 error bars.
 
     Args:
-        df (:obj:`DataFrame`): Availability_energy.
-        electricity_price (float): Float price of electricity in €/MWh.
-        save_dir (:obj:`str`, *optional*): Path dir to save graph representation.
-            Defaults to `None`.
-    '''
-    years = df['Years'].tolist()
-    en_loss = df['En_loss_kWh'].tolist()
-    energy_av = df['En_availability'].tolist()
+        df (pd.DataFrame): AVG yearly energy results.
+        electricity_price (float): Electricity price in €/MWh.
+        name_file (str, optional): Name used in the output filename.
+        save_dir (str, optional): Directory where the plot is saved.
+        df_p10 (pd.DataFrame, optional): P10 yearly energy results.
+        df_p90 (pd.DataFrame, optional): P90 yearly energy results.
+    """
+    years = df['Years'].to_numpy()
+    en_loss = df['En_loss_kWh'].to_numpy(dtype=float)
+    energy_av = df['En_availability'].to_numpy(dtype=float)
 
-    if energy_av[-1] == 100:
+    use_percentiles = df_p10 is not None and df_p90 is not None
+
+    # Calculate indirect costs in M€.
+    cost_avg = en_loss * electricity_price / 1e9
+
+    if use_percentiles:
+        cost_p10 = (df_p10['En_loss_kWh'].to_numpy(dtype=float) * electricity_price / 1e9)
+        cost_p90 = (df_p90['En_loss_kWh'].to_numpy(dtype=float) * electricity_price / 1e9)
+
+    # Remove the final year if energy availability is 100%.
+    if len(energy_av) and energy_av[-1] == 100:
         years = years[:-1]
-        en_loss = en_loss[:-1]
+        cost_avg = cost_avg[:-1]
+        if use_percentiles:
+            cost_p10 = cost_p10[:-1]
+            cost_p90 = cost_p90[:-1]
 
-    # Calcolo costi
-    cost_losses = [loss * (electricity_price / 1e3)/1e6 for loss in en_loss] #[kWh]*([eur/Mwh]/1e03)/1e06 = Meur
+    if len(cost_avg) == 0:
+        return
 
-    fig5 = plt.figure(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.bar(years, cost_avg, color='skyblue', edgecolor='black')
 
-    plt.bar(years, cost_losses, color='skyblue', edgecolor='black')
+    # Add P10-P90 error bars when both percentile datasets are available.
+    if use_percentiles:
+        yerr = np.maximum(np.vstack([cost_avg - cost_p10,cost_p90 - cost_avg]),0)
+        ax.errorbar(
+            years,
+            cost_avg,
+            yerr=yerr,
+            fmt='none',
+            ecolor='black',
+            capsize=4,
+            elinewidth=1.2
+        )
 
-    xticks_filtered = [year for year in years if year % 5 == 0]
-    plt.xticks(xticks_filtered)
+    ax.set_xticks([year for year in years if year % 5 == 0])
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    ax.set_axisbelow(True)
+    ax.set_xlabel('Years')
+    ax.set_ylabel('Indirect costs (M€)')
 
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.xlabel('Years')
-    plt.ylabel('Indirect costs (M€)')
-    plt.ylim(min(cost_losses) * 0.9, max(cost_losses) * 1.1)
-    plt.title('Indirect costs per year')
+    min_cost = np.nanmin(cost_p10) if use_percentiles else np.nanmin(cost_avg)
+    max_cost = np.nanmax(cost_p90) if use_percentiles else np.nanmax(cost_avg)
+    ax.set_ylim(max(0, min_cost * 0.9), max_cost * 1.1 if max_cost > 0 else 1)
+
+    title = 'Indirect costs per year'
+    if use_percentiles:
+        title += ' (AVG with P10-P90 range)'
+    else:
+        title += ' (AVG)'
+    ax.set_title(title)
+
+    fig.tight_layout()
 
     if save_dir is not None:
-        plt.savefig(os.path.join(save_dir, f'yearly_indirect_costs_{name_file}.jpg'), bbox_inches='tight')
-    plt.close()
+        fig.savefig(os.path.join(save_dir, f'yearly_indirect_costs_{name_file}.jpg'), dpi=300, bbox_inches='tight')
+
+    plt.close(fig)
 
 
 def farm_availability(
-        df: pd.DataFrame,
-        name_file: str=None,
-        save_dir: str=None
+        df_: pd.DataFrame | dict,
+        name_file: str = None,
+        save_dir: str = None
     ):
-    '''It produces a graph representing the time and energy availability.
+    '''It produces graphs representing time and energy availability.
     Args:
-        df (:obj:`DataFrame`): Availability_energy.
-        save_dir (:obj:`str`, *optional*): Path dir to save graph representation.
-            Deafults to `None`.
+        df_ (DataFrame | dict): Availability data. If a dict is provided,
+            it must contain 'AVG', 'P10' and 'P90' DataFrames.
+        name_file (str, optional): Name used in the output filenames.
+        save_dir (str, optional): Directory where graphs are saved.
     '''
+    has_percentiles = isinstance(df_, dict)
+    df = df_['AVG'] if has_percentiles else df_
+
     years = df['Years'].tolist()
     energy_av = df['En_availability'].tolist()
     time_av = df['Time_availability'].tolist()
+
+    if has_percentiles:
+        df_p10 = df_['P10']
+        df_p90 = df_['P90']
+
     if energy_av[-1] == 100:
         years = years[:-1]
         energy_av = energy_av[:-1]
         time_av = time_av[:-1]
+        if has_percentiles:
+            df_p10 = df_p10.iloc[:-1]
+            df_p90 = df_p90.iloc[:-1]
 
     avg_time = df['Time_availability'].mean()
     avg_en = df['En_availability'].mean()
 
-    fig6 = plt.figure(figsize=(15,6))
-    plt.bar(years, time_av, color='skyblue', edgecolor='black')
-    plt.grid()
+    yerr_time = None
+    yerr_en = None
 
+    if has_percentiles:
+        yerr_time = [
+            (time_av - df_p10['Time_availability'].to_numpy()).clip(min=0),
+            (df_p90['Time_availability'].to_numpy() - time_av).clip(min=0)
+        ]
+        yerr_en = [
+            (energy_av - df_p10['En_availability'].to_numpy()).clip(min=0),
+            (df_p90['En_availability'].to_numpy() - energy_av).clip(min=0)
+        ]
+
+    plt.figure(figsize=(15, 6))
+    plt.bar(years, time_av, color='skyblue', edgecolor='black', yerr=yerr_time, capsize=3)
+    plt.grid(axis='y')
     xticks_filtered = [year for year in years if year % 5 == 0]
     plt.xticks(xticks_filtered)
     plt.xlabel('Years')
     plt.ylabel('Time availability %')
     plt.ylim(min(time_av) * 0.9, 100)
-
-    plt.title('Time availability per year : Avg %i' %avg_time)
+    plt.title('Time availability per year: Avg %i' % avg_time)
     if save_dir is not None:
-        plt.savefig(os.path.join(save_dir, 'time_availability_'+ name_file+'.jpg'))
+        plt.savefig(os.path.join(save_dir, 'time_availability_' + str(name_file or '') + '.jpg'), bbox_inches='tight')
     plt.close()
 
-    fig9 = plt.figure(figsize=(15,6))
-    plt.bar(years, energy_av, color='skyblue', edgecolor='black')
-    plt.grid()
+    plt.figure(figsize=(15, 6))
+    plt.bar(years, energy_av, color='skyblue', edgecolor='black', yerr=yerr_en, capsize=3)
+    plt.grid(axis='y')
     plt.xticks(xticks_filtered)
     plt.xlabel('Years')
     plt.ylabel('Energy availability %')
     plt.ylim(min(energy_av) * 0.9, 100)
-
-    plt.title('Energy availability per year : Avg %i' %avg_en)
+    plt.title('Energy availability per year: Avg %i' % avg_en)
     if save_dir is not None:
-        plt.savefig(os.path.join(save_dir, 'energy_availability_'+name_file+'.jpg'))
+        plt.savefig(os.path.join(save_dir, 'energy_availability_' + str(name_file or '') + '.jpg'), bbox_inches='tight')
     plt.close()
 
 

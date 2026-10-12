@@ -84,7 +84,7 @@ class TestReportGraphs(unittest.TestCase):
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            report_graphs_module.direct_costs_per_year(df=df, save_dir=tmpdir)
+            report_graphs_module.direct_costs_per_year(df=df, df_p10=df, df_p90=df, save_dir=tmpdir)
             out_path = os.path.join(tmpdir, "yearly_direct_costs.jpg")
             self.assertTrue(os.path.exists(out_path))
 
@@ -120,7 +120,7 @@ class TestReportGraphs(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             report_graphs_module.farm_availability(
-                df=df,
+                df_=df,
                 name_file="wind",
                 save_dir=tmpdir,
             )
