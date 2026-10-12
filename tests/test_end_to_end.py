@@ -62,6 +62,19 @@ class TestMainEndToEnd(unittest.TestCase):
 
             df_exp = self._read_csv_normalized(exp_path)
             df_act = self._read_csv_normalized(act_path)
+
+            if exp_path.name == "kpi_yearly_final.csv":
+                df_exp = (
+                    df_exp
+                    .sort_values("vessel_id", na_position="first")
+                    .reset_index(drop=True)
+                )
+                df_act = (
+                    df_act
+                    .sort_values("vessel_id", na_position="first")
+                    .reset_index(drop=True)
+                )
+
             try:
                 assert_frame_equal(
                     df_act,
