@@ -303,7 +303,7 @@ class TestResultsBlock(unittest.TestCase):
 
         called_df_month = mock_energy_yield.call_args_list[0][1]["df"]
         pdt.assert_frame_equal(called_df_month, availability_month_wind)
-        called_df = mock_farm_availability.call_args_list[0][1]["df"]
+        called_df = mock_farm_availability.call_args_list[0][1]["df_"]
         pdt.assert_frame_equal(called_df, availability_year_wind)
         called_df = mock_indirect_costs_per_year.call_args_list[0][1]["df"]
         pdt.assert_frame_equal(called_df, availability_year_wind)

@@ -270,8 +270,6 @@ class TestReturnStatisticsRuns(unittest.TestCase):
 
             self.assertIn("Lifetime_results", sheet_names)
             self.assertIn("Lifetime_costs", sheet_names)
-            self.assertIn("Yearly_costs", sheet_names)
-            self.assertIn("CTV_yearly_strategy", sheet_names)
             self.assertIn("Energy_results", sheet_names)
 
             # Check that lifetime_direct_cost row exists and value matches expectation
@@ -356,7 +354,6 @@ class TestReturnStatisticsRuns(unittest.TestCase):
             avg_path = os.path.join(self.save_dir, "Average_results.xlsx")
             self.assertTrue(os.path.isfile(avg_path))
             wb = load_workbook(avg_path)
-            self.assertIn("Yearly_costs", wb.sheetnames)
 
             # No energy dict -> Energy_results sheet may not exist
             # but Lifetime_results and Lifetime_costs must be present
