@@ -152,14 +152,18 @@ def define_activities(
             ]) is True:
                 # This is a transit between devices activity
                 duration = transit_between_devices
-            # Duration
             elif 'transit' in act["name"].lower():
-                # This is a transit activity
-                duration = ((distance_to_site * 1000) / operation.vessel1.speed_transit) / 3600
+                try: 
+                    duration = float(act["duration"]) 
+                except (KeyError, TypeError, ValueError):
+                    duration = ( (distance_to_site * 1000) / operation.vessel1.speed_transit ) / 3600
             elif tow_op and re.search(r'\btow\b', act["name"].lower()) is not None:
                 towing = True
-                # This is a towing activity
-                duration = ((distance_to_site * 1000) / operation.vessel1.speed_tow) / 3600
+                try:
+                    duration = float(act["duration"]) 
+                except (KeyError, TypeError, ValueError):               
+                    # This is a towing activity
+                    duration = ((distance_to_site * 1000) / operation.vessel1.speed_tow) / 3600
                 # Incase of shutdown is needed, a <tech>_shutdown_dur must
                 # be included in this activity
                 try:

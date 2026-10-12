@@ -116,6 +116,7 @@ def kpi_final_total_cost(
         """ Function to create filtered dataframes of log events for cost evaluations"""
         log_events_op = log_events[log_events['event'].isin(['operation', 'inspection_port', 'inspection_site', 'tow'])].copy()
         log_events_op_ST = log_events_merged[log_events_merged["ST_contract_1"] | log_events_merged["ST_contract_2"]].copy()
+        log_events_op_ST = log_events_op_ST[log_events_op_ST["d_end_stat_chart"] != 'reuse_vessel']
         log_events_op_merged = log_events_merged[log_events_merged['event'] =='operation_merged'].copy()
         log_events_op_def_merged = log_events_merged[log_events_merged['event'] == 'operation_deferred_merged'].copy()
         log_events_op_merged_oper = log_events_merged[log_events_merged['event']=='operation'].copy()
@@ -164,7 +165,7 @@ def kpi_final_total_cost(
     log_events_insp_merged, log_events_mobi_merged,
     log_events_tow, log_event_op_port ) = filter_log_file_per_operations(log_events, log_events_merged)
 
-    vessel_day_count_ST = VesselDayCounter(log_events_merged = log_events_op_ST, vessels=vessels)
+    vessel_day_count_ST = VesselDayCounter(log_events_merged = log_events_op_ST, vessels=vessels, prepare_df = False)
     _ = vessel_day_count_ST.allocate_vessels(log_events_merged = log_events_merged, contract_evaluation = False)
 
     # Create boolean dictionary for vessel long term contract

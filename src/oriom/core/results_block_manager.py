@@ -3,6 +3,7 @@ import logging
 import os
 
 from oriom.utils import aux_functions
+from oriom.common.constants import EVENT_LOG_ORDER
 
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.vessels_manager import vessel_mobilisation_manager
@@ -144,7 +145,10 @@ def results_block(
         logging.info('Uploading Log events merged file from previous folder')
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
-        vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+        if Config.STATISTICAL_CHART:
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False)
+        else:
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
         log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
 
     except (TypeError, FileNotFoundError) as e_:
@@ -171,7 +175,7 @@ def results_block(
             )
 
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
-        vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+        vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, ST_used=False)
         log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
 
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
@@ -197,7 +201,7 @@ def results_block(
                 )
  
             # Recreate the usage_record considering the reused vessels
-            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
+            vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False, ST_used = False)
             _ = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged)
 
         else:
@@ -205,7 +209,21 @@ def results_block(
             log_events_merged['d_end_stat_chart_orig'] = log_events_merged['d_end_stat_chart']
             log_events_merged['n_vessel_1_effective'] = log_events_merged['n_vessel_1']
 
-    aux_functions.save_file_csv(log_events_merged,result_dir_r,'log_events_merged.csv')
+        log_events_merged = vessel_mobilisation_manager.mobilitate_second_vessel(
+            log_events_merged = log_events_merged,
+            find_element_class = find_element,
+            operations_tow = operations_tow_stats
+        )
+
+    # Reorder and save log events merged
+    log_events_merged["_event_order"] = (log_events_merged["event"].map(EVENT_LOG_ORDER).fillna(99))
+    log_events_merged = (
+        log_events_merged.sort_values(
+            by=["d_trigger", "d_end_wait_start", "_event_order"],
+            na_position="first"
+        ).drop(columns="_event_order").reset_index(drop=True))
+
+    aux_functions.save_file_csv(log_events_merged, result_dir_r, 'log_events_merged.csv')
 
 
     logging.info('----------------------------------------------------')
@@ -263,7 +281,7 @@ def results_block(
                         electricity_cost_tech = inputs.cost.electricity_price_dict['wt']
                     elif 'wave' in k:
                         electricity_cost_tech = inputs.cost.electricity_price_dict['wec']
-                    report_graphs.farm_availability(df = df, name_file = name[17:], save_dir = graph_dir_r)
+                    report_graphs.farm_availability(df_ = df, name_file = name[17:], save_dir = graph_dir_r)
                     report_graphs.indirect_costs_per_year(df = df, electricity_price = electricity_cost_tech, name_file = name[17:], save_dir = graph_dir_r)
 
         if len(combined.keys())>1:

@@ -174,6 +174,8 @@ def create_logs_corrective_file(
                         index = {'fail_index': fail_index, 'last_valid_idx': safe_getattr(oper.tow_data.add_op_tow_port, ['ts_data','last_valid_index'])},
                         CONST = {'COLS': COLS, 'CUTOFF_DATE': CUTOFF_DATE, 'time_fail_op_immediately': time_fail_op_immediately},
                     )
+                    # As first operation made, next reaction is expected so consider immediate reaction
+                    time_fail_op_immediately = 0.01
 
                     if row_add_op_tow_port is None or row_add_op_tow_port.empty:
                         continue
@@ -323,7 +325,8 @@ def create_logs_corrective_file(
                 mob_time = 0
                 lead_mob_time = lead_mob_time_tow
                 vessel1_id, vessel2_id, ves_1, ves_2 = None, None, None, None
-
+                # As TTP made, next reaction is expected so consider immediate reaction
+                time_fail_op_immediately = 0.01
 
             #------------------------
             # SITE CREATION
@@ -438,7 +441,7 @@ def create_logs_corrective_file(
                     tow_stat_chart_month = oper.tow_data.tow_op_site_stat.dur_total_dict[str(row_tow_site['d_end_leadtime'].iloc[0].month)]
 
                     # Update the fail_index
-                    end_tow_site_date = approximate_hourly_data(row_dates['d_end'][0])
+                    end_tow_site_date = approximate_hourly_data(row_tow_site['d_end'][0])
                     end_add_op_time_site = approximate_hourly_data(row_tow_site['d_end_dur_net_site'].iloc[0])
                     fail_index = oper.tow_data.tow_site_oper_sched.index[oper.tow_data.tow_site_oper_sched['datetime'] == end_tow_site_date][0]
 
@@ -491,6 +494,13 @@ def create_logs_corrective_file(
                 if rows_df is not None:
                     row_dates = pd.concat([row_dates, rows_df], axis=0, ignore_index=True)
             if row_mob_line is not None:
+                # Avoid multiple mobilisation of same vessel for TTP op and TTP additional operation
+                row_mob_line = (row_mob_line.sort_values(
+                        ["vessel_1", "n_vessel_1", "d_trigger"],
+                        ascending=[True, False, True],
+                        kind="stable"
+                    ).drop_duplicates("vessel_1", keep="first")
+                )
                 # Overwrite d_end in first mobilisation line with end wait of weather for operation for future mobilisation reduction (KPI_FINAL_COSTS)
                 row_mob_line.loc[0, 'd_end'] = date_end_wait_start
                 row_dates = pd.concat([row_dates, row_mob_line], axis=0, ignore_index=True)

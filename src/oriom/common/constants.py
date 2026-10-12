@@ -67,3 +67,27 @@ FORMATS_DATETIME = [
 ]
 
 METOCEAN_COLUMNS = ['datetime', 'hs', 'tp', 'te', 'ws', 'ws_hub', 'cs', 'si', 'light']
+
+
+EVENT_LOG_ORDER = {
+    "failure": 0,
+    "mobilisation": 1,
+    "mobilisation_merged": 2,
+    "inspection_port": 3,
+    "inspection_site": 4,
+    "operation_deferred_merged": 5,
+    "operation_merged": 6,
+    "operation": 7,
+}
+
+PERCENTILE_DICT = {
+    "P10": 10,
+    "AVG": '',
+    "P90": 90,
+}
+
+COLORS_GRAPH = [
+    '#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F',
+    '#EDC948', '#B07AA1', '#FF9DA7', '#BAB0AC', '#86BCB6',
+    '#FABFD2', '#D37295', '#8CD17D', '#C49C94', '#7F7F7F'
+]

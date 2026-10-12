@@ -43,29 +43,29 @@ def choose_spec_loc_string(G, start_node):
         raise AttributeError(f'substation not found for node {start_node}')
     
     
-def condition_shut_fix_evaluation(op_corr_tow: dict, fail_op: list, op_add_tow: dict, r: str, specific_tow: str):
-    """ Evaluate the condition to decide if the shutdown or fix event should be added to the energy events."""
-    # if no tow operation is connected to the failure
-    has_corr = any(f.id in op_corr_tow.keys() for f in fail_op)
-    # if any tow operation is connected to the failure and is specific_tow op
-    has_remove = any(specific_tow in f.name.lower() for f in fail_op)
-    # If string disconnection
-    add_flag = op_add_tow.get(r, {}).get('string', False)
+def condition_fix_evaluation(op_add_tow: dict, r_id: str):
+    """
+    Evaluate the condition to decide if the fix event should be added to the energy events.
+    A fix event is added when:
+        - the operation is not a TTP operation, or
+        - the operation is a TTP operation that requires string disconnection.
+    Args:
+        op_add_tow (dict): dict of string representig object.id : string_disconnection that are additions to other operations.
+        r_id (str): id of the event (operation id)
+    """
+    op_to_additiona = op_add_tow.get(r_id, {})
 
-    enter_condition = (
-        not has_corr
-        or add_flag
-        or has_remove
+    return (
+        op_to_additiona.get("type") != "TTP"
+        or op_to_additiona.get("string", False)
     )
-    return enter_condition
+
 
 def logs_corrective_locations(
     r: pd.Series,
-    op_corr_excluding_tow: list,
     shut_attribute: str,
     find_element_class,
     dict_locations: dict,
-    op_corr_tow: dict,
     op_add_tow: dict
 ) -> tuple[list, dict]:
     """
@@ -74,8 +74,7 @@ def logs_corrective_locations(
 
     Args:
         r (:obj:`pd.Series`): Row of the Log_event (failure, operation, inspection_port, inspection_site).
-        op_corr_excluding_tow (list): list of string representig object.id :class:`OperationsMinor`+`OperationsMajor`.
-        op_corr_tow (dict): dict of string representig object.id :class:`OperationsTow`.
+        shut_attribute (str): string representing the attribute of the operation that contains the shutdown hours.
         op_add_tow (dict): dict of string representig object.id : string_disconnection that are additions to other operations.
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations,
             vessels and failures via internal dictionaries.
@@ -142,25 +141,25 @@ def logs_corrective_locations(
             })
 
     # ---------- OPERATION (excluding tow) ----------
-    elif r['event'] == 'operation' and r['id'] in op_corr_excluding_tow or r['event'] == 'recommissioning':
+    elif r['event'] == 'operation' or r['event'] == 'recommissioning':
         if not isinstance(r['comments'], str):
             raise TypeError(f"Invalid comments type: {r['comments']}")
 
         fail = r['comments'][5:]
         if fail not in dict_locations:
-            raise ValueError(
-                f"E availability: Corrective operation without failure: {r['id']}, {r['comments']}"
-            )
+            raise ValueError(f"E availability: Corrective operation without failure: {r['id']}, {r['comments']}")
 
         operation = find_element_class.find_operation_stats(r['id'])
+        if getattr(operation.op_class, 'tow_to_port', False):
+            return events, dict_locations
+        
         shut_fix = 'shut' if getattr(operation.op_class, 'tow_to_port', False) else 'fix'
         shutdown_hours = getattr(operation, shut_attribute)
         month = r['d_end_transit_ts'].month
 
-        fail_op = operation.op_class.failures or []
-
         # Shut operations
-        shut_case = condition_shut_fix_evaluation(op_corr_tow, fail_op, op_add_tow, r['id'], 'remov')
+        #----------------------
+        shut_case = True
         if shut_case:
             if r['event'] != 'recommissioning':
                 # optional shutdown before repair
@@ -178,7 +177,10 @@ def logs_corrective_locations(
                     })
         
         # fix or final state
-        fix_case = condition_shut_fix_evaluation(op_corr_tow, fail_op, op_add_tow, r['id'], 'deplo')
+        #----------------------
+        # Evaluate if fix event must be present
+        fix_case = condition_fix_evaluation(op_add_tow, r['id'])
+       
         if fix_case:
             events.append({
                 "date": r['d_end_dur_net_site'],

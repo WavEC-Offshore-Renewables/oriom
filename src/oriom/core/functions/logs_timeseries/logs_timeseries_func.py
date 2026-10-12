@@ -69,6 +69,9 @@ def create_mobilisation(
     # Manage the case of 16 columns in the dataframe (missing "shutdown", "ST_contract_1", "ST_contract_2" column in log_event that is added consecutevly)
     if len(df.columns) == len(row_values) - 3:
         row_values = row_values[:-3]
+    # Manage the case of 22 columns in the dataframe ("shutdown", "ST_contract_1", "ST_contract_2" and vessel_2 mobilisation)
+    if len(df.columns) == len(row_values) + 2:
+        row_values.extend([False, False])
 
     # Create the row to add to the dataframe
     row_mob_line = pd.DataFrame([row_values], columns=df.columns)

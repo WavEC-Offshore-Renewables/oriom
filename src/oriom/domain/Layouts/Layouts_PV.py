@@ -289,6 +289,7 @@ class Layout_PV:
             n_strings (int): Number of strings or number of strings per inverter.
             n_inverters (int): Number of inverters.
             n_substations (int): Number of substations. Defaults to `1`.
+            tow_string_shutdown (bool, optional): If True, electrical continuity not ensure while device TTP. Defaults to False.
             n_mvtransformers (int): Number of transformers. Defaults to `1`.
             number_island_per_array_cable (int): Number of transformers. Defaults to `1`.
             save_dir (:obj:`str`, *optional*): Path dir to save graph representation. Defaults to `None`.

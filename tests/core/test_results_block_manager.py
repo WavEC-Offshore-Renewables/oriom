@@ -123,6 +123,8 @@ class TestResultsBlock(unittest.TestCase):
 
         self.log_events_df = pd.DataFrame(
             {
+                "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
+                "d_end_wait_start": pd.to_datetime(["2025-01-01", "2025-01-02"]),
                 "event": ["operation", "recommissioning"],
                 "id": ["op1", "op2"],
                 "n_vessel_1": [1, 1],
@@ -132,6 +134,8 @@ class TestResultsBlock(unittest.TestCase):
 
         self.log_events_merged_df = pd.DataFrame(
             {
+                "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
+                "d_end_wait_start": pd.to_datetime(["2025-01-01", "2025-01-02"]),
                 "event": ["operation", "recommissioning"],
                 "id": ["op1", "op2"],
                 "n_vessel_1": [1, 1],
@@ -260,7 +264,10 @@ class TestResultsBlock(unittest.TestCase):
         with patch(
             "oriom.core.results_block_manager.manage_def_to_log_events",
             return_value=self.log_events_df.copy(),
-        ) as mock_manage_def_to_log_events:
+        ) as mock_manage_def_to_log_events, patch(
+            "oriom.core.results_block_manager.vessel_mobilisation_manager.mobilitate_second_vessel",
+            side_effect=lambda log_events_merged, find_element_class, operations_tow: log_events_merged,
+        ) as mock_mobilitate_second_vessel:
             results_block(
                 result_dir_r=self.result_dir,
                 r=self.run_index,
@@ -296,7 +303,7 @@ class TestResultsBlock(unittest.TestCase):
 
         called_df_month = mock_energy_yield.call_args_list[0][1]["df"]
         pdt.assert_frame_equal(called_df_month, availability_month_wind)
-        called_df = mock_farm_availability.call_args_list[0][1]["df"]
+        called_df = mock_farm_availability.call_args_list[0][1]["df_"]
         pdt.assert_frame_equal(called_df, availability_year_wind)
         called_df = mock_indirect_costs_per_year.call_args_list[0][1]["df"]
         pdt.assert_frame_equal(called_df, availability_year_wind)

@@ -180,15 +180,14 @@ class Failure():
                     _e = '"fail_variation" has to be a boolean value.'
                     logging.error('Failure:' + _e)
                     raise ValueError(_e)
-            if isinstance(perc_shutdown, bool):
-                self.perc_shutdown = 100 if perc_shutdown else 0
-            elif perc_shutdown is not None:
-                try:
-                    self.perc_shutdown = int(perc_shutdown)
-                except ValueError:
-                    _e = '"perc_shutdown" has to be a int value.'
-                    logging.error('Failure:' + _e)
-                    raise ValueError(_e)
+        if isinstance(perc_shutdown, bool):
+            self.perc_shutdown = 100 if perc_shutdown else 0
+        elif isinstance(perc_shutdown, int):
+            self.perc_shutdown = perc_shutdown
+        elif perc_shutdown is not None:
+            _e = '"perc_shutdown" has to be a bool or int value.'
+            logging.error('Failure: ' + _e)
+            raise ValueError(_e)
         if parts_cost is not None:
             self.parts_cost = float(parts_cost)
 

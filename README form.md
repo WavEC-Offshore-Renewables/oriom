@@ -190,10 +190,23 @@ Copy and paste the folder with the private modules inside:
         .\oriom\src\core\functions\private
 
 If private functions are not found it will not be possible:
-- Consider statistical chart duration of the vessels and recall-reuse mobilitated vessels
+
 - Reuse previous simulations. All data must be recalculated
+
 - Reduced KPI Vessels Insight
+
 - It will not be available to use ORIOM as ShortTerm O&M Simulator
+
+- Consider statistical chart duration of the vessels and recall-reuse mobilitated vessels.
+
+    Assumption consider in statistical chart of the vessel:
+    -   Reuse of charted Vessel that end prematurly the operation then the end of its contract
+    -   Rechart of the vessel that cannot complete the oepration before its end of contract.
+        1) A new vessel is mobilitated with a new contract duration regarding the max statistical month duration considered
+        2) If the monthly statistical duration is lower then 48 h, the new contract considered is of 2 days lenght
+        3) If is an inspection at site and the monthly statistical duration is more then 5 days, 5 days of new contract are considered
+        4) If the vessel has a mobilisation that not exceed 14 days and its montly statistical duration chart is lower than a third of its mobilisation time, the new duration of contracts is three time the lengh of its mobilisation time.
+        
 
 ## GEN_INPUTS
 - **Use previous run directory**: Insert the path of the previous directory to reuse
@@ -588,15 +601,73 @@ Check the layout level of nodes and edges to know which failures and at which le
     - Other future chart for TTP operations are simply evaluated. If previous contract stipulated cover these lasts operation, the vessel will be reused (PRIVATE FUNCTIONALITIES)
 
 ## ACTIVITIES
-- More detailed are the activities and better it is, add more activities as refined as possible for long operations. One is a part of the O&M on which the work can be stopped and taken back in another day (when is decided by MAX HOUR BETWEEN ACTIVITY).
+Activities are the step that must be conducted to complete a ``Major Operation`` and will be aggregated to the corrispondent operation.
+
+
+
+More detailed are the activities and better it is, more activities are defined and longer will take ORIOM to schedule the operation. 
+
+Add more activities as refined as possible for long operations. 
+
+
 
 
 - The tech_shutdown_dur (wtg_shutdown_dur	wec_shutdown_dur	pv_shutdown_dur) must be a boolean
 
+- When considering a transit activity ``location`` must be ``"transit"``. If want to overwrite transit duration with a pre-defined vaue insert the values in ``duration``. Otherwise the duration will be evaluated by the distance to port and the vessel speed considered
 
-- If towing operation with redeploy_removal_tow and the activity must define transit to one device and another in name must be contained "transit" and "next" i.e. ACT1 name: "Transit to next device"
+- If towing operation:
+    - To consider transit with towing speed, ``location`` must be ``"transit"`` and the word ``"tow"`` must be present in the activity ``name``
+
+        Example
+        
+            id : OWT_A33_A9
+            op_type : Tow
+            op : ofw_removal_tow
+            name : Tow to port
+            location : transit
+            wtg_shutdown_dur : TRUE
+            wec_shutdown_dur : —
+            pv_shutdown_dur: —
+            duration : —
+            hs : 2.5
+            tp: —
+            ws : 30
+            ws_hub : —
+            cs : —
+            light : FALSE
+            
+    - To consider transit within one device and another in ``redeploy_removal_tow`` in ``name`` must be contained ``"transit"`` and ``"next"`` 
+
+        (Operation that bring ``device 1`` from port to site, connect the ``device 1``, move from ``device 1`` to ``device 2``, disconnect ``device 2``, bring ``device 2`` at port)
+
+        Example
+        
+            id : OWT_A33_A9
+            op_type : Tow
+            op : redeploy_removal_tow
+            name : Transit to next device
+            location : site
+            wtg_shutdown_dur : TRUE
+            wec_shutdown_dur : —
+            pv_shutdown_dur: —
+            duration : —
+            hs : 2.5
+            tp: —
+            ws : 30
+            ws_hub : —
+            cs : —
+            light : FALSE
+    
 
 - Avoid to add port activities at the end of the activities if they are not recommissioning.
+
+
+
+``(Operation_scheduler logic)``
+
+The operation can start in a timestep if all the activities can be conducted consecutively respecting the OLC defined. A maximum wait between one activity and the other can be considered with the parameter ``MAX HOUR BETWEEN ACTIVITY``. If the operation cannot be conducted respecting this rule, the next timestep will be evaluated .
+
 
 ## KPIs OUTPUT Overview
 
