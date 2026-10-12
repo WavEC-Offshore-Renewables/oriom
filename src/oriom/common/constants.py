@@ -79,3 +79,15 @@ EVENT_LOG_ORDER = {
     "operation_merged": 6,
     "operation": 7,
 }
+
+PERCENTILE_DICT = {
+    "P10": 10,
+    "AVG": '',
+    "P90": 90,
+}
+
+COLORS_GRAPH = [
+    '#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F',
+    '#EDC948', '#B07AA1', '#FF9DA7', '#BAB0AC', '#86BCB6',
+    '#FABFD2', '#D37295', '#8CD17D', '#C49C94', '#7F7F7F'
+]
