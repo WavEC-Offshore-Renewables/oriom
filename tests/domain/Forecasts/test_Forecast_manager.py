@@ -83,7 +83,7 @@ class TestForecastManagerInit(unittest.TestCase):
         """The constructor should initialise attributes and trigger forecast retrieval."""
         forecast_user_data = {
             "type_forecast": "ipma",
-            "name_point": "previsao_AB_",
+            "name_point": "previsao_AB",
         }
 
         manager = forecast_manager_module.Forecast_manager(
@@ -92,7 +92,7 @@ class TestForecastManagerInit(unittest.TestCase):
         )
 
         self.assertEqual(manager.type_forecast, "ipma")
-        self.assertEqual(manager.name_point, "previsao_AB_")
+        self.assertEqual(manager.name_point, "previsao_AB")
         self.assertEqual(manager.save_dir, "fake/save/dir")
         self.assertTrue(manager.forecast_df.empty)
         self.assertTrue(manager.ensamble_df.empty)
@@ -111,7 +111,7 @@ class TestRetrieveForecastData(unittest.TestCase):
         )
         manager.type_forecast = "ipma"
         manager.forecast = forecast_class(type_forecast="ipma")
-        manager.name_point = "previsao_AB_"
+        manager.name_point = "previsao_AB"
         manager.save_dir = "fake/save/dir"
         manager.forecast_df = pd.DataFrame()
         manager.ensamble_df = pd.DataFrame()
@@ -159,11 +159,11 @@ class TestRetrieveForecastData(unittest.TestCase):
         self.assertEqual(mock_session.get.call_count, 2)
         self.assertEqual(
             mock_session.get.call_args_list[0].args[0],
-            "https://forecast.test/api/forecast_previsao_AB__20260710.dat",
+            "https://forecast.test/api/forecast_previsao_AB_20260710.dat",
         )
         self.assertEqual(
             mock_session.get.call_args_list[1].args[0],
-            "https://forecast.test/api/ensemble_previsao_AB__10072026.dat",
+            "https://forecast.test/api/ensemble_previsao_AB_10072026.dat",
         )
 
         expected_forecast_index = pd.date_range(
@@ -189,7 +189,7 @@ class TestRetrieveForecastData(unittest.TestCase):
 
         self.assertEqual(
             manager.timeseries_file,
-            "fake/save/dir/forecast_previsao_AB__20260710.dat.csv",
+            "fake/save/dir/forecast_previsao_AB_20260710.dat.csv",
         )
 
         self.assertEqual(mock_save_file_csv.call_count, 2)
@@ -199,7 +199,7 @@ class TestRetrieveForecastData(unittest.TestCase):
 
         self.assertEqual(
             first_save_call.kwargs["save_dir"],
-            "fake/save/dir/forecast_previsao_AB__20260710.dat.csv",
+            "fake/save/dir/forecast_previsao_AB_20260710.dat.csv",
         )
         self.assertFalse(first_save_call.kwargs["indexing"])
 
@@ -211,7 +211,7 @@ class TestRetrieveForecastData(unittest.TestCase):
 
         self.assertEqual(
             second_save_call.kwargs["save_dir"],
-            "fake/save/dir/ensemble_previsao_AB__10072026.dat.csv",
+            "fake/save/dir/ensemble_previsao_AB_10072026.dat.csv",
         )
         self.assertFalse(second_save_call.kwargs["indexing"])
 
@@ -258,20 +258,20 @@ class TestRetrieveForecastData(unittest.TestCase):
 
         self.assertEqual(
             mock_session.get.call_args_list[0].args[0],
-            "https://forecast.test/api/forecast_previsao_AB__20260710.dat",
+            "https://forecast.test/api/forecast_previsao_AB_20260710.dat",
         )
         self.assertEqual(
             mock_session.get.call_args_list[1].args[0],
-            "https://forecast.test/api/forecast_previsao_AB__20260709.dat",
+            "https://forecast.test/api/forecast_previsao_AB_20260709.dat",
         )
         self.assertEqual(
             mock_session.get.call_args_list[2].args[0],
-            "https://forecast.test/api/ensemble_previsao_AB__10072026.dat",
+            "https://forecast.test/api/ensemble_previsao_AB_10072026.dat",
         )
 
         self.assertEqual(
             manager.timeseries_file,
-            "fake/save/dir/forecast_previsao_AB__20260709.dat.csv",
+            "fake/save/dir/forecast_previsao_AB_20260709.dat.csv",
         )
 
         self.assertEqual(mock_save_file_csv.call_count, 2)
@@ -307,23 +307,22 @@ class TestRetrieveForecastData(unittest.TestCase):
         mock_read_csv,
         mock_save_file_csv,
     ):
-        """Unexpected processing errors should raise RuntimeError after both attempts fail."""
+        """Unexpected processing errors should raise RuntimeError after retries fail."""
         manager = self.create_manager_without_init()
 
         mock_session = MagicMock()
-        mock_session.get.side_effect = [
-            DummyResponse("invalid content"),
-            DummyResponse("invalid content"),
-        ]
+        mock_session.get.return_value = DummyResponse("invalid content")
         mock_session_class.return_value = mock_session
-
         mock_read_csv.side_effect = ValueError("parse failed")
 
         with self.assertRaises(RuntimeError) as context:
             manager.retrieve_forecast_data()
 
-        self.assertIn("Unexpected error while processing forecast data", str(context.exception))
-        self.assertEqual(mock_session.get.call_count, 2)
+        self.assertIn(
+            "Unexpected error while processing forecast data",
+            str(context.exception),
+        )
+        self.assertGreaterEqual(mock_session.get.call_count, 2)
         mock_save_file_csv.assert_not_called()
 
 

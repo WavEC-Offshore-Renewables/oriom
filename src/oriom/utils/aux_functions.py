@@ -158,21 +158,21 @@ def create_run_folder_operation(
         operation,
         operation_dir: str,
         inputs_gen,
-        operation_files: list
+        operation_files: list,
+        ST:bool = False
 ):
     """ Function used to create the operations folders and copy previous result if exists"""
 
     op_dir = os.path.join(operation_dir, operation.id)
     if not os.path.exists(op_dir):
         os.makedirs(op_dir)
-
     if (
             inputs_gen.consider_tseries is not None and
             inputs_gen.consider_tseries["value"] is True
     ):
-        # Copy results from a previous run, if possible
+        # Copy results from a previous run if not ST analysis and if possible
         src_dir = os.path.join(inputs_gen.previous_run_dir["value"], 'operation_dir', operation.id)
-        if not os.path.exists(src_dir):
+        if not os.path.exists(src_dir) or ST:
             # This operation was not considered in the previous run.
             # Nothing to copy.
             return

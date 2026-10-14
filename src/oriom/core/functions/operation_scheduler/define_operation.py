@@ -6,6 +6,7 @@ from datetime import timedelta
 from copy import deepcopy
 from tqdm import tqdm
 import logging
+import math
 
 from oriom.utils.aux_functions import save_file_csv
 
@@ -167,9 +168,9 @@ def define_operation_values(
 
         # Check what is the first timestep where this acvitivity can start.
         # We must consider previous acts net duration.
-        act_low_first_ts = int(metocean_ts + prev_duration)
+        act_low_first_ts = math.ceil(metocean_ts + prev_duration)
         act_low_startability = df_startability.iloc[act_low_first_ts:, act_most_restrict_idx].dropna()
-        if act_low_startability.sum() == 0:
+        if not act_low_startability.any():
             # This activity cannot start anymore
             return metocean_ts
 
@@ -188,7 +189,7 @@ def define_operation_values(
             ts_curr = act_low_ts
             # Initialize current time
             # When the most restrictive activity start
-            time_curr = act_low_ts + round((prev_duration % 1), 3)
+            time_curr = act_low_ts# - round((prev_duration % 1), 3)
 
             # Check if previous activities can start before this one:
             prev_act_idx = act_most_restrict_idx - 1
@@ -201,21 +202,21 @@ def define_operation_values(
                 # Update current time
                 time_curr = time_curr - act_dur
                 # Update current time step
-                ts_curr = int(time_curr)
+                ts_curr = math.floor(time_curr)
 
                 ts_max = ts_curr
 
                 ts_min = max(int(time_curr - MAX_WAIT), metocean_ts)
                 act_startability = df_startability.iloc[ts_min:(ts_max+1), prev_act_idx].dropna()
 
-                if act_startability.sum() == 0 or (time_curr - MAX_WAIT) < 0:
+                if not act_startability.any():
                     # This activity cannot start anymore.
                     # Get out from this while loop and
                     # test most restrictive activity next possible timstep.
                     break
 
                 # This activity can occur in this interval
-                if prev_act_idx == 0:
+                if prev_act_idx == 0 or (time_curr - MAX_WAIT) < 0:
                     prev_solution_found = True
                 # When?
                 act_ts_all = act_startability[act_startability == True].index
@@ -228,9 +229,10 @@ def define_operation_values(
 
             # Initialize current time
             # When the most restrictive activity ends
-            time_curr = act_low_ts + round((prev_duration % 1), 3) + activities[act_most_restrict_idx].duration
+            # time_curr = act_low_ts + round((prev_duration % 1), 3) + activities[act_most_restrict_idx].duration
+            time_curr = act_low_ts + activities[act_most_restrict_idx].duration
             # Timestep where the most restrictive activity starts
-            ts_curr = int(time_curr)
+            ts_curr = math.ceil(time_curr)
 
             # Check if next activities can start after this one:
             next_act_idx = act_most_restrict_idx + 1
@@ -245,7 +247,7 @@ def define_operation_values(
 
                 act_startability = df_startability.iloc[ts_min:(ts_max+1), next_act_idx].dropna()
 
-                if act_startability.sum() == 0 or (time_curr + MAX_WAIT) >= df_startability.shape[0]:
+                if not act_startability.any():
                     # This activity cannot start anymore.
                     # Get out from this while loop and
                     # test most restrictive activity next possible timestep.
@@ -261,7 +263,7 @@ def define_operation_values(
                 # Update current time
                 time_curr = ts_acts_start[next_act_idx] + act_dur
                 # Update current time step
-                ts_curr = int(time_curr)
+                ts_curr = math.ceil(time_curr)
                 next_act_idx += 1
 
             if next_solution_found:

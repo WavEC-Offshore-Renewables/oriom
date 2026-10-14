@@ -297,7 +297,8 @@ def failures_event(
 
 def ST_failures_event(
     failures: list,
-    result_dir_r: str
+    result_dir_r: str,
+    r:int
 ):
     """Create a table with failures throughtout the months for the lifetime.
 
@@ -310,6 +311,7 @@ def ST_failures_event(
     Args:
         failures (list): List obtained from the class, failure rate for each component.
         result_dir_r (str): string of the folder on which the results are stored
+        r (int): interation number
     """
 
     list_ids, list_operation_triggered = [], []
@@ -327,7 +329,8 @@ def ST_failures_event(
         'preferred_month'
     ])
 
-    dates_failures['datetime'] = [datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)]*len(list_ids)
+    dates_failures['datetime'] = [datetime.now().replace(
+        hour=0, minute=0, second=0, microsecond=0) + datetime(hour=r)]*len(list_ids)
     dates_failures['id'] = list_ids
     dates_failures['maintenance_strategy'] = 'immediately'
     dates_failures['operation_triggered'] = list_operation_triggered
