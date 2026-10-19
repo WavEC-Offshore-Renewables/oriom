@@ -206,7 +206,7 @@ def define_operation_values(
 
                 ts_max = ts_curr
 
-                ts_min = max(int(time_curr - MAX_WAIT), metocean_ts)
+                ts_min = max(math.floor(time_curr - MAX_WAIT), metocean_ts)
                 act_startability = df_startability.iloc[ts_min:(ts_max+1), prev_act_idx].dropna()
 
                 if not act_startability.any():
@@ -243,7 +243,7 @@ def define_operation_values(
                 act_dur = activities[next_act_idx].duration
 
                 ts_min = ts_curr
-                ts_max = min(int(time_curr + MAX_WAIT), df_startability.shape[0] - 1)
+                ts_max = min(math.ceil(time_curr + MAX_WAIT), df_startability.shape[0] - 1)
 
                 act_startability = df_startability.iloc[ts_min:(ts_max+1), next_act_idx].dropna()
 
