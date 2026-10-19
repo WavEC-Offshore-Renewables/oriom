@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import timedelta
+import ast
 
 from oriom.utils.read_dataframe_value import get_first_failure
 from oriom.utils.aux_functions import safe_copy_df
@@ -181,7 +182,14 @@ def mobilitate_second_vessel(log_events_merged: pd.DataFrame, find_element_class
     log_mobilisation = log_events_merged[log_events_merged["event"].isin(["mobilisation", "mobilisation_merged"])]
 
     for _, row in log_mobilisation.iterrows():
-        oper = find_element_class.find_operation(row["comments"][0])
+        oper = find_element_class.find_operation(
+            row["comments"][0] 
+            if not isinstance(row["comments"], str)
+            else ast.literal_eval(row["comments"])[0]
+        )
+        if isinstance(oper, str):
+            raise NameError(oper)
+        
         if oper.id in list_oper_avoid:
             continue
         vessel_2 = getattr(oper, 'vessel2', None)

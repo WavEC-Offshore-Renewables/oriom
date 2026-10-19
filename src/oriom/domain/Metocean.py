@@ -545,7 +545,7 @@ class Metocean():
         if not tow_metocean:
             # SITE METOCEAN
             if not port_metocean:
-                met = check_create_metocean(run_dir)
+                met = check_create_metocean(run_dir, ST = tseries_inputs.ST_O_M)
                 # add wind speed at hub height column
                 if power_farm is not None and getattr(power_farm, "wtg_number_devices", None) is not None:
                     if wtg is None or z0 is None:

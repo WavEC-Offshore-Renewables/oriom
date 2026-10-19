@@ -286,7 +286,7 @@ class OperationDeferredPortCreation():
 
             if df_filtered_start_tow.empty:
                 self.operation_completed = False
-                return pd.DataFrame()
+                return pd.DataFrame(), False
 
             row_dates = compute_operation_datetimes(df_filtered_start_tow, self.dict_oper_stat[id_row])
 
@@ -309,7 +309,7 @@ class OperationDeferredPortCreation():
             )
             if row_dates_tow.empty:
                 self.operation_completed = False
-                return pd.DataFrame()
+                return pd.DataFrame(), False
         if self.dev_idx_station_port not in self.tow_at_port_date[vessel_used]:
             self.tow_at_port_date[vessel_used][self.dev_idx_station_port] = [(None), (None)]
         if not same_vessel:

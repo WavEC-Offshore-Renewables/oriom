@@ -51,7 +51,13 @@ class TestBaseCorrection(unittest.TestCase):
     def test_add_hours_for_noon_shift(self):
         base_corr = BaseCorrection(datetime(2026, 4, 7, 8), self.sample_vessel, self.sample_oper)
         oper_sched = pd.DataFrame({0: [datetime(2026, 4, 7, h) for h in range(24)]})
-        base_corr.add_hours_for_noon_shift(fail_index=10, lead_mob_time=0, oper_sched=oper_sched)
+        base_corr.add_hours_for_noon_shift(fail_index=10, lead_mob_time=0, oper_sched=oper_sched, last_valid_idx = 1000)
+        self.assertIsNotNone(base_corr.idx_end_leadtime)
+        
+    def test_add_hours_for_noon_shift_over_valid_idx(self):
+        base_corr = BaseCorrection(datetime(2026, 4, 7, 8), self.sample_vessel, self.sample_oper)
+        oper_sched = pd.DataFrame({0: [datetime(2026, 4, 7, h) for h in range(24)]})
+        base_corr.add_hours_for_noon_shift(fail_index=10, lead_mob_time=0, oper_sched=oper_sched, last_valid_idx = 1000)
         self.assertIsNotNone(base_corr.idx_end_leadtime)
 
     def test_leadtime_evaluation(self):

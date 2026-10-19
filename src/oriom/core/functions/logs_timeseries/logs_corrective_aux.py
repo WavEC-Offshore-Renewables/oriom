@@ -151,6 +151,7 @@ def create_operation_site(
             fail_index = index['fail_index'],
             lead_mob_time = mobilisation['lead_mob_time'],
             oper_sched = oper_['oper_sched'],
+            last_valid_idx = safe_getattr(oper_['oper'], ['ts_data','last_valid_index'])           
         )
         date_op = immediate_correction.date_op
         idx_end_leadtime = immediate_correction.idx_end_leadtime

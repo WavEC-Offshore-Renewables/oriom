@@ -40,7 +40,8 @@ def aux_operation_builder(
         dirs: object,
         failures: list,
         farm_technologies: object,
-        G_layouts: dict
+        G_layouts: dict,
+        ST: bool = False
 ):
     """
     Create objects, populate for each operation the attributes and create a run folder with the activities and attributes files
@@ -53,6 +54,7 @@ def aux_operation_builder(
         failures (list): List of failure objects
         farm_technologies (object): Farm technologies object from ``FarmTechnologies`` class
         G_layouts (dict): Dictionary of graph layouts
+        ST (bool): Flag to determine if is a Short Term O&M Analysis
 
     Returns: dict: Dictionary with the following keys
         - rovs_drones: List of ROV and Drone objects
@@ -100,7 +102,8 @@ def aux_operation_builder(
             operation = operation,
             operation_dir = dirs.operation_dir,
             inputs_gen = inputs.general,
-            operation_files = Config.OPERATION_FILES
+            operation_files = Config.OPERATION_FILES,
+            ST = ST
         )
 
         # Populate Operations with vessels

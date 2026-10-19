@@ -1,0 +1,10 @@
+# Development dependencies for ORIOM
+-r requirements.txt
+
+# Testing
+pytest
+coverage
+
+# Documentation
+Sphinx
+sphinx-rtd-theme

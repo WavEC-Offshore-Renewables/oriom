@@ -211,7 +211,7 @@ def startability(
 
     # Save startability as a CSV
     if out_dir is not None:
-        save_file_csv(df_workability, out_dir, 'startability.csv', indexing = True)
+        save_file_csv(df_startability, out_dir, 'startability.csv', indexing = True)
         logging.info('Startability: saved as "%s".' % os.path.join(out_dir, 'startability.csv'))
 
     return df_startability

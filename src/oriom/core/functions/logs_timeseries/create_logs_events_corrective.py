@@ -238,6 +238,7 @@ def create_logs_corrective_file(
                             fail_index = fail_index if not deferred_tow else deferred_tow_correction.idx_end_leadtime,
                             lead_mob_time = mob_time,
                             oper_sched = oper.tow_data.tow_port_oper_sched,
+                            last_valid_idx = safe_getattr(oper, ['tow_data','last_valid_idx_tow_port'])
                         )
                 else:
                     # mobilisation in deferred_merged

@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 
 from oriom.utils.read_dataframe_value import approximate_hourly_data
+from oriom.utils.aux_functions import log_event_convert_stringtime
 
 
 def manage_recommissioning(log_events_tow: pd.DataFrame, substitute = False):
@@ -49,6 +50,7 @@ def create_stat_chart_campaign_operation(
 
     # Filter the df for deferred_merged_operation
     df_deferred = deepcopy(df[df['event'] != 'mobilisation_merged'])
+    df_deferred = log_event_convert_stringtime(df_deferred)
 
     # Extract month for grouping
     df_deferred['year'] = df_deferred['d_trigger'].dt.year
@@ -73,7 +75,7 @@ def create_stat_chart_campaign_operation(
 
         # Create dictionary with montlhy duration percentile
         month_percentiles_dict = {int(row['month']): int(np.ceil(row['duration_days'])) for _, row in month_percentiles.iterrows()}
-        vessel_month_percentiles_dict = {vessel.id: month_percentiles_dict}
+        vessel_month_percentiles_dict[vessel.id] = month_percentiles_dict
 
         # Add the monthly percentiles to the d_trigger only for the deferred operations
         mask = (df['event'] != 'mobilisation_merged') & (df['vessel_1'] == vessel.id)
@@ -94,31 +96,40 @@ def create_stat_chart_campaign_operation(
     return df, vessel_month_percentiles_dict
 
 
-def manage_chart(df: pd.DataFrame, vessels: list, percentile: float = 0.9):
+def manage_chart(
+    df: pd.DataFrame,
+    vessels: list,
+    percentile: float = 0.9
+) -> tuple[pd.DataFrame, dict]:
+    """Manage d_trigger, event and chart_vessel of the deferred tow merged."""
 
-    """ Manage d_trigger, event and chart_vessel of the deferred tow merged"""
+    df['_original_order'] = range(len(df))
 
-    # Modify event name
-    df['event'] = np.where(
-        df['event'] != 'mobilisation_merged',
-        'operation_deferred_merged',  # value if True
-        df['event']                   # value if False (keep the same)
-    )
+    # Modify event name, preserving mobilisation events
+    mask_mobilisation = df['event'] == 'mobilisation_merged'
+    df.loc[~mask_mobilisation, 'event'] = 'operation_deferred_merged'
 
-    # Uniform d_trigger and d_end_leadtime
-    df[['d_trigger', 'd_end_leadtime']] = (
-        df.groupby('year_month')[['d_trigger', 'd_end_leadtime']]
-        .transform('min')
-    )
-    
-    # Manage deferred chart for campaign tow
+    # Uniform d_trigger and d_end_leadtime, excluding mobilisation events
+    cols = ['d_trigger', 'd_end_leadtime']
+    mask_deferred = ~mask_mobilisation
+
+    df.loc[mask_deferred, cols] = (df.loc[mask_deferred].groupby('year_month')[cols].transform('min'))
+
+    # Remove year_month before calculating statistics
     df = df.drop(columns=['year_month'])
-    df, vessel_month_percentiles_dict = create_stat_chart_campaign_operation(
-        df = df,
-        vessels = vessels,
-        percentile = percentile
+
+    # Calculate statistics; mobilisation events are excluded internally
+    df, vessel_month_percentiles_dict = (
+        create_stat_chart_campaign_operation(
+            df=df,
+            vessels=vessels,
+            percentile=percentile
+        )
     )
-        
+
+    # Restore original row order and remove temporary column
+    df = (df.sort_values('_original_order').drop(columns=['_original_order']).reset_index(drop=True))
+
     return df, vessel_month_percentiles_dict
 
 

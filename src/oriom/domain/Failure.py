@@ -182,10 +182,10 @@ class Failure():
                     raise ValueError(_e)
         if isinstance(perc_shutdown, bool):
             self.perc_shutdown = 100 if perc_shutdown else 0
-        elif isinstance(perc_shutdown, int):
+        elif isinstance(perc_shutdown, (int, float)):
             self.perc_shutdown = perc_shutdown
         elif perc_shutdown is not None:
-            _e = '"perc_shutdown" has to be a bool or int value.'
+            _e = '"perc_shutdown" has to be a bool or float value.'
             logging.error('Failure: ' + _e)
             raise ValueError(_e)
         if parts_cost is not None:

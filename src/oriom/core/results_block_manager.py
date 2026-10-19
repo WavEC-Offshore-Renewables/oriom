@@ -85,7 +85,7 @@ def results_block(
         failure_dir = os.path.join(inputs.general.failureevent_file["value"], f"{'result_'}{r}", 'dates_failures.csv')
         if inputs.tseries.ST_O_M:
             failure_dir = os.path.join(inputs.general.failureevent_file["value"], 'dates_failures.csv')
-            ST_failures_event(failures = failures, result_dir_r = failure_dir)
+            ST_failures_event(failures = failures, result_dir_r = failure_dir, r = r)
         dates_failures = pd.read_csv(failure_dir, sep=',')
         dates_failures = aux_functions.convert_stringtime(dates_failures)
         dates_failures['preferred_month'] = pd.to_numeric(dates_failures['preferred_month'], errors='coerce').astype('Int64')

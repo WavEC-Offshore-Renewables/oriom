@@ -56,18 +56,20 @@ class BaseCorrection:
         return row_mob_line
 
 
-    def add_hours_for_noon_shift(self, fail_index: int, lead_mob_time: float, oper_sched: pd.DataFrame):
+    def add_hours_for_noon_shift(self, fail_index: int, lead_mob_time: float, oper_sched: pd.DataFrame, last_valid_idx: int):
         """Add hours if the failure occurs in the noon to schedule at 5AM of next day"""
         self.idx_end_leadtime = fail_index + lead_mob_time + int(self.time_fail_op_immediately)
         h_to_add = 0
 
-        if lead_mob_time == 0:
-            if self.vessel and getattr(self.vessel, "id", None) != 'v999':
-                hour_end_leadtime = int(oper_sched.iat[self.idx_end_leadtime, 0].hour)
-                if hour_end_leadtime > 12:
-                    h_to_add = int((5 - hour_end_leadtime) % 24)
-
-        self.idx_end_leadtime += h_to_add
+        if self.idx_end_leadtime < last_valid_idx:
+            if lead_mob_time == 0:
+                if self.vessel and getattr(self.vessel, "id", None) != 'v999':
+                    hour_end_leadtime = int(oper_sched.iat[self.idx_end_leadtime, 0].hour)
+                    if hour_end_leadtime > 12:
+                        h_to_add = int((5 - hour_end_leadtime) % 24)
+            self.idx_end_leadtime += h_to_add
+        # Insert an invalid index that will be managed subsequently
+        else: self.idx_end_leadtime = last_valid_idx+1
 
 
     def leadtime_evaluation(self, lead_mob_time: float, date_original = None):

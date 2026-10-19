@@ -353,7 +353,7 @@ class TestCreateOperationSite(unittest.TestCase):
                     columns=["d_trigger"],
                 )
 
-            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched):
+            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched, last_valid_idx):
                 # For the test, simply set idx_end_leadtime
                 self.idx_end_leadtime = fail_index + lead_mob_time
                 self.date_op = oper_sched.iloc[self.idx_end_leadtime]["datetime"]
@@ -702,7 +702,7 @@ class TestCreateOperationSite(unittest.TestCase):
             def mobilitate_vessel(self, log_events, r):
                 return None
 
-            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched):
+            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched, last_valid_idx):
                 self.idx_end_leadtime = fail_index
 
         MockImmediate.side_effect = StubImmediate

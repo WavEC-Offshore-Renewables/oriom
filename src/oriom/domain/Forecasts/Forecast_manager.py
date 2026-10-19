@@ -54,6 +54,7 @@ class Forecast_manager:
             Raise:
                 RuntimeError: if any exceptions occurs
             """
+            forecast_found = False
             # Iterate for exact day or previous day if forecast did not exit yet
             for day_offset in range(2):
                 date_trial = (forecast_date-pd.Timedelta(days=day_offset)).strftime(date_format)
@@ -67,10 +68,11 @@ class Forecast_manager:
                     response = session.get(forecast_url, timeout=30)
                     response.raise_for_status()
                     forecast_df = pd.read_csv(io.StringIO(response.text), delim_whitespace=True, header=None)
+                    forecast_found = True
                     break
                 except requests.exceptions.RequestException as exc:
                     if day_offset == 1:
-                        e_ = f"Failed to download forecast data for "f"{forecast_date}: {exc}"
+                        e_ = f"Failed to download forecast data for "f"{forecast_date}: {exc}\n{forecast_url}"
                         logging.error(e_)
                         raise RuntimeError(e_)
                 except Exception as exc:
@@ -78,7 +80,8 @@ class Forecast_manager:
                         e_ = f"Unexpected error while processing forecast data for {forecast_date}: {exc}. ST O&M not considered"
                         logging.exception(e_)
                         raise RuntimeError(e_)
-                    
+            if not forecast_found:
+                raise RuntimeError(f"Failed to download forecast data for {forecast_date-pd.Timedelta(days=day_offset)}")
             return forecast_df, url_save_file
 
         session = requests.Session()

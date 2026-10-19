@@ -2,6 +2,7 @@ import pandas as pd
 import math as mt
 
 from oriom.utils.read_dataframe_value import approximate_hourly_data
+from oriom.utils.aux_functions import convert_stringtime
 from oriom.core.functions.kpi_final import kpi_aux
 
 
@@ -293,6 +294,11 @@ def part_other_cost(
     merged.loc[mask, 'parts_cost'] = fail_ids.apply(get_parts_cost)
 
     # Total cost calculation
+    
+    cols = ['d_end', 'd_end_leadtime', 'd_trigger']
+    for col in cols:
+        merged = convert_stringtime(merged, col)
+
     part_cost = merged['parts_cost'].sum()
     other_cost = (
         merged['other_costs'].sum()

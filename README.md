@@ -162,6 +162,9 @@ Install dependencies and install the package in editable mode:
 ```bash
 python -m pip install -r requirements.txt
 python -m pip install -e .
+
+#If developer mode request
+python -m pip install -r dev-requirements.txt  
 ```
 
 ### 4) Quick verification

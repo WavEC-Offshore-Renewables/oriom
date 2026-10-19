@@ -5,7 +5,6 @@ import pandas as pd
 import requests
 
 from oriom.common import constants_forecast
-from oriom.utils.aux_functions import save_file_csv
 
 
 class Forecast:
