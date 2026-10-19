@@ -915,7 +915,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             def mobilitate_vessel(self, log_events, row):
                 return None
 
-            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched):
+            def add_hours_for_noon_shift(self, fail_index, lead_mob_time, oper_sched, last_valid_idx):
                 self.idx_end_leadtime = int(fail_index)
 
         MockTowPort.side_effect = StubTowPort
