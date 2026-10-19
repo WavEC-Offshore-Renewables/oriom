@@ -79,8 +79,6 @@ def convert_stringtime(
     if dt_column == 'd_end_stat_chart':
         mask_convert = df[dt_column] != 'reuse_vessel'
 
-
-
     i=0
     for fmt in FORMATS_DATETIME:
         i+=1

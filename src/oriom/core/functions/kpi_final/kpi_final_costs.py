@@ -3,6 +3,7 @@ import pandas as pd
 from copy import deepcopy
 from oriom.utils import aux_functions
 
+from oriom.utils.aux_functions import convert_stringtime
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.kpi_final.kpi_vessel_total import create_lifetime_cost, kpi_cost_vessel_internal
 from oriom.core.functions.kpi_final import kpi_extra
@@ -221,6 +222,7 @@ def kpi_final_total_cost(
     )
 
     # Extract years
+    log_events = convert_stringtime(log_events, 'd_end')
     log_events['year'] = log_events['d_end'].dt.year
     log_events_merged['year'] = log_events_merged['d_end'].dt.year
     years = range(inputs.stats.start_year["value"], inputs.stats.start_year["value"] + inputs.stats.lifetime["value"])
