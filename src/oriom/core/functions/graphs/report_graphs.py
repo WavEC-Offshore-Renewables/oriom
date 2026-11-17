@@ -1,9 +1,10 @@
 import os
 import pandas as pd
 import numpy as np
-import logging
 import matplotlib.pyplot as plt
 from copy import deepcopy
+
+from oriom.common.constants import COLORS_GRAPH
 
 
 """Relevant graphs based on results."""
@@ -262,13 +263,12 @@ def indirect_costs_per_year(
         df_p90 (pd.DataFrame, optional): P90 yearly energy results.
     """
     years = df['Years'].to_numpy()
-    en_loss = df['En_loss_kWh'].to_numpy(dtype=float)
     energy_av = df['En_availability'].to_numpy(dtype=float)
 
     use_percentiles = df_p10 is not None and df_p90 is not None
 
     # Calculate indirect costs in M€.
-    cost_avg = en_loss * electricity_price / 1e9
+    cost_avg = df['energy_loss_Meur']
 
     if use_percentiles:
         cost_p10 = (df_p10['En_loss_kWh'].to_numpy(dtype=float) * electricity_price / 1e9)
@@ -312,10 +312,6 @@ def indirect_costs_per_year(
     ax.set_ylim(max(0, min_cost * 0.9), max_cost * 1.1 if max_cost > 0 else 1)
 
     title = 'Indirect costs per year'
-    if use_percentiles:
-        title += ' (AVG with P10-P90 range)'
-    else:
-        title += ' (AVG)'
     ax.set_title(title)
 
     fig.tight_layout()
@@ -329,15 +325,17 @@ def indirect_costs_per_year(
 def farm_availability(
         df_: pd.DataFrame | dict,
         name_file: str = None,
-        save_dir: str = None
+        save_dir: str = None,
     ):
-    '''It produces graphs representing time and energy availability.
+    """
+    It produces graphs representing time and energy availability.
+    
     Args:
         df_ (DataFrame | dict): Availability data. If a dict is provided,
             it must contain 'AVG', 'P10' and 'P90' DataFrames.
         name_file (str, optional): Name used in the output filenames.
         save_dir (str, optional): Directory where graphs are saved.
-    '''
+    """
     has_percentiles = isinstance(df_, dict)
     df = df_['AVG'] if has_percentiles else df_
 
@@ -349,7 +347,7 @@ def farm_availability(
         df_p10 = df_['P10']
         df_p90 = df_['P90']
 
-    if energy_av[-1] == 100:
+    if energy_av[-1] == 100 and len(energy_av)>1:
         years = years[:-1]
         energy_av = energy_av[:-1]
         time_av = time_av[:-1]
@@ -560,10 +558,70 @@ def distribution_mobilization(
         plt.title("Mobilisation")
 
         if save_dir is not None:
-                plt.savefig(os.path.join(save_dir,name+".jpg"))
+            plt.savefig(os.path.join(save_dir,name+".jpg"))
         plt.close()
 
 
+def lifetime_cost(
+        df: pd.DataFrame,
+        title: str,
+        save_dir: str = None,
+    ):
+    """Plot lifetime costs as horizontal AVG bars with P10-P90 error bars."""
+
+    colors = COLORS_GRAPH
+
+    df_filtered = df.loc[df['values'] != 0, ['cost_type', 'values']].copy()
+    df_filtered['cost_type'] = (df_filtered['cost_type'].str.split('€').str[0].str.strip())
+
+    labels = [label.split('_', 1)[-1].replace('_', ' ') for label in df_filtered['cost_type']]
+    values = df_filtered['values'].to_numpy(dtype=float)
+
+    total = values.sum()
+    percentages = values / total * 100 if total else np.zeros_like(values)
+
+    fig, ax = plt.subplots(figsize=(10, max(5, len(labels) * 0.6)))
+
+    bar_colors = [colors[i % len(colors)] for i in range(len(labels))]
+    bars = ax.barh(
+        labels,
+        values,
+        color=bar_colors,
+        height=0.7,
+        error_kw={'ecolor': 'black', 'capsize': 4, 'elinewidth': 1.2}
+    )
+
+    max_value = max(values) if len(values) else 0
+    ax.set_xlim(0, max_value * 1.35 if max_value > 0 else 1)
+
+    for bar, value, percentage in zip(bars, values, percentages):
+        ax.text(
+            bar.get_width() + max_value * 0.015,
+            bar.get_y() + (bar.get_height() / 3),
+            f'{value:,.0f} € ({percentage:.1f}%)',
+            va='center',
+            fontsize=11
+        )
+
+    ax.set_title(f'{title}: {total / 1e6:.2f} M€', fontsize=16, pad=15)
+    ax.set_xlabel('Cost (€)', fontsize=12)
+    ax.set_ylabel('Cost type', fontsize=12)
+    ax.tick_params(axis='y', labelsize=11)
+    ax.grid(axis='x', linestyle='--', alpha=0.3)
+    ax.set_axisbelow(True)
+
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.spines['bottom'].set_visible(True)
+
+    plt.tight_layout()
+
+    if save_dir:
+        plt.savefig(os.path.join(save_dir, f'{title.lower()}.png'),dpi=300,bbox_inches='tight')
+    else:
+        plt.show()
+
+    plt.close()
 
 if '__main__' == __name__:
     pass

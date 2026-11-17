@@ -692,6 +692,12 @@ class Layout_Wind():
                 string_list = [8, 8, 8, 8, 9, 8, 8, 8, 8]
             elif n_turbines == 40:
                 string_list = [5, 8, 5, 8, 6, 8]
+            # BARD ONE
+            elif n_turbines == 80:
+                string_list = [8, 8, 8, 8, 8, 8, 4, 4, 8, 4, 4, 8]
+            # EAST ANGLIA
+            elif n_turbines == 102:
+                string_list = [8, 8, 9, 9, 10, 7, 7, 19, 5, 10, 10]
             else:
                 if n_turbines % n_strings != 0:
                     raise ValueError("Layout 4: n_turbines must be divisible by n_strings or modify string_list manually")
@@ -717,13 +723,13 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=1,
-        n_turbines=10,
-        n_strings=2,
+        n_layout=4,
+        n_turbines=102,
+        n_strings=11,
         n_substations=1,
         n_exports=1,
         n_string_to_connector = 6,
-        tow_string_shutdown = True,
+        tow_string_shutdown = False,
         save_dir = None,
         show_plot=True
     )

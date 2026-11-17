@@ -33,7 +33,7 @@ class TestForecast(unittest.TestCase):
             sentinel.forecast_data,
             create=True,
         ):
-            forecast = forecast_module.Forecast(type_forecast=forecast_type)
+            forecast = forecast_module.Forecast(type_forecast=forecast_type, name_point='AB', save_dir=None)
 
         self.assertEqual(forecast.type_forecast, forecast_type)
         self.assertEqual(forecast.username, "test_user")

@@ -50,7 +50,7 @@ def data_ctv_long_term_strategy(
 
         # Create a new log_events_merged with different ST
         vessel_day_count_sensitivity = VesselDayCounter(log_events_merged = log_events_m, vessels=[ves])
-        log_m = vessel_day_count_sensitivity.allocate_vessels(log_events_merged = log_events_m, ST = True)
+        log_m = vessel_day_count_sensitivity.allocate_vessels(log_events_merged = log_events_m, ST_contract = True)
 
         # Filter only for ST
         log_m = log_m[log_m["ST_contract_1"] | log_m["ST_contract_2"]].copy()

@@ -223,15 +223,21 @@ class ProjectDirs:
         if self.data_overwrite_user_path:
             self.overwrite_files_path = {
                 'failure_path': os.path.join(self.data_overwrite_user_path, 'failures_user.yaml'),
-                'operations_path': {
-                    'operations_tow': os.path.join(self.data_overwrite_user_path, 'operations_corrective_tow_user.yaml'),
-                    'operations_corr_major': os.path.join(self.data_overwrite_user_path, 'operations_corrective_major_user.yaml'),
-                    'operations_minor': os.path.join(self.data_overwrite_user_path, 'operations_corrective_minor_user.yaml'),
-                    'operations_inspect_site': os.path.join(self.data_overwrite_user_path, 'operations_inspect_site_user.yaml'),
-                    'operations_inspect_port': os.path.join(self.data_overwrite_user_path, 'operations_inspect_port_user.yaml'),
-                },
-                'vessels_path': os.path.join(self.data_overwrite_user_path, 'vessels_user.yaml'),
                 'forecast_path': os.path.join(self.data_overwrite_user_path, 'forecast_user.yaml'),
+                'TTP_op_path': os.path.join(self.data_overwrite_user_path, 'TTP_op_user.yaml'),
+                'vessels_path': os.path.join(self.data_overwrite_user_path, 'vessels_user.yaml'),
+                
+                #---------------------------------------------------------------------------------------------------------------------------------
+                # REDUCED FUNCTIONALITY
+                #
+                # 'operations_path': {
+                #     'operations_tow': os.path.join(self.data_overwrite_user_path, 'operations_corrective_tow_user.yaml'),
+                #     'operations_corr_major': os.path.join(self.data_overwrite_user_path, 'operations_corrective_major_user.yaml'),
+                #     'operations_corr_minor': os.path.join(self.data_overwrite_user_path, 'operations_corrective_minor_user.yaml'),
+                #     'operations_inspect_site': os.path.join(self.data_overwrite_user_path, 'operations_inspect_site_user.yaml'),
+                #     'operations_inspect_port': os.path.join(self.data_overwrite_user_path, 'operations_inspect_port_user.yaml'),
+                # },
+                #---------------------------------------------------------------------------------------------------------------------------------
             }
 
     def __repr__(self):

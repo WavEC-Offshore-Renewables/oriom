@@ -214,11 +214,16 @@ class DummyStats:
 class DummyGen:
     def __init__(self, energy_path):
         self.powerevent_file = energy_path
+        
+class DummyCost:
+    def __init__(self):
+        self.electricity_price_dict = {'wt':100, 'wec': 100, 'pv': 100}
 
 class DummyInput:
     def __init__(self, start_year, start_month, lifetime, energy_path):
         self.stats = DummyStats(start_year, start_month, lifetime)
         self.general = DummyGen(energy_path)
+        self.cost = DummyCost()
 
 
 
@@ -286,7 +291,7 @@ class TestEnergyAvailabilityWindIntegration(unittest.TestCase):
 
         inputs = DummyInput({'value': 2025}, {'value': 1}, {'value': 1}, {'value': 'path'})
 
-        result = ea.energy_availability(
+        result, energy_data = ea.energy_availability(
             inputs=inputs,
             r=1,
             log_events_energy=log_events_energy,

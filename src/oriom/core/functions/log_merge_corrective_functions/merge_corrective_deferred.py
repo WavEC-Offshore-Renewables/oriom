@@ -61,7 +61,7 @@ def merge_deferred_operations(
 
     """
 
-    def cont_shift_lenght(df, column, initial_index):
+    def cont_shift_lenght(df, column, initial_index, value = 0):
         """
         Auxiliary function that return the number of hours that an operation can delay its starts from the operation_schedule.
         This represents the possible hours of work that can be added on the original shift conducted
@@ -69,7 +69,7 @@ def merge_deferred_operations(
         val = df[column].to_numpy()[initial_index+1:]
 
         # Find the first value different from zero
-        mask_zero = (val == 0)
+        mask_zero = (val <= value)
         if not np.any(~mask_zero):  # all zeros
             return len(val)
 
@@ -189,7 +189,7 @@ def merge_deferred_operations(
                             logging.warning(f'Merged_deferred:{e_}\n  Shift not available for {op_id} at date {oper_sched.iat[day_start_idx, index_wait_to_start_col]}\n failure remain uncorrected')
                             break
 
-                        if wait_at_site != 0:
+                        if wait_at_site < 1:
                             wait_site_restriction = True
 
                         operation_total_duration = oper.ts_data.dur_net_site + oper.ts_data.dur_net_port + oper.ts_data.transit_ts + oper.ts_data.transit_tp + wait_at_site
@@ -228,7 +228,7 @@ def merge_deferred_operations(
                         # Count how many hours of delay can start the operation
                         duration_shift_wait_start = cont_shift_lenght(oper_sched, 'wait_start', day_start_idx)
                         try:
-                            duration_shift_wait_site = cont_shift_lenght(oper_sched, 'wait_site', day_start_idx)
+                            duration_shift_wait_site = cont_shift_lenght(oper_sched, 'wait_site', day_start_idx, value=1)
                         except KeyError:
                             duration_shift_wait_site = duration_shift_wait_start
 
@@ -266,7 +266,7 @@ def merge_deferred_operations(
                         )
 
                     # id and comments of merged operations
-                    subset = op_row.iloc[operation_concluded - total_device_this_shift : operation_concluded]
+                    subset = op_row.iloc[int(operation_concluded - total_device_this_shift):int(operation_concluded)]
                     group_def_id = list(zip(subset.index, subset['id']))
                     group_def_comm_failures = subset['comments'].tolist()
                     group_def_comm = {'tech_tot': number_technicians*n_vessel_used, 'tech_cost': tech_cost*number_technicians*n_vessel_used, 'failures': group_def_comm_failures} #NOTE and in case of second vessel are we counting tech cost?

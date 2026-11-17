@@ -34,10 +34,9 @@ class OperationTow():
             ``1`` if not defined.
         other_costs (float): Other costs (port, cranes, insurance, etc.).
             Its value is :obj:`0.0` if not defided.
-        addition_op_tow (:obj: CorrectiveMajor): Major operation object to conduct
+        addition_op_tow (:class:`~oriom.domain.CorrectiveMajor.CorrectiveMajor): Major operation object to conduct
             before or after the towing operation. Its value is ``None`` if not defided
-        activities (list): List of
-            :class:`~oriom.domain.Activity.Activity` preformed during
+        activities (list): List of :class:`~oriom.domain.Activity.Activity` preformed during
             the logistic operation.
         vessel1 (:class:`~oriom.domain.Vessel.Vessel`): Main vessel
             used in this operation. Its value is ``None`` if not defided.

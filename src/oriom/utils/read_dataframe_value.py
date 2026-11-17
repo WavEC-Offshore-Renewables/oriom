@@ -2,7 +2,7 @@ import ast
 from datetime import timedelta
 import pandas as pd
 
-def get_first_failure(value)->str:
+def get_first_failure(value, first = True)->str|list[str]:
     """
     Analyze the value and return the first failure encountered in the value is:
         - a dictionary
@@ -11,16 +11,17 @@ def get_first_failure(value)->str:
 
     Args:
         value (dict|str): value to analyze
+        first (bool): if True, return the first failure encountered, otherwise return all failures
 
     Return:
-        str: first failure encountered
+        str: first failure encountered | list[str]: all failures encountered
     """
 
     # Case 1: value is a dict
     if isinstance(value, dict):
         failures = value.get('failures')
         if isinstance(failures, list) and failures:
-            return failures[0]
+            return failures[0] if first else failures
 
     # Case 2: value is string representing a dict
     elif isinstance(value, str):
@@ -29,7 +30,7 @@ def get_first_failure(value)->str:
             if isinstance(parsed, dict):
                 failures = parsed.get('failures')
                 if isinstance(failures, list) and failures:
-                    return failures[0]
+                    return failures[0] if first else failures
         except (ValueError, SyntaxError):
             pass
 
