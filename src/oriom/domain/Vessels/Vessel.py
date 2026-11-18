@@ -18,6 +18,14 @@ class Vessel():
         mother_vessel (bool): boolean that define a mother vessel.
         annual_contract (float): Long term contract cost.
             Defaults to ``0``.
+        n_ves_annual_contract (int): Number of vessel yearly contracted.
+            Defaults to ``0``.
+        months_contract (list) = List of months that vessels are montlhy contracted
+            Defaults to ``[]``.
+        monthly_contract_cost (float): Mothly chart contract cost.
+            Defaults to ``0``.
+        n_ves_monthly_contract (int): Number of vessel monthly contracted.
+            Defaults to ``0``.
         speed_tow (float): Vessel tow speed, in m/s. Defaults to ``0.0``.
         crew_capacity (int): Maximum number of crew members.
         overnight (:obj:`bool`): True if the vessel can stay overnight.

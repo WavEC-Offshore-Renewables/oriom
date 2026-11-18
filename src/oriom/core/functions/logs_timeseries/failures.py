@@ -7,7 +7,6 @@ import logging
 import numpy as np
 import math
 
-from oriom.utils import aux_functions
 from oriom.common.constants import DICT_DAYS
 
 
@@ -297,8 +296,7 @@ def failures_event(
 
 def ST_failures_event(
     failures: list,
-    result_dir_r: str,
-    r:int
+    date_use: datetime
 ):
     """Create a table with failures throughtout the months for the lifetime.
 
@@ -310,16 +308,16 @@ def ST_failures_event(
         
     Args:
         failures (list): List obtained from the class, failure rate for each component.
-        result_dir_r (str): string of the folder on which the results are stored
-        r (int): interation number
+        date_use (datetime): Date on wich generate the failure
     """
 
-    list_ids, list_operation_triggered = [], []
+    list_ids, list_operation_triggered, list_maintenance_strategy  = [], [], []
     for fail in failures:
         fail_events = math.ceil(fail.fail_rate)
         for _ in range(fail_events):
             list_ids.append(fail.id)
             list_operation_triggered.append(fail.operation_triggered)
+            list_maintenance_strategy.append(fail.maintenance_strategy )
 
     dates_failures = pd.DataFrame(columns=[
         'datetime',
@@ -329,16 +327,12 @@ def ST_failures_event(
         'preferred_month'
     ])
 
-    dates_failures['datetime'] = [datetime.now().replace(
-        hour=0, minute=0, second=0, microsecond=0) + datetime(hour=r)]*len(list_ids)
+    dates_failures['datetime'] = [date_use.strftime('%m-%d-%Y %H:%M:%S')]*len(list_ids)
     dates_failures['id'] = list_ids
-    dates_failures['maintenance_strategy'] = 'immediately'
+    dates_failures['maintenance_strategy'] = list_maintenance_strategy
     dates_failures['operation_triggered'] = list_operation_triggered
-    dates_failures['preferred_month'] = pd.Series(None, dtype='Int64')
+    dates_failures['preferred_month'] = [date_use.month] * len(list_ids)
     dates_failures = dates_failures.sort_values(by ='datetime').reset_index(drop=True)
-
-    aux_functions.save_file_csv(dates_failures, result_dir_r)
-
 
     return dates_failures
 

@@ -1,15 +1,23 @@
+# tests/core/test_results_block_manager.py
+
 import os
 import unittest
+from contextlib import ExitStack
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
-import pandas.testing as pdt
 
 import pandas as pd
+import pandas.testing as pdt
 
 from oriom.core.results_block_manager import results_block
 
 
+MODULE = "oriom.core.results_block_manager"
+
+
 class DummyResults:
+    """Minimal results container required by results_block."""
+
     def __init__(self):
         self.dfs_energy_yearly_month_dict = {
             "availability_month_wind": [],
@@ -29,22 +37,34 @@ class DummyResults:
         self.dfs_log_events = []
         self.dfs_log_events_merged = []
         self.dfs_vessel_fuel_usage = []
+        self.dfs_energy_data = []
 
 
 class DummyVesselDayCounter:
+    """Record calls while returning a valid merged-log DataFrame."""
+
     def __init__(self, log_events_merged=None, vessels=None):
         self.log_events_merged = log_events_merged
         self.vessels = vessels
         self.calls = []
 
-    def allocate_vessels(self, log_events_merged=None, ST=False):
-        self.calls.append({"log_events_merged": log_events_merged, "ST": ST})
-        return log_events_merged.copy()
+    def allocate_vessels(self, log_events_merged=None, ST_contract=False, **kwargs):
+        self.calls.append(
+            {"log_events_merged": log_events_merged, "ST_contract": ST_contract, **kwargs}
+        )
+        source = (
+            log_events_merged
+            if log_events_merged is not None
+            else self.log_events_merged
+        )
+        return source.copy()
 
 
 class TestResultsBlock(unittest.TestCase):
+    """Tests for new generation, previous-file reuse and empty-log guard."""
+
     def setUp(self):
-        self.result_dir = "/tmp/test_result_dir"
+        self.result_dir = os.path.join("fake", "test_result_dir")
         self.run_index = 0
 
         self.inputs = SimpleNamespace(
@@ -59,7 +79,7 @@ class TestResultsBlock(unittest.TestCase):
                 merge_vessel={"value": ["ctv"]},
                 time_between_devices_dict={"device": 1.0},
                 shift_duration={"value": 12},
-                ST_O_M = False
+                ST_O_M=False,
             ),
             stats=SimpleNamespace(
                 lifetime={"value": 20},
@@ -86,17 +106,36 @@ class TestResultsBlock(unittest.TestCase):
             STATISTICAL_CHART=False,
             ENERGY_AVAILABILITY_CALCULATION=True,
             ENERGY_STATISTICAL_CALCULATION=False,
+            FUEL_TO_ADD={},
+            MOBILISATION_TO_ADD={},
+            ST=False,
         )
 
         self.find_element = MagicMock()
         self.failures = [MagicMock(id="f1")]
-        self.operations_tow_stats = {"pmain": ["tow_main"], "pmax": ["tow_max"]}
-        self.inspections_port_stats = {"pmain": ["port_main"], "pmax": ["port_max"]}
-        self.inspections_site_stats = {"pmain": ["site_main"], "pmax": ["site_max"]}
-        self.operations_corrective_stats = {"pmain": ["corr_main"], "pmax": ["corr_max"]}
+        self.operations_tow_stats = {
+            "pmain": ["tow_main"],
+            "pmax": ["tow_max"],
+        }
+        self.inspections_port_stats = {
+            "pmain": ["port_main"],
+            "pmax": ["port_max"],
+        }
+        self.inspections_site_stats = {
+            "pmain": ["site_main"],
+            "pmax": ["site_max"],
+        }
+        self.operations_corrective_stats = {
+            "pmain": ["corr_main"],
+            "pmax": ["corr_max"],
+        }
         self.vessels = [MagicMock(id="ctv_1")]
         self.mother_vessels = [MagicMock(id="mv_1")]
-        self.G_layouts = {"G_wind": MagicMock(), "G_wave": MagicMock(), "G_pv": MagicMock()}
+        self.G_layouts = {
+            "G_wind": MagicMock(),
+            "G_wave": MagicMock(),
+            "G_pv": MagicMock(),
+        }
         self.dict_power_wind = {"1": 100.0}
         self.dict_power_wave = {"1": 200.0}
         self.metocean_timeseries = pd.DataFrame({"p": [1, 2, 3]})
@@ -110,17 +149,15 @@ class TestResultsBlock(unittest.TestCase):
                 pv_number_devices=20,
             )
         )
-
         self.results_dict = DummyResults()
 
         self.dates_failures_df = pd.DataFrame(
             {
                 "datetime": pd.to_datetime(["2025-01-01 00:00:00"]),
                 "id": ["f1.0"],
-                'preferred_month': [1]
+                "preferred_month": [1],
             }
         )
-
         self.log_events_df = pd.DataFrame(
             {
                 "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
@@ -131,7 +168,6 @@ class TestResultsBlock(unittest.TestCase):
                 "d_end": pd.to_datetime(["2025-01-02", "2025-01-03"]),
             }
         )
-
         self.log_events_merged_df = pd.DataFrame(
             {
                 "d_trigger": pd.to_datetime(["2025-01-01", "2025-01-02"]),
@@ -142,89 +178,125 @@ class TestResultsBlock(unittest.TestCase):
                 "d_end": pd.to_datetime(["2025-01-04", "2025-01-05"]),
             }
         )
-
-        self.kpi_total_df = pd.DataFrame({"metric": ["a"], "value": [1.0]})
+        self.kpi_total_df = pd.DataFrame(
+            {
+                "vessel_id": ["v001", "technician", "insurance", "port", "total"],
+                "tot_mobilization_costs": [0, 0, 0, 0, 0],
+                "tot_vessel_costs": [0, 0, 0, 0, 0],
+                "tot_technicians_costs": [0, 0, 0, 0, 0],
+                "tot_part_costs": [0, 0, 0, 0, 0],
+                "tot_rov_costs": [0, 0, 0, 0, 0],
+                "tot_other_costs": [0, 0, 0, 0, 0],
+                "value": [1.0, 0, 0, 0, 1.0],
+                "lifetime_direct_costs": [1.0, 0, 0, 0, 1.0],
+            }
+        )
         self.kpi_yearly_df = pd.DataFrame({"year": [2025], "value": [2.0]})
         self.daily_vessel_df = pd.DataFrame({"day": [1], "vessel": ["ctv_1"]})
-
-    @patch("oriom.core.results_block_manager.report_graphs.distribution_failures")
-    @patch("oriom.core.results_block_manager.report_graphs.indirect_costs_per_year")
-    @patch("oriom.core.results_block_manager.report_graphs.farm_availability")
-    @patch("oriom.core.results_block_manager.report_graphs.energy_yield_combined")
-    @patch("oriom.core.results_block_manager.report_graphs.energy_yield")
-    @patch("oriom.core.results_block_manager.kpi_final_total_cost")
-    @patch("oriom.core.results_block_manager.energy_availability")
-    @patch("oriom.core.results_block_manager.config_energy_availability")
-    @patch("oriom.core.results_block_manager.vessel_mobilisation_manager.reduce_redundant_mobilisations_inspection")
-    @patch("oriom.core.results_block_manager.vessel_mobilisation_manager.create_yearly_mobilisation_mother_vessel")
-    @patch("oriom.core.results_block_manager.VesselDayCounter")
-    @patch("oriom.core.results_block_manager.create_logs_merge")
-    @patch("oriom.core.results_block_manager.create_logs_timeseries_file")
-    @patch("oriom.core.results_block_manager.failures_event")
-    @patch("oriom.core.results_block_manager.os.makedirs")
-    @patch("oriom.core.results_block_manager.aux_functions.save_file_csv")
-    @patch("oriom.core.results_block_manager.aux_functions.log_event_convert_stringtime")
-    @patch("oriom.core.results_block_manager.aux_functions.convert_stringtime")
-    @patch("oriom.core.results_block_manager.pd.read_csv")
-    def test_results_block_generates_all_outputs_when_previous_files_do_not_exist(
-        self,
-        mock_read_csv,
-        mock_convert_stringtime,
-        mock_log_event_convert_stringtime,
-        mock_save_file_csv,
-        mock_makedirs,
-        mock_failures_event,
-        mock_create_logs_timeseries_file,
-        mock_create_logs_merge,
-        mock_vessel_day_counter_cls,
-        mock_create_yearly_mob,
-        mock_reduce_redundant,
-        mock_config_energy,
-        mock_energy_availability,
-        mock_kpi_final_total_cost,
-        mock_energy_yield,
-        mock_energy_yield_combined,
-        mock_farm_availability,
-        mock_indirect_costs_per_year,
-        mock_distribution_failures,
-    ):
-        """
-        This test covers the main generation path:
-        - failures are generated
-        - log events are generated
-        - merged log events are generated
-        - deferred overwrite path is applied
-        - energy availability is calculated
-        - KPI files are generated
-        - result containers are updated
-        """
-
-        mock_read_csv.side_effect = FileNotFoundError
-        mock_convert_stringtime.return_value = self.dates_failures_df.copy()
-        mock_log_event_convert_stringtime.side_effect = lambda df: df.copy()
-
-        mock_failures_event.return_value = self.dates_failures_df.copy()
-        mock_create_logs_timeseries_file.return_value = self.log_events_df.copy()
-
-        merged_after_create = self.log_events_merged_df.copy()
-        deferred_log_df = pd.DataFrame({"event": ["deferred"]})
-        mock_create_logs_merge.return_value = (
-            merged_after_create,
-            [0, 1],
-            deferred_log_df,
-            {}
+        self.fuel_usage_df = pd.DataFrame(
+            {
+                "vessel_type": ["v001_ctv"],
+                "transit": [80],
+                "maneuver": [50],
+                "standby": [20],
+            }
+        )
+        self.availability_month_wind = pd.DataFrame(
+            {"Months": [1], "En_max_kWh": [1000], "En_loss_kWh": [100]}
+        )
+        self.availability_year_wind = pd.DataFrame(
+            {
+                "Years": [2025],
+                "En_loss_kWh": [100],
+                "En_availability": [99],
+                "Time_availability": [98],
+            }
+        )
+        self.availability_month_wave = pd.DataFrame(
+            {"Months": [1], "En_max_kWh": [2000], "En_loss_kWh": [200]}
+        )
+        self.availability_year_wave = pd.DataFrame(
+            {
+                "Years": [2025],
+                "En_loss_kWh": [200],
+                "En_availability": [97],
+                "Time_availability": [96],
+            }
+        )
+        self.availability_year_pv = pd.DataFrame(
+            {
+                "Years": [2025],
+                "En_loss_kWh": [300],
+                "En_availability": [95],
+                "Time_availability": [94],
+            }
         )
 
-        vessel_day_counter_instance = DummyVesselDayCounter(
+    @staticmethod
+    def _patch_dependencies(stack):
+        """Patch dependencies by name to avoid decorator-argument order errors."""
+        targets = {
+            "read_csv": "pd.read_csv",
+            "convert_stringtime": "aux_functions.convert_stringtime",
+            "log_event_convert_stringtime": "aux_functions.log_event_convert_stringtime",
+            "save_file_csv": "aux_functions.save_file_csv",
+            "makedirs": "os.makedirs",
+            "failures_event": "failures_event",
+            "create_logs_timeseries_file": "create_logs_timeseries_file",
+            "create_logs_merge": "create_logs_merge",
+            "manage_def_to_log_events": "manage_def_to_log_events",
+            "VesselDayCounter": "VesselDayCounter",
+            "create_yearly_mob": (
+                "vessel_mobilisation_manager.create_yearly_mobilisation_mother_vessel"
+            ),
+            "reduce_redundant": (
+                "vessel_mobilisation_manager.reduce_redundant_mobilisations_inspection"
+            ),
+            "mobilitate_second_vessel": (
+                "vessel_mobilisation_manager.mobilitate_second_vessel"
+            ),
+            "config_energy": "config_energy_availability",
+            "energy_availability": "energy_availability",
+            "kpi_final_total_cost": "kpi_final_total_cost",
+            "graphs_simulation_creation": "graphs_simulation_creation",
+            "availability_graph_manager": "availability_graph_manager"
+        }
+        return {
+            name: stack.enter_context(patch(f"{MODULE}.{target}"))
+            for name, target in targets.items()
+        }
+
+    def _configure_common_mocks(self, mocks):
+        """Return valid domain-shaped outputs from all mocked dependencies."""
+        mocks["convert_stringtime"].return_value = self.dates_failures_df.copy()
+        mocks["log_event_convert_stringtime"].side_effect = lambda df: df.copy()
+        mocks["failures_event"].return_value = self.dates_failures_df.copy()
+        mocks["create_logs_timeseries_file"].return_value = self.log_events_df.copy()
+        mocks["create_logs_merge"].return_value = (
+            self.log_events_merged_df.copy(),
+            [0, 1],
+            pd.DataFrame({"event": ["deferred"]}),
+            {},
+        )
+        mocks["manage_def_to_log_events"].return_value = self.log_events_df.copy()
+        mocks["create_yearly_mob"].side_effect = (
+            lambda log_events_merged, mother_vessel_list: log_events_merged
+        )
+        mocks["reduce_redundant"].side_effect = (
+            lambda log_events_merged, vessels: log_events_merged
+        )
+        mocks["mobilitate_second_vessel"].side_effect = (
+            lambda log_events_merged, find_element_class, operations_tow:
+            log_events_merged
+        )
+
+        counter = DummyVesselDayCounter(
             log_events_merged=self.log_events_merged_df.copy(),
             vessels=self.vessels,
         )
-        mock_vessel_day_counter_cls.return_value = vessel_day_counter_instance
+        mocks["VesselDayCounter"].return_value = counter
 
-        mock_create_yearly_mob.side_effect = lambda log_events_merged, mother_vessel_list: log_events_merged
-        mock_reduce_redundant.side_effect = lambda log_events_merged, vessels: log_events_merged
-
-        mock_config_energy.return_value = {
+        mocks["config_energy"].return_value = {
             "G_wind_copy": MagicMock(),
             "G_wave_copy": MagicMock(),
             "G_pv_copy": MagicMock(),
@@ -232,257 +304,138 @@ class TestResultsBlock(unittest.TestCase):
             "n_modules_per_strings": 3,
             "max_failure_module": 4,
         }
-
-        availability_month_wind = pd.DataFrame({"Months": [1], "En_max_kWh": [1000], "En_loss_kWh": [100]})
-        availability_year_wind = pd.DataFrame({"Years": [2025], "En_loss_kWh": [100], "En_availability": [99], "Time_availability": [98]})
-        availability_month_wave = pd.DataFrame({"Months": [1], "En_max_kWh": [2000], "En_loss_kWh": [200]})
-        availability_year_wave = pd.DataFrame({"Years": [2025], "En_loss_kWh": [200], "En_availability": [97], "Time_availability": [96]})
-        availability_year_pv = pd.DataFrame({"Years": [2025], "En_loss_kWh": [300], "En_availability": [95], "Time_availability": [94]})
-
-        mock_energy_availability.return_value = {
-            "availability_month_wind": availability_month_wind,
-            "availability_year_wind": availability_year_wind,
-            "availability_month_wave": availability_month_wave,
-            "availability_year_wave": availability_year_wave,
-            "availability_year_pv": availability_year_pv,
+        mocks["energy_availability"].return_value = {
+            "availability_month_wind": self.availability_month_wind,
+            "availability_year_wind": self.availability_year_wind,
+            "availability_month_wave": self.availability_month_wave,
+            "availability_year_wave": self.availability_year_wave,
+            "availability_year_pv": self.availability_year_pv,
+        }, {
+            "corrective": {"wind": pd.DataFrame()},
+            "preventive": {"wind": pd.DataFrame()},
         }
-
-        mock_kpi_final_total_cost.return_value = (
-            self.kpi_total_df,
-            self.kpi_yearly_df,
+        mocks["kpi_final_total_cost"].return_value = (
+            self.kpi_total_df.copy(),
+            self.kpi_yearly_df.copy(),
             {"ctv_1": {"days": 12}},
-            self.daily_vessel_df,
+            self.daily_vessel_df.copy(),
             {"corrective": 10.0},
-            pd.DataFrame({
-                "vessel_type": ["v001_ctv"],
-                "transit": [80],
-                "maneuver": [50],
-                "standby": [20],
-            })
+            self.fuel_usage_df.copy(),
         )
+        mocks["availability_graph_manager"].return_value()
+        return counter
 
-        with patch(
-            "oriom.core.results_block_manager.manage_def_to_log_events",
-            return_value=self.log_events_df.copy(),
-        ) as mock_manage_def_to_log_events, patch(
-            "oriom.core.results_block_manager.vessel_mobilisation_manager.mobilitate_second_vessel",
-            side_effect=lambda log_events_merged, find_element_class, operations_tow: log_events_merged,
-        ) as mock_mobilitate_second_vessel:
-            results_block(
-                result_dir_r=self.result_dir,
-                r=self.run_index,
-                inputs=self.inputs,
-                Config=self.config,
-                find_element=self.find_element,
-                farm_technologies=self.farm_technologies,
-                results_dict=self.results_dict,
-                failures=self.failures,
-                operations_tow_stats=self.operations_tow_stats,
-                inspections_port_stats=self.inspections_port_stats,
-                inspections_site_stats=self.inspections_site_stats,
-                operations_corrective_stats=self.operations_corrective_stats,
-                vessels=self.vessels,
-                mother_vessels=self.mother_vessels,
-                G_layouts=self.G_layouts,
-                dict_power_wind=self.dict_power_wind,
-                dict_power_wave=self.dict_power_wave,
-                metocean_timeseries=self.metocean_timeseries,
-            )
-
-        mock_failures_event.assert_called_once()
-        mock_create_logs_timeseries_file.assert_called_once()
-        mock_create_logs_merge.assert_called_once()
-        mock_manage_def_to_log_events.assert_called_once()
-
-        self.assertGreaterEqual(len(vessel_day_counter_instance.calls), 1)
-        self.assertTrue(any(call["ST"] is True for call in vessel_day_counter_instance.calls))
-
-        mock_config_energy.assert_called_once()
-        mock_energy_availability.assert_called_once()
-        mock_kpi_final_total_cost.assert_called_once()
-
-        called_df_month = mock_energy_yield.call_args_list[0][1]["df"]
-        pdt.assert_frame_equal(called_df_month, availability_month_wind)
-        called_df = mock_farm_availability.call_args_list[0][1]["df_"]
-        pdt.assert_frame_equal(called_df, availability_year_wind)
-        called_df = mock_indirect_costs_per_year.call_args_list[0][1]["df"]
-        pdt.assert_frame_equal(called_df, availability_year_wind)
-
-        mock_energy_yield_combined.assert_called_once()
-        mock_distribution_failures.assert_called_once()
-
-        self.assertEqual(len(self.results_dict.dfs_tot_cost_list), 1)
-        self.assertEqual(len(self.results_dict.dfs_tot_yearly_cost_list), 1)
-        self.assertEqual(len(self.results_dict.kpi_om_type_cost_list), 1)
-        self.assertEqual(len(self.results_dict.dfs_log_events), 1)
-        self.assertEqual(len(self.results_dict.dfs_log_events_merged), 1)
-        self.assertEqual(len(self.results_dict.dfs_ctv_list), 1)
-        self.assertEqual(len(self.results_dict.dfs_vessel_fuel_usage), 1)
-
-        self.assertEqual(len(self.results_dict.dfs_energy_yearly_month_dict["availability_month_wind"]), 1)
-        self.assertEqual(len(self.results_dict.dfs_energy_yearly_month_dict["availability_month_wave"]), 1)
-        self.assertEqual(len(self.results_dict.dfs_energy_yearly_dict["availability_year_wind"]), 1)
-        self.assertEqual(len(self.results_dict.dfs_energy_yearly_dict["availability_year_wave"]), 1)
-        self.assertEqual(len(self.results_dict.dfs_energy_yearly_dict["availability_year_pv"]), 1)
-
-        mock_makedirs.assert_called_once_with(os.path.join(self.result_dir, "graph_dir"))
-
-    @patch("oriom.core.results_block_manager.report_graphs.distribution_failures")
-    @patch("oriom.core.results_block_manager.kpi_final_total_cost")
-    @patch("oriom.core.results_block_manager.VesselDayCounter")
-    @patch("oriom.core.results_block_manager.aux_functions.save_file_csv")
-    @patch("oriom.core.results_block_manager.aux_functions.log_event_convert_stringtime")
-    @patch("oriom.core.results_block_manager.aux_functions.convert_stringtime")
-    @patch("oriom.core.results_block_manager.pd.read_csv")
-    @patch("oriom.core.results_block_manager.os.makedirs")
-    def test_results_block_reuses_previous_files_and_skips_energy_when_disabled(
-        self,
-        mock_makedirs,
-        mock_read_csv,
-        mock_convert_stringtime,
-        mock_log_event_convert_stringtime,
-        mock_save_file_csv,
-        mock_vessel_day_counter_cls,
-        mock_kpi_final_total_cost,
-        mock_distribution_failures,
-    ):
-        """
-        This test covers the reuse path:
-        - failure file is loaded from a previous run
-        - log_events file is loaded from a previous run
-        - merged log_events file is loaded from a previous run
-        - energy availability is skipped
-        - KPI path still runs
-        """
-
-        config = SimpleNamespace(
-            TIME_FAIL_OP_IMMEDIATELY=2,
-            STATISTICAL_CHART=False,
-            ENERGY_AVAILABILITY_CALCULATION=False,
-            ENERGY_STATISTICAL_CALCULATION=False,
-        )
-
-        mock_read_csv.side_effect = [
-            self.dates_failures_df.copy(),
-            self.log_events_df.copy(),
-            self.log_events_merged_df.copy(),
-        ]
-        mock_convert_stringtime.return_value = self.dates_failures_df.copy()
-        mock_log_event_convert_stringtime.side_effect = lambda df: df.copy()
-
-        vessel_day_counter_instance = DummyVesselDayCounter(
-            log_events_merged=self.log_events_merged_df.copy(),
+    def _call_results_block(self, config=None):
+        """Call the function under test using its current keyword-based API."""
+        return results_block(
+            result_dir_r=self.result_dir,
+            r=self.run_index,
+            inputs=self.inputs,
+            Config=config if config is not None else self.config,
+            find_element=self.find_element,
+            farm_technologies=self.farm_technologies,
+            results_dict=self.results_dict,
+            failures=self.failures,
+            operations_tow_stats=self.operations_tow_stats,
+            inspections_port_stats=self.inspections_port_stats,
+            inspections_site_stats=self.inspections_site_stats,
+            operations_corrective_stats=self.operations_corrective_stats,
             vessels=self.vessels,
-        )
-        mock_vessel_day_counter_cls.return_value = vessel_day_counter_instance
-
-        mock_kpi_final_total_cost.return_value = (
-            self.kpi_total_df,
-            self.kpi_yearly_df,
-            {},
-            self.daily_vessel_df,
-            {"preventive": 20.0},
-            pd.DataFrame({
-                "vessel_type": ["v001_ctv"],
-                "transit": [80],
-                "maneuver": [50],
-                "standby": [20],
-            })
+            mother_vessels=self.mother_vessels,
+            G_layouts=self.G_layouts,
+            dict_power_wind=self.dict_power_wind,
+            dict_power_wave=self.dict_power_wave,
+            metocean_timeseries=self.metocean_timeseries,
+            ST_operations_TTP_authorized=[],
         )
 
-        with patch("oriom.core.results_block_manager.failures_event") as mock_failures_event, \
-             patch("oriom.core.results_block_manager.create_logs_timeseries_file") as mock_create_logs_timeseries_file, \
-             patch("oriom.core.results_block_manager.create_logs_merge") as mock_create_logs_merge, \
-             patch("oriom.core.results_block_manager.config_energy_availability") as mock_config_energy, \
-             patch("oriom.core.results_block_manager.energy_availability") as mock_energy_availability, \
-             patch("oriom.core.results_block_manager.report_graphs.energy_yield") as mock_energy_yield, \
-             patch("oriom.core.results_block_manager.report_graphs.energy_yield_combined") as mock_energy_yield_combined, \
-             patch("oriom.core.results_block_manager.report_graphs.farm_availability") as mock_farm_availability, \
-             patch("oriom.core.results_block_manager.report_graphs.indirect_costs_per_year") as mock_indirect_costs_per_year:
+    def test_results_block_generates_all_outputs_when_previous_files_do_not_exist(self):
+        """No previous files: generate logs, energy, KPI outputs and graphs."""
+        with ExitStack() as stack:
+            mocks = self._patch_dependencies(stack)
+            counter = self._configure_common_mocks(mocks)
+            mocks["read_csv"].side_effect = FileNotFoundError
 
-            results_block(
-                result_dir_r=self.result_dir,
-                r=self.run_index,
-                inputs=self.inputs,
-                Config=config,
-                find_element=self.find_element,
-                farm_technologies=self.farm_technologies,
-                results_dict=self.results_dict,
-                failures=self.failures,
-                operations_tow_stats=self.operations_tow_stats,
-                inspections_port_stats=self.inspections_port_stats,
-                inspections_site_stats=self.inspections_site_stats,
-                operations_corrective_stats=self.operations_corrective_stats,
-                vessels=self.vessels,
-                mother_vessels=self.mother_vessels,
-                G_layouts=self.G_layouts,
-                dict_power_wind=self.dict_power_wind,
-                dict_power_wave=self.dict_power_wave,
-                metocean_timeseries=self.metocean_timeseries,
+            self._call_results_block()
+
+            mocks["read_csv"].assert_called()
+            mocks["failures_event"].assert_called_once()
+            mocks["create_logs_timeseries_file"].assert_called_once()
+            mocks["create_logs_merge"].assert_called_once()
+            mocks["manage_def_to_log_events"].assert_called_once()
+
+            self.assertGreaterEqual(len(counter.calls), 1)
+            self.assertTrue(any(item["ST_contract"] is True for item in counter.calls))
+            mocks["VesselDayCounter"].assert_called()
+            self.assertIs(
+                mocks["VesselDayCounter"].call_args.kwargs["vessels"],
+                self.vessels,
+            )
+            mocks["config_energy"].assert_called_once()
+            mocks["energy_availability"].assert_called_once()
+            mocks["kpi_final_total_cost"].assert_called_once()
+
+            mocks["graphs_simulation_creation"].assert_called_once()
+            mocks["makedirs"].assert_called_once_with(
+                os.path.join(self.result_dir, "graph_dir")
             )
 
-        mock_failures_event.assert_not_called()
-        mock_create_logs_timeseries_file.assert_not_called()
-        mock_create_logs_merge.assert_not_called()
-        mock_config_energy.assert_not_called()
-        mock_energy_availability.assert_not_called()
-        mock_energy_yield.assert_not_called()
-        mock_energy_yield_combined.assert_not_called()
-        mock_farm_availability.assert_not_called()
-        mock_indirect_costs_per_year.assert_not_called()
+            self.assertEqual(len(self.results_dict.dfs_tot_cost_list), 1)
+            self.assertEqual(len(self.results_dict.dfs_tot_yearly_cost_list), 1)
+            self.assertEqual(len(self.results_dict.kpi_om_type_cost_list), 1)
+            self.assertEqual(len(self.results_dict.dfs_log_events), 1)
+            self.assertEqual(len(self.results_dict.dfs_log_events_merged), 1)
+            self.assertEqual(len(self.results_dict.dfs_ctv_list), 1)
+            self.assertEqual(len(self.results_dict.dfs_vessel_fuel_usage), 1)
+            self.assertEqual(len(self.results_dict.dfs_energy_data), 1)
 
-        self.assertEqual(len(vessel_day_counter_instance.calls), 1)
-        self.assertTrue(vessel_day_counter_instance.calls[0]["ST"])
+    def test_results_block_reuses_previous_files_and_skips_energy_when_disabled(self):
+        """Reuse previous logs, bypass energy calculation and still generate KPIs."""
+        with ExitStack() as stack:
+            mocks = self._patch_dependencies(stack)
+            counter = self._configure_common_mocks(mocks)
+            mocks["read_csv"].side_effect = [
+                self.dates_failures_df.copy(),
+                self.log_events_df.copy(),
+                self.log_events_merged_df.copy(),
+            ]
+            config = SimpleNamespace(**vars(self.config))
+            config.ENERGY_AVAILABILITY_CALCULATION = False
+            self._call_results_block(config=config)
 
-        mock_kpi_final_total_cost.assert_called_once()
-        mock_distribution_failures.assert_called_once()
-        mock_makedirs.assert_called_once_with(os.path.join(self.result_dir, "graph_dir"))
+            self.assertEqual(mocks["read_csv"].call_count, 3)
+            mocks["failures_event"].assert_not_called()
+            mocks["create_logs_timeseries_file"].assert_not_called()
+            mocks["create_logs_merge"].assert_not_called()
+            mocks["config_energy"].assert_not_called()
+            mocks["energy_availability"].assert_not_called()
 
-        self.assertEqual(len(self.results_dict.dfs_ctv_list), 0)
-
-    @patch("oriom.core.results_block_manager.create_logs_timeseries_file")
-    @patch("oriom.core.results_block_manager.failures_event")
-    @patch("oriom.core.results_block_manager.pd.read_csv", side_effect=FileNotFoundError)
-    @patch("oriom.core.results_block_manager.aux_functions.save_file_csv")
-    def test_results_block_raises_when_log_events_are_empty(
-        self,
-        mock_save_file_csv,
-        mock_read_csv,
-        mock_failures_event,
-        mock_create_logs_timeseries_file,
-    ):
-        """
-        This test covers the explicit guard that raises when log_events is empty.
-        """
-
-        mock_failures_event.return_value = self.dates_failures_df.copy()
-        mock_create_logs_timeseries_file.return_value = pd.DataFrame()
-
-        with self.assertRaises(Exception) as ctx:
-            results_block(
-                result_dir_r=self.result_dir,
-                r=self.run_index,
-                inputs=self.inputs,
-                Config=self.config,
-                find_element=self.find_element,
-                farm_technologies=self.farm_technologies,
-                results_dict=self.results_dict,
-                failures=self.failures,
-                operations_tow_stats=self.operations_tow_stats,
-                inspections_port_stats=self.inspections_port_stats,
-                inspections_site_stats=self.inspections_site_stats,
-                operations_corrective_stats=self.operations_corrective_stats,
-                vessels=self.vessels,
-                mother_vessels=self.mother_vessels,
-                G_layouts=self.G_layouts,
-                dict_power_wind=self.dict_power_wind,
-                dict_power_wave=self.dict_power_wave,
-                metocean_timeseries=self.metocean_timeseries,
+            self.assertEqual(len(counter.calls), 1)
+            self.assertTrue(counter.calls[0]["ST_contract"])
+            mocks["kpi_final_total_cost"].assert_called_once()
+            mocks["graphs_simulation_creation"].assert_called_once()
+            mocks["makedirs"].assert_called_once_with(
+                os.path.join(self.result_dir, "graph_dir")
             )
+            self.assertEqual(len(self.results_dict.dfs_ctv_list), 1)
 
-        self.assertIn("log_events dataframe is empty", str(ctx.exception))
-        mock_failures_event.assert_called_once()
-        mock_create_logs_timeseries_file.assert_called_once()
+    def test_results_block_raises_when_log_events_are_empty(self):
+        """Reject a newly generated empty log_events dataframe."""
+        with ExitStack() as stack:
+            mocks = self._patch_dependencies(stack)
+            self._configure_common_mocks(mocks)
+            mocks["read_csv"].side_effect = FileNotFoundError
+            mocks["create_logs_timeseries_file"].return_value = pd.DataFrame()
+
+            with self.assertRaisesRegex(Exception, "log_events dataframe is empty"):
+                self._call_results_block()
+
+            mocks["failures_event"].assert_called_once()
+            mocks["create_logs_timeseries_file"].assert_called_once()
+            mocks["create_logs_merge"].assert_not_called()
+            mocks["kpi_final_total_cost"].assert_not_called()
+            mocks["energy_availability"].assert_not_called()
+            mocks["graphs_simulation_creation"].assert_not_called()
 
 
 if __name__ == "__main__":

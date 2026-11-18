@@ -95,6 +95,8 @@ class TestReportGraphs(unittest.TestCase):
                 "Years": [1, 2, 3],
                 "En_loss_kWh": [1000.0, 2000.0, 3000.0],
                 "En_availability": [99.0, 98.0, 100.0],  # ultimo = 100 -> viene scartato
+                "Time_availability": [94.0, 95.0, 100.0],
+                "energy_loss_Meur": [1000.0*0.3, 2000.0*0.3, 3000.0*0.3]
             }
         )
 

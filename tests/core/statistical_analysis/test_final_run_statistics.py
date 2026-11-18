@@ -51,9 +51,9 @@ class TestReturnStatisticsRuns(unittest.TestCase):
         """
         data = [
             # vessel_id, lifetime_direct_costs,   tot_* only used on last row
-            ("insurance", 1000.0, np.nan, np.nan, np.nan, np.nan, np.nan),
-            ("port",      2000.0, np.nan, np.nan, np.nan, np.nan, np.nan),
-            ("technician",3000.0, np.nan, np.nan, np.nan, np.nan, np.nan),
+            ("insurance", 1000.0, np.nan, np.nan, np.nan, np.nan, 1000.0),
+            ("port",      2000.0, np.nan, np.nan, np.nan, np.nan, 2000.0),
+            ("technician",3000.0, np.nan, np.nan, np.nan, np.nan, 3000.0),
             (
                 "TOTAL",
                 6000.0,
@@ -62,7 +62,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
                 900.0,   # tot_mobilization_costs
                 400.0,   # tot_rov_costs
                 500.0,   # tot_part_costs
-                0.0,   # tot_part_costs
+                6000.0,   # tot_part_costs
             ),
         ]
         return pd.DataFrame(
@@ -224,8 +224,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
 
         # Patch external side-effects: plots, CSVs, KPI_Insight
         module_path = "oriom.core.statistical_analysis.final_run_statistics"
-        with patch(f"{module_path}.aux_functions.save_file_csv") as m_save_csv, \
-             patch(f"{module_path}.final_economic_graphs") as m_econ_graphs, \
+        with patch(f"{module_path}.final_economic_graphs") as m_econ_graphs, \
              patch(f"{module_path}.report_graphs") as m_report_graphs, \
              patch(f"{module_path}.KPI_Insight") as m_kpi_cls:
 
@@ -322,8 +321,7 @@ class TestReturnStatisticsRuns(unittest.TestCase):
         mobilisation_add = {"vA": 5.0}
 
         module_path = "oriom.core.statistical_analysis.final_run_statistics"
-        with patch(f"{module_path}.aux_functions.save_file_csv") as m_save_csv, \
-             patch(f"{module_path}.final_economic_graphs") as m_econ_graphs, \
+        with patch(f"{module_path}.final_economic_graphs") as m_econ_graphs, \
              patch(f"{module_path}.report_graphs") as m_report_graphs, \
              patch(f"{module_path}.KPI_Insight") as m_kpi_cls:
 

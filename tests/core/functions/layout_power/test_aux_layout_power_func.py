@@ -321,10 +321,10 @@ class TestChooseLoc(unittest.TestCase):
             )
 
     @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
-    @patch("oriom.core.functions.layout_power.aux_layout_power_func.logging.error")
-    def test_all_nodes_failed_logs_error_and_selects_any(self, m_log_error, m_choice):
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.logging.warning")
+    def test_all_nodes_failed_logs_error_and_selects_any(self, m_log_warning, m_choice):
         """
-        If all nodes at a given level are failed, an error is logged and one of them is still selected.
+        If all nodes at a given level are failed, an warning is logged and one of them is still selected.
         """
         G = nx.DiGraph()
         G.add_node(1, level="device")
@@ -343,14 +343,14 @@ class TestChooseLoc(unittest.TestCase):
 
         self.assertEqual(loc, 1)
         # verify error is logged
-        m_log_error.assert_called_once()
-        self.assertIn("all device has failed", m_log_error.call_args[0][0])
+        m_log_warning.assert_called_once()
+        self.assertIn("all devices have failed", m_log_warning.call_args[0][0])
 
     @patch("oriom.core.functions.layout_power.aux_layout_power_func.random.choice")
-    @patch("oriom.core.functions.layout_power.aux_layout_power_func.logging.error")
-    def test_all_edges_failed_logs_error_and_selects_any(self, m_log_error, m_choice):
+    @patch("oriom.core.functions.layout_power.aux_layout_power_func.logging.warning")
+    def test_all_edges_failed_logs_error_and_selects_any(self, m_log_warning, m_choice):
         """
-        If all candidate edges are failed, an error is logged and one of them is still selected.
+        If all candidate edges are failed, an warning is logged and one of them is still selected.
         """
         G = nx.DiGraph()
         G.add_node(1, level="sub")
@@ -371,8 +371,8 @@ class TestChooseLoc(unittest.TestCase):
 
         self.assertEqual(loc, (1, 2))
         # verify error is logged
-        m_log_error.assert_called_once()
-        self.assertIn("all the components", m_log_error.call_args[0][0])
+        m_log_warning.assert_called_once()
+        self.assertIn("all the components", m_log_warning.call_args[0][0])
 
 class TestFixPercentageMarkersDates(unittest.TestCase):
 

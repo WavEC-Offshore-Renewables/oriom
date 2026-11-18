@@ -7,13 +7,15 @@ from oriom.common.constants import EVENT_LOG_ORDER
 
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.vessels_manager import vessel_mobilisation_manager
-from oriom.core.functions.graphs import report_graphs
+from oriom.core.functions.graphs.simulation_graphs_call import graphs_simulation_creation, availability_graph_manager
 from oriom.core.functions.log_merge_corrective_functions.merge_corrective import create_logs_merge
 from oriom.core.functions.layout_power.layout_power import energy_availability, config_energy_availability
 from oriom.core.functions.kpi_final.kpi_final_costs import kpi_final_total_cost
 from oriom.core.functions.logs_timeseries.failures import failures_event, ST_failures_event
 from oriom.core.functions.logs_timeseries.create_logs_timeseries import create_logs_timeseries_file
 from oriom.core.functions.logs_timeseries.logs_corrective_aux import manage_def_to_log_events
+from oriom.core.functions.graphs.ST_visualization import PlotConfig, create_ST_figures
+
 try:
     from oriom.core.functions.private.VesselMobilisationScheduler import VesselMobilisationScheduler
 except ImportError:
@@ -38,7 +40,8 @@ def results_block(
     G_layouts: dict,
     dict_power_wind: dict,
     dict_power_wave: dict,
-    metocean_timeseries: pd.DataFrame
+    metocean_timeseries: pd.DataFrame,
+    ST_operations_TTP_authorized: list
 ):
 
     """
@@ -77,6 +80,7 @@ def results_block(
         dict_power_wind (dict): dictionary with the average hourly power production [kW of wind farm
         dict_power_wave (dict): dictionary with the average hourly power production [kW] of wave farm
         metocean_timeseries (pd.DataFrame): Timeseries dataframe with power column
+        ST_operations_TTP_authorized (list): List of ST O&M TTP operations that are analysed if ST O&M analysis.
         """
 
     dates_failures_OLD = pd.DataFrame ()
@@ -85,10 +89,12 @@ def results_block(
         failure_dir = os.path.join(inputs.general.failureevent_file["value"], f"{'result_'}{r}", 'dates_failures.csv')
         if inputs.tseries.ST_O_M:
             failure_dir = os.path.join(inputs.general.failureevent_file["value"], 'dates_failures.csv')
-            ST_failures_event(failures = failures, result_dir_r = failure_dir, r = r)
-        dates_failures = pd.read_csv(failure_dir, sep=',')
+            dates_failures = ST_failures_event(failures = failures, date_use = metocean_timeseries.index[r])
+        else:
+            dates_failures = pd.read_csv(failure_dir, sep=',')
+            dates_failures['preferred_month'] = pd.to_numeric(dates_failures['preferred_month'], errors='coerce').astype('Int64')
+            
         dates_failures = aux_functions.convert_stringtime(dates_failures)
-        dates_failures['preferred_month'] = pd.to_numeric(dates_failures['preferred_month'], errors='coerce').astype('Int64')
         logging.info('Uploading Failure file from previous run %d folder', r)
         aux_functions.save_file_csv(dates_failures, result_dir_r,'dates_failures.csv')
 
@@ -131,7 +137,9 @@ def results_block(
             vessels = vessels,
             find_element_class = find_element,
             vessel_to_merge = inputs.tseries.merge_vessel["value"],
-            mother_vessels_list = mother_vessels
+            mother_vessels_list = mother_vessels,
+            ST_operations_TTP_authorized = ST_operations_TTP_authorized,
+            metocean_timeseries_cut_off = metocean_timeseries.index[-1]
         )
     if log_events.empty:
         raise Exception("Result Block: The log_events dataframe is empty. No operation have been created")
@@ -149,7 +157,7 @@ def results_block(
             vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, first_counter = False)
         else:
             vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels)
-        log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
+        log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST_contract = True)
 
     except (TypeError, FileNotFoundError) as e_:
         log_events_merged, index_overwrite_log_ev, df_port_operation_def_log, operation_vessel_percentiles_dict = create_logs_merge(
@@ -164,6 +172,8 @@ def results_block(
             vessel_to_merge = inputs.tseries.merge_vessel["value"],
             time_fail_op_immediately = Config.TIME_FAIL_OP_IMMEDIATELY,
             duration_shift = inputs.tseries.shift_duration["value"],
+            ST = getattr(inputs.tseries, "ST_O_M", False),
+            ST_operations_TTP_authorized = ST_operations_TTP_authorized
         )
 
         if index_overwrite_log_ev:
@@ -176,7 +186,7 @@ def results_block(
 
         # Find the Short Term Vessel used and create usage_record and find ST_contract vessel
         vessel_day_count = VesselDayCounter(log_events_merged = log_events_merged, vessels=vessels, ST_used=False)
-        log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST = True)
+        log_events_merged = vessel_day_count.allocate_vessels(log_events_merged = log_events_merged, ST_contract = True)
 
         log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
 
@@ -236,7 +246,7 @@ def results_block(
     if Config.ENERGY_AVAILABILITY_CALCULATION:
         energy_config = config_energy_availability(G_layouts, farm_technologies)
 
-        availability_total = energy_availability(
+        availability_total, energy_data = energy_availability(
             inputs = inputs,
             r = r,
             log_events_energy = log_events,
@@ -262,30 +272,8 @@ def results_block(
             result_dir_r = result_dir_r
         )
 
-        combined = {}
-        for k, df in availability_total.items():
-            if df.empty is False:
-                name = k
-                aux_functions.save_file_csv(df,result_dir_r,name +'.csv')
-
-                if 'month' in name:
-                    results_dict.dfs_energy_yearly_month_dict[k].append(df)
-                    combined.update({k:df})
-                    report_graphs.energy_yield(df = df, name_file = name[18:], save_dir = graph_dir_r)
-
-                elif 'year' in name:
-                    results_dict.dfs_energy_yearly_dict[k].append(df)
-                    if 'pv' in k:
-                        electricity_cost_tech = inputs.cost.electricity_price_dict['pv']
-                    elif 'wind' in k:
-                        electricity_cost_tech = inputs.cost.electricity_price_dict['wt']
-                    elif 'wave' in k:
-                        electricity_cost_tech = inputs.cost.electricity_price_dict['wec']
-                    report_graphs.farm_availability(df_ = df, name_file = name[17:], save_dir = graph_dir_r)
-                    report_graphs.indirect_costs_per_year(df = df, electricity_price = electricity_cost_tech, name_file = name[17:], save_dir = graph_dir_r)
-
-        if len(combined.keys())>1:
-            report_graphs.energy_yield_combined(dfs = combined, save_dir = graph_dir_r)
+        results_dict.dfs_energy_data.append(energy_data)
+        availability_graph_manager(inputs, results_dict, availability_total, result_dir_r, graph_dir_r)
 
     logging.info('----------------------------------------------------')
     logging.info('----------------------------------------------------')
@@ -314,6 +302,7 @@ def results_block(
         insurance_cost_annual=inputs.cost.insurance_cost_year["value"],
         technician_cost_annual=inputs.cost.technicians_year["value"],
         mother_vessels = mother_vessels,
+        energy_losses_dfs = availability_total if Config.ENERGY_AVAILABILITY_CALCULATION else {}
     )
 
     aux_functions.save_file_csv(kpi_total_timeseries,result_dir_r,'kpi_total_final.csv')
@@ -330,6 +319,9 @@ def results_block(
         ctv_df = pd.DataFrame.from_dict(ctv_dict, orient='index')
         aux_functions.save_file_csv(ctv_df,result_dir_r,'ctv_df.csv', True)
         results_dict.dfs_ctv_list.append(ctv_df)
+        
+    for k, it in operation_vessel_percentiles_dict.items():
+        aux_functions.save_file_csv(pd.DataFrame.from_dict(it, orient='index'), result_dir_r, f'{k}.csv', True)
 
     # total cost
     results_dict.dfs_tot_cost_list.append(kpi_total_timeseries)
@@ -342,11 +334,25 @@ def results_block(
     logging.info('----------------------------------------------------')
     logging.info('--------------------\tReport Graphs\t----------------')
 
-    if not dates_failures.empty:
-        report_graphs.distribution_failures(df = dates_failures, save_dir = graph_dir_r)
-
-    for k, it in operation_vessel_percentiles_dict.items():
-        aux_functions.save_file_csv(pd.DataFrame.from_dict(it, orient='index'), result_dir_r, f'{k}.csv', True)
+    graphs_simulation_creation(
+        Config = Config,
+        inputs = inputs,
+        find_element = find_element,
+        dates_failures = dates_failures,
+        kpi_total_timeseries = kpi_total_timeseries,
+        kpi_yearly_timeseries = kpi_yearly_timeseries,
+        graph_dir_r = graph_dir_r,
+    )
+    
+    if Config.ST:
+        create_ST_figures(
+            log_events_merged = log_events_merged,
+            wind_corrective_energy = pd.DataFrame() if not Config.ENERGY_AVAILABILITY_CALCULATION else energy_data['corrective']['wind'],
+            timeseries_power = metocean_timeseries,
+            vessel_types = {v.id: v.type for v in vessels},
+            energy_price = inputs.cost.electricity_price_dict['wt'],
+            graph_dir_r = graph_dir_r
+        )
 
     return 
 

@@ -142,7 +142,11 @@ class CorrectionDeferred(BaseCorrection):
         else:
             self.time_fail_op_immediately = 0
         self.date_op = datetime(
-            year=self.date_failure.year if preferred_month > self.date_failure.month else self.date_failure.year + 1,
+            year = (
+                self.date_failure.year
+                if (preferred_month, day_preferred) >= (self.date_failure.month, self.date_failure.day)
+                else self.date_failure.year + 1
+            ),
             month=preferred_month,
             day=day_preferred,
             hour=5,
