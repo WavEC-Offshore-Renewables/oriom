@@ -255,7 +255,8 @@ class OperationDeferredPortCreation():
         id_row = row['id']
         write_event = True
         diff = 1
-
+        row_dates_tow = pd.DataFrame()
+    
         # If the spots are free to the port take tow to port oper_schedule
         if self.n_device == 1 or vessel_used_qt*self.n_device <= self.vessel_available[vessel_used]:
             self.dev_idx_station_port = self.n_device
@@ -414,7 +415,8 @@ class OperationDeferredPortCreation():
         vessel_used = row['vessel_1']
         vessel_used_qt = row['n_vessel_1']
         id_row = row['id']
-
+        row_dates_tow = pd.DataFrame()
+        
         if self.reuse_logs:
             self.dev_idx_station_port = self.n_device
             row_dates_tow = row.to_frame().T

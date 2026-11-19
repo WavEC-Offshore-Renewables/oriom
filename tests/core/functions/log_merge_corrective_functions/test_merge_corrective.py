@@ -93,7 +93,8 @@ class TestCreateLogsMerge(unittest.TestCase):
             percentile=self.percentile,
             vessel_to_merge=self.vessel_to_merge,
             time_fail_op_immediately=self.time_fail_op_immediately,
-            duration_shift=self.duration_shift
+            duration_shift=self.duration_shift,
+            ST = False
         )
 
         self.assertIsInstance(df_out, pd.DataFrame)
@@ -114,7 +115,8 @@ class TestCreateLogsMerge(unittest.TestCase):
             percentile=self.percentile,
             vessel_to_merge=self.vessel_to_merge,
             time_fail_op_immediately=self.time_fail_op_immediately,
-            duration_shift=self.duration_shift
+            duration_shift=self.duration_shift,
+            ST = False
         )
 
         # Expect the failure row to be included
@@ -136,7 +138,8 @@ class TestCreateLogsMerge(unittest.TestCase):
             percentile=self.percentile,
             vessel_to_merge=self.vessel_to_merge,
             time_fail_op_immediately=self.time_fail_op_immediately,
-            duration_shift=self.duration_shift
+            duration_shift=self.duration_shift,
+            ST = False
         )
 
         sorted_dates = df_out['d_trigger'].tolist()

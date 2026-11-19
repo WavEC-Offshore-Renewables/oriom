@@ -67,7 +67,9 @@ def create_logs_merge(
     percentile: float,
     vessel_to_merge: list,
     time_fail_op_immediately: float,
-    duration_shift: float
+    duration_shift: float,
+    ST: bool,
+    ST_operations_TTP_authorized: list = []
 )->tuple[pd.DataFrame, pd.Index, pd.DataFrame, dict]:
 
     """
@@ -98,6 +100,8 @@ def create_logs_merge(
         vessel_to_merge (:obj;`list`): list of vessel that are considered for the immediate merge
         time_fail_op_immediately (float): Time between failure and immediate operations.
         duration_shift (float): Maximum hours of working shift.
+        ST (bool): Boolean to identify ST O&M analysis operations,
+        ST_operations_TTP_authorized (list): List of ST O&M TTP operations that are analysed if ST O&M analysis.
 
     Raises:
         ValueError: "preferred_months" in a inspection of periodicity lower than 1 year
@@ -233,7 +237,10 @@ def create_logs_merge(
     # TOW OPERATION
     #------------------
     log_event_tow = log_event_to_merge.loc[log_event_to_merge['event'] == 'tow']
-
+    # Try to see if is ST O&M and an additional operation is analysed
+    if log_event_tow.empty and ST and ST_operations_TTP_authorized:
+        log_event_tow = log_event_to_merge.loc[log_event_to_merge['id'].isin(ST_operations_TTP_authorized)]
+        
     if not log_event_tow.empty:
         comments_failure_id_tow = comment_filtering(log_event_tow)
         log_events_tow_def, deferred_comments_tow = filter_tow_op(
@@ -323,6 +330,8 @@ def create_logs_merge(
     # IMMEDIATE OPERATION
     #------------------
     # From only that comply a tow filter avoiding deferred failures and tow failures
+    if ST:
+        failures_correction_tow = []
     failure_avoid = deferred_failures_correction + failures_correction_tow + deferred_failures_correction_tow
     mask = (
         (log_event_to_merge['event'].isin(['operation'])) &

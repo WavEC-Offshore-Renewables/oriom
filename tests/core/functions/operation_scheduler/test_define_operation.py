@@ -125,42 +125,22 @@ class TestDefineOperationValues(unittest.TestCase):
             out_dir=None,
         )
 
-        exp_wait_start = (
-            [2, 1, 0]
-            + [0] * 7
-            + [5, 4, 3, 2, 1, 0]
-            + [0] * 26
-        )
-
-        exp_wait_site = (
-            [0] * 5
-            + [7, 6, 5, 4, 3]
-            + [0] * 32
-        )
-
-        exp_dur_total = (
-            [11, 10, 9]
-            + [9] * 2
-            + [16, 15, 14, 13, 12]
-            + [14, 13, 12, 11, 10, 9]
-            + [9] * 26
-        )
-
-        exp_dur_net_port = [2.0] * 42
-        exp_dur_net_site = [5.0] * 42
-        exp_tr_site = [1.0] * 42
-        exp_tr_port = [1.0] * 42
-        exp_wait_port = [0.0] * 42
-        exp_shut_wtg = [3.0] * 42
-        exp_shut_wec = [0.0] * 42
-        exp_shut_pv = [0.0] * 42
-
-        # Rows 42..49 must be NaN for operation values.
-        # Keep datetime unchanged.
+        zero_dur = [0] * 42 + [np.nan] * 8
+        one_dur = [1] * 42 + [np.nan] * 8
+        tree_dur = [3] * 42 + [np.nan] * 8
+        
+        exp_dur_total = ([11.0, 10.0]+[9]*3+[16.0, 15.0, 14.0, 13.0, 12.0]+[14.0, 13.0, 12.0, 11.0, 10.0]+[9]*27 +[np.nan]*8)
+        exp_dur_net_port = ([2] * 42 + [np.nan] * 8)
+        exp_dur_net_site = ([5] * 42 + [np.nan] * 8)
+        exp_wait_start = ([2,1] + [0] * 8 + [5, 4, 3, 2, 1] + [0] * 27 + [np.nan] * 8)
+        exp_wait_site = ([0]*5 + [7, 6, 5, 4, 3] + [0]*32 + [np.nan]*8)
+        exp_tr_site, exp_tr_port = (one_dur, one_dur)
+        exp_shut_wtg = (tree_dur)
+        exp_wait_port, exp_shut_wec, exp_shut_pv = (zero_dur, zero_dur, zero_dur)
 
         def assert_col(col, expected):
             pd.testing.assert_series_equal(
-                df.loc[:41, col].reset_index(drop=True),
+                df.loc[:, col].reset_index(drop=True),
                 pd.Series(expected, dtype=float),
                 check_names=False,
                 check_dtype=False,

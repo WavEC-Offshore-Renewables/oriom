@@ -4,6 +4,7 @@ import math as mt
 import ast
 
 from oriom.utils.read_dataframe_value import compute_rov_cost
+from oriom.utils.aux_functions import log_event_convert_stringtime
 
 
 def store_fuel_data(
@@ -16,7 +17,7 @@ def store_fuel_data(
 ):
     vessel_key = f"{ves.id}_{ves.type}"
     vessel_usage[vessel_key] = {}
-    for fuel_use, value_fuel in zip(['transit', 'maneuver', 'standby'], [transit_cost, maneuver_cost, standby_cost]):
+    for fuel_use, value_fuel in zip(['transit_Litres', 'maneuver_Litres', 'standby_Litres'], [transit_cost, maneuver_cost, standby_cost]):
         if fuel_cost_times_density != 0:
             vessel_usage[vessel_key][fuel_use] = value_fuel/fuel_cost_times_density
         else:
@@ -183,7 +184,7 @@ def filter_df_events_per_vessel(
         df_filtered['n_vessel_2']
     )
 
-    return df_filtered
+    return log_event_convert_stringtime(df_filtered)
 
 
 def remove_row_vessel_double(

@@ -55,7 +55,7 @@ TECH_TYPES = ['wtg', 'wec', 'pv']
 FORMATS_DATETIME = [
     "%Y-%m-%d %H:%M:%S",
     "%Y-%m-%d %H:%M",
-    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%d %H:%M:%S",
     "%d/%m/%Y %H:%M",
     "%d/%m/%y %H:%M:%S",
     "%d-%m-%y %H:%M:%S",
@@ -63,7 +63,9 @@ FORMATS_DATETIME = [
     "%d-%m-%Y %H:%M",
     "%Y/%m/%d %H:%M:%S",
     "%Y/%m/%d %H:%M",
-    "%m/%d/%Y %H:%M"
+    "%m/%d/%Y %H:%M",
+    "%m/%d/%Y %H:%M:%S",
+    "%m-%d-%Y %H:%M:%S"
 ]
 
 METOCEAN_COLUMNS = ['datetime', 'hs', 'tp', 'te', 'ws', 'ws_hub', 'cs', 'si', 'light']

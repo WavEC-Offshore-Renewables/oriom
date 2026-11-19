@@ -156,6 +156,7 @@ class TestValuesFromLogFile(unittest.TestCase):
             "d_end_dur_net_site": [dt(30), dt(45)],
             "d_end": [dt(40), dt(60)],
             "d_end_leadtime": [dt(32), dt(48)],
+            "n_vessel":[1,1]
         })
         # transit_ts: (12-10)=2, (22-20)=2 => 4
         # transit_tp: (35-30)=5, (50-45)=5 => 10  => total transit = 14

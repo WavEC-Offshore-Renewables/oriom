@@ -124,7 +124,7 @@ def choose_loc(
         list_nG_not_failed = set(list_nG) - list_failed
 
         if not list_nG_not_failed:
-            logging.error(f"At {date} all {level} has failed, an already failed {level} has been selected for the failure")
+            logging.warning(f"At {date} all {level}s have failed, an already failed {level} has been selected for the failure")
             list_nG_not_failed = list_nG
 
         loc = random.choice(list(list_nG_not_failed))
@@ -136,7 +136,7 @@ def choose_loc(
         list_eG_not_failed = set(list_eG) - list_failed
 
         if not list_eG_not_failed and list_eG:
-            logging.error(f"At {date} all the components {level} has failed, an already failed {level} has been selected for the failure")
+            logging.warning(f"At {date} all the components {level} has failed, an already failed {level} has been selected for the failure")
             list_eG_not_failed = list_eG
 
         if list_eG_not_failed:
@@ -150,7 +150,6 @@ def choose_loc(
                 e_ = (f"At {date} all the edges {level} has failed")
                 raise KeyError(e_)
     else:
-        logging.info(level)
         logging.error(f'{level} Layout perc: "device/edge" not recognized')
         raise ValueError(f'{level} Layout perc: "device/edge" not recognized')
     return loc

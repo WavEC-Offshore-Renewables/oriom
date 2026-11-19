@@ -3,7 +3,6 @@ import pandas as pd
 from copy import deepcopy
 from oriom.utils import aux_functions
 
-from oriom.utils.aux_functions import convert_stringtime
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.kpi_final.kpi_vessel_total import create_lifetime_cost, kpi_cost_vessel_internal
 from oriom.core.functions.kpi_final import kpi_extra
@@ -29,6 +28,7 @@ def kpi_final_total_cost(
     insurance_cost_annual: float,
     technician_cost_annual: float,
     mother_vessels: list,
+    energy_losses_dfs: dict = {},
 )->pd.DataFrame:
 
     """
@@ -57,6 +57,7 @@ def kpi_final_total_cost(
         port_cost_annual (float): Annual port costs.
         insurance_cost_annual (float): Annual insurance costs.
         technician_cost_annual (float): Annual technician costs.
+        energy_losses_dfs (pd.DataFrame): Dataframe with the energy losses for each tech and year.
         mother_vessels (list): list of object from class ´´Vessels´´ considered for mother vessel campaign
 
     Returns:
@@ -113,7 +114,7 @@ def kpi_final_total_cost(
         return kpi_om, kpi_om_year_final
 
 
-    def filter_log_file_per_operations(log_events,log_events_merged):
+    def filter_log_file_per_operations(log_events, log_events_merged):
         """ Function to create filtered dataframes of log events for cost evaluations"""
         log_events_op = log_events[log_events['event'].isin(['operation', 'inspection_port', 'inspection_site', 'tow'])].copy()
         log_events_op_ST = log_events_merged[log_events_merged["ST_contract_1"] | log_events_merged["ST_contract_2"]].copy()
@@ -159,12 +160,13 @@ def kpi_final_total_cost(
     total_operations = operations_corr_stat + inspections_site_stat + inspections_port_stat  + operations_tow_stat
 
     log_events_merged = aux_functions.log_event_convert_stringtime(log_events_merged)
+    log_events = aux_functions.log_event_convert_stringtime(log_events)
 
     # Dataframe preparations
     (log_events_op, log_events_op_ST, log_events_op_merged,
     log_events_op_def_merged, log_events_op_merged_oper,
     log_events_insp_merged, log_events_mobi_merged,
-    log_events_tow, log_event_op_port ) = filter_log_file_per_operations(log_events, log_events_merged)
+    log_events_tow, log_event_op_port) = filter_log_file_per_operations(log_events, log_events_merged)
 
     vessel_day_count_ST = VesselDayCounter(log_events_merged = log_events_op_ST, vessels=vessels, prepare_df = False)
     _ = vessel_day_count_ST.allocate_vessels(log_events_merged = log_events_merged, contract_evaluation = False)
@@ -220,9 +222,18 @@ def kpi_final_total_cost(
         find_element_class = find_element_class,
         years = inputs.stats.lifetime["value"],
     )
+     
+    # # Add indirect costs to the kpi_om dataframe TODO
+    # kpi_om['av_energy_losses_costs'] = 0.0
+    # kpi_om['tot_energy_losses_costs'] = 0.0
+    # for name, df_energy in energy_losses_dfs.items():
+    #     if 'year' in name:
+    #         kpi_om['av_energy_losses_costs'] += df_energy['energy_loss_Meur'].sum() / inputs.stats.lifetime["value"]   
+    #         kpi_om['tot_energy_losses_costs'] += df_energy['energy_loss_Meur'].sum()
 
     # Extract years
-    log_events = convert_stringtime(log_events, 'd_end')
+    log_events = aux_functions.convert_stringtime(log_events, 'd_end')
+    log_events_merged = aux_functions.convert_stringtime(log_events_merged, 'd_end')
     log_events['year'] = log_events['d_end'].dt.year
     log_events_merged['year'] = log_events_merged['d_end'].dt.year
     years = range(inputs.stats.start_year["value"], inputs.stats.start_year["value"] + inputs.stats.lifetime["value"])

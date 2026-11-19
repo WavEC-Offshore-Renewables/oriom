@@ -224,6 +224,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
         self.assertTrue(out.empty)
         self.assertEqual(list(out.columns), LOG_COLS)
@@ -267,6 +268,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         # We still get the "failure" row coming from failure_df_to_logevent_df,
@@ -337,6 +339,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         # One operation row only (for the repairable failure).
@@ -400,6 +403,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         self.assertEqual(captured["mob_time"], 2)
@@ -464,6 +468,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         self.assertEqual(captured["fail_index"], 4)
@@ -524,6 +529,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         ops = out[out["event"] == "operation"]
@@ -592,6 +598,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         ops = out[out["event"] == "operation"]
@@ -636,6 +643,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         self.assertEqual((out["event"] == "operation").sum(), 0)
@@ -679,6 +687,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
                 time_fail_op_immediately_original=1,
                 vessel_to_merge=[],
                 find_element_class=finder,
+                ST = False   
             )
 
     @patch(
@@ -740,6 +749,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         ops = out[out["event"] == "operation"]
@@ -799,6 +809,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         self.assertEqual((out["event"] == "operation").sum(), 0)
@@ -980,6 +991,7 @@ class TestCreateLogsCorrectiveFile(unittest.TestCase):
             time_fail_op_immediately_original=1,
             vessel_to_merge=[],
             find_element_class=finder,
+            ST = False
         )
 
         tow_rows = out[out["event"] == "tow"]

@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from oriom.core.functions.logs_timeseries.failures import failures_event, find_month_available
+from oriom.core.functions.logs_timeseries.failures import failures_event, find_month_available, ST_failures_event
 from oriom.domain.Failure import Failure
 from oriom.domain.Scenario import Scenario
 
@@ -437,6 +437,202 @@ class TestFindMonthAvailable(unittest.TestCase):
             dict_failures_variables_id=list(range(1, 13))
         )
 
+
+
+
+# =============================================================================
+# Short-term failures event tests
+# =============================================================================
+
+class DummyShortTermFailure:
+    """Minimal failure double exposing the fields used by ST_failures_event."""
+
+    def __init__(
+        self,
+        failure_id,
+        fail_rate,
+        operation_triggered="op_repair",
+        maintenance_strategy="immediately",
+        n_element=1,
+    ):
+        self.id = failure_id
+        self.fail_rate = fail_rate
+        self.operation_triggered = operation_triggered
+        self.maintenance_strategy = maintenance_strategy
+        self.n_element = n_element
+
+
+class TestShortTermFailuresEvent(unittest.TestCase):
+    """Regression tests for deterministic short-term failure generation."""
+
+    COLUMNS = [
+        "datetime",
+        "id",
+        "maintenance_strategy",
+        "operation_triggered",
+        "preferred_month",
+    ]
+    RUN_DATE = datetime(2026, 11, 2, 10, 6, 9)
+
+    def _generate(self, failures, date_use=None, result_dir_r="unused_result_dir"):
+        """Call the real ST generator with controlled input objects."""
+        return ST_failures_event(
+            failures=failures,
+            date_use=self.RUN_DATE if date_use is None else date_use,
+        )
+
+    def test_empty_failure_list_returns_empty_dataframe_with_expected_columns(self):
+        """No configured failures must produce an empty table with the full schema."""
+        result = self._generate([])
+
+        self.assertIsInstance(result, pd.DataFrame)
+        self.assertTrue(result.empty)
+        self.assertEqual(result.columns.tolist(), self.COLUMNS)
+        self.assertEqual(len(result.index), 0)
+
+    def test_zero_failure_rates_produce_no_events(self):
+        """Failure types with zero rate contribute no short-term events."""
+        result = self._generate([
+            DummyShortTermFailure("fail_a", 0.0),
+            DummyShortTermFailure("fail_b", 0),
+        ])
+
+        self.assertTrue(result.empty)
+        self.assertEqual(result.columns.tolist(), self.COLUMNS)
+
+    def test_each_failure_rate_is_rounded_up_independently(self):
+        """The count for each failure type is ceil(fail_rate), not round or floor."""
+        cases = [
+            ("zero", 0.0, 0),
+            ("tiny", 0.00001, 1),
+            ("half", 0.5, 1),
+            ("exact_one", 1.0, 1),
+            ("above_one", 1.00001, 2),
+            ("two", 2.0, 2),
+            ("two_point_two", 2.2, 3),
+        ]
+
+        failures = [DummyShortTermFailure(name, rate) for name, rate, _ in cases]
+        result = self._generate(failures)
+        actual = result["id"].value_counts().to_dict()
+
+        self.assertEqual(len(result), sum(expected for _, _, expected in cases))
+        for name, rate, expected in cases:
+            with self.subTest(failure_id=name, fail_rate=rate):
+                self.assertEqual(actual.get(name, 0), expected)
+
+    def test_does_not_multiply_failure_rate_by_number_of_devices(self):
+        """The current ST implementation uses ceil(fail_rate), without n_element."""
+        failure = DummyShortTermFailure(
+            failure_id="large_array",
+            fail_rate=0.75,
+            n_element=1000,
+        )
+
+        result = self._generate([failure])
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result["id"].tolist(), ["large_array"])
+
+    def test_each_row_preserves_failure_metadata(self):
+        """Repeated rows must retain their source failure's operation and strategy."""
+        failures = [
+            DummyShortTermFailure(
+                "dynamic_cable",
+                1.2,
+                operation_triggered="repair_cable",
+                maintenance_strategy="specific month",
+            ),
+            DummyShortTermFailure(
+                "wtg_pitch",
+                2.1,
+                operation_triggered="repair_pitch",
+                maintenance_strategy="immediately",
+            ),
+        ]
+
+        result = self._generate(failures)
+        expected = {
+            "dynamic_cable": (2, "repair_cable", "specific month"),
+            "wtg_pitch": (3, "repair_pitch", "immediately"),
+        }
+
+        self.assertEqual(result.columns.tolist(), self.COLUMNS)
+        self.assertEqual(len(result), 5)
+        for failure_id, (count, operation_id, strategy) in expected.items():
+            with self.subTest(failure_id=failure_id):
+                rows = result.loc[result["id"] == failure_id]
+                self.assertEqual(len(rows), count)
+                self.assertEqual(set(rows["operation_triggered"]), {operation_id})
+                self.assertEqual(set(rows["maintenance_strategy"]), {strategy})
+
+    def test_all_events_use_the_supplied_timestamp_and_month(self):
+        """Every event is generated at date_use with the original string format."""
+        failure = DummyShortTermFailure("failure_1", 3.0)
+        test_dates = [
+            datetime(2026, 11, 2, 10, 6, 9),
+            datetime(2027, 1, 1, 0, 0, 0),
+            datetime(2028, 2, 29, 23, 59, 59),
+            datetime(2029, 12, 31, 12, 30, 5),
+        ]
+
+        for date_use in test_dates:
+            with self.subTest(date_use=date_use):
+                result = self._generate([failure], date_use=date_use)
+                expected_date = date_use.strftime("%m-%d-%Y %H:%M:%S")
+                self.assertEqual(result["datetime"].tolist(), [expected_date] * 3)
+                self.assertEqual(result["preferred_month"].tolist(), [date_use.month] * 3)
+                self.assertTrue(result["datetime"].map(lambda value: isinstance(value, str)).all())
+
+    def test_results_have_clean_consecutive_index(self):
+        """Returned rows should be indexed from zero without gaps."""
+        result = self._generate([
+            DummyShortTermFailure("first", 1.0),
+            DummyShortTermFailure("second", 2.5),
+        ])
+
+        self.assertEqual(result.index.tolist(), [0, 1, 2, 3])
+        self.assertTrue(result.index.is_unique)
+
+    def test_repeated_calls_are_deterministic(self):
+        """Identical inputs produce equal DataFrames across independent calls."""
+        failures = [
+            DummyShortTermFailure("failure_1", 1.3),
+            DummyShortTermFailure("failure_2", 0.4),
+        ]
+
+        first = self._generate(failures)
+        second = self._generate(failures)
+
+        pd.testing.assert_frame_equal(first, second)
+
+    def test_failure_objects_are_not_mutated(self):
+        """Generating event rows must not modify the supplied domain objects."""
+        failures = [
+            DummyShortTermFailure("failure_1", 1.2, "operation_1", "immediately", 10),
+            DummyShortTermFailure("failure_2", 0.7, "operation_2", "specific month", 20),
+        ]
+        before = [vars(failure).copy() for failure in failures]
+
+        self._generate(failures)
+
+        self.assertEqual([vars(failure) for failure in failures], before)
+
+    def test_invalid_nan_failure_rate_raises_value_error(self):
+        """An undefined rate cannot be converted to a finite number of events."""
+        failure = DummyShortTermFailure("invalid", float("nan"))
+
+        with self.assertRaises(ValueError):
+            self._generate([failure])
+
+    def test_result_dir_does_not_affect_dataframe(self):
+        """The result_dir_r argument does not change in-memory event generation."""
+        failures = [DummyShortTermFailure("failure_1", 2.4)]
+
+        first = self._generate(failures, result_dir_r="first_directory")
+        second = self._generate(failures, result_dir_r="second_directory")
+
+        pd.testing.assert_frame_equal(first, second)
 
 if __name__ == '__main__':
     unittest.main()
