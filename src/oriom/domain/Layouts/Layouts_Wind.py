@@ -355,7 +355,7 @@ class Layout_Wind():
 
         count_nodes = substation_node
         for s in range(len(turb_per_string)):
-            for t in turb_per_string[s][:-1]:
+            for t in (turb_per_string[s][:-1] if len(turb_per_string[s]) > 1 else turb_per_string[s]):
                 offset = (-0.25, 0.25) if t % 2 == 0 else (0.25, 0.25)
                 count_nodes +=1
                 # Connector
@@ -396,46 +396,47 @@ class Layout_Wind():
                 nx.set_edge_attributes(G, attr_ef)
                 nx.set_node_attributes(G,values=att_w1)
                 h+=2
-                if t < turb_per_string[s][-2]:
-                    # Connector + 1
-                    t_1 = t+1
-                    G.add_node(count_nodes+2)
-                    att_w2 = {count_nodes+2:{
-                            'name' : "Conn_%i" %t_1,
-                            'coords' : (s,h),
-                            'level' : 'circuit_braker',
-                            'power' : 0
-                    }}
-                    G.add_edge(count_nodes+2,count_nodes)
-                    attr_ef2 = {(count_nodes+2,count_nodes):{
-                            'name' : "array_cable",
-                            'level' : 'array_cable',
-                            'visible': True,
-                            'p_limit': None
-                    }}
+                if len(turb_per_string[s]) > 1:
+                    if t < turb_per_string[s][-2]:
+                        # Connector + 1
+                        t_1 = t+1
+                        G.add_node(count_nodes+2)
+                        att_w2 = {count_nodes+2:{
+                                'name' : "Conn_%i" %t_1,
+                                'coords' : (s,h),
+                                'level' : 'circuit_braker',
+                                'power' : 0
+                        }}
+                        G.add_edge(count_nodes+2,count_nodes)
+                        attr_ef2 = {(count_nodes+2,count_nodes):{
+                                'name' : "array_cable",
+                                'level' : 'array_cable',
+                                'visible': True,
+                                'p_limit': None
+                        }}
 
-                    nx.set_edge_attributes(G, attr_ef2)
-                    nx.set_node_attributes(G,values=att_w2)
-                    h+=3
-                else:
-                    t_1 = t+1
-                    G.add_node(count_nodes+2)
-                    att_w1 = {count_nodes+2:{
-                            'name' : "WTG_%i" %t_1,
-                            'coords' : (s,h+2),
-                            'level' : 'device',
-                            'power' : 1
-                    }}
-                    nx.set_node_attributes(G,values=att_w1)
-                    G.add_edge(count_nodes+2,count_nodes)
-                    attr_ef = {(count_nodes+2,count_nodes):{
-                            'name' : "inter_array_cable",
-                            'level' : 'dyn_cable-sub',
-                            'visible': True,
-                            'p_limit': None
-                    }}
-                    nx.set_edge_attributes(G, attr_ef)
-                    count_nodes +=1
+                        nx.set_edge_attributes(G, attr_ef2)
+                        nx.set_node_attributes(G,values=att_w2)
+                        h+=3
+                    else:
+                        t_1 = t+1
+                        G.add_node(count_nodes+2)
+                        att_w1 = {count_nodes+2:{
+                                'name' : "WTG_%i" %t_1,
+                                'coords' : (s,h+2),
+                                'level' : 'device',
+                                'power' : 1
+                        }}
+                        nx.set_node_attributes(G,values=att_w1)
+                        G.add_edge(count_nodes+2,count_nodes)
+                        attr_ef = {(count_nodes+2,count_nodes):{
+                                'name' : "inter_array_cable",
+                                'level' : 'dyn_cable-sub',
+                                'visible': True,
+                                'p_limit': None
+                        }}
+                        nx.set_edge_attributes(G, attr_ef)
+                        count_nodes +=1
                 count_nodes+=1
             
             h=4
@@ -717,13 +718,13 @@ if __name__ == "__main__":
 
     lw = Layout_Wind()
     G = lw.layout_wind(
-        n_layout=1,
-        n_turbines=10,
+        n_layout=5,
+        n_turbines=2,
         n_strings=2,
         n_substations=1,
         n_exports=1,
-        n_string_to_connector = 6,
-        tow_string_shutdown = True,
+        n_string_to_connector = 1,
+        tow_string_shutdown = False,
         save_dir = None,
         show_plot=True
     )
