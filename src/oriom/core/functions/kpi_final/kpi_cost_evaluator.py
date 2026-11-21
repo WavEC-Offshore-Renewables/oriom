@@ -64,17 +64,16 @@ def values_from_log_file(
     This function calculates the time of transit, standby and maneuver for each operation. Furtermore,
     it calculates the days of vessel use and the cost of ROV and technicians.
     """
-
     # Time calculation of vessel use
-    df['transit_ts'] = (df['d_end_transit_ts'] - df['d_end_dur_net_port']).dt.total_seconds()/3600
-    df['transit_tp'] = (df['d_end_transit_tp'] - df['d_end_dur_net_site']).dt.total_seconds()/3600
+    df['transit_ts'] = ((df['d_end_transit_ts'] - df['d_end_dur_net_port']).dt.total_seconds()/3600)*df['n_vessel']
+    df['transit_tp'] = ((df['d_end_transit_tp'] - df['d_end_dur_net_site']).dt.total_seconds()/3600)*df['n_vessel']
     transit_time = df['transit_ts'].sum() + df['transit_tp'].sum()
 
-    df['standby_p_start'] = (df['d_end_dur_net_port']-df['d_end_leadtime']).dt.total_seconds()/3600
-    df['standby_p_end'] = (df['d_end']-df['d_end_transit_tp']).dt.total_seconds()/3600
+    df['standby_p_start'] = ((df['d_end_dur_net_port']-df['d_end_leadtime']).dt.total_seconds()/3600)*df['n_vessel']
+    df['standby_p_end'] = ((df['d_end']-df['d_end_transit_tp']).dt.total_seconds()/3600)*df['n_vessel']
     standby_time = df['standby_p_start'].sum() + df['standby_p_end'].sum()
 
-    df['maneuvre'] = (df['d_end_dur_net_site']-df['d_end_transit_ts']).dt.total_seconds()/3600
+    df['maneuvre'] = ((df['d_end_dur_net_site']-df['d_end_transit_ts']).dt.total_seconds()/3600)*df['n_vessel']
     maneuver_time = df['maneuvre'].sum()
 
     df = kpi_aux.remove_row_vessel_double(df = df, ves = ves, rov_tech_vessel_count = rov_tech_vessel_count)

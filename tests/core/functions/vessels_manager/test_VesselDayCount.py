@@ -89,10 +89,12 @@ class TestVesselDayCounter(unittest.TestCase):
             {
                 "d_trigger": [dt0, dt0, dt0, dt2, dt3],
                 "d_end_leadtime": [dt0, dt0, dt0, dt2, dt3],
-                "d_end_wait_start": [dt0, dt0, dt0, dt2, dt3],
-                "d_end": [dt1, dt1, dt1, dt3, dt3],
+                "d_end_wait_start": [dt0, dt0, dt2, dt2, dt3],
+                "d_end": [dt1, dt1, dt3, dt3, dt3],
                 "vessel_1": [None, 'v001', 'v001', 'v002', 'v001'],
+                "n_vessel_1": [None, 1, 1, 1, 1],
                 "vessel_2": [None, 'v003', 'v003', 'v003', 'v003'],
+                "n_vessel_2": [None, 1, 1, 1, 1],
                 "event": [
                     "failure"    ,                 # failure
                     "operation_deferred_merged",  # same campaign same vessel
@@ -111,12 +113,14 @@ class TestVesselDayCounter(unittest.TestCase):
             }
         )
 
-        out = self.counter.log_event_preparation(df.copy(), ST = False)
+        out = self.counter.log_event_preparation(df.copy(), ST_contract = False)
 
         # We expect:
         # - 1 merged campaign row for the 'operation_deferred_merged'
         # - 1 row for the normal 'operation'
         self.assertEqual(len(out), 3)
+        self.assertEqual(out["n_vessel_1"].tolist(), [1.0, 1.0, 1.0])
+        self.assertEqual(out["n_vessel_2"].tolist(), [1.0, 1.0, 1.0])
         self.assertEqual(out["event"].tolist().count("operation_deferred_merged"), 2)
         self.assertEqual(out["event"].tolist().count("operation"), 1)
 
@@ -124,6 +128,7 @@ class TestVesselDayCounter(unittest.TestCase):
         # d_trigger of the campaign.
         campaign_row = out[out["event"] == "operation_deferred_merged"].iloc[0]
         self.assertEqual(campaign_row["d_trigger"], dt0)
+
 
     def test_log_event_preparation_merges_campaign_operations_second_counter(self):
         """
@@ -144,7 +149,9 @@ class TestVesselDayCounter(unittest.TestCase):
                 "d_end_wait_start": [dt0, dt0, dt0, dt2, dt3],
                 "d_end": [dt1, dt1, dt1, dt3, dt3],
                 "vessel_1": [None, 'v001', 'v001', 'v002', 'v001'],
+                "n_vessel_1": [None, 1, 1, 1, 1],
                 "vessel_2": [None, 'v003', 'v003', 'v003', 'v003'],
+                "n_vessel_2": [None, 1, 1, 1, 1],
                 "event": [
                     "failure"    ,                 # failure
                     "operation_deferred_merged",  # same campaign same vessel
@@ -165,12 +172,14 @@ class TestVesselDayCounter(unittest.TestCase):
         )
 
         self.counter.first_counter = False
-        out = self.counter.log_event_preparation(df.copy(), ST=False)
+        out = self.counter.log_event_preparation(df.copy(), ST_contract=False)
 
         # We expect:
         # - 1 merged campaign row for the 'operation_deferred_merged'
         # - 1 row for the normal 'operation'
         self.assertEqual(len(out), 3)
+        self.assertEqual(out["n_vessel_1"].tolist(), [2.0, 1.0, 1.0])
+        self.assertEqual(out["n_vessel_2"].tolist(), [2.0, 1.0, 1.0])
         self.assertEqual(out["event"].tolist().count("operation_deferred_merged"), 2)
         self.assertEqual(out["event"].tolist().count("operation"), 1)
 
@@ -237,8 +246,8 @@ class TestVesselDayCounter(unittest.TestCase):
                 "d_end_leadtime": [d_end_leadtime],
                 "d_end_stat_chart": [d_end_stat_chart],
                 "vessel_1": ["V1"],
-                "n_vessel_1": [2],             # used when ST=True
-                "n_vessel_1_effective": [2],   # used when ST=False
+                "n_vessel_1": [2],             # used when ST_contract=True
+                "n_vessel_1_effective": [2],   # used when ST_contract=False
                 "vessel_2": [np.nan],
                 "n_vessel_2": [0],
             }
@@ -262,10 +271,10 @@ class TestVesselDayCounter(unittest.TestCase):
         df_events = self._build_single_operation_df()
         self.counter.log_event_day = df_events.copy()
 
-        # No ST flag; only LT capacity is considered, and vessel usage is stored
+        # No ST_contract flag; only LT capacity is considered, and vessel usage is stored
         log_events_merged_out = self.counter.allocate_vessels(
             log_events_merged=df_events.copy(),
-            ST=False,
+            ST_contract=False,
         )
 
         # usage_records must reflect 2 vessels per day from 2025-01-02 to 2025-01-04
@@ -288,12 +297,12 @@ class TestVesselDayCounter(unittest.TestCase):
         # A vessel not present in the calendar returns 0
         self.assertEqual(self.counter.count_day_vessel("V_UNKNOWN"), 0)
 
-        # ST_contract is not touched when ST=False
+        # ST_contract is not touched when ST_contract=False
         self.assertNotIn("ST_contract_1", log_events_merged_out.columns)
 
     def test_allocate_vessels_marks_ST_contract_when_needed(self):
         """
-        When ST=True and LT capacity is exceeded, ST_contract_1 is set to True
+        When ST_contract=True and LT capacity is exceeded, ST_contract_1 is set to True
         on the corresponding row.
         """
         # Long-term contract: 1 vessel per month
@@ -311,7 +320,7 @@ class TestVesselDayCounter(unittest.TestCase):
 
         out = self.counter.allocate_vessels(
             log_events_merged=df_events,
-            ST=True,
+            ST_contract=True,
             contract_evaluation=True
         )
 

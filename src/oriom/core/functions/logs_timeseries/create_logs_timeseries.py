@@ -41,7 +41,9 @@ def create_logs_timeseries_file(
         vessels: list,
         find_element_class,
         vessel_to_merge: list=None,
-        mother_vessels_list: list = []
+        mother_vessels_list: list = [],
+        ST_operations_TTP_authorized: list = [],
+        metocean_timeseries_cut_off = None
 )->pd.DataFrame:
     """Based on the dates of the failures and the periodicity of the
     inspections a dataframe is created logging all the events. This is done using the timeseries analysis
@@ -76,8 +78,9 @@ def create_logs_timeseries_file(
         vessels (list): List of objectts :class:`Vessel`
         find_element_class (Find_element_class): Initialized instance that provides fast access to operations, vessels and failures via internal dictionaries.
         vessel_to_merge (:obj;`list`): list of vessel that are considered for the merge. Default to None
-        percentile (:obj:`float`, *optional*): Percentile value to calculate the statistic for inspection_port. Default to 0.9
-
+        mother_vessels_list (:obj:`float`, *optional*): List of mother vessels lists
+        ST_operations_TTP_authorized (list): List of ST O&M TTP operations that are analysed if ST O&M analysis.
+        metocean_timeseries_cut_off (int): Last index of the metocean timeseries to consider for the ST O&M analysis. Default to None
     Raises:
         ValueError: "preferred_months" in a inspection of periodicity lower than 1 year
             should be at least as many times as the occurences per year.
@@ -98,8 +101,11 @@ def create_logs_timeseries_file(
         end_month = inputs.stats.start_month["value"] - 1
 
     # NOTE: Avoid to consider event and failure on the last month for maintenance
-    CUTOFF_DATE = pd.to_datetime(f"{end_year}-{end_month}-{DICT_DAYS[end_month]} 23:59:59")
-
+    CUTOFF_DATE = (
+        pd.to_datetime(f"{end_year}-{end_month}-{DICT_DAYS[end_month]} 23:59:59")
+        if not getattr(inputs.tseries, "ST_O_M", False) else metocean_timeseries_cut_off
+    )
+    
     log_corrective = create_logs_events_corrective.create_logs_corrective_file(
         COLS = COLS,
         CUTOFF_DATE = CUTOFF_DATE,
@@ -108,6 +114,8 @@ def create_logs_timeseries_file(
         time_fail_op_immediately_original=time_fail_op_immediately,
         vessel_to_merge = vessel_to_merge,
         find_element_class = find_element_class,
+        ST = getattr(inputs.tseries, "ST_O_M", False),
+        ST_operations_TTP_authorized = ST_operations_TTP_authorized
     )
 
     log_preventive = create_logs_events_preventive.create_logs_preventive(

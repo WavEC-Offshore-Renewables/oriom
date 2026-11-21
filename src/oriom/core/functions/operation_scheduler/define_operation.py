@@ -213,6 +213,7 @@ def define_operation_values(
                     # This activity cannot start anymore.
                     # Get out from this while loop and
                     # test most restrictive activity next possible timstep.
+                    prev_solution_found = False
                     break
 
                 # This activity can occur in this interval

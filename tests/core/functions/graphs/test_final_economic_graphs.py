@@ -117,17 +117,16 @@ class TestFinalRunStatistics(unittest.TestCase):
             save_dir=self.save_dir,
         )
 
-        self.assert_plot_saved('lifetime_cost.png')
+        self.assert_plot_saved('lifetime costs.png')
 
     def test_lifetime_cost_custom_filename(self):
         lifetime_cost(
             df=self.df_lifetime,
             title='Yearly costs',
-            file_name='yearly_costs',
             save_dir=self.save_dir,
         )
 
-        self.assert_plot_saved('yearly_costs.png')
+        self.assert_plot_saved('yearly costs.png')
 
     def test_lifetime_cost_without_saving(self):
         with patch('matplotlib.pyplot.show') as mock_show:

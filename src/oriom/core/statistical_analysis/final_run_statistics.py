@@ -7,7 +7,6 @@ import numpy as np
 from copy import deepcopy
 
 from oriom.common.constants import PERCENTILE_DICT
-from oriom.utils import aux_functions
 from oriom.core.functions.graphs import final_economic_graphs
 from oriom.core.functions.graphs import report_graphs
 try:
@@ -67,6 +66,7 @@ def calculate_statistics(values, axis=None, ignore_nan=False):
         for stat, percentile in PERCENTILE_DICT.items()
     }
     
+    
 def prepare_statistics_sheets(wb): 
     sheets = {}
     for i, stat in enumerate(PERCENTILE_DICT):
@@ -76,11 +76,13 @@ def prepare_statistics_sheets(wb):
         
     return sheets
     
+    
 def append_df_to_sheet(ws, name, df):
     ws.append([name])
     for row in dataframe_to_rows(df, index=False, header=True):
         ws.append(row)
         ws.append([])
+
 
 def calculate_df_statistics(dfs):
     dfs = [df.astype(float) for df in dfs if not df.empty]
@@ -94,6 +96,86 @@ def calculate_df_statistics(dfs):
     }
 
 
+def create_costs_data(
+    lists_costs_tot: dict,
+    fuel_add: dict,
+    mobilisation_add: dict,
+    n_lifetime: int
+):
+    """Prepare data for lifetime costs"""
+    # Extrapolate all cost found in the simulations
+    lifetime_fixed_port_cost, lifetime_technician_cost , lifetime_vessels_cost, lifetime_rov_cost, lifetime_other_cost  = [], [], [], [], []
+    lifetime_repair_cost, lifetime_fixed_tech_cost,  lifetime_mobilisation_cost, lifetime_fixed_insurance_cost  = [], [], [], []
+    
+    for kpi_tot_sim in lists_costs_tot:
+        kpi_tot = kpi_tot_sim.iloc[-1]
+        kpi_tot_sim = kpi_tot_sim.iloc[:-1]
+        kpi_tot_sim['lifetime_direct_costs'] = kpi_tot_sim['lifetime_direct_costs'].astype(float)
+        fuel_to_add = sum(fuel_add.values())
+        mobilisation_to_add = sum(mobilisation_add.values())
+        port_fixed = kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'port', 'lifetime_direct_costs'].values[0]
+        tech_fixed = kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'technician', 'lifetime_direct_costs'].values[0]
+        insur_fixed = kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'insurance', 'lifetime_direct_costs'].values[0]
+        
+        lifetime_fixed_insurance_cost.append(insur_fixed)
+        lifetime_fixed_port_cost.append(port_fixed)
+        lifetime_fixed_tech_cost.append(tech_fixed)
+        lifetime_technician_cost.append(kpi_tot['tot_technicians_costs'])
+        lifetime_vessels_cost.append(kpi_tot['tot_vessel_costs'] + n_lifetime * fuel_to_add)
+        lifetime_mobilisation_cost.append(kpi_tot['tot_mobilization_costs'] + n_lifetime * mobilisation_to_add)
+        lifetime_rov_cost.append(kpi_tot['tot_rov_costs'])
+        lifetime_repair_cost.append(kpi_tot['tot_part_costs'])
+        lifetime_other_cost.append(kpi_tot['tot_other_costs'] - (tech_fixed + port_fixed + insur_fixed))
+
+    return {
+            'lifetime_vessels_cost €': lifetime_vessels_cost,
+            'lifetime_mobilisation_cost €': lifetime_mobilisation_cost,
+            'lifetime_rov_cost €': lifetime_rov_cost,
+            'lifetime_technician_cost €': lifetime_technician_cost,
+            'lifetime_repair_cost €': lifetime_repair_cost,
+            'lifetime_other_cost €': lifetime_other_cost,
+            'lifetime_fixed_port_cost €': lifetime_fixed_port_cost,
+            'lifetime_fixed_tech_cost €': lifetime_fixed_tech_cost,
+            'lifetime_fixed_insurance_cost €': lifetime_fixed_insurance_cost,
+        }
+
+
+def create_vessel_cost(
+    percentile_arrays: dict,
+    fuel_add: dict,
+    mobilisation_add: dict,
+    all_index: pd.Index,
+    all_columns: pd.Index
+):
+    """ Retrive data costs for Vessels operations"""
+    df_cost_yearly_dict = {}
+
+    for stat, values in percentile_arrays.items():
+        df = pd.DataFrame(values, index=all_index, columns=all_columns)
+        df = df.reset_index().rename(columns={"index": "vessel_id"})
+
+        # Add fuel and mobilisation costs to direct costs
+        years = sorted(set(col[0] for col in df.columns if isinstance(col, tuple) and col[1] == 'direct_costs'))
+
+        for ves, addition in fuel_add.items():
+            for year in years:
+                col_key = (year, 'direct_costs')
+                if col_key in df.columns:
+                    mask = df['vessel_id'] == ves
+                    df.loc[mask, col_key] += addition
+
+        for ves, addition in mobilisation_add.items():
+            for year in years:
+                col_key = (year, 'direct_costs')
+                if col_key in df.columns:
+                    mask = df['vessel_id'] == ves
+                    df.loc[mask, col_key] += addition
+
+        df_cost_yearly_dict[stat] = df
+        
+    return df_cost_yearly_dict
+    
+    
 def return_statistics_runs(
         n_lifetime: int,
         find_element_class: dict,
@@ -125,7 +207,6 @@ def return_statistics_runs(
         operations_total (list): List of object for all the classes `Operations`
         save_dir (str, optional): directory to averaged results. Defaults to None.
     """
-
 
     def restructure_df_year(kpi_om_year_final: pd.DataFrame) -> pd.DataFrame:
         """
@@ -168,41 +249,16 @@ def return_statistics_runs(
     
     # Lifetime costs
     #--------------------
-    lifetime_fixed_port_cost, lifetime_technician_cost , lifetime_vessels_cost, lifetime_rov_cost, lifetime_other_cost  = [], [], [], [], []
-    lifetime_repair_cost, lifetime_fixed_tech_cost,  lifetime_mobilisation_cost, lifetime_fixed_insurance_cost  = [], [], [], []
     final_cost, final_energy = {}, {}
 
-    # Extrapolate all cost found in the simulations
-    for kpi_tot_sim in results_dict.dfs_tot_cost_list:
-        kpi_tot = kpi_tot_sim.iloc[-1]
-        kpi_tot_sim = kpi_tot_sim.iloc[:-1]
-        kpi_tot_sim['lifetime_direct_costs'] = kpi_tot_sim['lifetime_direct_costs'].astype(float)
-        fuel_to_add = sum(fuel_add.values())
-        mobilisation_to_add = sum(mobilisation_add.values())
-
-        lifetime_fixed_insurance_cost.append(kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'insurance', 'lifetime_direct_costs'].values[0])
-        lifetime_fixed_port_cost.append(kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'port', 'lifetime_direct_costs'].values[0])
-        lifetime_fixed_tech_cost.append(kpi_tot_sim.loc[kpi_tot_sim['vessel_id'] == 'technician', 'lifetime_direct_costs'].values[0])
-        lifetime_technician_cost.append(kpi_tot['tot_technicians_costs'])
-        lifetime_vessels_cost.append(kpi_tot['tot_vessel_costs'] + n_lifetime * fuel_to_add)
-        lifetime_mobilisation_cost.append(kpi_tot['tot_mobilization_costs'] + n_lifetime * mobilisation_to_add)
-        lifetime_rov_cost.append(kpi_tot['tot_rov_costs'])
-        lifetime_repair_cost.append(kpi_tot['tot_part_costs'])
-        lifetime_other_cost.append(kpi_tot['tot_other_costs'])
-
-    # Create a dataframe with P10, avg and P90 costs
-    costs = {
-        'lifetime_vessels_cost €': lifetime_vessels_cost,
-        'lifetime_mobilisation_cost €': lifetime_mobilisation_cost,
-        'lifetime_rov_cost €': lifetime_rov_cost,
-        'lifetime_technician_cost €': lifetime_technician_cost,
-        'lifetime_repair_cost €': lifetime_repair_cost,
-        'lifetime_other_cost €': lifetime_other_cost,
-        'lifetime_fixed_port_cost €': lifetime_fixed_port_cost,
-        'lifetime_fixed_tech_cost €': lifetime_fixed_tech_cost,
-        'lifetime_fixed_insurance_cost €': lifetime_fixed_insurance_cost,
-    }
+    costs = create_costs_data(
+        lists_costs_tot = results_dict.dfs_tot_cost_list,
+        fuel_add = fuel_add,
+        mobilisation_add = mobilisation_add,
+        n_lifetime = n_lifetime
+    )
     
+    # Create a dataframe with P10, avg and P90 costs
     dict_cost = {name: calculate_statistics(values) for name, values in costs.items()}
     df_cost = pd.DataFrame.from_dict(dict_cost, orient='index').rename_axis('cost_type').reset_index()
     df_cost_yearly = deepcopy(df_cost)
@@ -213,8 +269,8 @@ def return_statistics_runs(
         df_cost_yearly[aggregation] /= n_lifetime
         
     # Create graphs
-    final_economic_graphs.lifetime_cost(df = df_cost, title = 'Lifetime costs', save_dir = save_dir, file_name='lifetime cost')
-    final_economic_graphs.lifetime_cost(df = df_cost_yearly, title = 'Yearly costs', save_dir = save_dir, file_name='yearly cost')
+    final_economic_graphs.lifetime_cost(df = df_cost, title = 'Lifetime costs', save_dir = save_dir)
+    final_economic_graphs.lifetime_cost(df = df_cost_yearly, title = 'Yearly costs', save_dir = save_dir)
 
     # Add a single total row after calculating all statistics
     df_cost.loc[len(df_cost)] = {'cost_type': 'lifetime_direct_cost',
@@ -225,7 +281,7 @@ def return_statistics_runs(
     for row in dataframe_to_rows(df_cost, index=False, header=True):
         ws2.append(row)
         
-    # Yearly costs
+    # Yearly vessel costs
     #--------------------
     # If read from excel file need to create multiindex
     if recycled:
@@ -236,30 +292,13 @@ def return_statistics_runs(
     # Evaluate the average, P10 and P90 for each cell
     percentile_arrays = calculate_statistics(array_stack, axis=0, ignore_nan=True)
     # Reconstruct one DataFrame for each statistic
-    df_cost_yearly_dict = {}
-
-    for stat, values in percentile_arrays.items():
-        df = pd.DataFrame(values, index=all_index, columns=all_columns)
-        df = df.reset_index().rename(columns={"index": "vessel_id"})
-
-        # Add fuel and mobilisation costs to direct costs
-        years = sorted(set(col[0] for col in df.columns if isinstance(col, tuple) and col[1] == 'direct_costs'))
-
-        for ves, addition in fuel_add.items():
-            for year in years:
-                col_key = (year, 'direct_costs')
-                if col_key in df.columns:
-                    mask = df['vessel_id'] == ves
-                    df.loc[mask, col_key] += addition
-
-        for ves, addition in mobilisation_add.items():
-            for year in years:
-                col_key = (year, 'direct_costs')
-                if col_key in df.columns:
-                    mask = df['vessel_id'] == ves
-                    df.loc[mask, col_key] += addition
-
-        df_cost_yearly_dict[stat] = df
+    df_cost_yearly_dict = create_vessel_cost(
+        percentile_arrays = percentile_arrays,
+        fuel_add = fuel_add,
+        mobilisation_add = mobilisation_add,
+        all_index = all_index,
+        all_columns = all_columns
+    )
 
     # Export all three statistics to separate Excel sheets
     for stat, df in df_cost_yearly_dict.items():
@@ -267,7 +306,12 @@ def return_statistics_runs(
         for row in dataframe_to_rows(df, index=False, header=True):
             ws_Y_cost.append(row)
 
-    final_economic_graphs.yearly_vessel_cost(df = df_cost_yearly_dict['AVG'], title = 'Yearly costs', find_element_class = find_element_class, save_dir = save_dir)
+    final_economic_graphs.yearly_vessel_cost(
+        df = df_cost_yearly_dict['AVG'],
+        title = 'Yearly costs',
+        find_element_class = find_element_class,
+        save_dir = save_dir
+    )
 
     # Average cost ctv
     #--------------------

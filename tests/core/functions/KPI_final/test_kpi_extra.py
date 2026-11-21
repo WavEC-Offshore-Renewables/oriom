@@ -80,7 +80,7 @@ class FakeVesselDayCounter:
         return self.log_events_merged.copy()
 
     def count_day_vessel(self, vessel_id):
-        # Make ST days depend on trial long-term contract (n_ves_annual_contract).
+        # Make ST_contract days depend on trial long-term contract (n_ves_annual_contract).
         # This lets us verify the branch changes the result across strategies.
         trial_contract = getattr(self.vessels, "n_ves_annual_contract", 0)
         return 10 + int(trial_contract)

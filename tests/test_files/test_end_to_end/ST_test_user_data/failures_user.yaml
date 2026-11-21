@@ -1,0 +1,40 @@
+- id: ofw_fail_1
+  name: Failure 1
+  n_element: 1
+  fail_rate: 0.3
+  maintenance_strategy: Specific month
+  level_failure: device
+  operation_triggered: ofw_OP001
+  preferred_month: 7
+  preferred_day: 3
+  lead_time: 0
+  bath_tub: false
+  potential_shutdown: false
+  perc_shutdown: 100
+  parts_cost: 1200
+
+- id: ofw_fail_2
+  name: Failure 2
+  n_element: 1
+  fail_rate: 0.127
+  maintenance_strategy: Immediately
+  level_failure: device
+  operation_triggered: ofw_OP001
+  lead_time: 0
+  bath_tub: false
+  potential_shutdown: false
+  perc_shutdown: 100
+  parts_cost: 1200
+
+- id: ofw_fail_4
+  name: Failure 4
+  number_of_element_farm: 1
+  probability_failure: 0.1
+  maintenance_strategy: Immediately
+  level_failure: device
+  op_trigger: ofw_OP003
+  lead_time: 168
+  bath_tub: false
+  potential_shutdown: true
+  perc_shutdown: 100
+  parts_cost: 10000

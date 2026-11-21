@@ -24,13 +24,10 @@ from oriom.core.builders.systems_builder import system_builder
 from oriom.core.statistical_analysis.statisticals_duration_manager import statistical_duration_manager
 from oriom.core.statistical_analysis.power_stats import average_pwind, average_pwave
 from oriom.core.statistical_analysis.final_run_statistics import return_statistics_runs
+from oriom.core.statistical_analysis.final_run_statistics_ST import return_statistics_runs_ST
 from oriom.core.results_block_manager import results_block
+from oriom.export.st_package import export_st_package
 from oriom import test
-
-print()
-test.test()
-time.sleep(1)
-print()
 
 
 try:
@@ -52,20 +49,20 @@ logging.basicConfig(
 ### Parameters hard coded to define ###
 DEFAULT_CONFIG = ConfigRun(
     STATISTICAL_CHART=True,
-    DIFF_DISTANCE=False,
+    DIFF_DISTANCE=True,
     DIFF_KM_DISTANCE=5,
     KM_MOTHER_VESSEL=5,
-    VESSEL_DIST_REDUCED_LIST=["ctv","sv"],
+    VESSEL_DIST_REDUCED_LIST=["sov"],
     FUEL_TO_ADD = {},
     MOBILISATION_TO_ADD={},
     ENERGY_AVAILABILITY_CALCULATION=True,
     ENERGY_STATISTICAL_CALCULATION=False,
-    PROJECT_NAME="C0_S11_Radial_QCDP_Ricci",
+    PROJECT_NAME="form_v6_WTG_BARD_ONE",
     BASEFILES_FROM_EXCEL=False,
-    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Equipa WavEC - PS CT QCDP\01 Working Documents\WP4 - Cost Assessment\Run cases\Forms\Riccardo",
+    EXCEL_FILE_PATH=r"C:\Users\RiccardoMeda\WavEC Offshore Renewables\Equipa WavEC - T4.5\Files\FORM COMPONENT FILES",
     SOURCE_PATH_SHAREPOINT="",
-    FORM_NAME="C0_S11_Radial_QCDP_Ricci.xlsx",
-    TIME_FAIL_OP_IMMEDIATELY=30*24,
+    FORM_NAME="form_v6_WTG_BARD_ONE.xlsx",
+    TIME_FAIL_OP_IMMEDIATELY=24,
     ST = False,
     DIRS_OVERWRITE_PATH = r''
 )
@@ -77,6 +74,8 @@ DEFAULT_CONFIG = ConfigRun(
 
 def run(config: ConfigRun | None = None):
     """Run a full simulation and return the created ProjectDirs."""
+    ST_user_class = None
+    
     Config = config or DEFAULT_CONFIG
 
     print(Config.FORM_NAME)
@@ -167,7 +166,7 @@ def run(config: ConfigRun | None = None):
     )
 
 
-    logging.info('--------------------\FAILURES\t--------------------')
+    logging.info('--------------------\tFAILURES\t--------------------')
     # Define failure events
     failures = Failure.get_failures_from_yaml(file_path = files.failures_file)
 
@@ -195,7 +194,8 @@ def run(config: ConfigRun | None = None):
         dirs = dirs,
         failures = failures,
         farm_technologies = farm_technologies,
-        G_layouts = G_layouts
+        G_layouts = G_layouts,
+        ST = getattr(Config, 'ST', False)
     )
 
     # Create list of vessels and mother_vessels
@@ -203,14 +203,14 @@ def run(config: ConfigRun | None = None):
 
     logging.info('--------------------\tINPUTS - USER DEFINITION\t--------------------')
     if user_inputs and getattr(Config, 'DIRS_OVERWRITE_PATH', False):
-        failures, operations, vessels = user_inputs.user_input_overwrite.run_overwrite(
+        failures, operations, vessels, ST_user_class = user_inputs.user_input_overwrite.run_overwrite(
+            Config = Config,
             inputs=inputs, 
             dirs=dirs, 
             failures=failures, 
             operations=operations,
             vessels = vessels,
             files_paths = dirs.overwrite_files_path,
-            ST = getattr(Config, 'ST', False)
         )
 
     mother_vessels = [v for v in vessels if v.mother_vessel]
@@ -287,7 +287,8 @@ def run(config: ConfigRun | None = None):
     logging.info('---------------------------------------------------------------')
 
     results_container = Results()
-    for r in range(inputs.general.number_runs["value"]):
+    iterations = inputs.general.number_runs["value"] if not inputs.tseries.ST_O_M else len(metocean_dict['metocean'].df_timeseries)
+    for r in range(iterations):
         logging.info('Simulating run number: %d \n This process might take a while', r)
         result_dir_r = os.path.join(dirs.result_dir,f"{'result_'}{r}")
         logging.info('Creating folder results: ' + f"{'result_'}{r}")
@@ -313,7 +314,8 @@ def run(config: ConfigRun | None = None):
             G_layouts = G_layouts,
             dict_power_wind = dict_power_wind,
             dict_power_wave = dict_power_wave,
-            metocean_timeseries = metocean_dict['metocean'].df_timeseries
+            metocean_timeseries = metocean_dict['metocean'].df_timeseries,
+            ST_operations_TTP_authorized = ST_user_class.op_authorized_ST_TTP if ST_user_class else []
         )
 
         end = time.time()
@@ -326,33 +328,37 @@ def run(config: ConfigRun | None = None):
 
     if not os.path.exists(dirs.result_dir_avg):
         os.makedirs(dirs.result_dir_avg)
-
-    return_statistics_runs(
-        n_lifetime = inputs.stats.lifetime["value"],
-        find_element_class = find_element,
-        results_dict = results_container,
-        fuel_add = Config.FUEL_TO_ADD,
-        mobilisation_add = Config.MOBILISATION_TO_ADD,
-        electricity_cost_dict = inputs.cost.electricity_price_dict,
-        n_runs = inputs.general.number_runs["value"],
-        vessels = vessels,
-        operations_total = operations['total_operations'],
-        save_dir = dirs.result_dir_avg
-    )
-
-    logging.info('--------------------\tEND OF THE SIMULATION\t--------------------')
-
     if not Config.ST:
-        export_path = os.path.join(os.getcwd(), 'export_pack')
-        os.makedirs(export_path, exist_ok=True)
-        from oriom.export.st_package import export_st_package
-        export_st_package(
-            package_dir=export_path,
-            operations_stats = operations_stats,
-            overwrite = True
+        return_statistics_runs(
+            n_lifetime = inputs.stats.lifetime["value"],
+            find_element_class = find_element,
+            results_dict = results_container,
+            fuel_add = Config.FUEL_TO_ADD,
+            mobilisation_add = Config.MOBILISATION_TO_ADD,
+            electricity_cost_dict = inputs.cost.electricity_price_dict,
+            n_runs = iterations,
+            vessels = vessels,
+            operations_total = operations['total_operations'],
+            save_dir = dirs.result_dir_avg
         )
-
+        if not Config.ST:
+            export_path = os.path.join(os.getcwd(), 'export_pack')
+            os.makedirs(export_path, exist_ok=True)
+            export_st_package(package_dir=export_path, operations_stats = operations_stats, overwrite = True)
+    else:
+        return_statistics_runs_ST(
+            results_dict = results_container,
+            n_runs = iterations,
+            metocean_df = metocean_dict['metocean'].df_timeseries,
+            dir_result = dirs.result_dir,
+            save_dir = dirs.result_dir_avg
+        )
+        
     return dirs
 
 if __name__ == "__main__":
+    print()
+    test.test()
+    time.sleep(1)
+    print()
     run()

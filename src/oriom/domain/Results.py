@@ -4,6 +4,8 @@ class Results:
     def __init__(self):
         self.dfs_failures = {}
         self.operation_vessel_percentiles_dict = {}
+        self.dfs_energy_yearly_dict, self.dfs_energy_yearly_month_dict = {}, {}
+        self.dfs_energy_data = []
         self.dfs_tot_cost_list = []
         self.dfs_tot_yearly_cost_list = []
         self.dfs_ctv_list = []
@@ -12,14 +14,6 @@ class Results:
         self.kpi_om_type_cost_list = []
         self.dfs_vessel_fuel_usage = []
 
-        self.dfs_energy_yearly_dict = {
-            "Availability_year_wind": [],
-            "Availability_year_wave": [],
-            "Availability_year_pv": []
-        }
-
-        self.dfs_energy_yearly_month_dict = {
-            "Availability_month_wind": [],
-            "Availability_month_wave": [],
-            "Availability_month_pv": []
-        }
+        for tech in ["wind", "wave", "pv"]:
+            self.dfs_energy_yearly_dict[f"Availability_year_{tech}"] = []
+            self.dfs_energy_yearly_month_dict[f"Availability_month_{tech}"] = []

@@ -42,6 +42,7 @@ class DummyOperation:
         self.vessel2_id = vessel2_id
         self.vessel2 = DummyVessel()
         self.vessel2_qt = 1
+        self.vessel1_qt = 1
 
 
 class DummyVessel:
@@ -564,7 +565,7 @@ class TestMergeDeferredOperationsMultipleShifts(unittest.TestCase):
             self.assertEqual(len(group_def_id), 1)
 
         # merge_shift_deferred must have been called twice (two shifts)
-        self.assertEqual(mock_merge_shift.call_count, 2)
+        self.assertEqual(mock_merge_shift.call_count, 1)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

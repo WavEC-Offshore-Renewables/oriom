@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import math as mt
 
-from oriom.utils.aux_functions import safe_copy_df
+from oriom.utils.aux_functions import safe_copy_df, log_event_convert_stringtime
 
 from oriom.core.functions.vessels_manager.VesselDayCount import VesselDayCounter
 from oriom.core.functions.kpi_final import kpi_aux
@@ -131,6 +131,7 @@ def kpi_cost_vessel_internal(
 
     # Cost for port operation with no vessel defined
     if not log_events_op_port.empty:
+        log_events_op_port = log_event_convert_stringtime(log_events_op_port)
         n_oper_at_port = len(log_events_op_port)
 
         # Tech and ROV costs

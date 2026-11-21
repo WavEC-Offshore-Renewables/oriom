@@ -425,6 +425,7 @@ def energy_availability(
             dict_power_tech: dict,
             n_device_tech: int,
             descr: str,
+            electricity_price: float,
             degradation_rate: float=None
         ):
 
@@ -437,6 +438,7 @@ def energy_availability(
             dict_power_tech (dict): Dictionary of power production of the technology by months
             n_device_tech (int): Number of devices present for the tech
             descr (str): Description of the technology under analysis ('wind', 'wave', 'pv')
+            electricity_price (float): Electricity price in €/MWh. 
             degradation_rate (float): degradation_rate of the pv modules. Default as None
 
         Returns:
@@ -453,6 +455,9 @@ def energy_availability(
                 tech = descr,
                 degradation_rate=degradation_rate
             )
+            availability_tech_m['energy_loss_Meur'] = availability_tech_m['En_loss_kWh']*electricity_price / 1e9
+            availability_tech_y['energy_loss_Meur'] = availability_tech_y['En_loss_kWh']*electricity_price / 1e9
+            
         else:
             availability_tech_m = pd.DataFrame()
             availability_tech_y = pd.DataFrame()
@@ -534,14 +539,19 @@ def energy_availability(
     availability_wind_m, availability_wind_y = create_monthly_yearly_availability(
         energy_data['preventive']['wind'], 
         energy_data['corrective']['wind'],
-        dict_power_wind, n_device_wtg,
-        'wind', degradation_rate=None
+        dict_power_wind,
+        n_device_wtg,
+        'wind',
+        electricity_price=inputs.cost.electricity_price_dict['wt'],
+        degradation_rate=None
     )
     availability_wave_m, availability_wave_y = create_monthly_yearly_availability(
         energy_data['preventive']['wave'],
         energy_data['corrective']['wave'],
-        dict_power_wave, n_device_wec,
+        dict_power_wave, 
+        n_device_wec,
         'wave',
+        electricity_price=inputs.cost.electricity_price_dict['wec'],
         degradation_rate=None
     )
     availability_pv_m, availability_pv_y = create_monthly_yearly_availability(
@@ -550,6 +560,7 @@ def energy_availability(
         dict_power_pv,
         n_device_pv,
         'PV',
+        electricity_price=inputs.cost.electricity_price_dict['pv'],
         degradation_rate=degradation_rate
     )
 
@@ -562,7 +573,7 @@ def energy_availability(
         'Availability_year_pv' : availability_pv_y
     }
 
-    return compressed_output
+    return compressed_output, energy_data
 
 
 if __name__ == '__main__':

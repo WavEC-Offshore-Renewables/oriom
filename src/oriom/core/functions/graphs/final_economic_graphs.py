@@ -62,8 +62,7 @@ def plot_ctv_annual_chart_strategy(df_ctv: pd.DataFrame, title: str = '', save_d
 def lifetime_cost(
         df: pd.DataFrame,
         title: str,
-        file_name: str = 'lifetime_cost',
-        save_dir: str = None
+        save_dir: str = None,
     ):
     """Plot lifetime costs as horizontal AVG bars with P10-P90 error bars."""
 
@@ -123,7 +122,7 @@ def lifetime_cost(
     plt.tight_layout()
 
     if save_dir:
-        plt.savefig(os.path.join(save_dir, f'{file_name}.png'),dpi=300,bbox_inches='tight')
+        plt.savefig(os.path.join(save_dir, f'{title.lower()}.png'),dpi=300,bbox_inches='tight')
     else:
         plt.show()
 
