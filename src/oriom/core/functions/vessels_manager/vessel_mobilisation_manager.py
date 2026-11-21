@@ -152,7 +152,7 @@ def reduce_redundant_mobilisations_inspection(
 def mobilitate_second_vessel(log_events_merged: pd.DataFrame, find_element_class: object, operations_tow: dict):
     
     """
-    Mobilitate the second vessel of the opeartion if the refered vessel_1 have been mobilitated 
+    Mobilitate the second vessel of the operation if the refered vessel_1 have been mobilitated 
 
     Args:
         log_events_merged (pd.DataFrame): dataframe of all log_events_merged,
@@ -182,11 +182,15 @@ def mobilitate_second_vessel(log_events_merged: pd.DataFrame, find_element_class
     log_mobilisation = log_events_merged[log_events_merged["event"].isin(["mobilisation", "mobilisation_merged"])]
 
     for _, row in log_mobilisation.iterrows():
-        oper = find_element_class.find_operation(
-            row["comments"][0] 
-            if not isinstance(row["comments"], str)
-            else ast.literal_eval(row["comments"])[0]
-        )
+        if isinstance(row["comments"], str):
+            operation_name = ast.literal_eval(row["comments"])[0]
+        elif isinstance(row["comments"][0], tuple):
+            operation_name = row["comments"][0][1]
+        else:
+            operation_name = row["comments"][0]
+            
+        oper = find_element_class.find_operation(operation_name)
+        
         if isinstance(oper, str):
             raise NameError(oper)
         
