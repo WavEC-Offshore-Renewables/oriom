@@ -147,8 +147,8 @@ def define_activities(
             pv_shutdown_dur = 0
 
             if tow_op and all([
-                    'transit' in act["name"].lower(),
-                    'next' in act["name"].lower()
+                'transit' in act["name"].lower(),
+                'next' in act["name"].lower()
             ]) is True:
                 # This is a transit between devices activity
                 duration = transit_between_devices

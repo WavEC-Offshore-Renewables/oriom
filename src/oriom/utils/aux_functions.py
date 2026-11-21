@@ -5,6 +5,7 @@ import logging
 import pandas as pd
 import shutil
 from copy import deepcopy
+import re
 
 from oriom.common.constants import FORMATS_DATETIME
 
@@ -90,8 +91,11 @@ def convert_stringtime(
             return df
         except ValueError as _e:
             if i == len(FORMATS_DATETIME):
-                logging.error(f'LogDates: {_e} for {df}')
-                raise ValueError(f'LogDates: {_e} for {df}')
+                match = re.search(r'at position (\d+)', str(_e))
+                if match:
+                    position_error = int(match.group(1))
+                logging.error(f'LogDates: {_e} \n error {df.iloc[position_error]} \n for df {df}')
+                raise ValueError(f'LogDates: {_e} \n error {df.iloc[position_error]} \n for df {df}')
             continue
     return df
 

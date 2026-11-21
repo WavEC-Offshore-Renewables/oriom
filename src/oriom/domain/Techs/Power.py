@@ -187,7 +187,7 @@ class Matrix():
 
         Args:
             file_ (str): The path to the CSV file containing the power matrix data.
-            rated (float): The rated power value.
+            rated (float): The rated power value in KW.
         Raises:
             ValueError: If the rated power is negative.
             FileNotFoundError: If the specified file does not exist.
