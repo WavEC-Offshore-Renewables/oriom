@@ -24,10 +24,20 @@ def plot_ctv_annual_chart_strategy(df_ctv: pd.DataFrame, title: str = '', save_d
             ax.plot(df_avg['n_vessel'], df_avg[col] / (1e6 * 30), marker=marker, linestyle='-', color=color, label=f'{label} AVG')
 
         # P10-P90 data
-        for perc in ('P10', 'P90'):
-            if perc in df_ctv:
-                df_perc = df_ctv[perc]
-                ax.plot(df_perc['n_vessel'], df_perc[col] / (1e6 * 30), linestyle='--', color=color, alpha=0.35, label='_nolegend_')
+        if 'P10' in df_ctv and 'P90' in df_ctv:
+            df_p10 = df_ctv['P10']
+            df_p90 = df_ctv['P90']
+
+            x = df_p10['n_vessel']
+            y_p10 = df_p10[col] / (1e6 * 30)
+            y_p90 = df_p90[col] / (1e6 * 30)
+
+            # Fill between P10 and P90
+            ax.fill_between(x, y_p10, y_p90, color=color, alpha=0.15)
+
+            # P10 and P90 boundaries
+            ax.plot(x, y_p10, linestyle='--', color=color, alpha=0.35)
+            ax.plot(x, y_p90, linestyle='--', color=color, alpha=0.35)
 
         # Single combined legend entry for P10-P90
         if 'P10' in df_ctv or 'P90' in df_ctv:
@@ -38,6 +48,7 @@ def plot_ctv_annual_chart_strategy(df_ctv: pd.DataFrame, title: str = '', save_d
     ax.set_title(f'{title} Yearly CTV cost - Long Term Chart Strategy')
     ax.grid(True, linestyle='--', alpha=0.6)
     ax.legend()
+    ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
     fig.tight_layout()
 
     if save_dir:

@@ -290,7 +290,7 @@ def return_statistics_runs(
 
             if sheet_prefix == "CTV_yearly_strategy":
                 df_stat.insert(0, 'n_vessel', range(len(df_stat)))
-                df_stat_dict_CTV[percentile] = df_stat
+                df_stat_dict_CTV[stat] = df_stat
 
             ws_V_guel = wb_V_fuel.create_sheet(title=f"{sheet_prefix}_{stat}")
             for row in dataframe_to_rows(df_stat, index=False, header=True):
