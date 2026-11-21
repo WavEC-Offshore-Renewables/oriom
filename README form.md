@@ -308,12 +308,71 @@ If private functions are not found it will not be possible:
 
 ## LAYOUT
 
-Create documentation to check which layout are availables
+Create documentation and navigate Layout of technology to check visually which layout are availables
 
 - **Layout_string_disconnection**:
 Does not allow for electrical continuity on the array if a device is TOWED. If set to True, a tow device do disconnect all the consecutive devices.
 
 
+## TECHNOLOGIES POWER CURVE/MATRIX
+
+The files for power matrix or power curve **must** be in csv format
+
+- **WIND POWER CURVE**: The column name required must be | "``speed_[unit]``" | "``power_[unit]``" |
+
+    The unit allowed are:
+
+    - speed_units = ["``_m/s``", "``_km/h``", "``_kn``", "``_knots``"]
+        
+    - power_unit = ["``_w``", "``_kw``", "``_mw``"]
+
+    Example
+            
+        speed_[m/s]	    power_[kW]
+        3.00	            296.29638
+        3.50	            507.9369744
+        3.98	            761.9020708
+        4.51	            1100.529734
+        4.99	            1566.137686
+        5.49	            2095.235781
+        .....               .....
+            
+
+- **WAVE POWER MATRIX**: The file must be a teble. The first cell must be "``Hs\Tp``". Column name must be expressed as tuple range (a,b)
+
+    The unit allowed are:
+    - wave_hs_units = ["``m``"]
+    - wave_tp_units = ["``s``"]
+    - power_unit = ["``kw``"]
+
+    Example
+
+        Hs\Tp	    (4,5)   (5,6)	(6,7)   .....
+        (0,0.5)	    0	    0	    0   .....
+        (0.5,1)	    0	    0	    8   .....
+        (1,1.5)	    0	    13	    17  .....
+        .....       .....   .....   .....   .....
+            
+- **PV POWER**: The file must be a teble. The first cell must be "``hours``". Column name must be "``Month_X``" where X is the month number. The power matrix must be the averaged hourly power production in "``W``" for each month for a single PV module.
+
+    The unit allowed are:
+    - time_units = ["``h``"]
+    - Period_unit = ["``M``"]
+    - power_unit = ["``W``"]
+
+    Example
+    
+        hour	Month_1	Month_2	Month_3	Month_4	Month_5  .....
+        0	    0	    0	    0	    0	    0   .....
+        1	    0	    0	    0	    0	    0   .....
+        2	    0	    0	    0	    0	    0   .....
+        3	    0	    0	    0	    0	    0   .....
+        4	    0	    0	    0	    0	    1.68    .....
+        5	    0	    0	    0	    2.43	19.67   .....
+        6	    0	    0	    1.23	30.55	68.62   .....
+        7	    0	    0.30	20.95	96.96	146.94  .....
+        8	    0.33	13.31	75.38	178.52	224.86  .....
+        .....   .....   .....   .....   .....   .....   .....
 ## VESSEL
 
 - **Charter**: put values equal to zero only if you only have long term vessel. No short term vessel will be rented, ideal for inspections or deferred maintenace that do use a vessel only if previous shift is completed. Usually consider both (long_term and short term) so fill both short and long term charts.
@@ -603,18 +662,15 @@ Check the layout level of nodes and edges to know which failures and at which le
 ## ACTIVITIES
 Activities are the step that must be conducted to complete a ``Major Operation`` and will be aggregated to the corrispondent operation.
 
-
-
 More detailed are the activities and better it is, more activities are defined and longer will take ORIOM to schedule the operation. 
 
 Add more activities as refined as possible for long operations. 
 
-
-
-
 - The tech_shutdown_dur (wtg_shutdown_dur	wec_shutdown_dur	pv_shutdown_dur) must be a boolean
 
-- When considering a transit activity ``location`` must be ``"transit"``. If want to overwrite transit duration with a pre-defined vaue insert the values in ``duration``. Otherwise the duration will be evaluated by the distance to port and the vessel speed considered
+- When considering a transit activity ``location`` must be ``"transit"`` and the word ``"transit"`` must be present in the activity ``name``. 
+    
+    If want to overwrite transit duration with a pre-defined vaue insert the values in ``duration``. Otherwise the duration will be evaluated by the distance to port and the vessel speed considered
 
 - If towing operation:
     - To consider transit with towing speed, ``location`` must be ``"transit"`` and the word ``"tow"`` must be present in the activity ``name``

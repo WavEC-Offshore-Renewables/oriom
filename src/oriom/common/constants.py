@@ -68,7 +68,6 @@ FORMATS_DATETIME = [
 
 METOCEAN_COLUMNS = ['datetime', 'hs', 'tp', 'te', 'ws', 'ws_hub', 'cs', 'si', 'light']
 
-
 EVENT_LOG_ORDER = {
     "failure": 0,
     "mobilisation": 1,
