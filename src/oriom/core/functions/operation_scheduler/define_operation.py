@@ -216,7 +216,7 @@ def define_operation_values(
                     break
 
                 # This activity can occur in this interval
-                if prev_act_idx == 0 or (time_curr - MAX_WAIT) < 0:
+                if prev_act_idx == 0:
                     prev_solution_found = True
                 # When?
                 act_ts_all = act_startability[act_startability == True].index
